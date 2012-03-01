@@ -1,0 +1,172 @@
+\SweaveOpts{prefix.string=gen/fig, eps=FALSE, keep.source=TRUE}
+\documentclass[man]{apa}
+%\usepackage[margin=1in]{geometry}
+\usepackage{url}
+
+\title{Thoughtless awareness: Folk familiarity and context}
+\author{Joshua N.\ Pritikin}
+\affiliation{University of Virginia}
+
+\abstract{Thoughtless awareness has a rich history.}
+
+\acknowledgements{Comments may be sent to the author at jpritikin@virginia.edu.}
+
+\shorttitle{THOUGHTLESS AWARENESS}
+
+\begin{document}
+\maketitle                            
+
+Researchers have struggled with the lack of agreement on a specific
+definition of meditation (\citeNP[p.~1]{ospina2007};
+\citeNP[pp.~601--602]{shapiro2009}).
+Meditation generally requires a quiet location.
+A comfortable posture is recommended.
+The practice generally has something to do with
+controlling the attention and being non-judgmental \cite{cdc2009}.
+One problem with this general definition is
+that it does make much distinction between meditation
+and relaxation \cite{holmes1984}.
+That is not to say that relaxation, or some standardized version of it,
+does not offer benefits; it does \cite{benson1974}.
+However, the historical context of meditation suggests that meditation
+was originally conceived as much more than relaxation in
+both method and results.
+
+In terms of results, it is appropriate to consult ancient Indian
+literature as the Asians were seminal contributors to the notion
+of meditation.
+In India, meditation is closely associated with the tradition of yoga
+and widely known cultural themes.
+While yoga has since taken on many meanings,
+the original Sanskrit meaning is ``to join'' or ``union.''
+In Indian culture, it is understood that the goal of yoga/meditation
+is \emph{moksha}. ``Moksha is achieved when a person has overcome all
+tendencies to immoral, unethical, and self-destructive thoughts and behavior''
+\cite[p.~87]{manocha2009}.
+Aspirants are encouraged to develop qualities such as wisdom, courage, love,
+kindness, a sense of justice, temperance, and gratitude
+(\citeNP{mascaro2002}; \citeNP{mascaro1973}; \citeNP{mascaro1965}).
+After discounting for hyperbole, the Indian perspective suggests
+an expectation that meditation, in concert with yogic traditions,
+will promote diverse strengths of character,
+relaxation being seen as just one facet of the experience.
+
+In terms of method, the two most popular methods represented in current
+scientific literature can be broadly classified as mantra meditation
+and mindfulness meditation (\citeNP[pp.~28--32]{ospina2007}).
+Mantra meditation involves the use of a mantra.
+A mantra is a word or phrase repeated silently or aloud.
+Examples of mantra meditation include
+Relaxation Response \cite{benson1974}
+and Clinically Standardized Meditation \cite{carrington1978}.
+Mindfulness meditation consists of a variety of interrelated practices.
+For the purposes here, the most important aspect of mindfulness practice
+is the aim to curtail one's reaction to thoughts. The aspirant is to cultivate
+an attitude of non-judgment, patience, and acceptance.
+Among other benefits,
+this practice is thought to help disrupt negative thought-affect cycles
+\cite{baer2003}.
+
+Curiously, neither mantra meditation nor mindfulness meditation value
+the pivotal experience of the historical Indian yogic
+tradition, that is, thoughtless awareness (a.k.a. mental silence).
+The notion of thoughtless awareness is found in the Mahabharat,
+Upanishads, Yoga Sutras of Patanjali, and Gyaneshwari
+\cite[pp.~93--94]{manocha2009}.
+Thoughtless awareness is an experience in which the meditator is
+no longer is thinking and
+no longer feels the compulsion to continuously engage in thought.
+The experience occurs in a normal waking state;
+thoughtless awareness is not similar to sleeping or unconsciousness.
+Thoughtless awareness subsumes prescriptions
+imposing limitations on permissible thought.
+For example, choiceless awareness 
+considers the presence and action of choice as indicating
+confusion and potentially bias \cite{krishnamurti1975}.
+If there are no thoughts then there are no choices.
+Another example is mindfulness meditation's emphasis
+on non-judgmental awareness.
+If there are no thoughts, and consequentially no judgments,
+then the remaining awareness is non-judgmental.
+Thoughtless awareness is the most stringent limitation
+on permissible types of thought.
+
+For those unfamiliar,
+the conditions of thoughtless awareness may benefit from some elucidation.
+The notion of thoughtless awareness is in contradiction with
+DesCartes' ``I think therefore I am.'' \cite{damasio1995}.
+Furthermore,
+there is an important similarity between thoughtless awareness
+and Heisenberg's uncertainty principle.
+The uncertainty principle is a result of quantum physics
+concerning the accuracy with which particles can be measured.
+Since the measurement itself perturbs a particle randomly,
+the accuracy to which certain physical properties of a particle
+can be measured is limited.
+Similar, the accuracy of self-report on the experience
+of thoughtless awareness is constrained because
+thought, the medium of self-report, is excluded from
+the experience.
+Therefore, self-reports concerning thoughtless awareness
+must be considered, at best, analogical and only accurate to some limit.
+
+Given the difficulty with self-reports, it is
+important to consider other ways of
+assessing the experience of thoughtless awareness.
+There is almost no research in this area.
+Two studies are noteworthy:
+One high-resolution EEG investigation of meditation
+raises more questions than it answers \cite{LIA01}, and
+there is tentative evidence that skin temperature
+can distinguish thoughtless awareness from rest \cite{manocha2010}.
+The paucity of investigations into thoughtless awareness
+raise at least two alternatives.
+Perhaps thoughtless awareness is like extrasensory perception in
+the sense that it seems plausible
+but statistical confirmation will remain indefinitely elusive \cite{lau2004}.
+Or alternately, perhaps thoughtless awareness is not
+an uncommon experience but has simply been overlooked.
+
+TODO: Report no mention in \citeA[p.~103]{csikszentmihalyi1991};
+\citeA{peterson2004}; and \citeA{shapiro2009}
+
+\break
+Proposed survey: 
+
+\begin{verbatim}
+  TA=thoughtless awareness
+
+  familiarity with TA scale (6 items, 1 dimension)
+    notion of TA does not make sense
+    doubt that TA is possible for anybody
+    doubt that TA is possible for yourself
+    experienced TA accidentally?
+    intentional experienced TA?
+    certain that TA is possible for anybody
+
+  if/when intentional
+    how often do you intend it? daily? weekly? monthly?
+    how do you intend it?
+    what is your success rate?
+
+  if/when accidental
+    how often do you experience it? daily? weekly? monthly?
+    what contexts are supportive or unsupportive of TA?
+
+  length of time of TA
+    an irregular series of point moments or one continuous longer period?
+    approximately how long? a moment, 10 sec, 1 minute, 10 minutes or more
+
+  for each of a number of experiences such as:
+    religion, spirituality, inspiration,
+      problem solving, rehabilitation
+    how satisfactory is [EXPERIENCE] with TA?
+    how satisfactory is [EXPERIENCE] without TA?
+    how much TA in your experience of [EXPERIENCE]?
+
+  familiarity with TA scale (again)?
+    maybe remembered something answering other questions
+\end{verbatim}
+
+\bibliography{jpritikin}
+\end{document} 
