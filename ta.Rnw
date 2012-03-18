@@ -2,6 +2,7 @@
 \documentclass[man]{apa}
 %\usepackage[margin=1in]{geometry}
 \usepackage{url}
+\usepackage{tikz}
 
 \title{Thoughtless awareness: Folk familiarity and context}
 \author{Joshua N.\ Pritikin}
@@ -23,8 +24,11 @@ Meditation generally requires a quiet location.
 A comfortable posture is recommended.
 The practice generally has something to do with
 controlling the attention and being non-judgmental \cite{cdc2009}.
-One problem with this general definition is
-that it does make much distinction between meditation
+This definition is fine, except that it also admits an activity like
+relaxing on the front porch enjoying the sunset with a beer.
+Meditation can be operationalized more specifically.
+However, it is still challenging
+to finding any physiological difference between meditation
 and relaxation \cite{holmes1984}.
 That is not to say that relaxation, or some standardized version of it,
 does not offer benefits; it does \cite{benson1974}.
@@ -35,8 +39,8 @@ both method and results.
 In terms of results, it is appropriate to consult ancient Indian
 literature as the Asians were seminal contributors to the notion
 of meditation.
-In India, meditation is closely associated with the tradition of yoga
-and widely known cultural themes.
+In India, meditation is closely associated with
+widely known cultural themes and the tradition of yoga.
 While yoga has since taken on many meanings,
 the original Sanskrit meaning is ``to join'' or ``union.''
 In Indian culture, it is understood that the goal of yoga/meditation
@@ -51,7 +55,7 @@ an expectation that meditation, in concert with yogic traditions,
 will promote diverse strengths of character,
 relaxation being seen as just one facet of the experience.
 
-In terms of method, the two most popular methods represented in current
+In terms of method, the two methods best represented in current
 scientific literature can be broadly classified as mantra meditation
 and mindfulness meditation (\citeNP[pp.~28--32]{ospina2007}).
 Mantra meditation involves the use of a mantra.
@@ -61,7 +65,8 @@ Relaxation Response \cite{benson1974}
 and Clinically Standardized Meditation \cite{carrington1978}.
 Mindfulness meditation consists of a variety of interrelated practices.
 For the purposes here, the most important aspect of mindfulness practice
-is the aim to curtail one's reaction to thoughts. The aspirant is to cultivate
+is the aim to curtail one's mental reaction to thoughts and events.
+The aspirant is to cultivate
 an attitude of non-judgment, patience, and acceptance.
 Among other benefits,
 this practice is thought to help disrupt negative thought-affect cycles
@@ -70,10 +75,11 @@ this practice is thought to help disrupt negative thought-affect cycles
 Curiously, neither mantra meditation nor mindfulness meditation value
 the pivotal experience of the historical Indian yogic
 tradition, that is, thoughtless awareness (a.k.a. mental silence).
-The notion of thoughtless awareness is found in the Mahabharat,
-Upanishads, Yoga Sutras of Patanjali, and Gyaneshwari
-\cite[pp.~93--94]{manocha2009}.
-Thoughtless awareness is an experience in which the meditator is
+The notion of thoughtless awareness is found in widely translated,
+centuries old
+books such as the Mahabharat, Upanishads, Yoga Sutras of Patanjali,
+and Gyaneshwari \cite[pp.~93--94]{manocha2009}.
+Thoughtless awareness is an experience in which one is
 no longer is thinking and
 no longer feels the compulsion to continuously engage in thought.
 The experience occurs in a normal waking state;
@@ -82,23 +88,91 @@ Thoughtless awareness subsumes prescriptions
 imposing limitations on permissible thought.
 For example, choiceless awareness 
 considers the presence and action of choice as indicating
-confusion and potentially bias \cite{krishnamurti1975}.
-If there are no thoughts then there are no choices.
+confusion and, potentially, bias.
+If there are no thoughts then there are no choices
+(cf. \citeNP[pp.~105--110]{krishnamurti1975}).
 Another example is mindfulness meditation's emphasis
 on non-judgmental awareness.
 If there are no thoughts, and consequentially no judgments,
 then the remaining awareness is non-judgmental.
 Thoughtless awareness is the most stringent limitation
 on permissible types of thought.
-
-For those unfamiliar,
-the conditions of thoughtless awareness may benefit from some elucidation.
-The notion of thoughtless awareness is in contradiction with
+The notion of thoughtless awareness contradicts
 DesCartes' ``I think therefore I am.'' \cite{damasio1995}.
-Furthermore,
-there is an important similarity between thoughtless awareness
-and Heisenberg's uncertainty principle.
-The uncertainty principle is a result of quantum physics
+
+%% Given that the clearest descriptions of thoughtless awareness
+%% have arguably come from Asia,
+%% anthropologists may wonder whether the experience only
+%% makes sense in an Indian or Asian cultural context.
+%% Researchers have argued that some medical and psychological syndromes
+%% are culture-bound to western cultures.
+%% For example, there is no specific pathogen that accounts for hypertension.
+%% It has been argued that hypertension is a culturally defined
+%% folk illness made up of about 50 concepts such as ``acute stress''
+%% and ``narrowed blood vessels'' in a network of supposed causation
+%% \cite{launer2003}. A similar case has been made for a number of
+%% so-called psychological disorders such as schizophrenia and anorexia
+%% (e.g., \citeNP{bentall2004}). Is thoughtless awareness similarly
+%% culture-bound?
+%%
+%% Can't decide yet because self-reports are too unreliable.
+
+\begin{figure}[tp]
+\input{gen/flow.tex}
+\caption{The essential elements of optimal experience
+  on a spectrum of psychic order to disorder.}
+\label{fig:teleonomy-of-self}
+\end{figure}
+
+\emph{Flow} is a psychological construct that seems closely related
+with thoughtless awareness.
+Flow is an intrinsically rewarding experience in which a person
+is absorbed in the optimal performance of an activity. 
+The conditions and contrasts of flow are illustrated in
+Figure \ref{fig:teleonomy-of-self}.
+A precondition of flow is a balance between the subjective challenge of an
+activity and the skill a person can bring to it.
+If challenge and skill are out of balance then either frustration or
+boredom ensues.
+Immediate feedback and clear goals are important because 
+without them it would be hard to judge whether challenge
+and skill are closely matched.
+Concentration is necessary because a skill cannot be performed
+well when one is frequently distracted.
+As Figure \ref{fig:teleonomy-of-self} suggests,
+flow is conceived of as the ordered side of a spectrum from
+psychic order to disorder.
+Excessive emotion, moodiness, or cognitive dissonance
+hinder performance and are antagonistic to flow \cite{csikszentmihalyi1988}.
+
+Can thoughtless awareness be a flow experience? 
+Without preparation, the challenge of thoughtless awareness
+is typically judged insurmountable.
+However, \citeA{manocha2000} reported that participants in his
+Meditation Research Program ``consistently describe the
+ability to achieve this experience'' (p.~1137).
+Perhaps with the appropriate training,
+the challenge of thoughtless awareness can be made navigable.
+Certainly thoughtless awareness has a clear goal and immediate feedback.
+Concentration is implicit; without engrossment in thoughtless awareness,
+thinking is bound to resume.
+Therefore, thoughtless awareness can meet the basic conditions of flow experience.
+
+What is curious is that \citeA[p.~103]{csikszentmihalyi1991} suggested
+that yoga is "one of the oldest and most systematic methods of
+producing the flow experience,"
+in the sense of facilitating flow in other activities besides yoga/meditation
+(cf. \citeNP[p.~31]{csikszentmihalyi1988}).
+What ability might yoga confer that facilitates flow?
+Given that the traditional aim of yoga is thoughtless awareness,
+perhaps thoughtless awareness facilitates flow or
+is even a latent component of flow.
+A connection between flow and thoughtless awareness would be
+easy to overlook because of the
+important similarity between thoughtless awareness and
+Heisenberg's uncertainty principle.
+
+Heisenberg's uncertainty principle is a result of quantum physics
 concerning the accuracy with which particles can be measured.
 Since the measurement itself perturbs a particle randomly,
 the accuracy to which certain physical properties of a particle
@@ -108,7 +182,11 @@ of thoughtless awareness is constrained because
 thought, the medium of self-report, is excluded from
 the experience.
 Therefore, self-reports concerning thoughtless awareness
-must be considered, at best, analogical and only accurate to some limit.
+must be considered, at best, analogical and only accurate to some
+limit.\footnote{Dissimilar to Heisenburg's uncertainty principle,
+which places a numerical limit on the accuracy of measurement,
+it seems unlikely that it will be possible to establish a
+bound on the precision of self-reports about thoughtless awareness.}
 
 Given the difficulty with self-reports, it is
 important to consider other ways of
@@ -120,53 +198,33 @@ raises more questions than it answers \cite{LIA01}, and
 there is tentative evidence that skin temperature
 can distinguish thoughtless awareness from rest \cite{manocha2010}.
 The paucity of investigations into thoughtless awareness
-raise at least two alternatives.
-Perhaps thoughtless awareness is like extrasensory perception in
-the sense that it seems plausible
-but statistical confirmation will remain indefinitely elusive \cite{lau2004}.
-Or alternately, perhaps thoughtless awareness is not
-an uncommon experience but has simply been overlooked.
+allow for little certainly about its effect size and importance.
+In comparison, extrasensory perception has attracted 2-3 orders of
+magnitude more studies \cite{lau2004}.
 
-TODO: Report no mention in \citeA[p.~103]{csikszentmihalyi1991};
-\citeA{peterson2004}; and \citeA{shapiro2009}
+The hypothesis advanced here is that thoughtless awareness
+has simply been overlooked.
+Certainly a suppression approach to thoughtless awareness
+is unworkable \cite{wegner2003},
+but this is not sufficient reason to cease investigation altogether.
+\citeA{henry2004} gathered evidence from a decade of workshops and
+questionnaire studies asking non-clinical adults what methods and
+approaches have been efficacious in changing their lives for the
+better.  A general strategy of ``quietening the mind'' was frequently
+endorsed.
+However, this study did not try to discriminate
+precisely what was meant by ``quietening the mind.''
+While thoughtless awareness has typically been discussed
+in the context of meditation, it seems plausible that the experience
+occurs outside the context of meditation as well, perhaps as a component of flow.
+Is the experience of thoughtless awareness so rare
+that it does not even merit a glossary entry in reference works on
+positive psychology (\citeNP{peterson2004}; \citeNP{snyder2009})?
+It seems plausible that accidental thoughtless awareness
+is much more common than assumed.
 
-\break
-Proposed survey: 
-
-\begin{verbatim}
-  TA=thoughtless awareness
-
-  familiarity with TA scale (6 items, 1 dimension)
-    notion of TA does not make sense
-    doubt that TA is possible for anybody
-    doubt that TA is possible for yourself
-    experienced TA accidentally?
-    intentional experienced TA?
-    certain that TA is possible for anybody
-
-  if/when intentional
-    how often do you intend it? daily? weekly? monthly?
-    how do you intend it?
-    what is your success rate?
-
-  if/when accidental
-    how often do you experience it? daily? weekly? monthly?
-    what contexts are supportive or unsupportive of TA?
-
-  length of time of TA
-    an irregular series of point moments or one continuous longer period?
-    approximately how long? a moment, 10 sec, 1 minute, 10 minutes or more
-
-  for each of a number of experiences such as:
-    religion, spirituality, inspiration,
-      problem solving, rehabilitation
-    how satisfactory is [EXPERIENCE] with TA?
-    how satisfactory is [EXPERIENCE] without TA?
-    how much TA in your experience of [EXPERIENCE]?
-
-  familiarity with TA scale (again)?
-    maybe remembered something answering other questions
-\end{verbatim}
+TODO: Link with the Oxford handbook of positive psychology
+(\citeNP{shapiro2009}, etc) and Character strengths and virtues \cite{peterson2004}
 
 \bibliography{jpritikin}
 \end{document} 
