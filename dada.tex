@@ -1,0 +1,281 @@
+\documentclass[10pt,utf8x]{beamer}
+\usefonttheme{serif}
+
+\mode<presentation>
+{
+  \usetheme{CVille}
+  \usecolortheme{cavs}
+  \setbeamercovered{transparent}
+  % or whatever (possibly just delete it)
+}
+
+
+\usepackage[english]{babel} % or whatever
+\usepackage{multimedia}
+\usepackage{apacite}
+\usepackage{tikz}
+\usepackage{color}
+\usepackage{soul}
+
+\newlength{\figurewidth} 
+\figurewidth \textwidth  % This is for rectangular graphs 
+\newlength{\figurewidthB} 
+\figurewidthB .7\textwidth  % This is for square graphs 
+
+\title{Is there a link between flow and meditation?}
+
+\author{Joshua N. Pritikin}
+
+\institute[University of Virginia] % (optional, but mostly needed)
+{
+  Department of Psychology\\
+  University of Virginia
+}
+
+\date[DADA] % (optional, should be abbreviation of conference name)
+{\footnotesize 19 Apr 2012}
+
+\pgfdeclareimage[height=0.4cm]{university-logo}{logo.png}
+\logo{\pgfuseimage{university-logo}}
+
+\begin{document}
+
+\begin{frame}
+  \titlepage
+\end{frame}
+
+\setlength{\parskip}{2ex}
+
+\section{Flow}
+\begin{frame}
+\frametitle{Flow a.k.a. Optimal Experience}
+Flow is an intrinsically rewarding experience in which a person
+is absorbed in the optimal performance of an activity. 
+
+Flow can occur in diverse contexts \cite{csikszentmihalyi1991}
+\begin{itemize}
+\item Music performance
+\item Reading
+\item Writing
+\item Mountain climbing
+\item Japanese motorcycle gangs
+\item etc
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\begin{figure}[tp]
+{\scriptsize
+\begin{tikzpicture}[>=latex,line join=bevel,scale=.7]
+  \pgfsetlinewidth{1bp}
+\input{gen/flow.tex}
+\end{tikzpicture}
+}
+\label{fig:teleonomy-of-self}
+\end{figure}
+\end{frame}
+
+\begin{frame}
+\citeA[p.~103]{csikszentmihalyi1991} suggested
+that yoga is "one of the oldest and most systematic methods of
+producing the flow experience,"
+in the sense of facilitating flow in other activities besides yoga/meditation
+(cf. \citeNP[p.~31]{csikszentmihalyi1988}).
+
+There is little outward commonality between stereotypical yogic
+practices and the diverse activities in which flow has been found.
+
+What aspect of yoga/meditation might facilitate flow?
+\end{frame}
+
+\begin{frame}
+In the historical Indian yogic tradition, thoughtless awareness
+(a.k.a. mental silence) is a primary goal of yoga/meditation.
+
+The notion of thoughtless awareness is found in widely translated,
+centuries old
+books such as the Mahabharat, Upanishads, Yoga Sutras of Patanjali,
+and Gyaneshwari \cite[pp.~93--94]{manocha2009}.
+
+Thoughtless awareness is an experience in which one is
+no longer is thinking and
+no longer feels the compulsion to continuously engage in thought.
+The experience occurs in a normal waking state;
+thoughtless awareness is not similar to sleeping or unconsciousness.
+\end{frame}
+
+\begin{frame}
+Can thoughtless awareness be a component of or itself a flow experience? 
+
+\begin{itemize}
+\item \textcolor{red}{Challenge/Skill} A naive thought suppression approach fails \cite{wegner2003}.
+However, \citeA{manocha2000} reported that participants in his
+Meditation Research Program ``consistently describe the
+ability to achieve this experience'' (p.~1137).
+Perhaps with the appropriate training,
+the challenge of thoughtless awareness can be made navigable.
+
+\item \textcolor{red}{Clear goal/Immediate feedback} Yes
+
+\item \textcolor{red}{Concentration} Without engrossment
+in thoughtless awareness, thinking is bound to resume.
+
+\end{itemize}
+
+Can meet the basic conditions of flow experience but ... ?
+\end{frame}
+
+\begin{frame}
+Thoughtless awareness / mental silence has not been studied.
+
+\begin{itemize}
+\item PsycNET searches for ``thoughtless awareness'' or ``mental silence''
+turn up nothing.
+\item
+In a collection of 13 scales related to spiritual and religious experience,
+no attempt was made to measure ``thoughtless awareness'' \cite{fetzer1999}.
+\item
+In two recent reviews of the state of the research on meditation/mindfulness,
+the possibility of thoughtless awareness or mental silence was not
+even acknowledged (\citeNP{shapiro2009}; \citeNP{baer2011}).
+\item
+No glossary entry found in reference works on
+positive psychology and the psychology of religion
+(\citeNP{pargament1997}; \citeNP{peterson2004}; \citeNP{snyder2009}; \citeNP{sheldon2011}).
+\item In comparison, extrasensory perception has attracted 2-3 orders of
+magnitude more scientific studies \cite{lau2004}.
+\end{itemize}
+
+A potentially vital component of flow has not received
+ any psychological scrutiny.
+\end{frame}
+
+\section{IRT}
+\begin{frame}
+  \frametitle{Item Response Theory -- Partial Credit Model}
+
+\begin{displaymath}
+P_{ix}(\theta) =
+\frac{e^{\left[\ \displaystyle\sum_{j=0}^{x} (\theta - \delta_{ij})\right]}}
+{\displaystyle\sum_{r=0}^{m_i}
+e^{\left[\ \displaystyle\sum_{j=0}^{r}(\theta - \delta_{ij})\right]}}
+\end{displaymath}
+
+\begin{itemize}
+\item $j$ is the person
+\item $i$ is the item
+\item $m_i$ is the number of choices for item $i$
+\end{itemize}
+\end{frame}
+
+\section{Survey}
+\begin{frame}
+\begin{itemize}
+\item Biographical information
+\item Familiarity with thoughtless awareness
+\item Thoughtless awareness in context
+\item Supplemental questions
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Biographical information}
+Age?
+
+Sex? Male/Female
+
+Highest level of education attained?
+\begin{itemize}
+\item High school graduate
+\item College Degree
+\item Graduate Degree
+\end{itemize}
+
+Have you pursued any training in meditation? Yes/No
+
+If so, what kind of meditation do you practice currently? (free text)
+\end{frame}
+
+\begin{frame}
+  \frametitle{Familiarity with Thoughtless Awareness}
+{\Large\ul{Introduction}}
+
+Thoughtless awareness (a.k.a mental silence) is an experience in which
+one is no longer thinking and no longer feels the compulsion to
+continuously engage in thought. The experience occurs in a normal
+waking state; thoughtless awareness is not similar to sleeping or
+unconsciousness.
+
+\end{frame}
+
+\begin{frame}
+  \frametitle{Familiarity with Thoughtless Awareness}
+
+In the remainder of this survey, thoughtless awareness is abbreviated
+as TA. Of interest are your recent experiences of TA (within the last
+year or so).
+
+On a 3-point Likert scale from \emph{agree} to \emph{disagree}, rate:
+
+\begin{itemize}
+\item The notion of TA does not make sense
+\item I doubt that TA is possible for anybody
+\item I doubt that TA is possible for myself
+\item I have experienced TA accidentally
+\item I have intentionally experienced TA
+\item I am certain that TA is possible for anybody
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}
+  \frametitle{Thoughtless Awareness in Context}
+
+{\Large\ul{For religion}}
+
+On a 3-point Likert scale from \emph{satisfactory} to
+\emph{unsatisfactory}, rate:
+
+\begin{itemize}
+\item How satisfactory is \textcolor{red}{religion} with TA?
+\item How satisfactory is \textcolor{red}{religion} without TA?
+\end{itemize}
+
+On a 5-point Likert scale from \emph{enough} to
+\emph{not enough}, rate:
+
+\begin{itemize}
+\item How much TA do you experience in your \textcolor{red}{religion}?
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}
+  \frametitle{Thoughtless Awareness in Context}
+
+{\Large\ul{For \emph{context}}}
+
+On a 3-point Likert scale from \emph{satisfactory} to
+\emph{unsatisfactory}, rate:
+
+\begin{itemize}
+\item How satisfactory is \textcolor{red}{\emph{context}} with TA?
+\item How satisfactory is \textcolor{red}{\emph{context}} without TA?
+\end{itemize}
+
+On a 5-point Likert scale from \emph{enough} to
+\emph{not enough}, rate:
+
+\begin{itemize}
+\item How much TA do you experience in your \textcolor{red}{\emph{context}}?
+\end{itemize}
+
+For contexts: religion, spirituality, problem solving, relaxation,
+daydreaming, and meditation.
+
+\end{frame}
+
+\bibliography{jpritikin} 
+\bibliographystyle{apacite}
+
+\end{document} 

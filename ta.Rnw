@@ -82,9 +82,9 @@ and Gyaneshwari \cite[pp.~93--94]{manocha2009}.
 Thoughtless awareness is an experience in which one is
 no longer is thinking and
 no longer feels the compulsion to continuously engage in thought.
-The experience occurs in a normal waking state;
+The experience occurs in a normal, lucid waking state;
 thoughtless awareness is not similar to sleeping or unconsciousness.
-Thoughtless awareness subsumes prescriptions
+Thoughtless awareness subsumes other prescriptions
 imposing limitations on permissible thought.
 For example, choiceless awareness 
 considers the presence and action of choice as indicating
@@ -118,7 +118,10 @@ DesCartes' ``I think therefore I am.'' \cite{damasio1995}.
 %% Can't decide yet because self-reports are too unreliable.
 
 \begin{figure}[tp]
+\begin{tikzpicture}[>=latex,line join=bevel]
+  \pgfsetlinewidth{1bp}
 \input{gen/flow.tex}
+\end{tikzpicture}
 \caption{The essential elements of optimal experience
   on a spectrum of psychic order to disorder.}
 \label{fig:teleonomy-of-self}
@@ -208,19 +211,17 @@ magnitude more scientific studies \cite{lau2004}.
 The hypothesis advanced here is that thoughtless awareness
 has been overlooked.
 PsycNET searches for ``thoughtless awareness'' or ``mental silence''
-only turned up one article besides those by Ramesh Manocha and colleagues.
-This article was concerned with mindlessness in the sense of
-responding to the structure of a request rather than its content
-\cite{benassi1993}.
+only turned nothing besides articles by Ramesh Manocha and colleagues.
 In a collection of 13 scales related to spiritual and religious experience,
 no attempt was made to measure ``thoughtless awareness'' \cite{fetzer1999}.
-In one recent review of the state of the research on meditation,
+In two recent reviews of the state of the research on meditation/mindfulness,
 the possibility of thoughtless awareness or mental silence was not
-even acknowledged \cite{shapiro2009}.
+even acknowledged (\citeNP{shapiro2009}; \citeNP{baer2011}).
 Is the experience of thoughtless awareness so rare
 that it does not even merit a glossary entry in reference works on
 positive psychology and the psychology of religion
-(\citeNP{pargament1997}; \citeNP{peterson2004}; \citeNP{snyder2009})?
+(\citeNP{pargament1997}; \citeNP{peterson2004};
+\citeNP{snyder2009}; \citeNP{sheldon2011})?
 It seems plausible that accidental thoughtless awareness
 is much more common than assumed.
 \citeA{henry2004} gathered evidence from a decade of workshops and
