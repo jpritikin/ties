@@ -26,36 +26,41 @@ The practice generally has something to do with
 controlling the attention and being non-judgmental \cite{cdc2009}.
 This definition is fine, except that it also admits an activity like
 relaxing on the front porch enjoying the sunset with a beer.
-Meditation can be operationalized more specifically \cite{bond2009}.
-However, it is still challenging
-to finding any physiological difference between meditation
-and relaxation \cite{holmes1984}.
-That is not to say that relaxation, or some standardized version of it,
-does not offer benefits; it does \cite{benson1974}.
-However, the historical context of meditation suggests that meditation
-was originally conceived as much more than relaxation in
-both method and results.
+Compounding the confusion is the dual meaning of the term meditation.
 
-In terms of results, it is appropriate to consult ancient Indian
-literature as the Asians were seminal contributors to the notion
-of meditation.
-In India, meditation is closely associated with
-widely known cultural themes and the tradition of yoga.
-While yoga has since taken on many meanings,
-the original Sanskrit meaning is ``to join'' or ``union.''
-In Indian culture, it is understood that the goal of yoga/meditation
-is \emph{moksha}. ``Moksha is achieved when a person has overcome all
-tendencies to immoral, unethical, and self-destructive thoughts and behavior''
-\cite[p.~87]{manocha2009}.
-Aspirants are encouraged to develop qualities such as wisdom, courage, love,
-kindness, a sense of justice, temperance, and gratitude
-(\citeNP{mascaro2002}; \citeNP{mascaro1973}; \citeNP{mascaro1965}).
-After discounting for hyperbole, the Indian perspective suggests
-an expectation that meditation, in concert with yogic traditions,
-will promote diverse strengths of character,
-relaxation being seen as just one facet of the experience.
+\begin{quotation}
+Because of a limitation in our vocabulary, the West refers to the simple
+psychological centering devices, the preliminary steps, as ``meditation.''
+We therefore give the same name to the techniques used to produce
+meditation as we do to the end state itself. According to the great
+meditative traditions, however, the centering techniques are not
+meditation. They are simply means toward the goal---which is meditation.
+These techniques are therefore more or less interchangeable, and the
+advanced practitioner will eventually discard all of them when he can
+achieve meditation directly. \cite[pp.~8--9]{carrington1977}
+\end{quotation}
 
-In terms of method, the two methods best represented in current
+%% In terms of results, it is appropriate to consult ancient Indian
+%% literature as the Asians were seminal contributors to the notion
+%% of meditation.
+%% In India, meditation is closely associated with
+%% widely known cultural themes and the tradition of yoga.
+%% While yoga has since taken on many meanings,
+%% the original Sanskrit meaning is ``to join'' or ``union.''
+%% In Indian culture, it is understood that the goal of yoga/meditation
+%% is \emph{moksha}. ``Moksha is achieved when a person has overcome all
+%% tendencies to immoral, unethical, and self-destructive thoughts and behavior''
+%% \cite[p.~87]{manocha2009}.
+%% Aspirants are encouraged to develop qualities such as wisdom, courage, love,
+%% kindness, a sense of justice, temperance, and gratitude
+%% (\citeNP{mascaro2002}; \citeNP{mascaro1973}; \citeNP{mascaro1965}).
+%% After discounting for hyperbole, the Indian perspective suggests
+%% an expectation that meditation, in concert with yogic traditions,
+%% will promote diverse strengths of character,
+%% relaxation being seen as just one facet of the experience.
+
+In terms of psychological centering devices,
+the two methods best represented in current
 scientific literature can be broadly classified as mantra meditation
 and mindfulness meditation (\citeNP[pp.~28--32]{ospina2007}).
 Mantra meditation involves the use of a mantra.
@@ -72,9 +77,9 @@ Among other benefits,
 this practice is thought to help disrupt negative thought-affect cycles
 \cite{baer2003}.
 
-Curiously, neither mantra meditation nor mindfulness meditation value
-the pivotal experience of the historical Indian yogic
-tradition, that is, thoughtless awareness (a.k.a. mental silence).
+Curiously, neither mantra meditation nor mindfulness meditation
+have dedicated sufficient discussion to the goal of meditation, that is,
+complete mental silence (a.k.a. thoughtless awareness).
 The notion of thoughtless awareness is found in widely translated,
 centuries old
 books such as the Mahabharat, Upanishads, Yoga Sutras of Patanjali,
@@ -86,7 +91,7 @@ The experience occurs in a normal, lucid waking state;
 thoughtless awareness is not similar to sleeping or unconsciousness.
 Thoughtless awareness subsumes other prescriptions
 imposing limitations on permissible thought.
-For example, choiceless awareness 
+For example, the notion of choiceless awareness 
 considers the presence and action of choice as indicating
 confusion and, potentially, bias.
 If there are no thoughts then there are no choices
@@ -99,6 +104,21 @@ Thoughtless awareness is the most stringent limitation
 on permissible types of thought.
 The notion of thoughtless awareness contradicts
 DesCartes' ``I think therefore I am.'' \cite{damasio1995}.
+
+\begin{quotation}
+A meditation session will often follow a certain progression. Starting
+with an active type of thought, it may move toward more quiet types of
+thinking, and sometimes this process leads to a state where no
+thinking seems to occur at all. In mantra meditation, the mantra may
+become increasingly soft and indistinct as the meditation session
+continues, until, no longer needed, it gives way to profound quiet. In
+breathing meditation, awareness of the breath may recede until it
+becomes almost imperceptible and silence is the all-encompassing
+experience.  According to the meditative tradition, at this point the
+mind is not focused on either thought or image, but is fully aware,
+conscious. The mind is said to be alert without having any
+\emph{object} of alertness. \cite[p.~91]{carrington1977}
+\end{quotation}
 
 %% Given that the clearest descriptions of thoughtless awareness
 %% have arguably come from Asia,
@@ -127,9 +147,13 @@ DesCartes' ``I think therefore I am.'' \cite{damasio1995}.
 \label{fig:teleonomy-of-self}
 \end{figure}
 
-\emph{Flow} is a psychological construct that seems closely related
-with thoughtless awareness.
-Flow is an intrinsically rewarding experience in which a person
+One goal of this article is to better integrate the notion of
+thoughtless awareness,
+independent of particular meditation technique,
+with other themes in positive psychology.
+At least one investigator has suggested that there is a relationship
+between flow and meditation \cite[p.~244]{carrington1977}.
+\emph{Flow} is an intrinsically rewarding experience in which a person
 is absorbed in the optimal performance of an activity. 
 The conditions and contrasts of flow are illustrated in
 Figure \ref{fig:teleonomy-of-self}.
@@ -160,17 +184,36 @@ the challenge of thoughtless awareness can be made navigable.
 Certainly thoughtless awareness has a clear goal and immediate feedback.
 Concentration is implicit; without engrossment in thoughtless awareness,
 thinking is bound to resume.
-Therefore, thoughtless awareness can meet the basic conditions of flow experience.
+Therefore, it seems plausible that thoughtless awareness can meet the basic
+conditions of flow experience.
 
-What is curious is that \citeA[p.~103]{csikszentmihalyi1991} suggested
-that yoga is "one of the oldest and most systematic methods of
-producing the flow experience,"
-in the sense of facilitating flow in other activities besides yoga/meditation
-(cf. \citeNP[p.~31]{csikszentmihalyi1988}).
-What ability might yoga confer that facilitates flow?
-There is little outward commonality between stereotypical yogic practices and
-the diverse activities in which flow has been found.
-Given that the traditional aim of yoga is thoughtless awareness,
+Perhaps thoughtless awareness is a flow experience, but what about
+the other direction?
+Does flow experience implicitly involve thoughtless awareness?
+\citeA[p.~103]{csikszentmihalyi1991} remarked
+that yoga is ``one of the oldest and most systematic methods of
+producing the flow experience,''
+in the sense of facilitating flow in other activities
+besides yoga/meditation.
+
+\begin{quotation}
+The ability to experience flow may be due to individual differences
+that are in part inborn, but it certainly can be learned. Many
+techniques of meditation or spiritual discipline attempt to develop
+control over consciousness. For instance, the various yoga traditions
+train the ability to concentrate attention, to control memory, and to
+limit awareness to specific goals. When a person learns such skills,
+it becomes much easier to achieve the necessary balancing of
+challenges and skills. \cite[p.~31]{csikszentmihalyi1988}
+\end{quotation}
+
+Specifically what ability or abilities might yoga/meditation
+confer that facilitates flow?
+Is it the separable abilities of concentrating attention,
+controlling memory, and narrowing focus to specific goals?
+Or is it the combination and coordination of such skills?
+Given that the traditional aim of yoga/meditation
+is thoughtless awareness,
 perhaps thoughtless awareness facilitates flow or
 is even a latent component of flow.
 A connection between flow and thoughtless awareness would be
@@ -189,9 +232,9 @@ thought, the medium of self-report, is excluded from
 the experience.
 Therefore, self-reports concerning thoughtless awareness
 must be considered, at best, analogical and only accurate to some
-limit.\footnote{Dissimilar to Heisenburg's uncertainty principle,
-which places a numerical limit on the accuracy of measurement,
-it seems unlikely that it will be possible to establish a
+limit.\footnote{Heisenburg's uncertainty principle
+places a numerical limit on the accuracy of measurement.
+It seems unlikely that it will be possible to establish a quantitative
 bound on the precision of self-reports about thoughtless awareness.}
 
 Given the difficulty with self-reports, it is
@@ -211,7 +254,7 @@ magnitude more scientific studies \cite{lau2004}.
 The hypothesis advanced here is that thoughtless awareness
 has been overlooked.
 PsycNET searches for ``thoughtless awareness'' or ``mental silence''
-only turned nothing besides articles by Ramesh Manocha and colleagues.
+turned up nothing besides articles by Ramesh Manocha and collaborators.
 In a collection of 13 scales related to spiritual and religious experience,
 no attempt was made to measure ``thoughtless awareness'' \cite{fetzer1999}.
 In two recent reviews of the state of the research on meditation/mindfulness,
@@ -229,11 +272,12 @@ questionnaire studies asking non-clinical adults what methods and
 approaches have been efficacious in changing their lives for the
 better.  A general strategy of ``quietening the mind'' was frequently
 endorsed.
-However, this study did not try to discriminate
+Unfortunately, this study did not try to discriminate
 precisely what was meant by ``quietening the mind.''
 While thoughtless awareness has typically been discussed
 in the context of meditation, it seems plausible that the experience
-occurs outside the context of meditation as well, perhaps as a component of flow.
+occurs outside the context of meditation as well,
+perhaps as a component of flow.
 
 \bibliography{jpritikin}
 \end{document} 
