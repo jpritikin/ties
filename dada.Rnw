@@ -1,4 +1,4 @@
-
+\SweaveOpts{prefix.string=gen/fig, eps=FALSE, keep.source=TRUE}
 \documentclass[10pt,utf8x]{beamer}
 \usefonttheme{serif}
 
@@ -45,8 +45,10 @@ numberstyle=\ttfamily\color{gray}\footnotesize}
 \pgfdeclareimage[height=0.4cm]{university-logo}{logo.png}
 \logo{\pgfuseimage{university-logo}}
 
-\usepackage{Sweave}
 \begin{document}
+<<echo=FALSE>>=
+source("analyze.R")
+@ 
 
 \begin{frame}
   \titlepage
@@ -345,11 +347,15 @@ Data were analyzed using the \textcolor{red}{eRm} package \cite{erm2011}.
 \end{frame}
 
 \begin{frame}
-\includegraphics{gen/fig-002}
+<<fig=TRUE,echo=FALSE>>=
+plotPImap(fam.pcm1, main="Familiarity with thoughtless awareness")
+@ 
 \end{frame}
 
 \begin{frame}
-\includegraphics{gen/fig-003}
+<<fig=TRUE,echo=FALSE>>=
+plotPImap(ctx.pcm1, main="Context of thoughtless awareness")
+@ 
 \end{frame}
 
 \section{Discussion}
