@@ -112,7 +112,7 @@ advanced practitioner will eventually discard all of them when he can
 achieve meditation directly. \cite[pp.~8--9]{carrington1977}
 \end{quotation}
 
-Meditation means:
+Hence, \emph{meditation} means:
 \begin{itemize}
 \item Psychological centering devices
 \item Experience of complete mental silence or thoughtless awareness
@@ -197,12 +197,13 @@ any psychological scrutiny.
 
 Some hypotheses:
 \begin{itemize}
+\item Intuitive or accidental thoughtless awareness is not uncommon.
 \item Thoughtless awareness occurs outside the context of meditation.
-\item Intuitive or unintentional thoughtless awareness is not uncommon.
-\item People who (try to) intend thoughtless awareness will exhibit differential item functioning (DIF) as a group.
-\item Educational achievement will positively correlate with thoughtless awareness in context of problem solving.\footnote{Not sure about effect size.}
-\item Flow and complete mental silence will be judged similar or related relative
-  to other obvious comparisons.
+\item Flow and complete mental silence will be judged as similar relative
+  to some other obvious comparisons.
+\item Differential item functioning (DIF):
+Has received any training in meditation? By education?
+Trying to intend complete mental silence or not?
 \end{itemize}
 \end{frame}
 
@@ -294,7 +295,7 @@ On a 5-point Likert scale from \emph{important} to \emph{not important}, rate:
 \begin{frame}
   \frametitle{Item Response Theory -- Partial Credit Model}
 
-The General Partial Credit Model (GPCM) model can be expressed in terms
+The Generalized Partial Credit Model (GPCM) model can be expressed in terms
 of the unconditional probability of each
 response $0, 1, \dots, m_i$ of person $j$'s attempt at item $i$. That is,
 
@@ -335,7 +336,8 @@ item parameters $\alpha$ and $\delta$ are centered at zero
 
 Unfortunately, no \textcolor{red}{R} implementation of GPCM is
 working well enough yet.
-Data were analyzed using the \textcolor{red}{eRm} package \cite{erm2011}.
+Data were analyzed using the \textcolor{red}{eRm} package \cite{erm2011}, fixing $\alpha=1$.
+This is parameterization of GPCM is equivalent to the Partial Credit Model.
 \end{frame}
 
 \section{Results}
@@ -345,11 +347,252 @@ Data were analyzed using the \textcolor{red}{eRm} package \cite{erm2011}.
 \end{frame}
 
 \begin{frame}
-\includegraphics{gen/fig-002}
+\frametitle{Demographics}
+Participants consisted of 200 fake
+Charlottesville residents with
+24\%
+ having some training in meditation/yoga.
+
+% latex table generated in R 2.15.0 by xtable 1.5-6 package
+% Wed Apr 11 14:12:23 2012
+\begin{table}[ht]
+\begin{center}
+\begin{tabular}{rr}
+  \hline
+ & Education \\ 
+  \hline
+high school &  54 \\ 
+  college &  72 \\ 
+  graduate &  74 \\ 
+   \hline
+\end{tabular}
+\end{center}
+\end{table}
+Other demographic data were not fabricated.
 \end{frame}
 
 \begin{frame}
 \includegraphics{gen/fig-003}
+\end{frame}
+
+\begin{frame}
+Item fit sorted by Infit MSQ.
+% latex table generated in R 2.15.0 by xtable 1.5-6 package
+% Wed Apr 11 14:12:24 2012
+\begin{table}[ht]
+\begin{center}
+\begin{tabular}{rrrrr}
+  \hline
+ & Outfit MSQ & Outfit t & Infit MSQ & Infit t \\ 
+  \hline
+notSense & 0.44 & -2.35 & 0.62 & -4.21 \\ 
+  intention & 0.62 & -3.69 & 0.69 & -4.99 \\ 
+  certain & 0.67 & -2.68 & 0.73 & -4.14 \\ 
+  possMyself & 0.70 & -2.21 & 0.87 & -1.81 \\ 
+  accident & 0.99 & -0.11 & 0.94 & -0.86 \\ 
+  possAny & 1.17 & 0.90 & 1.05 & 0.61 \\ 
+   \hline
+\end{tabular}
+\end{center}
+\end{table}
+Liberal acceptable range for MSQ 1.4-0.6
+\end{frame}
+
+\begin{frame}
+\includegraphics{gen/fig-005}
+
+Data for this item had the most variance (and underfit), simulating an
+item that was not answered very consistently with respect to latent trait level.
+\end{frame}
+
+\begin{frame}
+\includegraphics{gen/fig-006}
+
+Data for this item was the most overfit for both infit and outfit.
+\end{frame}
+
+\begin{frame}
+Person fit sorted by Infit MSQ.
+% latex table generated in R 2.15.0 by xtable 1.5-6 package
+% Wed Apr 11 14:12:26 2012
+\begin{table}[ht]
+\begin{center}
+\begin{tabular}{rrrrr}
+  \hline
+ & Outfit MSQ & Outfit t & Infit MSQ & Infit t \\ 
+  \hline
+P3 & 0.10 & -0.46 & 0.14 & -2.01 \\ 
+  P34 & 0.10 & -0.46 & 0.14 & -2.01 \\ 
+  P36 & 0.10 & -0.46 & 0.14 & -2.01 \\ 
+  P44 & 0.10 & -0.46 & 0.14 & -2.01 \\ 
+  P72 & 0.10 & -0.46 & 0.14 & -2.01 \\ 
+  P82 & 0.10 & -0.46 & 0.14 & -2.01 \\ 
+  P121 & 1.77 & 1.90 & 2.29 & 2.97 \\ 
+  P40 & 1.92 & 1.93 & 2.31 & 2.82 \\ 
+  P83 & 2.27 & 1.64 & 2.67 & 2.91 \\ 
+  P195 & 1.31 & 0.86 & 2.72 & 2.66 \\ 
+  P172 & 4.03 & 3.71 & 2.78 & 3.39 \\ 
+  P197 & 2.12 & 1.46 & 3.62 & 3.51 \\ 
+   \hline
+\end{tabular}
+\end{center}
+\end{table}
+Liberal acceptable range for MSQ 1.4-0.6. Clearly there are some
+crazy people here.
+\end{frame}
+
+\begin{frame}
+A likely response pattern:
+% latex table generated in R 2.15.0 by xtable 1.5-6 package
+% Wed Apr 11 14:12:26 2012
+\begin{table}[ht]
+\begin{center}
+\begin{tabular}{rrrrrrr}
+  \hline
+ & notSense & possAny & possMyself & accident & intention & certain \\ 
+  \hline
+3 &   2 &   2 &   2 &   2 &   1 &   1 \\ 
+   \hline
+\end{tabular}
+\end{center}
+\end{table}
+Some unlikely response patterns:
+% latex table generated in R 2.15.0 by xtable 1.5-6 package
+% Wed Apr 11 14:12:26 2012
+\begin{table}[ht]
+\begin{center}
+\begin{tabular}{rrrrrrr}
+  \hline
+ & notSense & possAny & possMyself & accident & intention & certain \\ 
+  \hline
+121 &   2 &   0 &   2 &   2 &   0 &   0 \\ 
+  40 &   2 &   2 &   0 &   2 &   0 &   1 \\ 
+  83 &   2 &   2 &   1 &   2 &   0 &   2 \\ 
+  195 &   2 &   2 &   2 &   2 &   0 &   2 \\ 
+  172 &   2 &   0 &   2 &   2 &   1 &   1 \\ 
+  197 &   0 &   2 &   0 &   0 &   0 &   0 \\ 
+   \hline
+\end{tabular}
+\end{center}
+\end{table}\end{frame}
+
+\begin{frame}
+\includegraphics{gen/fig-010}
+
+The information curve spans a reasonably wide range of trait scores.
+\end{frame}
+
+\begin{frame}
+\includegraphics{gen/fig-011}
+\end{frame}
+
+\begin{frame}
+\includegraphics{gen/fig-012}
+
+Thresholds are out of order. This is bad. If the same thing is
+seen in real data then there are too many response options or
+the item needs refinement.
+\end{frame}
+
+\begin{frame}
+Item fit sorted by Infit MSQ.
+% latex table generated in R 2.15.0 by xtable 1.5-6 package
+% Wed Apr 11 14:12:32 2012
+\begin{table}[ht]
+\begin{center}
+\begin{tabular}{rrrrr}
+  \hline
+ & Outfit MSQ & Outfit t & Infit MSQ & Infit t \\ 
+  \hline
+cxSolving & 0.65 & -5.17 & 0.68 & -5.57 \\ 
+  cxDaydream & 0.70 & -4.73 & 0.72 & -4.80 \\ 
+  cxMeditate & 0.81 & -2.09 & 0.79 & -3.04 \\ 
+  cxRelax & 0.98 & -0.19 & 0.97 & -0.45 \\ 
+  cxSpirit & 1.08 & 1.03 & 0.99 & -0.12 \\ 
+  cxReligion & 1.09 & 1.14 & 1.04 & 0.68 \\ 
+  cxExercise & 1.15 & 1.92 & 1.06 & 1.02 \\ 
+   \hline
+\end{tabular}
+\end{center}
+\end{table}
+Liberal acceptable range for MSQ 1.4-0.6
+\end{frame}
+
+\begin{frame}
+Person fit sorted by Infit MSQ.
+% latex table generated in R 2.15.0 by xtable 1.5-6 package
+% Wed Apr 11 14:12:33 2012
+\begin{table}[ht]
+\begin{center}
+\begin{tabular}{rrrrr}
+  \hline
+ & Outfit MSQ & Outfit t & Infit MSQ & Infit t \\ 
+  \hline
+P45 & 0.04 & -5.38 & 0.04 & -5.60 \\ 
+  P180 & 0.08 & -3.81 & 0.06 & -4.25 \\ 
+  P18 & 0.14 & -3.26 & 0.11 & -3.64 \\ 
+  P175 & 0.17 & -4.04 & 0.17 & -4.00 \\ 
+  P89 & 0.22 & -3.40 & 0.20 & -3.67 \\ 
+  P6 & 0.22 & -3.32 & 0.25 & -3.20 \\ 
+  P108 & 1.99 & 2.29 & 1.98 & 2.39 \\ 
+  P96 & 2.15 & 2.23 & 2.00 & 2.03 \\ 
+  P4 & 1.93 & 1.46 & 2.02 & 1.68 \\ 
+  P82 & 1.82 & 1.85 & 2.14 & 2.49 \\ 
+  P67 & 2.78 & 2.86 & 2.36 & 2.38 \\ 
+  P116 & 3.07 & 3.74 & 2.52 & 3.11 \\ 
+   \hline
+\end{tabular}
+\end{center}
+\end{table}
+Liberal acceptable range for MSQ 1.4-0.6. Again there are some
+crazy people here.
+\end{frame}
+
+\begin{frame}
+Some likely response pattern:
+% latex table generated in R 2.15.0 by xtable 1.5-6 package
+% Wed Apr 11 14:12:33 2012
+\begin{table}[ht]
+\begin{center}
+{\tiny
+\begin{tabular}{rrrrrrrr}
+  \hline
+ & cxReligion & cxSolving & cxSpirit & cxRelax & cxDaydream & cxMeditate & cxExercise \\ 
+  \hline
+45 &   2 &   3 &   3 &   2 &   1 &   3 &   2 \\ 
+  180 &   3 &   3 &   3 &   3 &   2 &   3 &   3 \\ 
+  18 &   1 &   2 &   1 &   1 &   0 &   2 &   1 \\ 
+   \hline
+\end{tabular}
+}
+\end{center}
+\end{table}
+Some unlikely response patterns:
+% latex table generated in R 2.15.0 by xtable 1.5-6 package
+% Wed Apr 11 14:12:33 2012
+\begin{table}[ht]
+\begin{center}
+{\tiny
+\begin{tabular}{rrrrrrrr}
+  \hline
+ & cxReligion & cxSolving & cxSpirit & cxRelax & cxDaydream & cxMeditate & cxExercise \\ 
+  \hline
+82 &   0 &   4 &   4 &   4 &   2 &   4 &   4 \\ 
+  67 &   3 &   1 &   0 &   0 &   0 &   0 &   0 \\ 
+  116 &   4 &   4 &   0 &   4 &   2 &   4 &   4 \\ 
+   \hline
+\end{tabular}
+}
+\end{center}
+\end{table}\end{frame}
+
+\begin{frame}
+\includegraphics{gen/fig-017}
+
+At least with this fake data, the information curve is somewhat
+compressed between -2 and 2. If this happens with real data,
+it may be worth considering other questions to better measure
+the extremes of the trait.
 \end{frame}
 
 \section{Discussion}

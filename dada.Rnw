@@ -48,6 +48,7 @@ numberstyle=\ttfamily\color{gray}\footnotesize}
 \begin{document}
 <<echo=FALSE>>=
 source("analyze.R")
+library(xtable)
 @ 
 
 \begin{frame}
@@ -114,7 +115,7 @@ advanced practitioner will eventually discard all of them when he can
 achieve meditation directly. \cite[pp.~8--9]{carrington1977}
 \end{quotation}
 
-Meditation means:
+Hence, \emph{meditation} means:
 \begin{itemize}
 \item Psychological centering devices
 \item Experience of complete mental silence or thoughtless awareness
@@ -199,12 +200,13 @@ any psychological scrutiny.
 
 Some hypotheses:
 \begin{itemize}
+\item Intuitive or accidental thoughtless awareness is not uncommon.
 \item Thoughtless awareness occurs outside the context of meditation.
-\item Intuitive or unintentional thoughtless awareness is not uncommon.
-\item People who (try to) intend thoughtless awareness will exhibit differential item functioning (DIF) as a group.
-\item Educational achievement will positively correlate with thoughtless awareness in context of problem solving.\footnote{Not sure about effect size.}
-\item Flow and complete mental silence will be judged similar or related relative
-  to other obvious comparisons.
+\item Flow and complete mental silence will be judged as similar relative
+  to some other obvious comparisons.
+\item Differential item functioning (DIF):
+Has received any training in meditation? By education?
+Trying to intend complete mental silence or not?
 \end{itemize}
 \end{frame}
 
@@ -286,7 +288,6 @@ On a 5-point Likert scale from \emph{important} to \emph{not important}, rate:
 \item Would flow help prepare you for complete mental silence?
 \item How similar are complete mental silence and flow?
 \item How compatible are complete mental silence and flow?
-\item How similar are blue and purple?
 \item\emph{What else?}
 \end{itemize}
 
@@ -296,7 +297,7 @@ On a 5-point Likert scale from \emph{important} to \emph{not important}, rate:
 \begin{frame}
   \frametitle{Item Response Theory -- Partial Credit Model}
 
-The General Partial Credit Model (GPCM) model can be expressed in terms
+The Generalized Partial Credit Model (GPCM) model can be expressed in terms
 of the unconditional probability of each
 response $0, 1, \dots, m_i$ of person $j$'s attempt at item $i$. That is,
 
@@ -337,7 +338,8 @@ item parameters $\alpha$ and $\delta$ are centered at zero
 
 Unfortunately, no \textcolor{red}{R} implementation of GPCM is
 working well enough yet.
-Data were analyzed using the \textcolor{red}{eRm} package \cite{erm2011}.
+Data were analyzed using the \textcolor{red}{eRm} package \cite{erm2011}, fixing $\alpha=1$.
+This is parameterization of GPCM is equivalent to the Partial Credit Model.
 \end{frame}
 
 \section{Results}
@@ -347,15 +349,161 @@ Data were analyzed using the \textcolor{red}{eRm} package \cite{erm2011}.
 \end{frame}
 
 \begin{frame}
+\frametitle{Demographics}
+Participants consisted of \Sexpr{dim(cms.latent)[[1]]} fake
+Charlottesville residents with
+\Sexpr{100*sum(cms.latent$train=="yes")/dim(cms.latent)[[1]]}\%
+ having some training in meditation/yoga.
+
+<<results=tex,echo=FALSE>>=
+tbl<-as.matrix(table(cms.latent$edu))
+dimnames(tbl)[[2]] <- c("Education")
+print(xtable(tbl, table.placement='!h'))
+@ 
+
+Other demographic data were not fabricated.
+\end{frame}
+
+\begin{frame}
 <<fig=TRUE,echo=FALSE>>=
 plotPImap(fam.pcm1, main="Familiarity with thoughtless awareness")
 @ 
 \end{frame}
 
 \begin{frame}
+Item fit sorted by Infit MSQ.
+<<results=tex,echo=FALSE>>=
+fit <- itemfit(fam.pcm1.p)
+fit.df <- as.data.frame(fit[c('i.outfitMSQ','i.outfitZ','i.infitMSQ','i.infitZ')])
+dimnames(fit.df)[[2]] <- c("Outfit MSQ", "Outfit t", "Infit MSQ", "Infit t")
+print(xtable(round(fit.df[order(fit.df$'Infit MSQ'),],2), table.placement='!h'))
+@ 
+
+Liberal acceptable range for MSQ 1.4-0.6
+\end{frame}
+
+\begin{frame}
+<<fig=TRUE,echo=FALSE,height=3>>=
+print(myPlotICC(thresholds(fam.pcm1)$threshtable$'1'[2,2:3]) +
+  opts(title="Possible for anybody"))
+@ 
+
+Data for this item had the most variance (and underfit), simulating an
+item that was not answered very consistently with respect to latent trait level.
+\end{frame}
+
+\begin{frame}
+<<fig=TRUE,echo=FALSE,height=3>>=
+print(myPlotICC(thresholds(fam.pcm1)$threshtable$'1'[1,2:3]) +
+  opts(title="Does not make sense"))
+@ 
+
+Data for this item was the most overfit for both infit and outfit.
+\end{frame}
+
+\begin{frame}
+Person fit sorted by Infit MSQ.
+<<results=tex,echo=FALSE>>=
+fit <- personfit(fam.pcm1.p)
+fit.df <- as.data.frame(fit[c('p.outfitMSQ','p.outfitZ','p.infitMSQ','p.infitZ')])
+dimnames(fit.df)[[2]] <- c("Outfit MSQ", "Outfit t", "Infit MSQ", "Infit t")
+fit.crazy <- rbind(fit.df[head(order(fit.df$'Infit MSQ')),],
+  fit.df[tail(order(fit.df$'Infit MSQ')),])
+print(xtable(round(fit.crazy,2), table.placement='!h'))
+@ 
+
+Liberal acceptable range for MSQ 1.4-0.6. Clearly there are some
+crazy people here.
+\end{frame}
+
+\begin{frame}
+A likely response pattern:
+<<results=tex,echo=FALSE>>=
+print(xtable(cms[c(3),1:6], table.placement='!h'))
+@ 
+
+Some unlikely response patterns:
+<<results=tex,echo=FALSE>>=
+print(xtable(cms[c(121,40,83,195,172,197),1:6], table.placement='!h'))
+@ 
+\end{frame}
+
+\begin{frame}
+<<fig=TRUE,echo=FALSE,height=3>>=
+print(plotInfo(thresholds(fam.pcm1)$threshtable$'1', c(-8,8)))
+@ 
+
+The information curve spans a reasonably wide range of trait scores.
+\end{frame}
+
+\begin{frame}
 <<fig=TRUE,echo=FALSE>>=
 plotPImap(ctx.pcm1, main="Context of thoughtless awareness")
 @ 
+\end{frame}
+
+\begin{frame}
+<<fig=TRUE,echo=FALSE,height=3.5>>=
+p1 <- myPlotICC(thresholds(ctx.pcm1)$threshtable$'1'[4,2:5], xrange=c(-4,4)) +
+  opts(title="Relaxation")
+p2 <- myPlotICC(thresholds(ctx.pcm1)$threshtable$'1'[6,2:5], xrange=c(-4,4)) +
+  opts(title="Meditation")
+multiplot(p1,p2,cols=1)
+@ 
+
+Thresholds are out of order. This is bad. If the same thing is
+seen in real data then there are too many response options or
+the item needs refinement.
+\end{frame}
+
+\begin{frame}
+Item fit sorted by Infit MSQ.
+<<results=tex,echo=FALSE>>=
+fit <- itemfit(ctx.pcm1.p)
+fit.df <- as.data.frame(fit[c('i.outfitMSQ','i.outfitZ','i.infitMSQ','i.infitZ')])
+dimnames(fit.df)[[2]] <- c("Outfit MSQ", "Outfit t", "Infit MSQ", "Infit t")
+print(xtable(round(fit.df[order(fit.df$'Infit MSQ'),],2), table.placement='!h'))
+@ 
+
+Liberal acceptable range for MSQ 1.4-0.6
+\end{frame}
+
+\begin{frame}
+Person fit sorted by Infit MSQ.
+<<results=tex,echo=FALSE>>=
+fit <- personfit(ctx.pcm1.p)
+fit.df <- as.data.frame(fit[c('p.outfitMSQ','p.outfitZ','p.infitMSQ','p.infitZ')])
+dimnames(fit.df)[[2]] <- c("Outfit MSQ", "Outfit t", "Infit MSQ", "Infit t")
+fit.crazy <- rbind(fit.df[head(order(fit.df$'Infit MSQ')),],
+  fit.df[tail(order(fit.df$'Infit MSQ')),])
+print(xtable(round(fit.crazy,2), table.placement='!h'))
+@ 
+
+Liberal acceptable range for MSQ 1.4-0.6. Again there are some
+crazy people here.
+\end{frame}
+
+\begin{frame}
+Some likely response pattern:
+<<results=tex,echo=FALSE>>=
+print(xtable(cms[c(45,180,18),7:13], table.placement='!h'), size='tiny')
+@ 
+
+Some unlikely response patterns:
+<<results=tex,echo=FALSE>>=
+print(xtable(cms[c(82,67,116),7:13], table.placement='!h'), size='tiny')
+@ 
+\end{frame}
+
+\begin{frame}
+<<fig=TRUE,echo=FALSE,height=3>>=
+print(plotInfo(thresholds(ctx.pcm1)$threshtable$'1', c(-6,6)))
+@ 
+
+At least with this fake data, the information curve is somewhat
+compressed between -2 and 2. If this happens with real data,
+it may be worth considering other questions to better measure
+the extremes of the trait.
 \end{frame}
 
 \section{Discussion}
