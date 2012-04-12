@@ -364,6 +364,33 @@ print(xtable(tbl, table.placement='!h'))
 Other demographic data were not fabricated.
 \end{frame}
 
+\begin{frame}[fragile]
+\frametitle{Model fits}
+Subscales:
+
+\begin{itemize}
+\item Familiarity with complete mental silence
+
+<<echo=FALSE>>=
+logLik(fam.pcm1)
+@ 
+Single dimension, 1st eigenvalue of residual $= \Sexpr{round(fam.pcm1.res$values[1],2)}$\footnote{The threshold for 100 persons and 20 items is 1.74 \cite{raiche2005}.}
+\bigskip
+
+\item Context of complete mental silence
+
+<<echo=FALSE>>=
+logLik(ctx.pcm1)
+@ 
+Single dimension, 1st eigenvalue of residual $= \Sexpr{round(ctx.pcm1.res$values[1],2)}$
+\bigskip
+
+\item Relationship to flow
+
+\emph{Not simulated}
+\end{itemize}
+\end{frame}
+
 \begin{frame}
 <<fig=TRUE,echo=FALSE>>=
 plotPImap(fam.pcm1, main="Familiarity with thoughtless awareness")
