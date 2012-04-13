@@ -392,8 +392,12 @@ Single dimension, 1st eigenvalue of residual $= \Sexpr{round(ctx.pcm1.res$values
 \end{frame}
 
 \begin{frame}
-<<fig=TRUE,echo=FALSE>>=
+<<fig=TRUE,echo=FALSE,height=4>>=
 plotPImap(fam.pcm1, main="Familiarity with thoughtless awareness")
+@ 
+<<results=tex,echo=FALSE>>=
+print(xtable(t(as.matrix(summary(fam.pcm1$etapar))),
+             table.placement='!h', digits=c(2)), include.rownames=FALSE)
 @ 
 \end{frame}
 
@@ -403,7 +407,13 @@ Item fit sorted by Infit MSQ.
 fit <- itemfit(fam.pcm1.p)
 fit.df <- as.data.frame(fit[c('i.outfitMSQ','i.outfitZ','i.infitMSQ','i.infitZ')])
 dimnames(fit.df)[[2]] <- c("Outfit MSQ", "Outfit t", "Infit MSQ", "Infit t")
-print(xtable(round(fit.df[order(fit.df$'Infit MSQ'),],2), table.placement='!h'))
+fit.df <- fit.df[order(fit.df$'Infit MSQ'),]
+fit.sum <- c(fmtMeanSD(fit.df$'Outfit MSQ'), '',
+             fmtMeanSD(fit.df$'Infit MSQ'), '')
+fit.df <- round(fit.df,2)
+fit.df <- rbind(fit.df, "Mean (SD)"=fit.sum)
+print(xtable(fit.df, table.placement='!h'),
+      hline.after=c(-1,0,nrow(fit.df)-1,nrow(fit.df)))
 @ 
 
 Liberal acceptable range for MSQ 1.4-0.6
@@ -429,14 +439,25 @@ Data for this item was the most overfit for both infit and outfit.
 \end{frame}
 
 \begin{frame}
+Summary of person parameters:
+
+<<results=tex,echo=FALSE>>=
+print(xtable(t(as.matrix(summary(fam.pcm1.p$theta.table$Person))),
+             digits=c(2)), include.rownames=FALSE)
+@ 
+\end{frame}
+
+\begin{frame}
 Person fit sorted by Infit MSQ.
 <<results=tex,echo=FALSE>>=
 fit <- personfit(fam.pcm1.p)
 fit.df <- as.data.frame(fit[c('p.outfitMSQ','p.outfitZ','p.infitMSQ','p.infitZ')])
 dimnames(fit.df)[[2]] <- c("Outfit MSQ", "Outfit t", "Infit MSQ", "Infit t")
-fit.crazy <- rbind(fit.df[head(order(fit.df$'Infit MSQ')),],
-  fit.df[tail(order(fit.df$'Infit MSQ')),])
-print(xtable(round(fit.crazy,2), table.placement='!h'))
+chunk <- 5
+fit.crazy <- rbind(fit.df[head(order(fit.df$'Infit MSQ'),n=chunk),],
+  fit.df[tail(order(fit.df$'Infit MSQ'),n=chunk),])
+print(xtable(round(fit.crazy,2), table.placement='!h'),
+      hline.after=c(-1,0,nrow(fit.crazy),chunk))
 @ 
 
 Liberal acceptable range for MSQ 1.4-0.6. Clearly there are some
@@ -456,6 +477,22 @@ print(xtable(cms[c(121,40,83,195,172,197),1:6], table.placement='!h'))
 \end{frame}
 
 \begin{frame}
+Participants with training in meditation were suppose
+to have somewhat higher trait scores.
+
+Andersen LR $= \Sexpr{round(lrt$LR,2)},
+df = \Sexpr{round(lrt$df,2)}, p = \Sexpr{round(lrt$pvalue,2)}$.
+
+<<results=tex,echo=FALSE>>=
+beta <- cbind(lrt$betalist$'0', lrt$betalist$'1',
+              lrt$betalist$'1'-lrt$betalist$'0')
+dimnames(beta)[[1]] <- str_replace(dimnames(beta)[[1]], "beta ", '')
+dimnames(beta)[[2]] <- c("without","with","with-without")
+print(xtable(beta, table.placement='!h', digits=c(2)))
+@ 
+\end{frame}
+
+\begin{frame}
 <<fig=TRUE,echo=FALSE,height=3>>=
 print(plotInfo(thresholds(fam.pcm1)$threshtable$'1', c(-8,8)))
 @ 
@@ -464,13 +501,17 @@ The information curve spans a reasonably wide range of trait scores.
 \end{frame}
 
 \begin{frame}
-<<fig=TRUE,echo=FALSE>>=
+<<fig=TRUE,echo=FALSE,height=4>>=
 plotPImap(ctx.pcm1, main="Context of thoughtless awareness")
+@ 
+<<results=tex,echo=FALSE>>=
+print(xtable(t(as.matrix(summary(ctx.pcm1$etapar))),
+             table.placement='!h', digits=c(2)), include.rownames=FALSE)
 @ 
 \end{frame}
 
 \begin{frame}
-<<fig=TRUE,echo=FALSE,height=3.5>>=
+<<fig=TRUE,echo=FALSE,height=4.5>>=
 p1 <- myPlotICC(thresholds(ctx.pcm1)$threshtable$'1'[4,2:5], xrange=c(-4,4)) +
   opts(title="Relaxation")
 p2 <- myPlotICC(thresholds(ctx.pcm1)$threshtable$'1'[6,2:5], xrange=c(-4,4)) +
@@ -489,10 +530,25 @@ Item fit sorted by Infit MSQ.
 fit <- itemfit(ctx.pcm1.p)
 fit.df <- as.data.frame(fit[c('i.outfitMSQ','i.outfitZ','i.infitMSQ','i.infitZ')])
 dimnames(fit.df)[[2]] <- c("Outfit MSQ", "Outfit t", "Infit MSQ", "Infit t")
-print(xtable(round(fit.df[order(fit.df$'Infit MSQ'),],2), table.placement='!h'))
+fit.df <- fit.df[order(fit.df$'Infit MSQ'),]
+fit.sum <- c(fmtMeanSD(fit.df$'Outfit MSQ'), '',
+             fmtMeanSD(fit.df$'Infit MSQ'), '')
+fit.df <- round(fit.df,2)
+fit.df <- rbind(fit.df, "Mean (SD)"=fit.sum)
+print(xtable(fit.df, table.placement='!h'),
+      hline.after=c(-1,0,nrow(fit.df)-1,nrow(fit.df)))
 @ 
 
 Liberal acceptable range for MSQ 1.4-0.6
+\end{frame}
+
+\begin{frame}
+Summary of person parameters:
+
+<<results=tex,echo=FALSE>>=
+print(xtable(t(as.matrix(summary(ctx.pcm1.p$theta.table$Person))),
+             digits=c(2)), include.rownames=FALSE)
+@ 
 \end{frame}
 
 \begin{frame}
@@ -501,9 +557,11 @@ Person fit sorted by Infit MSQ.
 fit <- personfit(ctx.pcm1.p)
 fit.df <- as.data.frame(fit[c('p.outfitMSQ','p.outfitZ','p.infitMSQ','p.infitZ')])
 dimnames(fit.df)[[2]] <- c("Outfit MSQ", "Outfit t", "Infit MSQ", "Infit t")
-fit.crazy <- rbind(fit.df[head(order(fit.df$'Infit MSQ')),],
-  fit.df[tail(order(fit.df$'Infit MSQ')),])
-print(xtable(round(fit.crazy,2), table.placement='!h'))
+chunk <- 5
+fit.crazy <- rbind(fit.df[head(order(fit.df$'Infit MSQ'),n=chunk),],
+  fit.df[tail(order(fit.df$'Infit MSQ'),n=chunk),])
+print(xtable(round(fit.crazy,2), table.placement='!h'),
+      hline.after=c(-1,0,nrow(fit.crazy),chunk))
 @ 
 
 Liberal acceptable range for MSQ 1.4-0.6. Again there are some
