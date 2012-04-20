@@ -134,7 +134,7 @@ and Gyaneshwari \cite[pp.~93--94]{manocha2009}.
 
 Complete mental silence is an experience in which one is
 no longer is thinking and
-no longer feels the compulsion to continuously engage in thought.
+no longer feels the urge to continuously engage in thought.
 The experience occurs in a normal waking state;
 thoughtless awareness is not similar to sleeping or unconsciousness.
 \end{frame}
@@ -191,6 +191,26 @@ magnitude more scientific studies \cite{lau2004}.
 
 A potentially vital component of flow has not received
 any psychological scrutiny.
+\end{frame}
+
+\begin{frame}
+\frametitle{Maximum Likelihood}
+
+We would like to select the most likely model given the data.
+\begin{displaymath}
+\max p(Model|Data)
+\end{displaymath}
+However, what maximum likelihood does is maximize the probability of
+the data given a model.
+\begin{displaymath}
+\max p(Data|Model)
+\end{displaymath}
+Bayes' theorem tells us that
+\begin{displaymath}
+\max p(Model|Data) = \frac{p(Data|Model)p(Model)}{p(Data)}
+\end{displaymath}
+Since $p(Data)$ is constant, maximum likelihood will choose the most likely
+model only if $p(Model)$ is roughly equal for all candidate models.
 \end{frame}
 
 \section{Survey}
@@ -284,10 +304,11 @@ On a 5-point Likert scale from \emph{important} to \emph{not important}, rate:
 \emph{Needs more brainstorming \dots}
 
 \begin{itemize}
-\item Would complete mental silence help prepare you for flow?
-\item Would flow help prepare you for complete mental silence?
-\item How similar are complete mental silence and flow?
-\item How compatible are complete mental silence and flow?
+\item List a favorite flow activity: \emph{text}
+\item Would complete mental silence help prepare you for your flow activity?
+\item Would flow activity help prepare you for complete mental silence?
+\item Do you experience complete mental silence during your flow activity?
+\item How similar are complete mental silence and your flow activity?
 \item\emph{What else?}
 \end{itemize}
 

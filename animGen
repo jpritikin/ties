@@ -1,0 +1,111 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use Cairo;
+use List::Util qw(sum);
+use Fatal qw(mkdir unlink);
+use Math::Spline qw(binsearch);
+use constant BG_FILE => 'brain.png';
+use constant WIDTH => 200;
+use constant HEIGHT => 200;
+use constant TMPDIR => 'gen';
+use constant THOUGHT_WIDTH => 150/5;
+use constant THOUGHT_HEIGHT => -30;
+use constant THOUGHT_Y => 100;
+use constant PI => 3.1415926535;
+
+our $background = Cairo::ImageSurface->create_from_png(BG_FILE);
+
+-d TMPDIR or mkdir TMPDIR;
+
+# thought coordinate system:
+# x -2 to 2
+
+our $ampCurve = Math::Spline->new([-2,-1,-.5,.5,1,2], [.3,.6,1,1,.6,.3]);
+
+sub thoughtFunc {
+    my ($state, $x) = @_;
+    my $warpx = $x * (1-sin((.5+$x/4) * PI));
+    my $loc = $state->{loc};
+    my $amp = $state->{amp};
+    my $at = binsearch($loc, $warpx);
+    my $pct = ($warpx - $loc->[$at]) / ($loc->[$at+1] - $loc->[$at]);
+    my $amp2 = Math::Spline->new($loc, $amp);
+    my $height = $amp2->evaluate($warpx);
+    $height + $height * sin($pct*2*PI) * $ampCurve->evaluate($x);
+}
+
+sub mean { # not used
+    my ($v) = @_;
+    sum(@$v)/scalar(@$v)
+}
+
+sub integrate {
+    my ($loc, $v, $from, $to) = @_;
+    my $x1 = binsearch($loc, $from);
+    my $x2 = binsearch($loc, $to);
+    my $count = 0;
+    my $sum = 0;
+    my $pct = 1 - ($from - $loc->[$x1]) / ($loc->[$x1+1] - $loc->[$x1]);
+    $sum += $pct * $v->[$x1];
+    $count += $pct;
+    $pct = ($to - $loc->[$x2]) / ($loc->[$x2+1] - $loc->[$x2]);
+    $sum += $pct * $v->[$x2];
+    $count += $pct;
+    for (my $x=$x1+1; $x < $x2; $x += 1) {
+	$sum += $v->[$x];
+	$count += 1;
+    }
+    $sum / $count;
+}
+
+sub drawFrame {
+    my ($f, $state) = @_;
+    my $surface = Cairo::ImageSurface->create('argb32', WIDTH, HEIGHT);
+    my $cr = Cairo::Context->create($surface);
+
+    if (1) {
+    $cr->save;
+    $cr->set_source_surface($background, 0,0);
+    $cr->paint_with_alpha(.5);
+    $cr->restore;
+
+    $cr->save;
+    $cr->set_source_rgba(1,.5,1,.5);
+    $cr->paint;
+    $cr->restore;
+}
+
+    $cr->save;
+    $cr->set_source_rgba(.5,.5,1,1);
+    $cr->set_line_width((1-integrate($state->{loc}, $state->{amp},-2,2)) * 10);
+    $cr->new_path;
+    for (my $x=-2; $x <= 2; $x += .025) {
+	my @pos = ($x * THOUGHT_WIDTH + WIDTH/2,
+		   thoughtFunc($state, $x) * THOUGHT_HEIGHT + THOUGHT_Y);
+	$cr->line_to(@pos);
+    }
+    $cr->stroke;
+    $cr->restore;
+
+    my $out = TMPDIR.sprintf("/frame-%03d.png", $f);
+    if (-f $out) { unlink($out) }
+    $surface->write_to_png($out);
+
+    die $cr->status
+      if $cr->status ne 'success';
+}
+
+sub drawFrames {
+    my $state = {
+		 loc => [-9,-8,-7,-6,-5,-4,-3,-2,-1,0,1,2],
+		 amp => [ 0, 0, 0, 0, 0, 0,.2,.4,.6,1,1,1]
+		};
+    for (my $f=0; $f < 70; $f++) {
+	drawFrame($f, $state);
+	for my $l (@{$state->{loc}}) { $l += .1 }
+    }
+}
+
+drawFrames();
