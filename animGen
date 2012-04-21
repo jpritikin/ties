@@ -6,6 +6,7 @@ use Cairo;
 use List::Util qw(sum);
 use Fatal qw(mkdir unlink);
 use Math::Spline qw(binsearch);
+require GD;
 use constant BG_FILE => 'brain.png';
 use constant WIDTH => 200;
 use constant HEIGHT => 200;
@@ -41,7 +42,7 @@ sub mean { # not used
     sum(@$v)/scalar(@$v)
 }
 
-sub integrate {
+sub integrateStepFunc {
     my ($loc, $v, $from, $to) = @_;
     my $x1 = binsearch($loc, $from);
     my $x2 = binsearch($loc, $to);
@@ -60,26 +61,30 @@ sub integrate {
     $sum / $count;
 }
 
+sub framePath {
+    my ($f) = @_;
+    TMPDIR.sprintf("/frame-%03d.png", $f);
+}
+
 sub drawFrame {
     my ($f, $state) = @_;
     my $surface = Cairo::ImageSurface->create('argb32', WIDTH, HEIGHT);
     my $cr = Cairo::Context->create($surface);
 
-    if (1) {
+    $cr->save;
+    $cr->set_source_rgb(1,1,1);
+    $cr->paint;
+    $cr->restore;
+
     $cr->save;
     $cr->set_source_surface($background, 0,0);
     $cr->paint_with_alpha(.5);
     $cr->restore;
 
     $cr->save;
-    $cr->set_source_rgba(1,.5,1,.5);
-    $cr->paint;
-    $cr->restore;
-}
-
-    $cr->save;
     $cr->set_source_rgba(.5,.5,1,1);
-    $cr->set_line_width((1-integrate($state->{loc}, $state->{amp},-2,2)) * 10);
+    my $meanAmp = integrateStepFunc($state->{loc}, $state->{amp},-2,2);
+    $cr->set_line_width((1.25-$meanAmp) * 8);
     $cr->new_path;
     for (my $x=-2; $x <= 2; $x += .025) {
 	my @pos = ($x * THOUGHT_WIDTH + WIDTH/2,
@@ -89,7 +94,7 @@ sub drawFrame {
     $cr->stroke;
     $cr->restore;
 
-    my $out = TMPDIR.sprintf("/frame-%03d.png", $f);
+    my $out = framePath($f);
     if (-f $out) { unlink($out) }
     $surface->write_to_png($out);
 
@@ -98,14 +103,63 @@ sub drawFrame {
 }
 
 sub drawFrames {
-    my $state = {
-		 loc => [-9,-8,-7,-6,-5,-4,-3,-2,-1,0,1,2],
-		 amp => [ 0, 0, 0, 0, 0, 0,.2,.4,.6,1,1,1]
-		};
-    for (my $f=0; $f < 70; $f++) {
-	drawFrame($f, $state);
-	for my $l (@{$state->{loc}}) { $l += .1 }
+    my $frameDelay = 10;
+    my ($curFrame, $prevFrame,$gif);
+
+    my @amp = reverse ((1) x 3, 3/4,1/2,1/4, (0)x7,1/3,2/3,(1)x5);
+    my @loc = 1 .. scalar(@amp);
+    for my $l (@loc) { $l -= scalar(@amp)+2 }
+    my $tape = { loc => \@loc, amp => \@amp };
+    my $frames = (scalar(@amp) - 5) * 10;
+    for (my $f=0; $f < $frames; $f++) {
+	drawFrame($f, $tape);
+	for my $l (@{$tape->{loc}}) { $l += .1 }
+
+	if ($f == 0) {
+	    $curFrame = GD::Image->new(framePath(0));
+	    die if !$curFrame;
+	    open $gif, '>', TMPDIR.'/mental.gif';
+	    print $gif $curFrame->gifanimbegin(0, 0);
+	    print $gif $curFrame->gifanimadd(1,0,0,$frameDelay,1);
+	} else {
+	    $prevFrame = $curFrame;
+	    $curFrame = GD::Image->new(framePath($f));
+	    die if !$curFrame;
+	    print $gif $curFrame->gifanimadd(1,0,0,$frameDelay,1,$prevFrame);
+	}
     }
+    print $gif $curFrame->gifanimend;
 }
 
-drawFrames();
+sub convertToGIF {
+    my $frameDelay = 10;
+    my $fr = GD::Image->new(framePath(0));
+    die if !$fr;
+    open my($gif), '>', TMPDIR.'/mental.gif';
+    print $gif $fr->gifanimbegin(0, 1);
+    print $gif $fr->gifanimadd(1,0,0,$frameDelay,1);
+    for my $f (1 .. 110) {
+	my $prev = $fr;
+	$fr = GD::Image->new(framePath($f));
+	die $f if !$fr;
+	print $gif $fr->gifanimadd(1,0,0,$frameDelay,1,$prev);
+    }
+    print $gif $fr->gifanimend;
+}
+
+sub convertToGIF2 {
+    open my($gif), '>', TMPDIR.'/mental.gif';
+    my $prevFrame;
+    my $curFrame = GD::Image->new(framePath(0));
+    print $gif $curFrame->gifanimbegin;
+    print $gif $curFrame->gifanimadd;
+    for my $f (1..100) {
+	$prevFrame = $curFrame;
+	$curFrame  = GD::Image->new(framePath($f));
+	print $gif $curFrame->gifanimadd;
+    }
+    print $gif $curFrame->gifanimend;
+}
+
+#drawFrames();
+convertToGIF2();
