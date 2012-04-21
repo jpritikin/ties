@@ -133,33 +133,18 @@ sub drawFrames {
 
 sub convertToGIF {
     my $frameDelay = 10;
-    my $fr = GD::Image->new(framePath(0));
-    die if !$fr;
-    open my($gif), '>', TMPDIR.'/mental.gif';
-    print $gif $fr->gifanimbegin(0, 1);
-    print $gif $fr->gifanimadd(1,0,0,$frameDelay,1);
-    for my $f (1 .. 110) {
-	my $prev = $fr;
-	$fr = GD::Image->new(framePath($f));
-	die $f if !$fr;
-	print $gif $fr->gifanimadd(1,0,0,$frameDelay,1,$prev);
-    }
-    print $gif $fr->gifanimend;
-}
-
-sub convertToGIF2 {
     open my($gif), '>', TMPDIR.'/mental.gif';
     my $prevFrame;
     my $curFrame = GD::Image->new(framePath(0));
-    print $gif $curFrame->gifanimbegin;
-    print $gif $curFrame->gifanimadd;
+    print $gif $curFrame->gifanimbegin(1,0);
+    print $gif $curFrame->gifanimadd(1,0,0,$frameDelay,1);
     for my $f (1..100) {
 	$prevFrame = $curFrame;
 	$curFrame  = GD::Image->new(framePath($f));
-	print $gif $curFrame->gifanimadd;
+	print $gif $curFrame->gifanimadd(1,0,0,$frameDelay,1,$prevFrame);
     }
     print $gif $curFrame->gifanimend;
 }
 
 #drawFrames();
-convertToGIF2();
+convertToGIF();
