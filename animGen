@@ -17,9 +17,9 @@ use constant THOUGHT_X => WIDTH/2 + 10;   # middle
 use constant THOUGHT_Y => 75;
 use constant TEXT_Y => THOUGHT_Y - THOUGHT_HEIGHT + 20;
 use constant PI => 3.1415926535;
-use constant JITTER => 1.25;
+use constant JITTER => 1;
 use constant OPTIMIZE => 1;
-use constant FRAME_STEP => .05;
+use constant FRAME_STEP => .1;
 #use Data::Dumper;
 
 our $background = Cairo::ImageSurface->create_from_png(BG_FILE);
@@ -183,8 +183,11 @@ sub drawFrame {
     if ($meanAmp > 0) {
 	$cr->set_font_size(19);
 	$cr->set_source_rgba(0,.4,0,$meanAmp);
-	# cairo_font_options_set_hint_style TODO
-	# CAIRO_HINT_METRICS_OFF
+	my $fo = $cr->get_font_options;
+	$fo->set_antialias('gray');
+	$fo->set_hint_metrics('off');
+	$fo->set_hint_style('none');
+	$cr->set_font_options($fo);
 	showJitterText($cr, 'thought', $meanAmp, TEXT_Y);
 	showJitterText($cr, 'emotion', $meanAmp, TEXT_Y + 30);
     } else {
