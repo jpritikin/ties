@@ -279,5 +279,16 @@ in the context of meditation, it seems plausible that the experience
 occurs outside the context of meditation as well,
 perhaps as a component of flow.
 
+Some hypotheses:
+\begin{itemize}
+\item Intuitive or accidental thoughtless awareness is not uncommon.
+\item Thoughtless awareness occurs outside the context of meditation.
+\item Flow and complete mental silence will be judged as similar relative
+  to some other obvious comparisons.
+\item Differential item functioning (DIF):
+Has received any training in meditation? By education \cite{baer2008}?
+Trying to intend complete mental silence or not?
+\end{itemize}
+
 \bibliography{jpritikin}
 \end{document} 
