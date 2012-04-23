@@ -17,9 +17,10 @@ use constant THOUGHT_X => WIDTH/2 + 10;   # middle
 use constant THOUGHT_Y => 75;
 use constant TEXT_Y => THOUGHT_Y - THOUGHT_HEIGHT + 20;
 use constant PI => 3.1415926535;
-use constant JITTER => 1;
-use constant OPTIMIZE => 1;
+use constant JITTER => .75;
+use constant OPTIMIZE => 0;
 use constant FRAME_STEP => .1;
+use constant SILENCE => .1;
 #use Data::Dumper;
 
 our $background = Cairo::ImageSurface->create_from_png(BG_FILE);
@@ -140,7 +141,7 @@ sub drawFrame {
 	# pos range -2 .. 1.9
 	my @color = getBrewerColor($x);
 	my $altitude = $spline->evaluate($pos) * THOUGHT_HEIGHT;
-	my $alpha = (1-(abs($pos) / 2)) * .9 * $meanAmp;
+	my $alpha = (1-(abs($pos) / 2)) * ($meanAmp - SILENCE);
 	if ($pos < 0) {
 	    $cr->arc($pos * THOUGHT_WIDTH + THOUGHT_X,
 		     $altitude * $ampCurve->evaluate($pos) + THOUGHT_Y,
@@ -180,9 +181,9 @@ sub drawFrame {
 
     $cr->save;
     $cr->select_font_face("Sans", "normal", "bold");
-    if ($meanAmp > 0) {
+    if ($meanAmp > SILENCE) {
 	$cr->set_font_size(19);
-	$cr->set_source_rgba(0,.4,0,$meanAmp);
+	$cr->set_source_rgba(0,.4,0, $meanAmp - SILENCE);
 	my $fo = $cr->get_font_options;
 	$fo->set_antialias('gray');
 	$fo->set_hint_metrics('off');
@@ -219,7 +220,7 @@ sub drawFrame {
 }
 
 sub drawFrames {
-    my @amp = reverse ((0)x3,1/3,2/3,(1)x7,3/4,1/2,1/4,(0)x7);
+    my @amp = reverse ((SILENCE/2)x3,1/3,2/3,(1)x7,3/4,1/2,1/4,(SILENCE/2)x7);
     my @beginning = @amp[-5..-1];
     unshift @amp, @beginning;
     my @loc = 1 .. scalar(@amp);
