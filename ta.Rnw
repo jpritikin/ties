@@ -126,11 +126,32 @@ While the ambiguity of the English word `meditation' was identified as
 early as 1977 and perhaps earlier, little has been done to resolve the
 issue.
 The ambiguity still remains today \cite{bond2009}, hampering meta-analysis.
-Studies are conducted oriented to particular psychological
+Scientific studies are conducted oriented to particular
 centering devices ignoring the question of whether participants are
 experiencing complete mental silence.
 Since ancient times, Sanskrit has distinguished these two concepts
-without much difficulty. Complete mental silence is {\dn nirvichar samadhi}.
+without much difficulty.
+{\dn nirvicaara samaadhI} (nirvichar samadhi) is used to denote
+complete mental silence.
+{\dn samaadhI} (samadhi) literally means ``to acquire wholeness with.''
+{\dn samaadhI} (samadhi) is a compound word consisting of three parts:
+{\dn sam} (sum) means ``together'' or ``integrated,''
+{\dn aa} (ah) means ``towards,''
+and {\dn dhI} (dhi) means ``to hold.''
+{\dn nirvicaara} (nirvichar) literally means ``without thought.''
+{\dn nirvicaara} (nirvichar) is a compound word consisting of two parts:
+{\dn nir} (nir) means ``no'' and {\dn vicaara} (vichar) means ``thinking.''
+{\dn nirvicaara samaadhI} (nirvichar samadhi) is sometimes translated
+as ``thoughtless awareness,'' however,
+this phrase is somewhat misleading because ``thoughtlessness''
+can also connote carelessness.
+An alternate translation is ``mental silence.''
+Here ``complete mental silence'' is used to emphasize that
+{\dn nirvicaara samaadhI} (nirvichar samadhi) is not merely
+a reduction in intensity of thinking but a cessation of thinking.
+As for psychological centering devices, Sanskrit literature is generally
+specific about the type of practice prescribed and does not
+confuse centering devices with complete mental silence.
 
 %% Given that the clearest descriptions of thoughtless awareness
 %% have arguably come from Asia,

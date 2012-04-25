@@ -14,5 +14,7 @@ R --no-save --restore <<EOF
 Stangle("$name.Rnw")
 Sweave("$name.Rnw")
 EOF
+mv "$name.tex" "$name.dn"
+devnag "$name.dn" "$name.tex"
 pdflatex $name
 bibtex $name
