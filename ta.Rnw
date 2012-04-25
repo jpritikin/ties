@@ -3,16 +3,18 @@
 %\usepackage[margin=1in]{geometry}
 \usepackage{url}
 \usepackage{tikz}
+\usepackage{devanagari}
+% http://pravin.insanitybegins.com/files/devanagari.pdf
 
-\title{Thoughtless awareness: Folk familiarity and context}
+\title{Complete mental silence: Folk familiarity and context}
 \author{Joshua N.\ Pritikin}
 \affiliation{University of Virginia}
 
-\abstract{Thoughtless awareness has a rich history.}
+\abstract{Complete mental silence has a rich history.}
 
 \acknowledgements{Comments may be sent to the author at jpritikin@virginia.edu.}
 
-\shorttitle{THOUGHTLESS AWARENESS}
+\shorttitle{MENTAL SILENCE}
 
 \begin{document}
 \maketitle                            
@@ -80,16 +82,16 @@ this practice is thought to help disrupt negative thought-affect cycles
 Curiously, neither mantra meditation nor mindfulness meditation
 have dedicated sufficient discussion to the goal of meditation, that is,
 complete mental silence (a.k.a. thoughtless awareness).
-The notion of thoughtless awareness is found in widely translated,
+The notion of mental silence is found in widely translated,
 centuries old
 books such as the Mahabharat, Upanishads, Yoga Sutras of Patanjali,
 and Gyaneshwari \cite[pp.~93--94]{manocha2009}.
-Thoughtless awareness is an experience in which one is
+Mental silence is an experience in which one is
 no longer is thinking and
 no longer feels the urge to continuously engage in thought.
 The experience occurs in a normal, lucid waking state;
-thoughtless awareness is not similar to sleeping or unconsciousness.
-Thoughtless awareness subsumes other prescriptions
+Mental silence is not similar to sleeping or unconsciousness.
+Complete mental silence subsumes other prescriptions
 imposing limitations on permissible thought.
 For example, the notion of choiceless awareness 
 considers the presence and action of choice as indicating
@@ -100,9 +102,9 @@ Another example is mindfulness meditation's emphasis
 on non-judgmental awareness.
 If there are no thoughts, and consequentially no judgments,
 then the remaining awareness is non-judgmental.
-Thoughtless awareness is the most stringent limitation
+Complete mental silence is the most stringent limitation
 on permissible types of thought.
-The notion of thoughtless awareness contradicts
+The notion of mental silence contradicts
 DesCartes' ``I think therefore I am.'' \cite{damasio1995}.
 
 \begin{quotation}
@@ -119,6 +121,16 @@ mind is not focused on either thought or image, but is fully aware,
 conscious. The mind is said to be alert without having any
 \emph{object} of alertness. \cite[p.~91]{carrington1977}
 \end{quotation}
+
+While the ambiguity of the English word `meditation' was identified as
+early as 1977 and perhaps earlier, little has been done to resolve the
+issue.
+The ambiguity still remains today \cite{bond2009}, hampering meta-analysis.
+Studies are conducted oriented to particular psychological
+centering devices ignoring the question of whether participants are
+experiencing complete mental silence.
+Since ancient times, Sanskrit has distinguished these two concepts
+without much difficulty. Complete mental silence is {\dn nirvichar samadhi}.
 
 %% Given that the clearest descriptions of thoughtless awareness
 %% have arguably come from Asia,
