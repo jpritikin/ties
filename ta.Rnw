@@ -1,10 +1,24 @@
-\SweaveOpts{prefix.string=gen/fig, eps=FALSE, keep.source=TRUE}
+\SweaveOpts{prefix.string=gen/fig, eps=FALSE, keep.source=TRUE, echo=FALSE}
 \documentclass[man]{apa}
 %\usepackage[margin=1in]{geometry}
 \usepackage{url}
+%\usepackage{hyperref}  ugly clashes with apa style
+\usepackage{color}
+\usepackage[usenames,dvipsnames]{xcolor}
 \usepackage{tikz}
 \usepackage{devanagari}
 % http://pravin.insanitybegins.com/files/devanagari.pdf
+\usepackage{pdfpages}
+\usepackage{listings}
+\lstset{
+language=R,
+basicstyle=\scriptsize\ttfamily,
+commentstyle=\color{OliveGreen},
+stringstyle=\color{BrickRed},
+numbers=left,
+numberstyle=\color{gray}}
+\usepackage{setspace}
+%\usepackage{multicol}
 
 \title{Complete mental silence: Folk familiarity and context}
 \author{Joshua N.\ Pritikin}
@@ -127,29 +141,34 @@ early as 1977 and perhaps earlier, little has been done to resolve the
 issue.
 The ambiguity still remains today \cite{bond2009}, hampering meta-analysis.
 Scientific studies are conducted oriented to particular
-centering devices ignoring the question of whether participants are
+centering devices ignoring the critical question of whether participants are
 experiencing complete mental silence.
-Since ancient times, Sanskrit has distinguished these two concepts
-without much difficulty.
-{\dn nirvicaara samaadhI} (nirvichar samadhi) is used to denote
+Since ancient times, Sanskrit literature has distinguished these
+two concepts without much difficulty.
+{\dn nirvicaara samaadhi} (nirvichar samadhi) denotes
 complete mental silence.
-{\dn samaadhI} (samadhi) literally means ``to acquire wholeness with.''
-{\dn samaadhI} (samadhi) is a compound word consisting of three parts:
+{\dn samaadhi} (samadhi) literally means ``to acquire wholeness with.''
+{\dn samaadhi} (samadhi) is a compound word consisting of three parts:
 {\dn sam} (sum) means ``together'' or ``integrated,''
 {\dn aa} (ah) means ``towards,''
-and {\dn dhI} (dhi) means ``to hold.''
+and {\dn dhi} (dhi) means ``to hold.''
 {\dn nirvicaara} (nirvichar) literally means ``without thought.''
 {\dn nirvicaara} (nirvichar) is a compound word consisting of two parts:
 {\dn nir} (nir) means ``no'' and {\dn vicaara} (vichar) means ``thinking.''
-{\dn nirvicaara samaadhI} (nirvichar samadhi) is sometimes translated
+{\dn nirvicaara samaadhi} (nirvichar samadhi) is sometimes translated
 as ``thoughtless awareness,'' however,
-this phrase is somewhat misleading because ``thoughtlessness''
+this phrase is somewhat misleading because thoughtlessness
 can also connote carelessness.
 An alternate translation is ``mental silence.''
 Here ``complete mental silence'' is used to emphasize that
-{\dn nirvicaara samaadhI} (nirvichar samadhi) is not merely
-a reduction in intensity of thinking but a cessation of thinking.
-As for psychological centering devices, Sanskrit literature is generally
+{\dn nirvicaara samaadhi} (nirvichar samadhi) is not merely
+a reduction in the intensity of thinking but a cessation of thinking.
+The cessation of thinking must be of long enough duration to disrupt
+the prevailing rhythm of mental activity and
+present a choice of whether to engage in thought or not.
+This can happen within the span of a subjective moment.
+As for psychological centering devices,
+Sanskrit literature is generally
 specific about the type of practice prescribed and does not
 confuse centering devices with complete mental silence.
 
@@ -181,9 +200,8 @@ confuse centering devices with complete mental silence.
 \end{figure}
 
 One goal of this article is to better integrate the notion of
-thoughtless awareness,
-independent of particular meditation technique,
-with other themes in positive psychology.
+mental silence, independent of particular meditation technique,
+with other themes of positive psychology.
 At least one investigator has suggested that there is a relationship
 between flow and meditation \cite[p.~244]{carrington1977}.
 \emph{Flow} is an intrinsically rewarding experience in which a person
@@ -205,24 +223,26 @@ psychic order to disorder.
 Excessive emotion, moodiness, or cognitive dissonance
 hinder performance and are antagonistic to flow \cite{csikszentmihalyi1988}.
 
-Can thoughtless awareness be a flow experience? 
-Without preparation, the challenge of thoughtless awareness
+As a way to begin to relate the two concepts,
+let us conduct a thought experiment on whether
+mental silence can be a flow experience.
+Without preparation, the challenge of complete mental silence
 can be insurmountable;
 A naive thought suppression approach fails \cite{wegner2003}.
 However, \citeA{manocha2000} reported that participants in his
 Meditation Research Program ``consistently describe the
 ability to achieve this experience'' (p.~1137).
 Perhaps with the appropriate training,
-the challenge of thoughtless awareness can be made navigable.
-Certainly thoughtless awareness has a clear goal and immediate feedback.
-Concentration is implicit; without engrossment in thoughtless awareness,
+the challenge of mental silence can be made navigable.
+Certainly mental silence has a clear goal and immediate feedback.
+Concentration is implicit; without engrossment in mental silence,
 thinking is bound to resume.
-Therefore, it seems plausible that thoughtless awareness can meet the basic
+Therefore, it seems plausible that mental silence can meet the basic
 conditions of flow experience.
 
-Perhaps thoughtless awareness is a flow experience, but what about
+Perhaps mental silence is a flow experience, but what about
 the other direction?
-Does flow experience implicitly involve thoughtless awareness?
+Does flow experience implicitly involve mental silence?
 \citeA[p.~103]{csikszentmihalyi1991} remarked
 that yoga is ``one of the oldest and most systematic methods of
 producing the flow experience,''
@@ -245,13 +265,12 @@ confer that facilitates flow?
 Is it the separable abilities of concentrating attention,
 controlling memory, and narrowing focus to specific goals?
 Or is it the combination and coordination of such skills?
-Given that the traditional aim of yoga/meditation
-is thoughtless awareness,
-perhaps thoughtless awareness facilitates flow or
+Given that a traditional aim of yoga/meditation is mental silence,
+perhaps mental silence facilitates flow or
 is even a latent component of flow.
-A connection between flow and thoughtless awareness would be
+A connection between flow and mental silence would be
 easy to overlook because of the
-important similarity between thoughtless awareness and
+important similarity between mental silence and
 Heisenberg's uncertainty principle.
 
 Heisenberg's uncertainty principle is a result of quantum physics
@@ -260,45 +279,46 @@ Since the measurement itself perturbs a particle randomly,
 the accuracy to which certain physical properties of a particle
 can be measured is limited.
 Similar, the accuracy of self-report on the experience
-of thoughtless awareness is constrained because
+of mental silence is constrained because
 thought, the medium of self-report, is excluded from
 the experience.
-Therefore, self-reports concerning thoughtless awareness
+Therefore, self-reports concerning mental silence
 must be considered, at best, analogical and only accurate to some
 limit.\footnote{Heisenburg's uncertainty principle
 places a numerical limit on the accuracy of measurement.
 It seems unlikely that it will be possible to establish a quantitative
-bound on the precision of self-reports about thoughtless awareness.}
+bound on the precision of self-reports about mental silence.}
 
 Given the difficulty with self-reports, it is
 important to consider other ways of
-assessing the experience of thoughtless awareness.
+assessing the experience of mental silence.
 There is almost no research in this area.
 Two studies are noteworthy:
 One high-resolution EEG investigation of meditation
 raises more questions than it answers \cite{LIA01}, and
 there is tentative evidence that skin temperature
-can distinguish thoughtless awareness from rest \cite{manocha2010}.
-The paucity of investigations into thoughtless awareness
+can distinguish mental silence from rest \cite{manocha2010}.
+The paucity of investigations into mental silence
 allow for little certainly about its effect size and importance.
-In comparison, extrasensory perception has attracted 2-3 orders of
-magnitude more scientific studies \cite{lau2004}.
 
-The hypothesis advanced here is that thoughtless awareness
+The hypothesis advanced here is that mental silence
 has been overlooked.
-PsycNET searches for ``thoughtless awareness'' or ``mental silence''
+PsycNET searches for ``mental silence'' or ``thoughtless awareness''
 turned up nothing besides articles by Ramesh Manocha and collaborators.
 In a collection of 13 scales related to spiritual and religious experience,
-no attempt was made to measure ``thoughtless awareness'' \cite{fetzer1999}.
+no attempt was made to measure
+``mental silence'' or ``thoughtless awareness'' \cite{fetzer1999}.
 In two recent reviews of the state of the research on meditation/mindfulness,
-the possibility of thoughtless awareness or mental silence was not
+the possibility of mental silence or thoughtless awareness was not
 even acknowledged (\citeNP{shapiro2009}; \citeNP{baer2011}).
-Is the experience of thoughtless awareness so rare
+Is the experience of mental silence so rare
 that it does not even merit a glossary entry in reference works on
 positive psychology and the psychology of religion
 (\citeNP{pargament1997}; \citeNP{peterson2004};
 \citeNP{snyder2009}; \citeNP{sheldon2011})?
-It seems plausible that accidental thoughtless awareness
+A potentially vital component of flow has received almost
+no psychological scrutiny.
+It seems plausible that accidental mental silence
 is much more common than assumed.
 \citeA{henry2004} gathered evidence from a decade of workshops and
 questionnaire studies asking non-clinical adults what methods and
@@ -307,21 +327,267 @@ better.  A general strategy of ``quietening the mind'' was frequently
 endorsed.
 Unfortunately, this study did not try to discriminate
 precisely what was meant by ``quietening the mind.''
-While thoughtless awareness has typically been discussed
+While mental silence has typically been discussed
 in the context of meditation, it seems plausible that the experience
 occurs outside the context of meditation as well,
 perhaps as a component of flow.
 
-Some hypotheses:
-\begin{itemize}
-\item Intuitive or accidental thoughtless awareness is not uncommon.
-\item Thoughtless awareness occurs outside the context of meditation.
-\item Flow and complete mental silence will be judged as similar relative
-  to some other obvious comparisons.
-\item Differential item functioning (DIF):
-Has received any training in meditation? By education \cite{baer2008}?
-Trying to intend complete mental silence or not?
-\end{itemize}
+<<>>=
+source("analyze.R")
+@ 
+
+\section{Method}
+
+\subsection{Participants}
+
+Participants consisted of \Sexpr{dim(cms.latent)[[1]]} fake
+Charlottesville residents with
+\Sexpr{100*sum(cms.latent$train=="yes")/dim(cms.latent)[[1]]}\%
+having some training in meditation/yoga.
+This sample was probably much more educated than typical samples
+that draw participants from a university subject pool (Table \ref{tab:edu}).
+Other demographic data were not fabricated.
+
+<<results=tex>>=
+tbl<-as.matrix(table(cms.latent$edu))
+dimnames(tbl)[[2]] <- c("Education")
+print(xtable(tbl, caption="Distribution of education among participants.",
+             label="tab:edu"))
+@ 
+
+\subsection{Questionnaire}
+
+A questionnaire was developed to test these
+hypotheses (Appendix \ref{appendix:survey}).
+While self-reports about mental silence are necessarily imprecise,
+here the precision requested of participants is not great.
+Some brain systems certainly remain on-line even when there is no thought.
+In the same way that infants can remember experience prior to
+learning language and how to think in the conventional way,
+participants should not have much difficulty recalling whether
+they have experienced complete mental silence.
+None of the items ask participants to attempt to express the content of
+their mental silence experience.
+
+The questionnaire can be divided into four logical sections:
+basic demographic information, familiarity with mental silence (Familiarity),
+context of mental silence (Context),
+and the relationship between mental silence and flow (Flow).
+In the Familiarity subscale,
+items were presented in an hypothesized order from easy to difficult.
+In the Context subscale, the only question of interest in each section was:
+``Is complete mental silence an important component of \emph{X}?''
+Sections in the Context subscale were presented in random order
+to average out order effects.
+The Flow subscale would have benefited from additional brainstorming
+and is not analyzed in this report.
+Most of the other item were included because they (a) were of personal
+interest to the investigator, (b) could lead to additional hypotheses,
+and (c) pushed participants in the direction
+of thinking about the concepts more carefully.
+
+\subsection{Procedure}
+
+Participants responded to the questionnaire, all completing it within
+a single 30 min session. All participants answered all items;
+there was no missing data.
+No participants were excluded from statistical analysis.
+Raw response data is available in Appendix \ref{appendix:responses}.
+
+\section{Results}
+
+The analytic approach of item response theory (IRT) was selected.
+IRT offers considerable advantages over the alternatives.
+Using IRT, there is no need to assume that ordinal measurements
+on a Likert scale have interval measurement properties.
+Unlike classical test theory, IRT can obtain unbiased item difficulty
+estimates without the need of a huge sample to determine scale norms.
+Furthermore, IRT places items and person parameters on the same scale,
+easing interpretation.
+
+\subsection{Partial Credit Model}
+
+The Generalized Partial Credit Model (GPCM) model can be expressed in terms
+of the unconditional probability of each
+response $0, 1, \dots, m_i$ of person $j$'s attempt at item $i$. That is,
+
+\begin{displaymath}
+\sum_{h=0}^{m_i}P_{ijh} = 1.
+\end{displaymath}
+
+The probability of person $j$ scoring $x$ on item $i$ is
+
+\begin{displaymath}
+\forall x \in \{0,1,\dots,m_i\}, \quad
+P_{ijx} =
+\frac{\exp\left[\ \displaystyle\sum_{k=0}^{x} \alpha_{ik}(\theta_j - \delta_{ik})\right]}
+{\displaystyle\sum_{h=0}^{m_j}
+\left[\exp\ \displaystyle\sum_{k=0}^{h}\alpha_{ik}(\theta_j - \delta_{ik})\right]}
+\end{displaymath}
+
+where $\theta_j$ is person $j$'s trait level,
+$\delta_{ik}$ is the difficulty of the item $i$ at category $k$,
+$\alpha_{ik}$ is the discrimination of the item $i$ at category $k$,
+and summing across all persons $j$,
+item parameters $\alpha$ and $\delta$ are centered at zero
+
+\begin{displaymath}
+\sum_j\alpha_{ij}(\theta - \delta_{ij}) \equiv 0.
+\end{displaymath}
+
+Unfortunately, no \texttt{R} implementation of GPCM is
+working well enough yet.
+Data were analyzed using the \texttt{eRm} package \cite{erm2011},
+fixing $\alpha=1$.
+This is parameterization of GPCM
+is equivalent to the Partial Credit Model (PCM).
+\texttt{eRm} uses conditional maximum likelihood
+to estimate item and person parameters.
+
+\subsection{Familiarity subscale}
+
+A PCM was fit to the Familiarity subscale,
+$-2LL = \Sexpr{round(-2*logLik(fam.pcm1)$loglik,2)},
+df = \Sexpr{logLik(fam.pcm1)$df}$.
+To determine whether the scale assessed a single dimension,
+a principal component analysis was performed on the standardized
+residuals.
+The first eigenvalue was \Sexpr{round(fam.pcm1.res$values[1],2)},
+less than the 1.74 threshold (100 persons and 20 items, \citeNP{raiche2005})
+indicating that a second dimension was unlikely.
+
+\begin{figure}
+<<fig=TRUE,height=4>>=
+plotPImap(fam.pcm1, main="Familiarity with mental silence")
+@ 
+\caption{Person-item map of the Familiarity subscale.}
+\label{fig:familiarity:pimap}
+\end{figure}
+
+<<>>=
+s <- round(fivenum(fam.pcm1$etapar),2)
+@ 
+
+<<results=tex>>=
+fit <- itemfit(fam.pcm1.p)
+fit.df <- as.data.frame(fit[c('i.outfitMSQ','i.outfitZ','i.infitMSQ','i.infitZ')])
+dimnames(fit.df)[[2]] <- c("Outfit MSQ", "Outfit t", "Infit MSQ", "Infit t")
+fit.df <- fit.df[order(fit.df$'Infit MSQ'),]
+fit.sum <- c(fmtMeanSD(fit.df$'Outfit MSQ'), '',
+             fmtMeanSD(fit.df$'Infit MSQ'), '')
+fit.df <- round(fit.df,2)
+fit.df <- rbind(fit.df, "Mean (SD)"=fit.sum)
+print(xtable(fit.df, caption="Item outfit and infit sorted by infit.",
+             label="tab:familiarity:item:fit"),
+      hline.after=c(-1,0,nrow(fit.df)-1,nrow(fit.df)))
+@ 
+
+\begin{figure}
+<<fig=TRUE,height=3>>=
+print(myPlotICC(thresholds(fam.pcm1)$threshtable$'1'[1,2:3]) +
+  opts(title="Does not make sense"))
+@ 
+\caption{Item characteristic curves for the item ``Does not make sense''
+  in the Familiarity subscale.}
+\label{fig:familiarity:notSense}
+\end{figure}
+
+\begin{figure}
+<<fig=TRUE,height=3>>=
+print(myPlotICC(thresholds(fam.pcm1)$threshtable$'1'[2,2:3]) +
+  opts(title="Possible for anybody"))
+@ 
+\caption{Item characteristic curves for the item ``Possible for anybody''
+  in the Familiarity subscale.}
+\label{fig:familiarity:possAny}
+\end{figure}
+
+The person-item map is exhibited in Figure \ref{fig:familiarity:pimap}.
+Item parameters ranged from \Sexpr{s[1]} to \Sexpr{s[5]} with 50\%
+of the parameters between \Sexpr{s[2]} and \Sexpr{s[3]} and a median
+parameter of \Sexpr{s[3]}.
+Item outfit and infit statistics are exhibited in
+Table \ref{tab:familiarity:item:fit}.
+The liberal acceptable range for MSQ is 1.4 to 0.6.
+Only the notSense item's outfit fell outside this range (0.44),
+suggesting that notSense was overfit.
+The item characteristic curves for notSense
+(Figure \ref{fig:familiarity:notSense})
+confirmed the good behavior of this item.
+The possAny item was the most underfit item in the Familiarity subscale,
+although still well within the 1.4 MSQ fit threshold.
+Figure \ref{fig:familiarity:possAny} shows that the
+middle response category was infrequently endorsed.
+This suggests that the item may need rewording;
+a GPCM might find that this item discriminates poorly (as simulated).
+
+<<>>=
+s <- round(fivenum(fam.pcm1.p$theta.table$Person),2)
+@ 
+
+Person parameters 
+
+\subsection{Context subscale}
+
+A PCM was fit to the Context subscale,
+$-2LL = \Sexpr{round(-2*logLik(ctx.pcm1)$loglik,2)},
+df = \Sexpr{logLik(ctx.pcm1)$df}$.
+To determine whether the scale assessed a single dimension,
+a principal component analysis was performed on the standardized
+residuals.
+The first eigenvalue was \Sexpr{round(ctx.pcm1.res$values[1],2)},
+less than the 1.74 threshold (100 persons and 20 items, \citeNP{raiche2005})
+indicating that a second dimension was unlikely.
+
+\subsection{Summary}
+
+Complete \texttt{R} code for the analysis presented here is available
+in Appendices \ref{appendix:r-analysis} and \ref{appendix:r-presentation}.
+
+\section{Conclusion}
+
+This is a cool project.
 
 \bibliography{jpritikin}
+\appendix
+\section{Questionnaire}
+\label{appendix:survey}
+As a supplement to the questionnaire (exhibited on the following pages),
+an animation was developed to better convey the meaning of
+complete mental silence.
+See \url{http://people.virginia.edu/~jnp3bc/mental.gif} and
+Appendix \ref{appendix:animation}.
+\includepdf[pages=-,frame=true]{ta-survey.pdf}
+
+\section{Simulated Responses}
+
+\label{appendix:responses}
+\begin{singlespace}
+{\tiny
+<<>>=
+options(width=200)
+cms
+@ 
+}
+\end{singlespace}
+
+\section{R analysis code}
+\label{appendix:r-analysis}
+\begin{singlespace}
+\lstinputlisting{analyze.R}
+\end{singlespace}
+
+\section{R presentation code}
+\label{appendix:r-presentation}
+\begin{singlespace}
+\lstinputlisting{ta.R}
+\end{singlespace}
+
+\section{Source code for mental silence animation}
+\label{appendix:animation}
+\begin{singlespace}
+\lstset{basicstyle=\tiny\ttfamily}
+\lstinputlisting[language=Perl]{animGen}
+\end{singlespace}
+
 \end{document} 

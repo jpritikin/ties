@@ -48,7 +48,6 @@ numberstyle=\ttfamily\color{gray}\footnotesize}
 \begin{document}
 <<echo=FALSE>>=
 source("analyze.R")
-library(xtable)
 @ 
 
 \begin{frame}

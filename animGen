@@ -21,7 +21,6 @@ use constant JITTER => .75;
 use constant OPTIMIZE => 0;
 use constant FRAME_STEP => .1;
 use constant SILENCE => .05;
-#use Data::Dumper;
 
 our $background = Cairo::ImageSurface->create_from_png(BG_FILE);
 
@@ -53,11 +52,6 @@ sub thoughtFunc {
     my $pct = ($warpx - $loc->[$at]) / ($loc->[$at+1] - $loc->[$at]);
     my $height = $spline->evaluate($warpx);
     ($height + $height * sin($pct*2*PI))
-}
-
-sub mean { # not used
-    my ($v) = @_;
-    sum(@$v)/scalar(@$v)
 }
 
 sub integrateStepFunc {
@@ -266,4 +260,3 @@ sub convertToGIF {
 }
 
 drawFrames();
-#convertToGIF();
