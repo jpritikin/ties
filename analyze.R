@@ -159,3 +159,7 @@ train.flag <- round(cms.training=='yes')
 sink("/dev/null")
 lrt <- LRtest(fam.pcm1, splitcr=train.flag)
 sink()
+
+mySummary <- function(v) {
+  round(c(fivenum(v), mean(v), sd(v)),2)
+}

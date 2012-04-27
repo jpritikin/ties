@@ -24,7 +24,13 @@ numberstyle=\color{gray}}
 \author{Joshua N.\ Pritikin}
 \affiliation{University of Virginia}
 
-\abstract{Complete mental silence has a rich history.}
+\abstract{Complete mental silence is identified as a
+  potentially important psychological construct that
+  may be a component of meditation, religion, spirituality,
+  problem solving, relaxation, and flow.
+A survey is developed to assess folk familiarity and context
+of complete mental silence.
+Response data was simulated and analyzed using the Partial Credit Model.}
 
 \acknowledgements{Comments may be sent to the author at jpritikin@virginia.edu.}
 
@@ -166,10 +172,11 @@ Here ``complete mental silence'' is used to emphasize that
 {\dn nirvicaara samaadhi} (nirvichar samadhi) is not merely
 a reduction in the intensity of thinking but a cessation of thinking.
 The cessation of thinking must be of long enough duration to disrupt
-the prevailing rhythm of mental activity and
+prevailing mental activity and
 present a choice of whether to engage in thought or not.
 This can happen within the span of a subjective moment.
-A shift of identity occurs from ``I am the thinker'' to,
+If one is identified with thinking,
+a shift of identity occurs from ``I am the thinker'' to,
 approximately, ``I am the mental silence.''
 As for psychological centering devices,
 Sanskrit literature is generally
@@ -470,7 +477,7 @@ plotPImap(fam.pcm1, main="Familiarity with mental silence")
 \end{figure}
 
 <<>>=
-s <- round(fivenum(fam.pcm1$etapar),2)
+s <- mySummary(fam.pcm1$etapar)
 @ 
 
 <<results=tex>>=
@@ -507,10 +514,19 @@ print(myPlotICC(thresholds(fam.pcm1)$threshtable$'1'[2,2:3]) +
 \label{fig:familiarity:possAny}
 \end{figure}
 
+\begin{figure}
+<<fig=TRUE,height=3.5>>=
+print(plotInfo(thresholds(fam.pcm1)$threshtable$'1', c(-8,8)))
+@ 
+\caption{Information curves for the Familiarity items and scale.}
+\label{fig:familiarity:person:info}
+\end{figure}
+
 The person-item map is exhibited in Figure \ref{fig:familiarity:pimap}.
 Item parameters ranged from \Sexpr{s[1]} to \Sexpr{s[5]} with 50\%
-of the parameters between \Sexpr{s[2]} and \Sexpr{s[3]} and a median
-parameter of \Sexpr{s[3]}.
+of the parameters between \Sexpr{s[2]} and \Sexpr{s[4]} and
+a median, mean, and standard deviation of
+\Sexpr{s[3]}, \Sexpr{s[6]}, and \Sexpr{s[7]} respectively.
 Item outfit and infit statistics are exhibited in
 Table \ref{tab:familiarity:item:fit}.
 The liberal acceptable range for MSQ is 1.4 to 0.6.
@@ -525,9 +541,12 @@ Figure \ref{fig:familiarity:possAny} shows that the
 middle response category was infrequently endorsed.
 This suggests that the item may need rewording;
 a GPCM might find that this item discriminates poorly (as simulated).
+Item information curves are exhibited in
+Figure \ref{fig:familiarity:person:info}.
+The items are distributed over a reasonably wide range of trait scores.
 
 <<>>=
-s <- round(fivenum(fam.pcm1.p$theta.table$Person),2)
+s <- mySummary(fam.pcm1.p$theta.table$Person)
 @ 
 
 \begin{figure}
@@ -540,7 +559,7 @@ print(ggplot(data.frame(param=fam.pcm1.p$theta.table$Person), aes(param)) +
 \label{fig:familiarity:person:param}
 \end{figure}
 
-<<results=tex,echo=FALSE>>=
+<<results=tex>>=
 fit <- personfit(fam.pcm1.p)
 fit.df <- as.data.frame(fit[c('p.outfitMSQ','p.outfitZ','p.infitMSQ','p.infitZ')])
 dimnames(fit.df)[[2]] <- c("Outfit MSQ", "Outfit t", "Infit MSQ", "Infit t")
@@ -553,14 +572,56 @@ print(xtable(round(fit.crazy,2),
       hline.after=c(-1,0,nrow(fit.crazy),chunk))
 @ 
 
+<<results=tex>>=
+print(xtable(cms[c(3,34,36,44,72),1:6],
+             caption="Likely (overfit) response patterns on the Familiarity scale.",
+             label="tab:familiarity:person:likely"))
+@ 
+
+<<results=tex>>=
+print(xtable(cms[c(121,40,83,195,172,197),1:6],
+             caption="Unlikely (underfit) response patterns on the Familiarity scale.",
+             label="tab:familiarity:person:unlikely"))
+@ 
+
 Person parameters ranged from \Sexpr{s[1]} to \Sexpr{s[5]} with 50\%
-of the parameters between \Sexpr{s[2]} and \Sexpr{s[3]} and a median
-parameter of \Sexpr{s[3]}.
+of the parameters between \Sexpr{s[2]} and \Sexpr{s[4]} and
+a median, mean, and standard deviation of
+\Sexpr{s[3]}, \Sexpr{s[6]}, and \Sexpr{s[7]} respectively.
 A histogram of person trait levels is exhibited
 in Figure \ref{fig:familiarity:person:param}.
+To capture more variability,
+it would probably be worth trying a 5-point Likert scale
+instead of a 3-point scale.
 The most extreme item outfit and infit statistics are exhibited in
 Table \ref{tab:familiarity:person:fit}.
-The liberal acceptable range for MSQ is 1.4 to 0.6.
+The badness of fit can be investigated
+by looking at likely (Table \ref{tab:familiarity:person:likely})
+and unlikely (Table \ref{tab:familiarity:person:unlikely}) response patterns.
+Given that this is simulated data,
+there is not much of interest here.
+With real data, an unexpected response pattern could motivate
+an interview with the participant.
+
+<<results=tex>>=
+beta <- cbind(fam.pcm1$etapar[2:length(fam.pcm1$etapar)],
+              -lrt$betalist$'0', -lrt$betalist$'1',
+              -(lrt$betalist$'1'-lrt$betalist$'0'))
+dimnames(beta)[[1]] <- str_replace(dimnames(beta)[[1]], "beta ", '')
+dimnames(beta)[[2]] <- c("combined", "without","with","with-without")
+print(xtable(beta, digits=c(2),
+             caption="Difficulty estimates for participants with and without training in meditation.",
+             label='tab:familiarity:andersen'))
+@ 
+
+By simulation, participants with training in meditation were suppose
+to have somewhat higher trait scores.
+However, Andersen's LR test was not significant, $\Sexpr{round(lrt$LR,2)},
+df = \Sexpr{round(lrt$df,2)}, p = \Sexpr{round(lrt$pvalue,2)}$.
+Although the difference between \emph{with} and \emph{without}
+was expected to be positive, this was only found for some of the
+item categories (Table \ref{tab:familiarity:andersen}).
+There was likely too much noise in the simulated responses.
 
 \subsection{Context subscale}
 
@@ -574,6 +635,125 @@ The first eigenvalue was \Sexpr{round(ctx.pcm1.res$values[1],2)},
 less than the 1.74 threshold (100 persons and 20 items, \citeNP{raiche2005})
 indicating that a second dimension was unlikely.
 
+\begin{figure}
+<<fig=TRUE,height=4>>=
+plotPImap(ctx.pcm1, main="Context of mental silence")
+@ 
+\caption{Person-item map of the Context subscale.}
+\label{fig:context:pimap}
+\end{figure}
+
+<<>>=
+s <- mySummary(ctx.pcm1$etapar)
+@ 
+
+<<results=tex>>=
+fit <- itemfit(ctx.pcm1.p)
+fit.df <- as.data.frame(fit[c('i.outfitMSQ','i.outfitZ','i.infitMSQ','i.infitZ')])
+dimnames(fit.df)[[2]] <- c("Outfit MSQ", "Outfit t", "Infit MSQ", "Infit t")
+fit.df <- fit.df[order(fit.df$'Infit MSQ'),]
+fit.sum <- c(fmtMeanSD(fit.df$'Outfit MSQ'), '',
+             fmtMeanSD(fit.df$'Infit MSQ'), '')
+fit.df <- round(fit.df,2)
+fit.df <- rbind(fit.df, "Mean (SD)"=fit.sum)
+print(xtable(fit.df, caption="Item outfit and infit sorted by infit.",
+             label="tab:context:item:fit"),
+      hline.after=c(-1,0,nrow(fit.df)-1,nrow(fit.df)))
+@ 
+
+\begin{figure}
+<<fig=TRUE,height=4.5>>=
+p1 <- myPlotICC(thresholds(ctx.pcm1)$threshtable$'1'[4,2:5], xrange=c(-4,4)) +
+  opts(title="Relaxation")
+p2 <- myPlotICC(thresholds(ctx.pcm1)$threshtable$'1'[6,2:5], xrange=c(-4,4)) +
+  opts(title="Meditation")
+multiplot(p1,p2,cols=1)
+@ 
+\caption{Item characteristic curves from the Context subscale where difficulties are out of order.}
+\label{fig:context:baditems}
+\end{figure}
+
+\begin{figure}
+<<fig=TRUE,height=3.5>>=
+print(plotInfo(thresholds(ctx.pcm1)$threshtable$'1', c(-8,8)))
+@ 
+\caption{Information curves for the Context items and scale.}
+\label{fig:context:person:info}
+\end{figure}
+
+The person-item map is exhibited in Figure \ref{fig:context:pimap}.
+Item parameters ranged from \Sexpr{s[1]} to \Sexpr{s[5]} with 50\%
+of the parameters between \Sexpr{s[2]} and \Sexpr{s[4]} and
+a median, mean, and standard deviation of
+\Sexpr{s[3]}, \Sexpr{s[6]}, and \Sexpr{s[7]} respectively.
+Item outfit and infit statistics are exhibited in
+Table \ref{tab:context:item:fit}.
+The liberal acceptable range for MSQ is 1.4 to 0.6.
+Two items had out-of-order category thresholds 
+(Figure \ref{fig:context:baditems}).
+Crossing thresholds suggest that there is something wrong with the survey.
+Either the items need some rewording or there are too many response categories.
+Item information curves are exhibited in
+Figure \ref{fig:context:person:info}.
+Most item difficulties are compressed near a trait score of 0.
+Hopefully item difficulties will be dispersed more widely over
+possible trait scores when estimating item locations with real data.
+
+<<>>=
+s <- mySummary(ctx.pcm1.p$theta.table$Person)
+@ 
+
+\begin{figure}
+<<fig=TRUE,height=3>>=
+print(ggplot(data.frame(param=ctx.pcm1.p$theta.table$Person), aes(param)) +
+  geom_histogram(binwidth=.1) +
+  labs(x="Trait level", y="Count"))
+@ 
+\caption{Histogram of person parameters.}
+\label{fig:context:person:param}
+\end{figure}
+
+<<results=tex>>=
+fit <- personfit(ctx.pcm1.p)
+fit.df <- as.data.frame(fit[c('p.outfitMSQ','p.outfitZ','p.infitMSQ','p.infitZ')])
+dimnames(fit.df)[[2]] <- c("Outfit MSQ", "Outfit t", "Infit MSQ", "Infit t")
+chunk <- 8
+fit.crazy <- rbind(fit.df[head(order(fit.df$'Infit MSQ'),n=chunk),],
+  fit.df[tail(order(fit.df$'Infit MSQ'),n=chunk),])
+print(xtable(round(fit.crazy,2),
+             caption="Person outfit and infit sorted by infit.",
+             label="tab:context:person:fit"),
+      hline.after=c(-1,0,nrow(fit.crazy),chunk))
+@ 
+
+<<results=tex>>=
+print(xtable(cms[c(3,34,36,44,72),1:6],
+             caption="Likely (overfit) response patterns on the Context scale.",
+             label="tab:context:person:likely"))
+@ 
+
+<<results=tex>>=
+print(xtable(cms[c(121,40,83,195,172,197),1:6],
+             caption="Unlikely (underfit) response patterns on the Context scale.",
+             label="tab:context:person:unlikely"))
+@ 
+
+Person parameters ranged from \Sexpr{s[1]} to \Sexpr{s[5]} with 50\%
+of the parameters between \Sexpr{s[2]} and \Sexpr{s[4]} and
+a median, mean, and standard deviation of
+\Sexpr{s[3]}, \Sexpr{s[6]}, and \Sexpr{s[7]} respectively.
+A histogram of person trait levels is exhibited
+in Figure \ref{fig:context:person:param}.
+The most extreme item outfit and infit statistics are exhibited in
+Table \ref{tab:context:person:fit}.
+The badness of fit can be investigated
+by looking at likely (Table \ref{tab:context:person:likely})
+and unlikely (Table \ref{tab:context:person:unlikely}) response patterns.
+Given that this is simulated data,
+there is not much of interest here.
+With real data, an unexpected response pattern could motivate
+an interview with the participant.
+
 \subsection{Summary}
 
 Complete \texttt{R} code for the analysis presented here is available
@@ -581,7 +761,8 @@ in Appendices \ref{appendix:r-analysis} and \ref{appendix:r-presentation}.
 
 \section{Conclusion}
 
-This is a cool project.
+Item Response Theory is a power technique for analyzing survey
+response data.
 
 \bibliography{jpritikin}
 \appendix
