@@ -1,5 +1,5 @@
 \SweaveOpts{prefix.string=gen/fig, eps=FALSE, keep.source=TRUE, echo=FALSE}
-\documentclass[man]{apa}
+\documentclass[doc]{apa}
 %\usepackage[margin=1in]{geometry}
 \usepackage{url}
 %\usepackage{hyperref}  ugly clashes with apa style
@@ -32,6 +32,8 @@ numberstyle=\color{gray}}
 
 \begin{document}
 \maketitle                            
+
+\doublespacing
 
 Researchers have struggled with the lack of agreement on a specific
 definition of meditation (\citeNP[p.~1]{ospina2007};
@@ -167,6 +169,8 @@ The cessation of thinking must be of long enough duration to disrupt
 the prevailing rhythm of mental activity and
 present a choice of whether to engage in thought or not.
 This can happen within the span of a subjective moment.
+A shift of identity occurs from ``I am the thinker'' to,
+approximately, ``I am the mental silence.''
 As for psychological centering devices,
 Sanskrit literature is generally
 specific about the type of practice prescribed and does not
@@ -334,6 +338,7 @@ perhaps as a component of flow.
 
 <<>>=
 source("analyze.R")
+theme_set(theme_bw())
 @ 
 
 \section{Method}
@@ -392,7 +397,7 @@ Participants responded to the questionnaire, all completing it within
 a single 30 min session. All participants answered all items;
 there was no missing data.
 No participants were excluded from statistical analysis.
-Raw response data is available in Appendix \ref{appendix:responses}.
+Raw response data are available in Appendix \ref{appendix:responses}.
 
 \section{Results}
 
@@ -525,7 +530,37 @@ a GPCM might find that this item discriminates poorly (as simulated).
 s <- round(fivenum(fam.pcm1.p$theta.table$Person),2)
 @ 
 
-Person parameters 
+\begin{figure}
+<<fig=TRUE,height=3>>=
+print(ggplot(data.frame(param=fam.pcm1.p$theta.table$Person), aes(param)) +
+  geom_histogram(binwidth=.25) +
+  labs(x="Trait level", y="Count"))
+@ 
+\caption{Histogram of person parameters.}
+\label{fig:familiarity:person:param}
+\end{figure}
+
+<<results=tex,echo=FALSE>>=
+fit <- personfit(fam.pcm1.p)
+fit.df <- as.data.frame(fit[c('p.outfitMSQ','p.outfitZ','p.infitMSQ','p.infitZ')])
+dimnames(fit.df)[[2]] <- c("Outfit MSQ", "Outfit t", "Infit MSQ", "Infit t")
+chunk <- 8
+fit.crazy <- rbind(fit.df[head(order(fit.df$'Infit MSQ'),n=chunk),],
+  fit.df[tail(order(fit.df$'Infit MSQ'),n=chunk),])
+print(xtable(round(fit.crazy,2),
+             caption="Person outfit and infit sorted by infit.",
+             label="tab:familiarity:person:fit"),
+      hline.after=c(-1,0,nrow(fit.crazy),chunk))
+@ 
+
+Person parameters ranged from \Sexpr{s[1]} to \Sexpr{s[5]} with 50\%
+of the parameters between \Sexpr{s[2]} and \Sexpr{s[3]} and a median
+parameter of \Sexpr{s[3]}.
+A histogram of person trait levels is exhibited
+in Figure \ref{fig:familiarity:person:param}.
+The most extreme item outfit and infit statistics are exhibited in
+Table \ref{tab:familiarity:person:fit}.
+The liberal acceptable range for MSQ is 1.4 to 0.6.
 
 \subsection{Context subscale}
 

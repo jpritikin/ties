@@ -73,7 +73,8 @@ plotInfo <- function(threshold, xrange=c(-8,8)) {
   }
   df$all <- all
   return(ggplot(melt(df, id.vars=c('ability')),
-                aes(ability, value, color=variable)) + geom_line() +
+                aes(ability, value, color=variable, linetype=variable)) +
+         geom_line() +
     ylab("Information") + xlab("Trait score") +
     scale_x_continuous(limits=xrange,
                        breaks=seq(xrange[1],xrange[2],by=2)) +
@@ -113,7 +114,8 @@ calcICIF <- function(thr, xrange=c(-8,8)) {
 myPlotICC <- function(thr, xrange=c(-8,8)) {
   icc <- calcICC(thr, xrange)
   return(ggplot(melt(icc, id.vars=c('ability')),
-         aes(ability, value, color=variable)) + geom_line() +
+         aes(ability, value, color=variable, linetype=variable)) +
+         geom_line() +
          ylab("Probability") + xlab("Trait score") +
          ylim(0,1) +
          scale_x_continuous(limits=xrange,
