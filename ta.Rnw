@@ -50,7 +50,7 @@ The practice generally has something to do with
 controlling the attention and being non-judgmental \cite{cdc2009}.
 This definition is fine, except that it also admits an activity like
 relaxing on the front porch enjoying the sunset with a beer.
-Compounding the confusion is the dual meaning of the term meditation.
+Compounding the confusion is the dual meanings of the term meditation.
 
 \begin{quotation}
 Because of a limitation in our vocabulary, the West refers to the simple
@@ -127,7 +127,8 @@ then the remaining awareness is non-judgmental.
 Complete mental silence is the most stringent limitation
 on permissible types of thought.
 The notion of mental silence contradicts
-DesCartes' ``I think therefore I am.'' \cite{damasio1995}.
+DesCartes' ``I think therefore I am.'' (for more discussion
+see \citeNP{damasio1995}).
 
 \begin{quotation}
 A meditation session will often follow a certain progression. Starting
@@ -144,35 +145,34 @@ conscious. The mind is said to be alert without having any
 \emph{object} of alertness. \cite[p.~91]{carrington1977}
 \end{quotation}
 
-While the ambiguity of the English word `meditation' was identified as
-early as 1977 and perhaps earlier, little has been done to resolve the
-issue.
-The ambiguity still remains today \cite{bond2009}, hampering meta-analysis.
-Scientific studies are conducted oriented to particular
-centering devices ignoring the critical question of whether participants are
-experiencing complete mental silence.
+While the ambiguity of the English word \emph{meditation} was identified as
+early as 1977 and perhaps earlier, little has been done to address the issue.
+The ambiguity still remains today, hampering meta-analysis \cite{bond2009}.
+Scientific studies are conducted oriented to a particular
+centering device, ignoring the critical question of whether participants
+experience complete mental silence.
 Since ancient times, Sanskrit literature has distinguished these
 two concepts without much difficulty.
 {\dn nirvicaara samaadhi} (nirvichar samadhi) denotes
 complete mental silence.
-{\dn samaadhi} (samadhi) literally means ``to acquire wholeness with.''
+{\dn samaadhi} (samadhi) literally means \emph{to acquire wholeness with}.
 {\dn samaadhi} (samadhi) is a compound word consisting of three parts:
-{\dn sam} (sum) means ``together'' or ``integrated,''
-{\dn aa} (ah) means ``towards,''
-and {\dn dhi} (dhi) means ``to hold.''
-{\dn nirvicaara} (nirvichar) literally means ``without thought.''
+{\dn sam} (sum) means \emph{together} or \emph{integrated},
+{\dn aa} (ah) means \emph{towards},
+and {\dn dhi} (dhi) means \emph{to hold}.
+{\dn nirvicaara} (nirvichar) literally means \emph{without thought}.
 {\dn nirvicaara} (nirvichar) is a compound word consisting of two parts:
-{\dn nir} (nir) means ``no'' and {\dn vicaara} (vichar) means ``thinking.''
+{\dn nir} (nir) means \emph{no} and {\dn vicaara} (vichar) means \emph{thinking}.
 {\dn nirvicaara samaadhi} (nirvichar samadhi) is sometimes translated
-as ``thoughtless awareness,'' however,
+as \emph{thoughtless awareness}, however,
 this phrase is somewhat misleading because thoughtlessness
 can also connote carelessness.
-An alternate translation is ``mental silence.''
-Here ``complete mental silence'' is used to emphasize that
+An alternate translation is \emph{mental silence}.
+Here \emph{complete mental silence} is used to emphasize that
 {\dn nirvicaara samaadhi} (nirvichar samadhi) is not merely
-a reduction in the intensity of thinking but a cessation of thinking.
-The cessation of thinking must be of long enough duration to disrupt
-prevailing mental activity and
+a reduction in the intensity of thinking but the absence of thought.
+The absence of thought must be of long enough duration to disrupt
+the prevailing rhythm of mental activity and
 present a choice of whether to engage in thought or not.
 This can happen within the span of a subjective moment.
 If one is identified with thinking,
@@ -182,6 +182,8 @@ As for psychological centering devices,
 Sanskrit literature is generally
 specific about the type of practice prescribed and does not
 confuse centering devices with complete mental silence.
+Unambiguous terminology must be adopted if researchers
+are to communicate accurately about their research designs.
 
 %% Given that the clearest descriptions of thoughtless awareness
 %% have arguably come from Asia,
@@ -218,7 +220,7 @@ between flow and meditation \cite[p.~244]{carrington1977}.
 \emph{Flow} is an intrinsically rewarding experience in which a person
 is absorbed in the optimal performance of an activity. 
 The conditions and contrasts of flow are illustrated in
-Figure \ref{fig:teleonomy-of-self}.
+Figure~\ref{fig:teleonomy-of-self}.
 A precondition of flow is a balance between the subjective challenge of an
 activity and the skill a person can bring to it.
 If challenge and skill are out of balance then either frustration or
@@ -228,7 +230,7 @@ without them it would be hard to judge whether challenge
 and skill are closely matched.
 Concentration is necessary because a skill cannot be performed
 well when one is frequently distracted.
-As Figure \ref{fig:teleonomy-of-self} suggests,
+As Figure~\ref{fig:teleonomy-of-self} suggests,
 flow is conceived of as the ordered side of a spectrum from
 psychic order to disorder.
 Excessive emotion, moodiness, or cognitive dissonance
@@ -310,15 +312,14 @@ raises more questions than it answers \cite{LIA01}, and
 there is tentative evidence that skin temperature
 can distinguish mental silence from rest \cite{manocha2010}.
 The paucity of investigations into mental silence
-allow for little certainly about its effect size and importance.
+allow for little certainly about its reproducibility, effect size, and importance.
 
-The hypothesis advanced here is that mental silence
-has been overlooked.
 PsycNET searches for ``mental silence'' or ``thoughtless awareness''
 turned up nothing besides articles by Ramesh Manocha and collaborators.
-In a collection of 13 scales related to spiritual and religious experience,
-no attempt was made to measure
-``mental silence'' or ``thoughtless awareness'' \cite{fetzer1999}.
+In collections of scales related to spiritual and religious experience,
+no attempt was made to assess
+``mental silence'' or ``thoughtless awareness'' (\citeNP{fetzer1999};
+\citeNP{hill1999}).
 In two recent reviews of the state of the research on meditation/mindfulness,
 the possibility of mental silence or thoughtless awareness was not
 even acknowledged (\citeNP{shapiro2009}; \citeNP{baer2011}).
@@ -327,25 +328,61 @@ that it does not even merit a glossary entry in reference works on
 positive psychology and the psychology of religion
 (\citeNP{pargament1997}; \citeNP{peterson2004};
 \citeNP{snyder2009}; \citeNP{sheldon2011})?
-A potentially vital component of flow has received almost
-no psychological scrutiny.
-It seems plausible that accidental mental silence
-is much more common than assumed.
+
+Some attempts to measure proximate concepts were identified.
+One scale asked whether ``True religious experience occurs in periods
+of profound silence'' \cite{maranell1974}. However, what is meant by
+``profound silence?'' Is the question asking about inner mental
+silence or outer environmental silence?
+Two scales asked whether the subject had had an experience that defied
+description.
+One phrasing was, ``Our verbal language isn't adequate
+to express or communicate real religious experience'' \cite{maranell1974}.
+Another phrasing was, ``I have had an experience that cannot
+be expressed in words'' \cite{hood1975}.
+Unfortunately, these questions can not inform about cause.
+It would be useful to know why an experience cannot be expressed in words.
+Was it an impoverished imagination or something else?
+Another measure asks people to read descriptions of experiences,
+compare their own experiences, and rate the degree of similarity.
+For example:
+
+\begin{quotation}
+My mind, deeply under the influence of the thoughts and emotions
+called up by the reading and talk, was calm and peaceful. I was in a
+state of quiet, almost passive enjoyment, not actually thinking but
+letting thoughts and emotions flow by themselves through my mind. All
+at once, without any warning, I found myself wrapped in a flame colored
+cloud. For an instant I thought a great fire might be in the nearby
+city; the next moment I knew that the fire was within myself. Directly
+afterward I felt a sense of exultation, of immense joy and
+intellectual insight impossible to describe. \cite[p.~223]{burris1999}
+\end{quotation}
+
+Narratives like this, while intriguing, offer almost no information
+about the structure of the experience.
+As Socrates suggested, we need to determine ``where the natural
+joints are, and not trying to break any part,
+after the manner of a bad carver'' \cite{fowler1990}.
 \citeA{henry2004} gathered evidence from a decade of workshops and
 questionnaire studies asking non-clinical adults what methods and
 approaches have been efficacious in changing their lives for the
-better.  A general strategy of ``quietening the mind'' was frequently
-endorsed.
+better.
+A general strategy of ``quietening the mind'' was frequently endorsed.
 Unfortunately, this study did not try to discriminate
 precisely what was meant by ``quietening the mind.''
 While mental silence has typically been discussed
 in the context of meditation, it seems plausible that the experience
 occurs outside the context of meditation as well,
 perhaps as a component of flow.
+Accidental mental silence may be more common than assumed.
+A potentially vital component of flow has received almost
+no psychological scrutiny.
 
 <<>>=
 source("analyze.R")
 theme_set(theme_bw())
+table.placement <- 'tbp'
 @ 
 
 \section{Method}
@@ -357,34 +394,22 @@ Charlottesville residents with
 \Sexpr{100*sum(cms.latent$train=="yes")/dim(cms.latent)[[1]]}\%
 having some training in meditation/yoga.
 This sample was probably much more educated than typical samples
-that draw participants from a university subject pool (Table \ref{tab:edu}).
+that draw participants from a university subject pool (Table~\ref{tab:edu}).
 Other demographic data were not fabricated.
 
 <<results=tex>>=
 tbl<-as.matrix(table(cms.latent$edu))
 dimnames(tbl)[[2]] <- c("Education")
 print(xtable(tbl, caption="Distribution of education among participants.",
-             label="tab:edu"))
+             label="tab:edu"), table.placement=table.placement)
 @ 
 
 \subsection{Questionnaire}
 
-A questionnaire was developed to test these
-hypotheses (Appendix \ref{appendix:survey}).
-While self-reports about mental silence are necessarily imprecise,
-here the precision requested of participants is not great.
-Some brain systems certainly remain on-line even when there is no thought.
-In the same way that infants can remember experience prior to
-learning language and how to think in the conventional way,
-participants should not have much difficulty recalling whether
-they have experienced complete mental silence.
-None of the items ask participants to attempt to express the content of
-their mental silence experience.
-
-The questionnaire can be divided into four logical sections:
-basic demographic information, familiarity with mental silence (Familiarity),
-context of mental silence (Context),
-and the relationship between mental silence and flow (Flow).
+The questionnaire (see Appendix~\ref{appendix:survey}) has four logical sections:
+basic demographic information, familiarity with mental silence (Familiarity subscale),
+context of mental silence (Context subscale),
+and the relationship between mental silence and flow (Flow subscale).
 In the Familiarity subscale,
 items were presented in an hypothesized order from easy to difficult.
 In the Context subscale, the only question of interest in each section was:
@@ -398,13 +423,23 @@ interest to the investigator, (b) could lead to additional hypotheses,
 and (c) pushed participants in the direction
 of thinking about the concepts more carefully.
 
+While self-reports about mental silence are necessarily imprecise,
+here the precision requested of participants is not great.
+Some brain systems certainly remain on-line even when there is no thought.
+In the same way that infants can remember experience prior to
+learning language and how to think in the conventional way,
+participants should not have much difficulty recalling whether
+they have experienced complete mental silence.
+None of the items ask participants to attempt to express the content of
+their mental silence experience.
+
 \subsection{Procedure}
 
 Participants responded to the questionnaire, all completing it within
 a single 30 min session. All participants answered all items;
 there was no missing data.
 No participants were excluded from statistical analysis.
-Raw response data are available in Appendix \ref{appendix:responses}.
+Raw response data are available in Appendix~\ref{appendix:responses}.
 
 \section{Results}
 
@@ -451,22 +486,12 @@ Unfortunately, no \texttt{R} implementation of GPCM is
 working well enough yet.
 Data were analyzed using the \texttt{eRm} package \cite{erm2011},
 fixing $\alpha=1$.
-This is parameterization of GPCM
+This parameterization of GPCM
 is equivalent to the Partial Credit Model (PCM).
 \texttt{eRm} uses conditional maximum likelihood
 to estimate item and person parameters.
 
 \subsection{Familiarity subscale}
-
-A PCM was fit to the Familiarity subscale,
-$-2LL = \Sexpr{round(-2*logLik(fam.pcm1)$loglik,2)},
-df = \Sexpr{logLik(fam.pcm1)$df}$.
-To determine whether the scale assessed a single dimension,
-a principal component analysis was performed on the standardized
-residuals.
-The first eigenvalue was \Sexpr{round(fam.pcm1.res$values[1],2)},
-less than the 1.74 threshold (100 persons and 20 items, \citeNP{raiche2005})
-indicating that a second dimension was unlikely.
 
 \begin{figure}
 <<fig=TRUE,height=4>>=
@@ -476,22 +501,33 @@ plotPImap(fam.pcm1, main="Familiarity with mental silence")
 \label{fig:familiarity:pimap}
 \end{figure}
 
-<<>>=
-s <- mySummary(fam.pcm1$etapar)
+<<results=tex>>=
+pcmSummary(fam.pcm1, fam.pcm1.p,
+           caption='Summary statistics for the Familiarity subscale.',
+           label='tab:familiarity:summary')
 @ 
+
+A PCM was fit to the Familiarity subscale,
+$-2LL = \Sexpr{round(-2*logLik(fam.pcm1)$loglik,2)},
+df = \Sexpr{logLik(fam.pcm1)$df}$.
+To determine whether the scale assessed a single dimension,
+a principal component analysis was performed on the standardized
+residuals.
+The first eigenvalue was \Sexpr{round(fam.pcm1.res$values[1],2)},
+less than the 1.74 threshold,
+indicating that a second dimension was unlikely \cite{raiche2005}.
+The person-item map is exhibited in Figure~\ref{fig:familiarity:pimap}.
+Summary statistics for the item and person parameters are
+exhibited in Table~\ref{tab:familiarity:summary}.
 
 <<results=tex>>=
 fit <- itemfit(fam.pcm1.p)
 fit.df <- as.data.frame(fit[c('i.outfitMSQ','i.outfitZ','i.infitMSQ','i.infitZ')])
 dimnames(fit.df)[[2]] <- c("Outfit MSQ", "Outfit t", "Infit MSQ", "Infit t")
 fit.df <- fit.df[order(fit.df$'Infit MSQ'),]
-fit.sum <- c(fmtMeanSD(fit.df$'Outfit MSQ'), '',
-             fmtMeanSD(fit.df$'Infit MSQ'), '')
-fit.df <- round(fit.df,2)
-fit.df <- rbind(fit.df, "Mean (SD)"=fit.sum)
 print(xtable(fit.df, caption="Item outfit and infit sorted by infit.",
              label="tab:familiarity:item:fit"),
-      hline.after=c(-1,0,nrow(fit.df)-1,nrow(fit.df)))
+      table.placement=table.placement)
 @ 
 
 \begin{figure}
@@ -522,32 +558,23 @@ print(plotInfo(thresholds(fam.pcm1)$threshtable$'1', c(-8,8)))
 \label{fig:familiarity:person:info}
 \end{figure}
 
-The person-item map is exhibited in Figure \ref{fig:familiarity:pimap}.
-Item parameters ranged from \Sexpr{s[1]} to \Sexpr{s[5]} with 50\%
-of the parameters between \Sexpr{s[2]} and \Sexpr{s[4]} and
-a median, mean, and standard deviation of
-\Sexpr{s[3]}, \Sexpr{s[6]}, and \Sexpr{s[7]} respectively.
 Item outfit and infit statistics are exhibited in
-Table \ref{tab:familiarity:item:fit}.
+Table~\ref{tab:familiarity:item:fit}.
 The liberal acceptable range for MSQ is 1.4 to 0.6.
 Only the notSense item's outfit fell outside this range (0.44),
 suggesting that notSense was overfit.
 The item characteristic curves for notSense
-(Figure \ref{fig:familiarity:notSense})
+(Figure~\ref{fig:familiarity:notSense})
 confirmed the good behavior of this item.
 The possAny item was the most underfit item in the Familiarity subscale,
 although still well within the 1.4 MSQ fit threshold.
-Figure \ref{fig:familiarity:possAny} shows that the
+Figure~\ref{fig:familiarity:possAny} shows that the
 middle response category was infrequently endorsed.
-This suggests that the item may need rewording;
-a GPCM might find that this item discriminates poorly (as simulated).
+A GPCM might find that this item discriminates poorly (as simulated).
+In real data, a low discrimination may indicate that the item needs rewording.
 Item information curves are exhibited in
-Figure \ref{fig:familiarity:person:info}.
+Figure~\ref{fig:familiarity:person:info}.
 The items are distributed over a reasonably wide range of trait scores.
-
-<<>>=
-s <- mySummary(fam.pcm1.p$theta.table$Person)
-@ 
 
 \begin{figure}
 <<fig=TRUE,height=3>>=
@@ -555,7 +582,7 @@ print(ggplot(data.frame(param=fam.pcm1.p$theta.table$Person), aes(param)) +
   geom_histogram(binwidth=.25) +
   labs(x="Trait level", y="Count"))
 @ 
-\caption{Histogram of person parameters.}
+\caption{Histogram of person trait estimates.}
 \label{fig:familiarity:person:param}
 \end{figure}
 
@@ -569,39 +596,39 @@ fit.crazy <- rbind(fit.df[head(order(fit.df$'Infit MSQ'),n=chunk),],
 print(xtable(round(fit.crazy,2),
              caption="Person outfit and infit sorted by infit.",
              label="tab:familiarity:person:fit"),
-      hline.after=c(-1,0,nrow(fit.crazy),chunk))
+      hline.after=c(-1,0,nrow(fit.crazy),chunk),
+      table.placement=table.placement)
 @ 
 
 <<results=tex>>=
 print(xtable(cms[c(3,34,36,44,72),1:6],
              caption="Likely (overfit) response patterns on the Familiarity scale.",
-             label="tab:familiarity:person:likely"))
+             label="tab:familiarity:person:likely"),
+      table.placement=table.placement)
 @ 
 
 <<results=tex>>=
 print(xtable(cms[c(121,40,83,195,172,197),1:6],
              caption="Unlikely (underfit) response patterns on the Familiarity scale.",
-             label="tab:familiarity:person:unlikely"))
+             label="tab:familiarity:person:unlikely"),
+      table.placement=table.placement)
 @ 
 
-Person parameters ranged from \Sexpr{s[1]} to \Sexpr{s[5]} with 50\%
-of the parameters between \Sexpr{s[2]} and \Sexpr{s[4]} and
-a median, mean, and standard deviation of
-\Sexpr{s[3]}, \Sexpr{s[6]}, and \Sexpr{s[7]} respectively.
 A histogram of person trait levels is exhibited
-in Figure \ref{fig:familiarity:person:param}.
+in Figure~\ref{fig:familiarity:person:param}.
 To capture more variability,
 it would probably be worth trying a 5-point Likert scale
 instead of a 3-point scale.
 The most extreme item outfit and infit statistics are exhibited in
-Table \ref{tab:familiarity:person:fit}.
+Table~\ref{tab:familiarity:person:fit}.
 The badness of fit can be investigated
-by looking at likely (Table \ref{tab:familiarity:person:likely})
-and unlikely (Table \ref{tab:familiarity:person:unlikely}) response patterns.
+by looking at likely (Table~\ref{tab:familiarity:person:likely})
+and unlikely (Table~\ref{tab:familiarity:person:unlikely}) response patterns.
 Given that this is simulated data,
 there is not much of interest here.
 With real data, an unexpected response pattern could motivate
 an interview with the participant.
+Some items may be interpreted in unexpected ways.
 
 <<results=tex>>=
 beta <- cbind(fam.pcm1$etapar[2:length(fam.pcm1$etapar)],
@@ -610,8 +637,9 @@ beta <- cbind(fam.pcm1$etapar[2:length(fam.pcm1$etapar)],
 dimnames(beta)[[1]] <- str_replace(dimnames(beta)[[1]], "beta ", '')
 dimnames(beta)[[2]] <- c("combined", "without","with","with-without")
 print(xtable(beta, digits=c(2),
-             caption="Difficulty estimates for participants with and without training in meditation.",
-             label='tab:familiarity:andersen'))
+             caption="Difficulty estimates for participants with and without training in meditation. The notSense item was excluded due to inappropriate response patterns within subgroups.",
+             label='tab:familiarity:andersen'),
+      table.placement=table.placement)
 @ 
 
 By simulation, participants with training in meditation were suppose
@@ -620,20 +648,11 @@ However, Andersen's LR test was not significant, $\Sexpr{round(lrt$LR,2)},
 df = \Sexpr{round(lrt$df,2)}, p = \Sexpr{round(lrt$pvalue,2)}$.
 Although the difference between \emph{with} and \emph{without}
 was expected to be positive, this was only found for some of the
-item categories (Table \ref{tab:familiarity:andersen}).
-There was likely too much noise in the simulated responses.
+item categories (Table~\ref{tab:familiarity:andersen}).
+There was likely too much noise in the simulated responses
+to find the expected difference.
 
 \subsection{Context subscale}
-
-A PCM was fit to the Context subscale,
-$-2LL = \Sexpr{round(-2*logLik(ctx.pcm1)$loglik,2)},
-df = \Sexpr{logLik(ctx.pcm1)$df}$.
-To determine whether the scale assessed a single dimension,
-a principal component analysis was performed on the standardized
-residuals.
-The first eigenvalue was \Sexpr{round(ctx.pcm1.res$values[1],2)},
-less than the 1.74 threshold (100 persons and 20 items, \citeNP{raiche2005})
-indicating that a second dimension was unlikely.
 
 \begin{figure}
 <<fig=TRUE,height=4>>=
@@ -643,22 +662,33 @@ plotPImap(ctx.pcm1, main="Context of mental silence")
 \label{fig:context:pimap}
 \end{figure}
 
-<<>>=
-s <- mySummary(ctx.pcm1$etapar)
+<<results=tex>>=
+pcmSummary(fam.pcm1, fam.pcm1.p,
+           caption='Summary statistics for the Context subscale.',
+           label='tab:context:summary')
 @ 
+
+A PCM was fit to the Context subscale,
+$-2LL = \Sexpr{round(-2*logLik(ctx.pcm1)$loglik,2)},
+df = \Sexpr{logLik(ctx.pcm1)$df}$.
+To determine whether the scale assessed a single dimension,
+a principal component analysis was performed on the standardized
+residuals.
+The first eigenvalue was \Sexpr{round(ctx.pcm1.res$values[1],2)},
+less than the 1.74 threshold,
+indicating that a second dimension was unlikely \cite{raiche2005}.
+The person-item map is exhibited in Figure~\ref{fig:context:pimap}.
+Summary statistics for the item and person parameters are
+exhibited in Table~\ref{tab:context:summary}.
 
 <<results=tex>>=
 fit <- itemfit(ctx.pcm1.p)
 fit.df <- as.data.frame(fit[c('i.outfitMSQ','i.outfitZ','i.infitMSQ','i.infitZ')])
 dimnames(fit.df)[[2]] <- c("Outfit MSQ", "Outfit t", "Infit MSQ", "Infit t")
 fit.df <- fit.df[order(fit.df$'Infit MSQ'),]
-fit.sum <- c(fmtMeanSD(fit.df$'Outfit MSQ'), '',
-             fmtMeanSD(fit.df$'Infit MSQ'), '')
-fit.df <- round(fit.df,2)
-fit.df <- rbind(fit.df, "Mean (SD)"=fit.sum)
 print(xtable(fit.df, caption="Item outfit and infit sorted by infit.",
              label="tab:context:item:fit"),
-      hline.after=c(-1,0,nrow(fit.df)-1,nrow(fit.df)))
+      table.placement=table.placement)
 @ 
 
 \begin{figure}
@@ -681,27 +711,18 @@ print(plotInfo(thresholds(ctx.pcm1)$threshtable$'1', c(-8,8)))
 \label{fig:context:person:info}
 \end{figure}
 
-The person-item map is exhibited in Figure \ref{fig:context:pimap}.
-Item parameters ranged from \Sexpr{s[1]} to \Sexpr{s[5]} with 50\%
-of the parameters between \Sexpr{s[2]} and \Sexpr{s[4]} and
-a median, mean, and standard deviation of
-\Sexpr{s[3]}, \Sexpr{s[6]}, and \Sexpr{s[7]} respectively.
 Item outfit and infit statistics are exhibited in
-Table \ref{tab:context:item:fit}.
+Table~\ref{tab:context:item:fit}.
 The liberal acceptable range for MSQ is 1.4 to 0.6.
 Two items had out-of-order category thresholds 
-(Figure \ref{fig:context:baditems}).
-Crossing thresholds suggest that there is something wrong with the survey.
+(Figure~\ref{fig:context:baditems}).
+Crossing thresholds suggest that there is something wrong with the item.
 Either the items need some rewording or there are too many response categories.
 Item information curves are exhibited in
-Figure \ref{fig:context:person:info}.
-Most item difficulties are compressed near a trait score of 0.
+Figure~\ref{fig:context:person:info}.
+Most item difficulties are compressed near a trait score of 0.5.
 Hopefully item difficulties will be dispersed more widely over
 possible trait scores when estimating item locations with real data.
-
-<<>>=
-s <- mySummary(ctx.pcm1.p$theta.table$Person)
-@ 
 
 \begin{figure}
 <<fig=TRUE,height=3>>=
@@ -709,7 +730,7 @@ print(ggplot(data.frame(param=ctx.pcm1.p$theta.table$Person), aes(param)) +
   geom_histogram(binwidth=.1) +
   labs(x="Trait level", y="Count"))
 @ 
-\caption{Histogram of person parameters.}
+\caption{Histogram of person trait estimates.}
 \label{fig:context:person:param}
 \end{figure}
 
@@ -723,41 +744,41 @@ fit.crazy <- rbind(fit.df[head(order(fit.df$'Infit MSQ'),n=chunk),],
 print(xtable(round(fit.crazy,2),
              caption="Person outfit and infit sorted by infit.",
              label="tab:context:person:fit"),
-      hline.after=c(-1,0,nrow(fit.crazy),chunk))
+      hline.after=c(-1,0,nrow(fit.crazy),chunk),
+      table.placement=table.placement)
 @ 
 
 <<results=tex>>=
 print(xtable(cms[c(3,34,36,44,72),1:6],
              caption="Likely (overfit) response patterns on the Context scale.",
-             label="tab:context:person:likely"))
+             label="tab:context:person:likely"),
+      table.placement=table.placement)
 @ 
 
 <<results=tex>>=
 print(xtable(cms[c(121,40,83,195,172,197),1:6],
              caption="Unlikely (underfit) response patterns on the Context scale.",
-             label="tab:context:person:unlikely"))
+             label="tab:context:person:unlikely"),
+      table.placement=table.placement)
 @ 
 
-Person parameters ranged from \Sexpr{s[1]} to \Sexpr{s[5]} with 50\%
-of the parameters between \Sexpr{s[2]} and \Sexpr{s[4]} and
-a median, mean, and standard deviation of
-\Sexpr{s[3]}, \Sexpr{s[6]}, and \Sexpr{s[7]} respectively.
-A histogram of person trait levels is exhibited
-in Figure \ref{fig:context:person:param}.
-The most extreme item outfit and infit statistics are exhibited in
-Table \ref{tab:context:person:fit}.
+A histogram of person trait estimates is exhibited
+in Figure~\ref{fig:context:person:param}.
+The most extreme person outfit and infit statistics are exhibited in
+Table~\ref{tab:context:person:fit}.
 The badness of fit can be investigated
-by looking at likely (Table \ref{tab:context:person:likely})
-and unlikely (Table \ref{tab:context:person:unlikely}) response patterns.
+by looking at likely (Table~\ref{tab:context:person:likely})
+and unlikely (Table~\ref{tab:context:person:unlikely}) response patterns.
 Given that this is simulated data,
 there is not much of interest here.
 With real data, an unexpected response pattern could motivate
 an interview with the participant.
+Some items may be interpreted in unexpected ways.
 
 \subsection{Summary}
 
 Complete \texttt{R} code for the analysis presented here is available
-in Appendices \ref{appendix:r-analysis} and \ref{appendix:r-presentation}.
+in Appendices~\ref{appendix:r-analysis} and \ref{appendix:r-presentation}.
 
 \section{Conclusion}
 
@@ -765,6 +786,8 @@ Item Response Theory is a power technique for analyzing survey
 response data.
 
 \bibliography{jpritikin}
+
+\clearpage
 \appendix
 \section{Questionnaire}
 \label{appendix:survey}
@@ -772,7 +795,7 @@ As a supplement to the questionnaire (exhibited on the following pages),
 an animation was developed to better convey the meaning of
 complete mental silence.
 See \url{http://people.virginia.edu/~jnp3bc/mental.gif} and
-Appendix \ref{appendix:animation}.
+Appendix~\ref{appendix:animation}.
 \includepdf[pages=-,frame=true]{ta-survey.pdf}
 
 \section{Simulated Responses}

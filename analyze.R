@@ -150,10 +150,6 @@ multiplot <- function(..., plotlist=NULL, cols) {
   } 
 }
 
-fmtMeanSD <- function(v) {
-  paste(round(mean(v), 2), paste0('(', round(sd(v),2), ')'))
-}
-
 train.flag <- round(cms.training=='yes')
 
 sink("/dev/null")
@@ -161,5 +157,27 @@ lrt <- LRtest(fam.pcm1, splitcr=train.flag)
 sink()
 
 mySummary <- function(v) {
-  round(c(fivenum(v), mean(v), sd(v)),2)
+  c('count'=length(v),
+    quantile(v, 0),
+    quantile(v, .25),
+    'median'=median(v),
+    'mean'=mean(v),
+    quantile(v, .75),
+    quantile(v, 1),
+    'std deviation'=sd(v))
+}
+
+pcmSummary <- function(pcm1, pcm1.p, ...) {
+  item.param <- pcm1$etapar
+  item.fit <- itemfit(pcm1.p)
+  person.param <- pcm1.p$theta.table$Person
+  person.fit <- personfit(pcm1.p)
+
+  brief <- cbind('Item'=mySummary(item.param),
+                  'Outfit MSQ'=mySummary(item.fit$i.outfitMSQ),
+                  'Infit MSQ'=mySummary(item.fit$i.infitMSQ),
+                  'Person'=mySummary(person.param),
+                  'Outfit MSQ'=mySummary(person.fit$p.outfitMSQ),
+                  'Infit MSQ'=mySummary(person.fit$p.infitMSQ))
+  print(xtable(brief, ...), table.placement=table.placement)
 }
