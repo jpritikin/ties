@@ -164,7 +164,7 @@ mySummary <- function(v) {
     'mean'=mean(v),
     quantile(v, .75),
     quantile(v, 1),
-    'std deviation'=sd(v))
+    'SD'=sd(v))
 }
 
 pcmSummary <- function(pcm1, pcm1.p, ...) {
@@ -173,11 +173,12 @@ pcmSummary <- function(pcm1, pcm1.p, ...) {
   person.param <- pcm1.p$theta.table$Person
   person.fit <- personfit(pcm1.p)
 
-  brief <- cbind('Item'=mySummary(item.param),
-                  'Outfit MSQ'=mySummary(item.fit$i.outfitMSQ),
-                  'Infit MSQ'=mySummary(item.fit$i.infitMSQ),
+  brief <- rbind('Item'=mySummary(item.param),
+                  'Item Outfit MSQ'=mySummary(item.fit$i.outfitMSQ),
+                  'Item Infit MSQ'=mySummary(item.fit$i.infitMSQ),
                   'Person'=mySummary(person.param),
-                  'Outfit MSQ'=mySummary(person.fit$p.outfitMSQ),
-                  'Infit MSQ'=mySummary(person.fit$p.infitMSQ))
-  print(xtable(brief, ...), table.placement=table.placement)
+                  'Person Outfit MSQ'=mySummary(person.fit$p.outfitMSQ),
+                  'Person Infit MSQ'=mySummary(person.fit$p.infitMSQ))
+  print(xtable(brief, digits=c(0,0,rep(2,7)), ...),
+        table.placement=table.placement)
 }

@@ -1,6 +1,6 @@
 \SweaveOpts{prefix.string=gen/fig, eps=FALSE, keep.source=TRUE, echo=FALSE}
 \documentclass[doc]{apa}
-%\usepackage[margin=1in]{geometry}
+%\usepackage[margin=1.25in]{geometry}
 \usepackage{url}
 %\usepackage{hyperref}  ugly clashes with apa style
 \usepackage{color}
