@@ -215,15 +215,16 @@ are to communicate accurately about their research designs.
 One goal of this article is to better integrate the notion of
 mental silence, independent of particular meditation technique,
 with other themes of positive psychology.
-At least one investigator has suggested that there is a relationship
-between flow and meditation \cite[p.~244]{carrington1977}.
+At least two investigators have suggested that there may be a relationship
+between flow and meditation (\citeNP[p.~244]{carrington1977};
+\citeNP[p.~1219]{orme2008}).
 \emph{Flow} is an intrinsically rewarding experience in which a person
 is absorbed in the optimal performance of an activity. 
 The conditions and contrasts of flow are illustrated in
 Figure~\ref{fig:teleonomy-of-self}.
 A precondition of flow is a balance between the subjective challenge of an
 activity and the skill a person can bring to it.
-If challenge and skill are out of balance then either frustration or
+If challenge and skill are out of balance then either anxiety or
 boredom ensues.
 Immediate feedback and clear goals are important because 
 without them it would be hard to judge whether challenge
@@ -312,7 +313,7 @@ raises more questions than it answers \cite{LIA01}, and
 there is tentative evidence that skin temperature
 can distinguish mental silence from rest \cite{manocha2010}.
 The paucity of investigations into mental silence
-allow for little certainly about its reproducibility, effect size, and importance.
+allow for little certainly about its replicability, effect size, and importance.
 
 PsycNET searches for ``mental silence'' or ``thoughtless awareness''
 turned up nothing besides articles by Ramesh Manocha and collaborators.
