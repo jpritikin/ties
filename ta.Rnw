@@ -287,11 +287,11 @@ important similarity between mental silence and
 Heisenberg's uncertainty principle.
 
 Heisenberg's uncertainty principle is a result of quantum physics
-concerning the accuracy with which particles can be measured.
+concerning the accuracy with which subatomic particles can be measured.
 Since the measurement itself perturbs a particle randomly,
 the accuracy to which certain physical properties of a particle
 can be measured is limited.
-Similar, the accuracy of self-report on the experience
+Similarly, the accuracy of self-report on the experience
 of mental silence is constrained because
 thought, the medium of self-report, is excluded from
 the experience.
@@ -394,7 +394,7 @@ Charlottesville residents with
 \Sexpr{100*sum(cms.latent$train=="yes")/dim(cms.latent)[[1]]}\%
 having some training in meditation/yoga.
 This sample was probably much more educated than typical samples
-that draw participants from a university subject pool (Table~\ref{tab:edu}).
+drawn from a university subject pool (Table~\ref{tab:edu}).
 Other demographic data were not fabricated.
 
 <<results=tex>>=
@@ -430,7 +430,7 @@ In the same way that infants can remember experience prior to
 learning language and how to think in the conventional way,
 participants should not have much difficulty recalling whether
 they have experienced complete mental silence.
-None of the items ask participants to attempt to express the content of
+None of the items ask participants to articulate the content of
 their mental silence experience.
 
 \subsection{Procedure}
@@ -441,7 +441,7 @@ there was no missing data.
 No participants were excluded from statistical analysis.
 Raw response data are available in Appendix~\ref{appendix:responses}.
 
-\section{Results}
+\section{Results and Discussion}
 
 The analytic approach of item response theory (IRT) was selected.
 IRT offers considerable advantages over the alternatives.
@@ -462,7 +462,7 @@ response $0, 1, \dots, m_i$ of person $j$'s attempt at item $i$. That is,
 \sum_{h=0}^{m_i}P_{ijh} = 1.
 \end{displaymath}
 
-The probability of person $j$ scoring $x$ on item $i$ is
+\noindent The probability of person $j$ scoring $x$ on item $i$ is
 
 \begin{displaymath}
 \forall x \in \{0,1,\dots,m_i\}, \quad
@@ -472,7 +472,7 @@ P_{ijx} =
 \left[\exp\ \displaystyle\sum_{k=0}^{h}\alpha_{ik}(\theta_j - \delta_{ik})\right]}
 \end{displaymath}
 
-where $\theta_j$ is person $j$'s trait level,
+\noindent where $\theta_j$ is person $j$'s trait level,
 $\delta_{ik}$ is the difficulty of the item $i$ at category $k$,
 $\alpha_{ik}$ is the discrimination of the item $i$ at category $k$,
 and summing across all persons $j$,
@@ -628,7 +628,7 @@ Given that this is simulated data,
 there is not much of interest here.
 With real data, an unexpected response pattern could motivate
 an interview with the participant.
-Some items may be interpreted in unexpected ways.
+Some items may have been interpreted in unexpected ways.
 
 <<results=tex>>=
 beta <- cbind(fam.pcm1$etapar[2:length(fam.pcm1$etapar)],
@@ -773,21 +773,35 @@ Given that this is simulated data,
 there is not much of interest here.
 With real data, an unexpected response pattern could motivate
 an interview with the participant.
-Some items may be interpreted in unexpected ways.
-
-\subsection{Summary}
-
-Complete \texttt{R} code for the analysis presented here is available
-in Appendices~\ref{appendix:r-analysis} and \ref{appendix:r-presentation}.
+Some items may have been interpreted in unexpected ways.
 
 \section{Conclusion}
 
-Item Response Theory is a power technique for analyzing survey
+Item Response Theory is a powerful technique for analyzing survey
 response data.
+However, open source modeling software leaves much to be desired.
+Embedding IRT in structural equation modeling looks like a promising way to
+overcome these software limitations \cite{lu2005}.
 
 \bibliography{jpritikin}
 
 \clearpage
+\begin{center}
+{\Large List of Appendices}
+\end{center}
+
+\begin{table}[h!]
+\begin{tabular}{lp{5in}r}
+\ref{appendix:survey} & Questionnaire \dotfill & \pageref{appendix:survey} \\
+\ref{appendix:responses} & Simulated Responses \dotfill & \pageref{appendix:responses} \\
+\ref{appendix:r-analysis} & R analysis code \dotfill & \pageref{appendix:r-analysis} \\
+\ref{appendix:r-presentation} & R presentation code \dotfill & \pageref{appendix:r-presentation} \\
+\ref{appendix:animation} & Source code for mental silence animation \dotfill & \pageref{appendix:animation} \\
+\end{tabular}
+\end{table}
+
+\clearpage
+
 \appendix
 \section{Questionnaire}
 \label{appendix:survey}
