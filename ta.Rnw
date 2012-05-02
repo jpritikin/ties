@@ -332,13 +332,14 @@ positive psychology and the psychology of religion
 
 Some attempts to measure proximate concepts were identified.
 One scale asked whether ``True religious experience occurs in periods
-of profound silence'' \cite{maranell1974}. However, what is meant by
+of profound silence'' \cite[p.~23]{maranell1974}. However, what is meant by
 ``profound silence?'' Is the question asking about inner mental
 silence or outer environmental silence?
 Two scales asked whether the subject had had an experience that defied
 description.
 One phrasing was, ``Our verbal language isn't adequate
-to express or communicate real religious experience'' \cite{maranell1974}.
+to express or communicate real religious
+experience'' (\citeauthor{maranell1974}).
 Another phrasing was, ``I have had an experience that cannot
 be expressed in words'' \cite{hood1975}.
 Unfortunately, these questions can not inform about cause.
