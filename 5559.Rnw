@@ -383,13 +383,29 @@ A potentially vital component of flow has received almost
 no psychological scrutiny.
 
 <<>>=
-#theme_set(theme_bw())
+source("analyze.R")
+theme_set(theme_bw())
 table.placement <- 'tbp'
 @ 
 
 \section{Method}
 
 \subsection{Participants}
+
+Participants consisted of \Sexpr{dim(cms.latent)[[1]]} fake
+Charlottesville residents with
+\Sexpr{100*sum(cms.latent$train=="yes")/dim(cms.latent)[[1]]}\%
+having some training in meditation/yoga.
+This sample was probably much more educated than typical samples
+drawn from a university subject pool (Table~\ref{tab:edu}).
+Other demographic data were not fabricated.
+
+<<results=tex>>=
+tbl<-as.matrix(table(cms.latent$edu))
+dimnames(tbl)[[2]] <- c("Education")
+print(xtable(tbl, caption="Distribution of education among participants.",
+             label="tab:edu"), table.placement=table.placement)
+@ 
 
 \subsection{Questionnaire}
 
@@ -420,15 +436,414 @@ they have experienced complete mental silence.
 None of the items ask participants to articulate the content of
 their mental silence experience.
 
+\subsection{Procedure}
+
+Participants responded to the questionnaire, all completing it within
+a single 30 min session. All participants answered all items;
+there was no missing data.
+No participants were excluded from statistical analysis.
+Raw response data are available in Appendix~\ref{appendix:responses}.
+
+\section{Results and Discussion}
+
+The analytic approach of item response theory (IRT) was selected.
+IRT offers considerable advantages over the alternatives.
+Using IRT, there is no need to assume that ordinal measurements
+on a Likert scale have interval measurement properties.
+Unlike classical test theory, IRT can obtain unbiased item difficulty
+estimates without the need of a huge sample to determine scale norms.
+Furthermore, IRT places items and person parameters on the same scale,
+easing interpretation.
+
+\subsection{Partial Credit Model}
+
+The Generalized Partial Credit Model (GPCM) model can be expressed in terms
+of the unconditional probability of each
+response $0, 1, \dots, m_i$ of person $j$'s attempt at item $i$. That is,
+
+\begin{displaymath}
+\sum_{h=0}^{m_i}P_{ijh} = 1.
+\end{displaymath}
+
+\noindent The probability of person $j$ scoring $x$ on item $i$ is
+
+\begin{displaymath}
+\forall x \in \{0,1,\dots,m_i\}, \quad
+P_{ijx} =
+\frac{\exp\left[\ \displaystyle\sum_{k=0}^{x} \alpha_{ik}(\theta_j - \delta_{ik})\right]}
+{\displaystyle\sum_{h=0}^{m_j}
+\left[\exp\ \displaystyle\sum_{k=0}^{h}\alpha_{ik}(\theta_j - \delta_{ik})\right]}
+\end{displaymath}
+
+\noindent where $\theta_j$ is person $j$'s trait level,
+$\delta_{ik}$ is the difficulty of the item $i$ at category $k$,
+$\alpha_{ik}$ is the discrimination of the item $i$ at category $k$,
+and summing across all persons $j$,
+item parameters $\alpha$ and $\delta$ are centered at zero
+
+\begin{displaymath}
+\sum_j\alpha_{ij}(\theta - \delta_{ij}) \equiv 0.
+\end{displaymath}
+
+Unfortunately, no \texttt{R} implementation of GPCM is
+working well enough yet.
+Data were analyzed using the \texttt{eRm} package \cite{erm2011},
+fixing $\alpha=1$.
+This parameterization of GPCM
+is equivalent to the Partial Credit Model (PCM).
+\texttt{eRm} uses conditional maximum likelihood
+to estimate item and person parameters.
+
+\subsection{Familiarity subscale}
+
+\begin{figure}
+<<fig=TRUE,height=4>>=
+plotPImap(fam.pcm1, main="Familiarity with mental silence")
+@ 
+\caption{Person-item map of the Familiarity subscale.}
+\label{fig:familiarity:pimap}
+\end{figure}
+
+<<results=tex>>=
+pcmSummary(fam.pcm1, fam.pcm1.p,
+           caption='Summary statistics for the Familiarity subscale.',
+           label='tab:familiarity:summary')
+@ 
+
+A PCM was fit to the Familiarity subscale,
+$-2LL = \Sexpr{round(-2*logLik(fam.pcm1)$loglik,2)},
+df = \Sexpr{logLik(fam.pcm1)$df}$.
+To determine whether the scale assessed a single dimension,
+a principal component analysis was performed on the standardized
+residuals.
+The first eigenvalue was \Sexpr{round(fam.pcm1.res$values[1],2)},
+less than the 1.74 threshold,
+indicating that a second dimension was unlikely \cite{raiche2005}.
+The person-item map is exhibited in Figure~\ref{fig:familiarity:pimap}.
+Summary statistics for the item and person parameters are
+exhibited in Table~\ref{tab:familiarity:summary}.
+
+<<results=tex>>=
+fit <- itemfit(fam.pcm1.p)
+fit.df <- as.data.frame(fit[c('i.outfitMSQ','i.outfitZ','i.infitMSQ','i.infitZ')])
+dimnames(fit.df)[[2]] <- c("Outfit MSQ", "Outfit t", "Infit MSQ", "Infit t")
+fit.df <- fit.df[order(fit.df$'Infit MSQ'),]
+print(xtable(fit.df, caption="Item outfit and infit sorted by infit.",
+             label="tab:familiarity:item:fit"),
+      table.placement=table.placement)
+@ 
+
+\begin{figure}
+<<fig=TRUE,height=3>>=
+print(myPlotICC(thresholds(fam.pcm1)$threshtable$'1'[1,2:3]) +
+  opts(title="Does not make sense"))
+@ 
+\caption{Item characteristic curves for the item ``Does not make sense''
+  in the Familiarity subscale.}
+\label{fig:familiarity:notSense}
+\end{figure}
+
+\begin{figure}
+<<fig=TRUE,height=3>>=
+print(myPlotICC(thresholds(fam.pcm1)$threshtable$'1'[2,2:3]) +
+  opts(title="Possible for anybody"))
+@ 
+\caption{Item characteristic curves for the item ``Possible for anybody''
+  in the Familiarity subscale.}
+\label{fig:familiarity:possAny}
+\end{figure}
+
+\begin{figure}
+<<fig=TRUE,height=3.5>>=
+print(plotInfo(thresholds(fam.pcm1)$threshtable$'1', c(-8,8)))
+@ 
+\caption{Information curves for the Familiarity items and scale.}
+\label{fig:familiarity:person:info}
+\end{figure}
+
+Item outfit and infit statistics are exhibited in
+Table~\ref{tab:familiarity:item:fit}.
+The liberal acceptable range for MSQ is 1.4 to 0.6.
+Only the notSense item's outfit fell outside this range (0.44),
+suggesting that notSense was overfit.
+The item characteristic curves for notSense
+(Figure~\ref{fig:familiarity:notSense})
+confirmed the good behavior of this item.
+The possAny item was the most underfit item in the Familiarity subscale,
+although still well within the 1.4 MSQ fit threshold.
+Figure~\ref{fig:familiarity:possAny} shows that the
+middle response category was infrequently endorsed.
+A GPCM might find that this item discriminates poorly (as simulated).
+In real data, a low discrimination may indicate that the item needs rewording.
+Item information curves are exhibited in
+Figure~\ref{fig:familiarity:person:info}.
+The items are distributed over a reasonably wide range of trait scores.
+
+\begin{figure}
+<<fig=TRUE,height=3>>=
+print(ggplot(data.frame(param=fam.pcm1.p$theta.table$Person), aes(param)) +
+  geom_histogram(binwidth=.25) +
+  labs(x="Trait level", y="Count"))
+@ 
+\caption{Histogram of person trait estimates.}
+\label{fig:familiarity:person:param}
+\end{figure}
+
+<<results=tex>>=
+fit <- personfit(fam.pcm1.p)
+fit.df <- as.data.frame(fit[c('p.outfitMSQ','p.outfitZ','p.infitMSQ','p.infitZ')])
+dimnames(fit.df)[[2]] <- c("Outfit MSQ", "Outfit t", "Infit MSQ", "Infit t")
+chunk <- 8
+fit.crazy <- rbind(fit.df[head(order(fit.df$'Infit MSQ'),n=chunk),],
+  fit.df[tail(order(fit.df$'Infit MSQ'),n=chunk),])
+print(xtable(round(fit.crazy,2),
+             caption="Person outfit and infit sorted by infit.",
+             label="tab:familiarity:person:fit"),
+      hline.after=c(-1,0,nrow(fit.crazy),chunk),
+      table.placement=table.placement)
+@ 
+
+<<results=tex>>=
+print(xtable(cms[c(3,34,36,44,72),1:6],
+             caption="Likely (overfit) response patterns on the Familiarity scale.",
+             label="tab:familiarity:person:likely"),
+      table.placement=table.placement)
+@ 
+
+<<results=tex>>=
+print(xtable(cms[c(121,40,83,195,172,197),1:6],
+             caption="Unlikely (underfit) response patterns on the Familiarity scale.",
+             label="tab:familiarity:person:unlikely"),
+      table.placement=table.placement)
+@ 
+
+A histogram of person trait levels is exhibited
+in Figure~\ref{fig:familiarity:person:param}.
+To capture more variability,
+it would probably be worth trying a 5-point Likert scale
+instead of a 3-point scale.
+The most extreme item outfit and infit statistics are exhibited in
+Table~\ref{tab:familiarity:person:fit}.
+The badness of fit can be investigated
+by looking at likely (Table~\ref{tab:familiarity:person:likely})
+and unlikely (Table~\ref{tab:familiarity:person:unlikely}) response patterns.
+Given that this is simulated data,
+there is not much of interest here.
+With real data, an unexpected response pattern could motivate
+an interview with the participant.
+Some items may have been interpreted in unexpected ways.
+
+<<results=tex>>=
+beta <- cbind(fam.pcm1$etapar[2:length(fam.pcm1$etapar)],
+              -lrt$betalist$'0', -lrt$betalist$'1',
+              -(lrt$betalist$'1'-lrt$betalist$'0'))
+dimnames(beta)[[1]] <- str_replace(dimnames(beta)[[1]], "beta ", '')
+dimnames(beta)[[2]] <- c("combined", "without","with","with-without")
+print(xtable(beta, digits=c(2),
+             caption="Difficulty estimates for participants with and without training in meditation. The notSense item was excluded due to inappropriate response patterns within subgroups.",
+             label='tab:familiarity:andersen'),
+      table.placement=table.placement)
+@ 
+
+By simulation, participants with training in meditation were suppose
+to have somewhat higher trait scores.
+However, Andersen's LR test was not significant, $\Sexpr{round(lrt$LR,2)},
+df = \Sexpr{round(lrt$df,2)}, p = \Sexpr{round(lrt$pvalue,2)}$.
+Although the difference between \emph{with} and \emph{without}
+was expected to be positive, this was only found for some of the
+item categories (Table~\ref{tab:familiarity:andersen}).
+There was likely too much noise in the simulated responses
+to find the expected difference.
+
+\subsection{Context subscale}
+
+\begin{figure}
+<<fig=TRUE,height=4>>=
+plotPImap(ctx.pcm1, main="Context of mental silence")
+@ 
+\caption{Person-item map of the Context subscale.}
+\label{fig:context:pimap}
+\end{figure}
+
+<<results=tex>>=
+pcmSummary(fam.pcm1, fam.pcm1.p,
+           caption='Summary statistics for the Context subscale.',
+           label='tab:context:summary')
+@ 
+
+A PCM was fit to the Context subscale,
+$-2LL = \Sexpr{round(-2*logLik(ctx.pcm1)$loglik,2)},
+df = \Sexpr{logLik(ctx.pcm1)$df}$.
+To determine whether the scale assessed a single dimension,
+a principal component analysis was performed on the standardized
+residuals.
+The first eigenvalue was \Sexpr{round(ctx.pcm1.res$values[1],2)},
+less than the 1.74 threshold,
+indicating that a second dimension was unlikely \cite{raiche2005}.
+The person-item map is exhibited in Figure~\ref{fig:context:pimap}.
+Summary statistics for the item and person parameters are
+exhibited in Table~\ref{tab:context:summary}.
+
+<<results=tex>>=
+fit <- itemfit(ctx.pcm1.p)
+fit.df <- as.data.frame(fit[c('i.outfitMSQ','i.outfitZ','i.infitMSQ','i.infitZ')])
+dimnames(fit.df)[[2]] <- c("Outfit MSQ", "Outfit t", "Infit MSQ", "Infit t")
+fit.df <- fit.df[order(fit.df$'Infit MSQ'),]
+print(xtable(fit.df, caption="Item outfit and infit sorted by infit.",
+             label="tab:context:item:fit"),
+      table.placement=table.placement)
+@ 
+
+\begin{figure}
+<<fig=TRUE,height=4.5>>=
+p1 <- myPlotICC(thresholds(ctx.pcm1)$threshtable$'1'[4,2:5], xrange=c(-4,4)) +
+  opts(title="Relaxation")
+p2 <- myPlotICC(thresholds(ctx.pcm1)$threshtable$'1'[6,2:5], xrange=c(-4,4)) +
+  opts(title="Meditation")
+multiplot(p1,p2,cols=1)
+@ 
+\caption{Item characteristic curves from the Context subscale where difficulties are out of order.}
+\label{fig:context:baditems}
+\end{figure}
+
+\begin{figure}
+<<fig=TRUE,height=3.5>>=
+print(plotInfo(thresholds(ctx.pcm1)$threshtable$'1', c(-8,8)))
+@ 
+\caption{Information curves for the Context items and scale.}
+\label{fig:context:person:info}
+\end{figure}
+
+Item outfit and infit statistics are exhibited in
+Table~\ref{tab:context:item:fit}.
+The liberal acceptable range for MSQ is 1.4 to 0.6.
+Two items had out-of-order category thresholds 
+(Figure~\ref{fig:context:baditems}).
+Crossing thresholds suggest that there is something wrong with the item.
+Either the items need some rewording or there are too many response categories.
+Item information curves are exhibited in
+Figure~\ref{fig:context:person:info}.
+Most item difficulties are compressed near a trait score of 0.5.
+Hopefully item difficulties will be dispersed more widely over
+possible trait scores when estimating item locations with real data.
+
+\begin{figure}
+<<fig=TRUE,height=3>>=
+print(ggplot(data.frame(param=ctx.pcm1.p$theta.table$Person), aes(param)) +
+  geom_histogram(binwidth=.1) +
+  labs(x="Trait level", y="Count"))
+@ 
+\caption{Histogram of person trait estimates.}
+\label{fig:context:person:param}
+\end{figure}
+
+<<results=tex>>=
+fit <- personfit(ctx.pcm1.p)
+fit.df <- as.data.frame(fit[c('p.outfitMSQ','p.outfitZ','p.infitMSQ','p.infitZ')])
+dimnames(fit.df)[[2]] <- c("Outfit MSQ", "Outfit t", "Infit MSQ", "Infit t")
+chunk <- 8
+fit.crazy <- rbind(fit.df[head(order(fit.df$'Infit MSQ'),n=chunk),],
+  fit.df[tail(order(fit.df$'Infit MSQ'),n=chunk),])
+print(xtable(round(fit.crazy,2),
+             caption="Person outfit and infit sorted by infit.",
+             label="tab:context:person:fit"),
+      hline.after=c(-1,0,nrow(fit.crazy),chunk),
+      table.placement=table.placement)
+@ 
+
+<<results=tex>>=
+print(xtable(cms[c(3,34,36,44,72),1:6],
+             caption="Likely (overfit) response patterns on the Context scale.",
+             label="tab:context:person:likely"),
+      table.placement=table.placement)
+@ 
+
+<<results=tex>>=
+print(xtable(cms[c(121,40,83,195,172,197),1:6],
+             caption="Unlikely (underfit) response patterns on the Context scale.",
+             label="tab:context:person:unlikely"),
+      table.placement=table.placement)
+@ 
+
+A histogram of person trait estimates is exhibited
+in Figure~\ref{fig:context:person:param}.
+The most extreme person outfit and infit statistics are exhibited in
+Table~\ref{tab:context:person:fit}.
+The badness of fit can be investigated
+by looking at likely (Table~\ref{tab:context:person:likely})
+and unlikely (Table~\ref{tab:context:person:unlikely}) response patterns.
+Given that this is simulated data,
+there is not much of interest here.
+With real data, an unexpected response pattern could motivate
+an interview with the participant.
+Some items may have been interpreted in unexpected ways.
+
+\section{Conclusion}
+
+Item Response Theory is a powerful technique for analyzing survey
+response data.
+However, open source modeling software leaves much to be desired.
+Embedding IRT in structural equation modeling looks like a promising way to
+overcome these software limitations \cite{lu2005}.
+
 \bibliography{jpritikin}
+
+\clearpage
+\begin{center}
+{\Large List of Appendices}
+\end{center}
+
+\begin{table}[h!]
+\begin{tabular}{lp{5in}r}
+\ref{appendix:survey} & Questionnaire \dotfill & \pageref{appendix:survey} \\
+\ref{appendix:responses} & Simulated Responses \dotfill & \pageref{appendix:responses} \\
+\ref{appendix:r-analysis} & R analysis code \dotfill & \pageref{appendix:r-analysis} \\
+\ref{appendix:r-presentation} & R presentation code \dotfill & \pageref{appendix:r-presentation} \\
+\ref{appendix:animation} & Source code for mental silence animation \dotfill & \pageref{appendix:animation} \\
+\end{tabular}
+\end{table}
+
+\clearpage
 
 \appendix
 \section{Questionnaire}
 \label{appendix:survey}
 As a supplement to the questionnaire (exhibited on the following pages),
 an animation was developed to better convey the meaning of
-complete mental silence
-(see \url{http://people.virginia.edu/~jnp3bc/mental.gif}).
+complete mental silence.
+See \url{http://people.virginia.edu/~jnp3bc/mental.gif} and
+Appendix~\ref{appendix:animation}.
 \includepdf[pages=-,frame=true]{ta-survey.pdf}
+
+\section{Simulated Responses}
+
+\label{appendix:responses}
+\begin{singlespace}
+{\tiny
+<<>>=
+options(width=200)
+cms
+@ 
+}
+\end{singlespace}
+
+\section{R analysis code}
+\label{appendix:r-analysis}
+\begin{singlespace}
+\lstinputlisting{analyze.R}
+\end{singlespace}
+
+\section{R presentation code}
+\label{appendix:r-presentation}
+\begin{singlespace}
+\lstinputlisting{ta.R}
+\end{singlespace}
+
+\section{Source code for mental silence animation}
+\label{appendix:animation}
+\begin{singlespace}
+\lstset{basicstyle=\tiny\ttfamily}
+\lstinputlisting[language=Perl]{animGen}
+\end{singlespace}
 
 \end{document} 
