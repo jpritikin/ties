@@ -365,7 +365,8 @@ Narratives like this, while intriguing, offer almost no information
 about the structure of the experience.
 As Socrates suggested, we need to determine ``where the natural
 joints are, and not trying to break any part,
-after the manner of a bad carver'' \cite{fowler1990}.
+after the manner of a bad carver''
+(\citeauthor{fowler1914}, trans.~\citeyearNP{fowler1914}, sec.~265e).
 \citeA{henry2004} gathered evidence from a decade of workshops and
 questionnaire studies asking non-clinical adults what methods and
 approaches have been efficacious in changing their lives for the
