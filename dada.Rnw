@@ -184,8 +184,6 @@ even acknowledged (\citeNP{shapiro2009}; \citeNP{baer2011}).
 No glossary entry found in reference works on
 positive psychology and the psychology of religion
 (\citeNP{pargament1997}; \citeNP{peterson2004}; \citeNP{snyder2009}; \citeNP{sheldon2011}).
-\item In comparison, extrasensory perception has attracted 2-3 orders of
-magnitude more scientific studies \cite{lau2004}.
 \end{itemize}
 
 A potentially vital component of flow has not received

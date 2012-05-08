@@ -29,8 +29,7 @@ numberstyle=\color{gray}}
   may be a component of meditation, religion, spirituality,
   problem solving, relaxation, and flow.
 A survey is developed to assess folk familiarity and context
-of complete mental silence.
-Response data was simulated and analyzed using the Partial Credit Model.}
+of complete mental silence.}
 
 \acknowledgements{Comments may be sent to the author at jpritikin@virginia.edu.}
 
@@ -101,15 +100,13 @@ Among other benefits,
 this practice is thought to help disrupt negative thought-affect cycles
 \cite{baer2003}.
 
-Curiously, neither mantra meditation nor mindfulness meditation
-have dedicated sufficient discussion to the goal of meditation, that is,
+Curiously, most research using mantra or mindfulness meditation
+has not dedicated sufficient consideration to the goal of meditation, that is,
 complete mental silence (a.k.a. thoughtless awareness).
-The notion of mental silence is found in widely translated,
-centuries old
-books such as the Mahabharat, Upanishads, Yoga Sutras of Patanjali,
-and Gyaneshwari \cite[pp.~93--94]{manocha2009}.
-Mental silence is an experience in which one is
-no longer is thinking and
+The notion of mental silence can be found in Hindu, Buddhist,
+German mystical, and Jewish mystical traditions (\citeNP{forman1997};
+\citeNP[pp.~93--102]{manocha2009}).
+Mental silence is an experience in which one is no longer thinking and
 no longer feels the urge to continuously engage in thought.
 The experience occurs in a normal, lucid waking state;
 Mental silence is not similar to sleeping or unconsciousness.
@@ -129,6 +126,9 @@ on permissible types of thought.
 The notion of mental silence contradicts
 DesCartes' ``I think therefore I am.'' (for more discussion
 see \citeNP{damasio1995}).
+The notion of mental silence has attracted lucid discussion in artificial
+intelligence and studies of consciousness
+(\citeNP{fields2002}; \citeNP{forman1998}).
 
 \begin{quotation}
 A meditation session will often follow a certain progression. Starting
@@ -142,7 +142,8 @@ becomes almost imperceptible and silence is the all-encompassing
 experience.  According to the meditative tradition, at this point the
 mind is not focused on either thought or image, but is fully aware,
 conscious. The mind is said to be alert without having any
-\emph{object} of alertness. \cite[p.~91]{carrington1977}
+\emph{object} of alertness.
+(\citeNP[p.~91]{carrington1977}, emphasis in original)
 \end{quotation}
 
 While the ambiguity of the English word \emph{meditation} was identified as
@@ -155,7 +156,8 @@ Since ancient times, Sanskrit literature has distinguished these
 two concepts without much difficulty.
 {\dn nirvicaara samaadhi} (nirvichar samadhi) denotes
 complete mental silence.
-{\dn samaadhi} (samadhi) literally means \emph{to acquire wholeness with}.
+{\dn samaadhi} (samadhi) literally means \emph{to acquire wholeness with}
+and is used mainly in the context yoga/meditation.
 {\dn samaadhi} (samadhi) is a compound word consisting of three parts:
 {\dn sam} (sum) means \emph{together} or \emph{integrated},
 {\dn aa} (ah) means \emph{towards},
@@ -202,6 +204,117 @@ are to communicate accurately about their research designs.
 %%
 %% Can't decide yet because self-reports are too unreliable.
 
+A curious analogy can be drawn between mental silence and
+Heisenberg's uncertainty principle.
+Heisenberg's uncertainty principle is a result of quantum physics
+concerning the accuracy with which subatomic particles can be measured.
+Since the measurement itself perturbs a particle randomly,
+the accuracy to which certain physical properties of a particle
+can be measured is limited.
+Similarly, the accuracy of self-report on the experience
+of mental silence is constrained because
+thought, the medium of self-report, is excluded from
+the experience.
+Therefore, self-reports concerning the content of meditative experience
+must be considered, at best, analogical and only accurate to some
+limit (cf. \citeNP[p.~41]{forman1997}).\footnote{Heisenburg's
+uncertainty principle
+places a numerical limit on the accuracy of measurement.
+It seems unlikely that it will be possible to establish a quantitative
+bound on the precision of self-reports about mental silence.}
+
+For example, \citeA{forman1998} advanced the terminology
+``pure consciousness event'' as a label for the content
+of the experience of complete mental silence.
+However, it is not clear whether \emph{pure consciousness} is
+an entirely accurate characterization of the experience.
+``The pure consciousness event may be defined as a wakeful
+but contentless (non-intentional) consciousness''
+(\citeauthor{forman1998}, p.~72).
+The question is, what about emotion?
+Some emotions are plausibly dependent on symbolic cognition \cite{occ88}.
+For example, \emph{guilt} most likely clashes with mental silence.
+Yet some simpler, less cognitive emotions cannot be ruled out.
+Is an emotional, but mentally silent experience, contentless?
+Instead of wrestling with such questions,
+here the experience is labeled by its sufficient condition
+rather than by its content.
+An abundance of plausible attempts to describe the content of
+mental silence is available in a recent anthology \cite{franke2007}.
+
+Given the difficulty with self-reports, it is
+important to consider other ways of
+assessing the experience of mental silence.
+There is almost no research in this area.
+Two studies are noteworthy:
+One high-resolution EEG investigation of meditation
+raises more questions than it answers \cite{LIA01}, and
+there is tentative evidence that skin temperature
+can distinguish mental silence from rest \cite{manocha2010}.
+The paucity of investigations into mental silence
+allow for little certainly about its replicability,
+effect size, and importance.
+
+PsycNET searches for empirical research on ``mental silence''
+or ``thoughtless awareness''
+turned up nothing besides articles by Ramesh Manocha and collaborators.
+In collections of scales related to spiritual and religious experience,
+no attempt was made to assess
+``mental silence'' or ``thoughtless awareness'' (\citeNP{fetzer1999};
+\citeNP{hill1999}).
+Some attempts to measure proximate concepts were identified.
+One scale asked participants to rate the amount of
+inner dialog experienced recently on a 7-point Likert scale
+(from \emph{none} to \emph{a great deal}) \cite{pekala1981}.
+This question has a somewhat different emphasis than of interest here.
+Most retrospective self-reports imply a discontinuity
+between thinking and mental silence.
+The 7-point Likert scale could be collapsed to a dichotomous response,
+but this would offer little insight into the mental silence experience.
+One scale asked whether ``True religious experience occurs in periods
+of profound silence'' \cite[p.~23]{maranell1974}. However, what is meant by
+``profound silence?'' Is the question asking about inner mental
+silence or outer environmental silence?
+Two scales asked whether the subject had had an experience that defied
+description.
+One phrasing was, ``Our verbal language isn't adequate
+to express or communicate real religious
+experience'' (\citeauthor{maranell1974}).
+Another phrasing was, ``I have had an experience that cannot
+be expressed in words'' \cite{hood1975}.
+Unfortunately, these questions can not inform about cause.
+It would be useful to know why an experience cannot be expressed in words.
+Was it an impoverished imagination or something else?
+Another measure asked people to read descriptions of experiences,
+compare their own experiences, and rate the degree of similarity.
+For example:
+
+\begin{quotation}
+My mind, deeply under the influence of the thoughts and emotions
+called up by the reading and talk, was calm and peaceful. I was in a
+state of quiet, almost passive enjoyment, not actually thinking but
+letting thoughts and emotions flow by themselves through my mind. All
+at once, without any warning, I found myself wrapped in a flame colored
+cloud. For an instant I thought a great fire might be in the nearby
+city; the next moment I knew that the fire was within myself. Directly
+afterward I felt a sense of exultation, of immense joy and
+intellectual insight impossible to describe. \cite[p.~223]{burris1999}
+\end{quotation}
+
+\noindent Narratives like this, while intriguing, offer almost no information
+about the structure of the experience.
+As Socrates suggested, we need to determine ``where the natural
+joints are, and not trying to break any part,
+after the manner of a bad carver''
+(\citeauthor{fowler1914}, trans.~\citeyearNP{fowler1914}, sec.~265e).
+\citeA{henry2004} gathered evidence from a decade of workshops and
+questionnaire studies asking non-clinical adults what methods and
+approaches have been efficacious in changing their lives for the
+better.
+A general strategy of ``quietening the mind'' was frequently endorsed.
+Unfortunately, this study did not try to discriminate
+precisely what was meant by ``quietening the mind.''
+
 \begin{figure}[tp]
 \begin{tikzpicture}[>=latex,line join=bevel]
   \pgfsetlinewidth{1bp}
@@ -212,9 +325,18 @@ are to communicate accurately about their research designs.
 \label{fig:teleonomy-of-self}
 \end{figure}
 
+In two recent reviews of the state of the research on meditation/mindfulness,
+the possibility of mental silence or thoughtless awareness was not
+even acknowledged (\citeNP{shapiro2009}; \citeNP{baer2011}).
+Is the experience of mental silence so rare
+that it does not even merit a glossary entry in reference works on
+positive psychology and the psychology of religion
+(\citeNP{pargament1997}; \citeNP{peterson2004};
+\citeNP{snyder2009}; \citeNP{sheldon2011})?
 One goal of this article is to better integrate the notion of
 mental silence, independent of particular meditation technique,
 with other themes of positive psychology.
+
 At least two investigators have suggested that there may be a relationship
 between flow and meditation (\citeNP[p.~244]{carrington1977};
 \citeNP[p.~1219]{orme2008}).
@@ -282,98 +404,6 @@ Or is it the combination and coordination of such skills?
 Given that a traditional aim of yoga/meditation is mental silence,
 perhaps mental silence facilitates flow or
 is even a latent component of flow.
-A connection between flow and mental silence would be
-easy to overlook because of the
-important similarity between mental silence and
-Heisenberg's uncertainty principle.
-
-Heisenberg's uncertainty principle is a result of quantum physics
-concerning the accuracy with which subatomic particles can be measured.
-Since the measurement itself perturbs a particle randomly,
-the accuracy to which certain physical properties of a particle
-can be measured is limited.
-Similarly, the accuracy of self-report on the experience
-of mental silence is constrained because
-thought, the medium of self-report, is excluded from
-the experience.
-Therefore, self-reports concerning mental silence
-must be considered, at best, analogical and only accurate to some
-limit.\footnote{Heisenburg's uncertainty principle
-places a numerical limit on the accuracy of measurement.
-It seems unlikely that it will be possible to establish a quantitative
-bound on the precision of self-reports about mental silence.}
-
-Given the difficulty with self-reports, it is
-important to consider other ways of
-assessing the experience of mental silence.
-There is almost no research in this area.
-Two studies are noteworthy:
-One high-resolution EEG investigation of meditation
-raises more questions than it answers \cite{LIA01}, and
-there is tentative evidence that skin temperature
-can distinguish mental silence from rest \cite{manocha2010}.
-The paucity of investigations into mental silence
-allow for little certainly about its replicability, effect size, and importance.
-
-PsycNET searches for ``mental silence'' or ``thoughtless awareness''
-turned up nothing besides articles by Ramesh Manocha and collaborators.
-In collections of scales related to spiritual and religious experience,
-no attempt was made to assess
-``mental silence'' or ``thoughtless awareness'' (\citeNP{fetzer1999};
-\citeNP{hill1999}).
-In two recent reviews of the state of the research on meditation/mindfulness,
-the possibility of mental silence or thoughtless awareness was not
-even acknowledged (\citeNP{shapiro2009}; \citeNP{baer2011}).
-Is the experience of mental silence so rare
-that it does not even merit a glossary entry in reference works on
-positive psychology and the psychology of religion
-(\citeNP{pargament1997}; \citeNP{peterson2004};
-\citeNP{snyder2009}; \citeNP{sheldon2011})?
-
-Some attempts to measure proximate concepts were identified.
-One scale asked whether ``True religious experience occurs in periods
-of profound silence'' \cite[p.~23]{maranell1974}. However, what is meant by
-``profound silence?'' Is the question asking about inner mental
-silence or outer environmental silence?
-Two scales asked whether the subject had had an experience that defied
-description.
-One phrasing was, ``Our verbal language isn't adequate
-to express or communicate real religious
-experience'' (\citeauthor{maranell1974}).
-Another phrasing was, ``I have had an experience that cannot
-be expressed in words'' \cite{hood1975}.
-Unfortunately, these questions can not inform about cause.
-It would be useful to know why an experience cannot be expressed in words.
-Was it an impoverished imagination or something else?
-Another measure asks people to read descriptions of experiences,
-compare their own experiences, and rate the degree of similarity.
-For example:
-
-\begin{quotation}
-My mind, deeply under the influence of the thoughts and emotions
-called up by the reading and talk, was calm and peaceful. I was in a
-state of quiet, almost passive enjoyment, not actually thinking but
-letting thoughts and emotions flow by themselves through my mind. All
-at once, without any warning, I found myself wrapped in a flame colored
-cloud. For an instant I thought a great fire might be in the nearby
-city; the next moment I knew that the fire was within myself. Directly
-afterward I felt a sense of exultation, of immense joy and
-intellectual insight impossible to describe. \cite[p.~223]{burris1999}
-\end{quotation}
-
-Narratives like this, while intriguing, offer almost no information
-about the structure of the experience.
-As Socrates suggested, we need to determine ``where the natural
-joints are, and not trying to break any part,
-after the manner of a bad carver''
-(\citeauthor{fowler1914}, trans.~\citeyearNP{fowler1914}, sec.~265e).
-\citeA{henry2004} gathered evidence from a decade of workshops and
-questionnaire studies asking non-clinical adults what methods and
-approaches have been efficacious in changing their lives for the
-better.
-A general strategy of ``quietening the mind'' was frequently endorsed.
-Unfortunately, this study did not try to discriminate
-precisely what was meant by ``quietening the mind.''
 While mental silence has typically been discussed
 in the context of meditation, it seems plausible that the experience
 occurs outside the context of meditation as well,
@@ -401,13 +431,10 @@ In the Familiarity subscale,
 items were presented in an hypothesized order from easy to difficult.
 In the Context subscale, the only question of interest in each section was:
 ``Is complete mental silence an important component of \emph{X}?''
-Sections in the Context subscale were presented in random order
-to average out order effects.
-The Flow subscale would have benefited from additional brainstorming
-and is not analyzed in this report.
-Most of the other item were included because they (a) were of personal
-interest to the investigator, (b) could lead to additional hypotheses,
-and (c) pushed participants in the direction
+Sections in the Context subscale were presented in random order.
+Most of the other item were included because they were of personal
+interest to the investigator, could lead to additional hypotheses,
+and pushed participants in the direction
 of thinking about the concepts more carefully.
 
 While self-reports about mental silence are necessarily imprecise,
