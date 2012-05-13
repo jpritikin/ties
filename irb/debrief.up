@@ -1,0 +1,50 @@
+#!/bin/sh
+tail --lines=+4 $0 | markdown | ssh jnp3bc@blue.unix.virginia.edu 'cat > public_html/subjectiveTime/debrief.html'
+exit
+<big>Debriefing Form: <strong>Extremes of subjective passage of time</strong></big>
+
+Thank you for agreeing to participate in this study!  The general
+purpose of this research is to explore how the extremes of subjective
+passage of time relate to a variety of contexts.  Of particular
+interest is the extreme of being unaware of actual time. A part of
+this inquiry is to measure how familiar people are with the idea of
+complete mental silence and determine how various contexts are related
+to this experience.
+
+Meditation has two distinct meanings. One meaning of meditation refers
+to a psychological centering device such as mantra recitation, focus
+on the breath, mindfulness, or a visual focus. Psychological centering
+devices help one feel more relaxed and centered. The other meaning of
+meditation is the experience of complete mental
+silence. Traditionally, the purpose of centering devices is to achieve
+complete mental silence.  Although the dual meanings of meditation
+have been documented since at least 1977, most studies involving
+meditation focus on centering devices and ignore the question of
+whether participants experience complete mental silence.
+
+Remarkably, the experience of complete mental silence is practically
+unstudied in psychology. I believe that the experience of mental
+silence is more common than reference works on positive psychology
+suggest.
+
+If you have any concerns about your participation, please feel free to
+phone Karen Schmidt (434) 924-0694 about options for counseling.
+Alternatively, you could also phone the UVA Counseling and
+Psychological Services (434-243-5556) or the Mary D. Ainsworth
+Psychological Clinic in the psychology department (434-982-4737).
+
+Thank you for your participation in this study.  If you have further
+questions about the study, please contact Joshua Pritikin (434)
+906-9678.  In addition, if you have any concerns about any aspect of
+the study, you may contact Tonya Moon, Ph.D., Chair, Institutional
+Review Board for the Social and Behavioral Sciences, One Morton Drive,
+Suite 500, University of Virginia, P.O. Box 800392, Charlottesville,
+VA 22908-0392. Telephone: (434) 924-5999.
+
+Additional Reading:
+
+* Forman, R. K. C. (1997). _The problem of pure consciousness: Mysticism and philosophy._ Oxford University Press.
+* Manocha, R. (2000). Why meditation? _Australian Family Physician, 29_(12),
+1135-1138.
+* Ready to experience complete mental silence? Visit
+[http://coolcheck.org](http://coolcheck.org)

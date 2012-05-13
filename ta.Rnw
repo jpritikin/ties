@@ -31,7 +31,10 @@ numberstyle=\color{gray}}
 A survey is developed to assess folk familiarity and context
 of complete mental silence.}
 
-\acknowledgements{Comments may be sent to the author at jpritikin@virginia.edu.}
+\acknowledgements{Comments may be sent to the author at jpritikin@virginia.edu.
+
+I would like to thank Karen Schmidt, Steven Boker,
+Susanna Williams, Jean Hu, and Mike Kubovy.}
 
 \shorttitle{MENTAL SILENCE}
 
@@ -143,7 +146,7 @@ experience.  According to the meditative tradition, at this point the
 mind is not focused on either thought or image, but is fully aware,
 conscious. The mind is said to be alert without having any
 \emph{object} of alertness.
-(\citeNP[p.~91]{carrington1977}, emphasis in original)
+\cite[p.~91]{carrington1977}
 \end{quotation}
 
 While the ambiguity of the English word \emph{meditation} was identified as
@@ -240,7 +243,7 @@ Instead of wrestling with such questions,
 here the experience is labeled by its sufficient condition
 rather than by its content.
 An abundance of plausible attempts to describe the content of
-mental silence is available in a recent anthology \cite{franke2007}.
+mental silence are available in a recent anthology \cite{franke2007}.
 
 Given the difficulty with self-reports, it is
 important to consider other ways of
@@ -261,7 +264,7 @@ turned up nothing besides articles by Ramesh Manocha and collaborators.
 In collections of scales related to spiritual and religious experience,
 no attempt was made to assess
 ``mental silence'' or ``thoughtless awareness'' (\citeNP{fetzer1999};
-\citeNP{hill1999}).
+\citeNP{hill1999}; \citeNP{monod2011}).
 Some attempts to measure proximate concepts were identified.
 One scale asked participants to rate the amount of
 inner dialog experienced recently on a 7-point Likert scale
@@ -327,12 +330,12 @@ precisely what was meant by ``quietening the mind.''
 
 In two recent reviews of the state of the research on meditation/mindfulness,
 the possibility of mental silence or thoughtless awareness was not
-even acknowledged (\citeNP{shapiro2009}; \citeNP{baer2011}).
+even acknowledged (\citeNP{baer2011}; \citeNP{shapiro2009}).
 Is the experience of mental silence so rare
 that it does not even merit a glossary entry in reference works on
 positive psychology and the psychology of religion
 (\citeNP{pargament1997}; \citeNP{peterson2004};
-\citeNP{snyder2009}; \citeNP{sheldon2011})?
+\citeNP{sheldon2011}; \citeNP{snyder2009})?
 One goal of this article is to better integrate the notion of
 mental silence, independent of particular meditation technique,
 with other themes of positive psychology.
@@ -417,45 +420,6 @@ no psychological scrutiny.
 table.placement <- 'tbp'
 @ 
 
-\section{Method}
-
-\subsection{Participants}
-
-\subsection{Questionnaire}
-
-The questionnaire (see Appendix~\ref{appendix:survey}) has four logical sections:
-basic demographic information, familiarity with mental silence (Familiarity subscale),
-context of mental silence (Context subscale),
-and the relationship between mental silence and flow (Flow subscale).
-In the Familiarity subscale,
-items were presented in an hypothesized order from easy to difficult.
-In the Context subscale, the only question of interest in each section was:
-``Is complete mental silence an important component of \emph{X}?''
-Sections in the Context subscale were presented in random order.
-Most of the other item were included because they were of personal
-interest to the investigator, could lead to additional hypotheses,
-and pushed participants in the direction
-of thinking about the concepts more carefully.
-
-While self-reports about mental silence are necessarily imprecise,
-here the precision requested of participants is not great.
-Some brain systems certainly remain on-line even when there is no thought.
-In the same way that infants can remember experience prior to
-learning language and how to think in the conventional way,
-participants should not have much difficulty recalling whether
-they have experienced complete mental silence.
-None of the items ask participants to articulate the content of
-their mental silence experience.
-
 \bibliography{jpritikin}
-
-\appendix
-\section{Questionnaire}
-\label{appendix:survey}
-As a supplement to the questionnaire (exhibited on the following pages),
-an animation was developed to better convey the meaning of
-complete mental silence
-(see \url{http://people.virginia.edu/~jnp3bc/mental.gif}).
-\includepdf[pages=-,frame=true]{ta-survey.pdf}
 
 \end{document} 
