@@ -234,11 +234,11 @@ an entirely accurate characterization of the experience.
 ``The pure consciousness event may be defined as a wakeful
 but contentless (non-intentional) consciousness''
 (\citeauthor{forman1998}, p.~72).
-The question is, what about emotion?
+The question is, what about affect?
 Some emotions are plausibly dependent on symbolic cognition \cite{occ88}.
 For example, \emph{guilt} most likely clashes with mental silence.
-Yet some simpler, less cognitive emotions cannot be ruled out.
-Is an emotional, but mentally silent experience, contentless?
+Yet some simpler, less cognitive affects cannot be ruled out.
+Is an affective, but mentally silent experience, contentless?
 Instead of wrestling with such questions,
 here the experience is labeled by its sufficient condition
 rather than by its content.
