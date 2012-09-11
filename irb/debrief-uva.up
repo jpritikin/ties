@@ -1,5 +1,5 @@
 #!/bin/sh
-tail --lines=+4 $0 | markdown | ssh jnp3bc@blue.unix.virginia.edu 'cat > public_html/subjectiveTime/debrief.html'
+tail --lines=+4 $0 | markdown | ssh jnp3bc@blue.unix.virginia.edu 'cat > public_html/subjectiveTime/debrief-uva.html'
 exit
 <head><title>Extremes of subjective passage of time</title></head>
 <div style="float: right; border: thin black solid; padding: 1ex; margin: .5ex; font-size: 125%;">
@@ -47,16 +47,6 @@ systematic methods of producing the flow experience" (1991). However,
 little is known about the relationship between yoga and flow. This
 study hopes to begin to explore how mental silence relates to flow and
 generate more specific hypotheses about this relationship.
-
-Enough participants have participated in this survey that I can say
-with some confidence that the results will be very interesting.
-However, many more participants are needed for the planned statistical
-analysis. If you enjoyed participating, please invite your friends to
-participate as well.  Here's what you might write: "I recently
-participated in a survey on the subjective passage of time and also
-related to mental silence. I found it thought provoking and enjoyed
-going through it. You might enjoy it too. Take a look,
-http://tiny.cc/q2qmfw"
 
 Thank you for your participation in this study.  If you have further
 questions about the study, please contact Joshua Pritikin (434)
