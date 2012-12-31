@@ -100,3 +100,18 @@ dis.flow <- cbind(
   pmax(unclass(espt$fl.subjTime)-3,0),
   pmax(3-unclass(espt$fl.b.gi),0))
 table(apply((dis.flow), 1, sum, na.rm=TRUE))
+
+################################################################
+
+ms.scale <- espt[,c('msNotAny','msNotSelf','msMet','msAccident','msShared','msCause',
+  'msTeach','msEvery','msPay','msTrainTeach')]
+#table(apply(is.na(ms.scale), 1, sum))
+ms.scale <- ms.scale[apply(is.na(ms.scale), 1, sum) == 0,]
+parscale.export <- function () {
+  foo <- sapply(ms.scale, as.integer)
+  foo[,1:2] <- 6 - foo[,1:2]  # reverse score
+  foo[is.na(foo)] <- 9
+  ms.responses <- apply(foo, 1, paste0, collapse='')
+  cat(sprintf("%04d %s\n", 1:length(ms.responses), ms.responses), file="ms.dat", sep='')
+}
+
