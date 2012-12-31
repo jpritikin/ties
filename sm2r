@@ -19,6 +19,7 @@ my %ContextMap = ('religious' => 're',
 		  'daydreaming' => 'dd',
 		  'flow' => 'fl');
 
+# creates a map from col# to column name
 sub mapHeader {
     my ($h1, $h2) = @_;
     my %map;
@@ -217,33 +218,39 @@ for my $file (@ARGV) {
     my $h2 = $csv->getline($io);
     my $map = mapHeader($h1, $h2);
     next if !$map;
-    push @data, [$io, $map];
+    push @data, [$file, $io, $map];
     if ($maxCol < keys($map)) {
 	$maxCol = keys($map);
 	$maxColIndex = $#data;
     }
 }
 
-my $outMap = reverseMap($data[$maxColIndex][1]);
+# reverse to (column name -> col#)
+my $outMap = reverseMap($data[$maxColIndex][2]);
 
 my $out = IO::File->new();
 $out->open(">$dest") or die $?;
 
+# outputs an array of column headers
 sub getHeader {
     my ($h) = @_;
     my @h;
     while (my ($k,$v) = each %$h) {
 	$h[$v] = $k;
     }
+    push @h, qw(wave ip.continent ip.country ip.region ip.city); # for @extra
     \@h;
 }
 
 $csv->print($out, getHeader($outMap));
 
-for my $pair (@data) {
-    my ($io, $map) = @$pair;
+for my $waveinfo (@data) {
+    my ($file, $io, $map) = @$waveinfo;
     while (my $row = $csv->getline($io)) {
 	my @outRow;
+	my $wavename = $file;
+	$wavename =~ s/\.csv$//;
+	my @extra = ($wavename);
 	my $skip;
 	for my $sk (keys %$map) {
 	    my $value = $row->[$sk];
@@ -253,8 +260,7 @@ for my $pair (@data) {
 	    }
 	    if ($key eq 'ip') {
 		my $record = $GI->record_by_addr($value);
-		$value = join(';',
-			      $record->continent_code,
+		push @extra, ($record->continent_code,
 			      $record->country_name,
 			      $record->region_name,
 			      $record->city);
@@ -278,6 +284,7 @@ for my $pair (@data) {
 	    }
 	    next;
 	}
+	push @outRow, @extra;
 	$csv->print($out, \@outRow);
     }
 }
