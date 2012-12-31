@@ -1,0 +1,283 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use Text::CSV_XS;
+use Fatal qw(open);
+use IO::File;
+use Term::ANSIColor;
+use Geo::IP;
+our $GI = Geo::IP->open("/tmp/chromium/GeoIP-20121204/GeoLiteCity.dat", GEOIP_STANDARD);
+
+my %ContextMap = ('religious' => 're',
+		  'spiritual' => 'sp',
+		  'problem' => 'ps',
+		  'relaxation' => 'rx',
+		  'physical' => 'pe',
+		  'work' => 'wo',
+		  'meditation' => 'me',
+		  'daydreaming' => 'dd',
+		  'flow' => 'fl');
+
+sub mapHeader {
+    my ($h1, $h2) = @_;
+    my %map;
+    for (my $c=0; $c < @$h1; $c++) {
+	my $c0 = $c;
+	while (!$h1->[$c0] and $c0 > 0) { --$c0 }
+	my $t1 = $h1->[$c0];
+	my $t2 = $h2->[$c];
+	my $key = do {
+	    if ($t1 =~ /^(CollectorID|Email Address|First Name|LastName|Custom Data)$/) {
+		'ignore'
+	    } elsif ($t1 eq 'RespondentID') {
+		'id'
+	    } elsif ($t1 eq 'StartDate') {
+		'ignore'
+	    } elsif ($t1 eq 'EndDate') {
+		'end'
+	    } elsif ($t1 eq 'IP Address') {
+		'ip'
+	    } elsif ($t1 =~ /male or female/) {
+		'sex'
+	    } elsif ($t1 =~ /your current profession/) {
+		'work'
+	    } elsif ($t1 =~ /year were you born/) {
+		'born'
+	    } elsif ($t1 =~ /highest level of school you have completed/) {
+		'edu'
+	    } elsif ($t1 eq 'Location') {
+		if ($t2 =~ /^City/) {
+		    'city'
+		} elsif ($t2 =~ /^Country/) {
+		    'country';
+		}
+	    } elsif ($t1 =~ /relationship status/) {
+		'rel'
+	    } elsif ($t1 eq 'Familiarity with complete mental silence') {
+		if ($t2 =~ /not possible for anybody/) {
+		    'msNotAny'
+		} elsif ($t2 =~ /not possible for myself/) {
+		    'msNotSelf'
+		} elsif ($t2 =~ /I have met/) {
+		    'msMet'
+		} elsif ($t2 =~ /accidentally/) {
+		    'msAccident'
+		} elsif ($t2 =~ /others in a shared context/) {
+		    'msShared'
+		} elsif ($t2 =~ /intentionally cause myself/) {
+		    'msCause'
+		} elsif ($t2 =~ /teach other people/) {
+		    'msTeach'
+		} elsif ($t2 =~ /possible for everybody/) {
+		    'msEvery'
+		} elsif ($t2 =~ /ethical to pay money/) {
+		    'msPay'
+		} elsif ($t2 =~ /train teachers/) {
+		    'msTrainTeach'
+		}
+	    } elsif ($t1 eq 'Familiarity with boredom') {
+		if ($t2 =~ /fidgety/) {
+		    'boreFidget'
+		} elsif ($t2 =~ /cheerful/) {
+		    'boreCheer'
+		} elsif ($t2 =~ /lonely/) {
+		    'boreLone'
+		}
+	    } elsif ($t1 =~ /do not know how to intentionally cause yourself/) {
+		'wantLearn'
+	    } elsif ($t1 =~ /often do you try to intentionally cause/) {
+		'freqCause'
+	    } elsif ($t1 =~ /what percentage of the time are you successful/) {
+		'pctSuccess'
+	    } elsif ($t1 =~ /often do you experience complete mental silence accidentally/) {
+		'freqAccident'
+	    } elsif ($t1 =~ /characterize the actual duration of your experience/) {
+		'durationCharacter'
+	    } elsif ($t1 =~ /actual time did your longest experience/) {
+		'maxDuration'
+	    } elsif ($t1 =~ /practice religion/) {
+		'religion'
+	    } elsif ($t1 =~ /religious affiliation/) {
+		're.desc'
+	    } elsif ($t1 =~ /have a spiritual practice/) {
+		'spiritual'
+	    } elsif ($t1 =~ /briefly describe your spiritual practice/) {
+		'spiritual.desc'
+	    } elsif ($t1 =~ /favorite activities for physical exercise/) {
+		'pe.desc'
+	    } elsif ($t1 =~ /you practice meditation/) {
+		'meditation'
+	    } elsif ($t1 =~ /list a favorite flow activity/) {
+		'flow.desc'
+	    } elsif ($t1 =~ /thinking is involved in performing your favorite flow/) {
+		'flow.think'
+	    } elsif ($t1 =~ /Relationship/) {
+		if ($t2 =~ /complete mental silence help prepare you for your flow/) {
+		    'ms.flow'
+		} elsif ($t2 =~ /flow activity help prepare you for complete mental/) {
+		    'flow.ms'
+		}
+	    } elsif ($t1 =~ /training in meditation/) {
+		'm.training'
+	    } elsif ($t1 =~ /so, which training/) {
+		'm.training.desc'
+	    } elsif ($t1 =~ /you meditated regularly/) {
+		'm.regular'
+	    } elsif ($t1 =~ /describe your meditative/) {
+		'm.desc'
+	    } elsif ($t1 =~ /comments (or questions )?about this survey/) {
+		'comment'
+	    } elsif ($t1 =~ /followup interview/) {
+		'ignore'
+	    } elsif ($t1 =~ /UVa email address/) {
+		'ignore'
+	    } elsif ($t1 =~ /would you say your health is/) {
+		'ignore'
+	    } elsif ($t1 =~ /activities you might do during a typical day/) {
+		'ignore'
+	    } elsif ($t1 =~ /how would you rate your health in general/) {
+		'ignore'
+	    } elsif ($t1 =~ /how much of the time have you had any of the following problems/) {
+		'ignore'
+	    } elsif ($t1 =~ /physical health or emotional problems/) {
+		'ignore'
+	    } elsif ($t1 =~ /bodily pain/) {
+		'ignore'
+	    } elsif ($t1 =~ /how much did pain interfere/) {
+		'ignore'
+	    } elsif ($t1 =~ /about how you feel and how things have been with you/) {
+		'ignore'
+	    } elsif ($t1 =~ /How TRUE or FALSE is each of the following statements/) {
+		'ignore'
+	    } else {
+		my $match = '';
+		keys %ContextMap; # reset iterator
+		while (my ($k,$v) = each %ContextMap) {
+		    next if $t1 !~ /$k/;
+		    if ($t1 =~ /how often do you/) {
+			if ($t2 =~ /mental silence/) {
+			    $match = $v.'.ms.pf';
+			    last;
+			} elsif ($t2 =~ /boredom/) {
+			    $match = $v.'.b.pf';
+			    last;
+			}
+		    } elsif ($t1 =~ /subjective experience of time during/) {
+			$match = $v.'.subjTime';
+			last;
+		    } elsif ($t1 =~ /important or inappropriate component/) {
+			if ($t2 =~ /mental silence/) {
+			    $match = $v . '.ms.gi';
+			    last;
+			} elsif ($t2 =~ /boredom/) {
+			    $match = $v . '.b.gi';
+			    last;
+			}
+		    }
+		}
+		$match
+	    }
+	};
+	if (!$key) {
+	    warn "$t1 | $t2";
+	} elsif ($key eq 'ignore') {
+	    #
+	} else {
+	    $map{$c} = $key
+	}
+    }
+    \%map;
+}
+
+sub reverseMap {
+    my ($bestMap) = @_;
+    my %outMap;
+    my $col=0;
+    for my $k (sort { $a <=> $b } keys %$bestMap) {
+	$outMap{ $bestMap->{$k} } = $col++;
+    }
+    \%outMap;
+}
+
+my $csv = Text::CSV_XS->new ({ binary => 1, eol => "\n" }) or
+  die "Cannot use CSV: ".Text::CSV_XS->error_diag ();
+
+my @data;
+
+my $dest = pop @ARGV;
+
+die "No files provided" if !@ARGV;
+
+my $maxCol=0;
+my $maxColIndex;
+for my $file (@ARGV) {
+    open my $io, '<', $file;
+    my $h1 = $csv->getline($io);
+    my $h2 = $csv->getline($io);
+    my $map = mapHeader($h1, $h2);
+    next if !$map;
+    push @data, [$io, $map];
+    if ($maxCol < keys($map)) {
+	$maxCol = keys($map);
+	$maxColIndex = $#data;
+    }
+}
+
+my $outMap = reverseMap($data[$maxColIndex][1]);
+
+my $out = IO::File->new();
+$out->open(">$dest") or die $?;
+
+sub getHeader {
+    my ($h) = @_;
+    my @h;
+    while (my ($k,$v) = each %$h) {
+	$h[$v] = $k;
+    }
+    \@h;
+}
+
+$csv->print($out, getHeader($outMap));
+
+for my $pair (@data) {
+    my ($io, $map) = @$pair;
+    while (my $row = $csv->getline($io)) {
+	my @outRow;
+	my $skip;
+	for my $sk (keys %$map) {
+	    my $value = $row->[$sk];
+	    my $key = $map->{$sk};
+	    if ($value =~ /\btest\b/i and $value !~ /(taking a test|test-taking)/i) {
+		$skip = 1;
+	    }
+	    if ($key eq 'ip') {
+		my $record = $GI->record_by_addr($value);
+		$value = join(';',
+			      $record->continent_code,
+			      $record->country_name,
+			      $record->region_name,
+			      $record->city);
+	    }
+	    $outRow[ $outMap->{$key} ] = $value;
+	}
+	if ($skip) {
+	    if (0) {
+		print "Skipping ";
+		for my $s (@outRow) {
+		    if ($s =~ /test/i) {
+			print color 'bold blue';
+			print $s;
+			print color 'reset';
+		    } else {
+			print $s;
+		    }
+		    print " ";
+		}
+		print "\n";
+	    }
+	    next;
+	}
+	$csv->print($out, \@outRow);
+    }
+}

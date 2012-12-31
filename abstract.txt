@@ -1,0 +1,32 @@
+In the growth toward spirituality, an important step in the process is
+the experience of mental silence because mental silence facilitates a
+unique, outside perspective on one's own mental activity. Discussion
+of mental silence has appeared in diverse fields of study such as
+artificial intelligence (Fields, 2002), studies of consciousness
+(Forman, 1998), and neurophysiology (Ramamurthi, 1995), but rarely in
+psychology.  There are no self-report measures that focus on mental
+silence and the few scales that tap proximate constructs do so with
+few items in a tangential way (e.g., Burris, 1999; Hood, 1975;
+Maranell, 1974; and Pekala, 1998). The present study aims to develop
+and validate a new scale that focuses on the experience of mental
+silence.
+
+Participants are being recruited on the Internet and through the
+University of Virginia psychology subject pool. Data will be analyzed
+using Item Response Theory (IRT). IRT is the state-of-the-art
+quantitative method for analyzing survey data. IRT offers the
+advantages that an unbiased estimate of item parameters can be
+obtained from an unrepresentative sample, and item and person
+estimates are located on the same interval scale.
+
+Since mental silence may be related to flow (Orme-Johnson, 2008),
+religion, spirituality, and meditation (Forman, 1997), mental silence
+ought to be of concern to positive psychologists.  Little is known
+about the distribution of familiarity with mental silence within
+homogeneous populations and cross-culturally.  Are some contexts more
+or less conducive to mental silence?  How does familiarity with mental
+silence change over the lifespan?  There are specific interventions
+that aim to increase familiarity with mental silence, but are some
+more effective than others?  A valid, simple to administer self-report
+measure is not a panacea, but would be an important tool that could
+begin to shed light on these questions.
