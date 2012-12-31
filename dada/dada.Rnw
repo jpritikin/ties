@@ -1,0 +1,621 @@
+\SweaveOpts{prefix.string=gen/fig, eps=FALSE, keep.source=TRUE}
+\documentclass[10pt,utf8x]{beamer}
+\usefonttheme{serif}
+
+\mode<presentation>
+{
+  \usetheme{CVille}
+  \usecolortheme{cavs}
+  \setbeamercovered{transparent}
+  % or whatever (possibly just delete it)
+}
+
+
+\usepackage[english]{babel} % or whatever
+\usepackage{multimedia}
+\usepackage{apacite}
+\usepackage{color}
+\usepackage{listings}
+\lstset{
+language=R,
+basicstyle=\scriptsize\ttfamily,
+numbers=left,
+numberstyle=\ttfamily\color{gray}\footnotesize}
+\usepackage{tikz}
+\usepackage{soul}
+
+\newlength{\figurewidth} 
+\figurewidth \textwidth  % This is for rectangular graphs 
+\newlength{\figurewidthB} 
+\figurewidthB .7\textwidth  % This is for square graphs 
+
+\title{Is there a link between flow and meditation?}
+
+\author{Joshua N. Pritikin}
+
+\institute[University of Virginia] % (optional, but mostly needed)
+{
+  Department of Psychology\\
+  University of Virginia
+}
+
+\date[DADA] % (optional, should be abbreviation of conference name)
+{\footnotesize 19 Apr 2012}
+
+\pgfdeclareimage[height=0.4cm]{university-logo}{logo.png}
+\logo{\pgfuseimage{university-logo}}
+
+\begin{document}
+<<echo=FALSE>>=
+source("analyze.R")
+@ 
+
+\begin{frame}
+  \titlepage
+\end{frame}
+
+\setlength{\parskip}{2ex}
+
+\section{Flow}
+\begin{frame}
+\frametitle{Flow a.k.a. Optimal Experience}
+Flow is an intrinsically rewarding experience in which a person
+is absorbed in the optimal performance of an activity. 
+
+Flow can occur in diverse contexts
+\cite{csikszentmihalyi1991}\footnote{Csikszentmihalyi is pronounced ``C-Z''}
+\begin{itemize}
+\item Music performance
+\item Reading
+\item Writing
+\item Mountain climbing
+\item Japanese motorcycle gangs
+\item etc
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\begin{figure}[tp]
+{\scriptsize
+\begin{tikzpicture}[>=latex,line join=bevel,scale=.7]
+  \pgfsetlinewidth{1bp}
+\input{gen/flow.tex}
+\end{tikzpicture}
+}
+\label{fig:teleonomy-of-self}
+\end{figure}
+\end{frame}
+
+\begin{frame}
+\citeA[p.~103]{csikszentmihalyi1991} suggested
+that yoga is ``one of the oldest and most systematic methods of
+producing the flow experience,''
+in the sense of facilitating flow in other activities besides yoga/meditation
+(cf. \citeNP[p.~31]{csikszentmihalyi1988}).
+
+There is little outward commonality between stereotypical yogic
+practices and the diverse activities in which flow has been found.
+
+What aspect of yoga/meditation might facilitate flow?
+\end{frame}
+
+\begin{frame}
+\frametitle{\textcolor{red}{Meditation} means two different things!}
+
+\begin{quotation}
+Because of a limitation in our vocabulary, the West refers to the simple
+psychological centering devices, the preliminary steps, as ``meditation.''
+We therefore give the same name to the techniques used to produce
+meditation as we do to the end state itself. According to the great
+meditative traditions, however, the centering techniques are not
+meditation. They are simply means toward the goal---which is meditation.
+These techniques are therefore more or less interchangeable, and the
+advanced practitioner will eventually discard all of them when he can
+achieve meditation directly. \cite[pp.~8--9]{carrington1977}
+\end{quotation}
+
+Hence, \emph{meditation} means:
+\begin{itemize}
+\item Psychological centering devices
+\item Experience of complete mental silence or thoughtless awareness
+\end{itemize}
+\end{frame}  
+
+\begin{frame}  
+Psychological centering devices are a dime a dozen (mantra, breathing focus,
+visual focus, mindfulness, etc).
+Of interest here is complete mental silence.
+
+The notion of thoughtless awareness is found in widely translated,
+centuries old
+books such as the Mahabharat, Upanishads, Yoga Sutras of Patanjali,
+and Gyaneshwari \cite[pp.~93--94]{manocha2009}.
+
+Complete mental silence is an experience in which one is
+no longer is thinking and
+no longer feels the urge to continuously engage in thought.
+The experience occurs in a normal waking state;
+thoughtless awareness is not similar to sleeping or unconsciousness.
+\end{frame}
+
+\begin{frame}
+Can thoughtless awareness be a component of or itself a flow experience? 
+
+\begin{itemize}
+\item \textcolor{red}{Challenge/Skill} A naive thought suppression approach fails \cite{wegner2003}.
+However, \citeA{manocha2000} reported that participants in his
+Meditation Research Program ``consistently describe the
+ability to achieve this experience'' (p.~1137).
+Perhaps with the appropriate training,
+the challenge of thoughtless awareness can be made navigable.
+
+\item \textcolor{red}{Clear goal/Immediate feedback} Yes
+
+\item \textcolor{red}{Concentration} Without engrossment
+in thoughtless awareness, thinking is bound to resume.
+
+\end{itemize}
+
+Can meet the basic conditions of flow experience but ... ?
+\end{frame}
+
+\begin{frame}
+\frametitle{Thoughtless awareness has not been studied}
+
+\begin{itemize}
+\item PsycNET searches for ``thoughtless awareness'' or ``mental silence''
+turn up nothing.
+\item
+In a collection of 13 scales related to spiritual and religious experience,
+no attempt was made to measure ``thoughtless awareness'' \cite{fetzer1999}.
+\item
+In two recent reviews of the state of the research on meditation/mindfulness,
+the possibility of thoughtless awareness or mental silence was not
+even acknowledged (\citeNP{shapiro2009}; \citeNP{baer2011}).
+\end{itemize}
+
+(continued on the next slide \dots)
+\end{frame}
+
+\begin{frame}
+\frametitle{Thoughtless awareness has not been studied}
+\begin{itemize}
+\item
+No glossary entry found in reference works on
+positive psychology and the psychology of religion
+(\citeNP{pargament1997}; \citeNP{peterson2004}; \citeNP{snyder2009}; \citeNP{sheldon2011}).
+\end{itemize}
+
+A potentially vital component of flow has not received
+any psychological scrutiny.
+\end{frame}
+
+\begin{frame}
+\frametitle{Maximum Likelihood}
+
+We would like to select the most likely model given the data.
+\begin{displaymath}
+\max p(Model|Data)
+\end{displaymath}
+However, what maximum likelihood does is maximize the probability of
+the data given a model.
+\begin{displaymath}
+\max p(Data|Model)
+\end{displaymath}
+Bayes' theorem tells us that
+\begin{displaymath}
+\max p(Model|Data) = \frac{p(Data|Model)p(Model)}{p(Data)}
+\end{displaymath}
+Since $p(Data)$ is constant, maximum likelihood will choose the most likely
+model only if $p(Model)$ is roughly equal for all candidate models.
+\end{frame}
+
+\section{Survey}
+
+\begin{frame}
+\frametitle{Let's conduct a survey!}
+
+Some hypotheses:
+\begin{itemize}
+\item Intuitive or accidental thoughtless awareness is not uncommon.
+\item Thoughtless awareness occurs outside the context of meditation.
+\item Flow and complete mental silence will be judged as similar relative
+  to some other obvious comparisons.
+\item Differential item functioning (DIF):
+Has received any training in meditation? By education?
+Trying to intend complete mental silence or not?
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Let's conduct a survey!}
+Questionnaire sections:
+\begin{itemize}
+\item Biographical information
+\item Familiarity with complete mental silence (a.k.a. thoughtless awareness)
+\item Complete mental silence in context
+\item How is thoughtless awareness related to flow
+\item Supplemental questions\footnote{Omitted in this report.}
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Biographical information}
+Age?
+
+Sex? Male/Female
+
+Highest level of education attained?
+\begin{itemize}
+\item High school
+\item College degree
+\item Graduate degree
+\end{itemize}
+
+What is your current profession / occupation? (free text)
+
+Have you pursued any training in meditation? Yes/No
+
+If so, what kind of meditation do you practice currently? (free text)
+\end{frame}
+
+\begin{frame}
+  \frametitle{Familiarity with complete mental silence}
+
+Of interest are your recent experiences of complete mental silence
+(within the last year or so).
+
+On a 3-point Likert scale from \emph{agree} to \emph{disagree}, rate:
+
+\begin{itemize}
+\item The notion of complete mental silence does not make sense
+\item I doubt that complete mental silence is possible for anybody
+\item I doubt that complete mental silence is possible for myself
+\item I have experienced complete mental silence accidentally
+\item I have intentionally experienced complete mental silence
+\item I am certain that complete mental silence is possible for anybody
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}
+  \frametitle{Context of complete mental silence}
+
+On a 5-point Likert scale from \emph{important} to \emph{not important}, rate:
+
+\begin{itemize}
+\item Is complete mental silence an important component of religion?
+\item ... of problem solving?
+\item ... of spiritual practice?
+\item ... of relaxation?
+\item ... of daydreaming?
+\item ... of meditation?
+\item ... of physical exercise?
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}
+  \frametitle{Relationship to flow}
+
+\emph{Needs more brainstorming \dots}
+
+\begin{itemize}
+\item List a favorite flow activity: \emph{text}
+\item Would complete mental silence help prepare you for your flow activity?
+\item Would flow activity help prepare you for complete mental silence?
+\item Do you experience complete mental silence during your flow activity?
+\item How similar are complete mental silence and your flow activity?
+\item\emph{What else?}
+\end{itemize}
+
+\end{frame}
+
+\section{IRT}
+\begin{frame}
+  \frametitle{Item Response Theory -- Partial Credit Model}
+
+The Generalized Partial Credit Model (GPCM) model can be expressed in terms
+of the unconditional probability of each
+response $0, 1, \dots, m_i$ of person $j$'s attempt at item $i$. That is,
+
+\begin{displaymath}
+\sum_{h=0}^{m_i}P_{ijh} = 1.
+\end{displaymath}
+
+(continued on the next slide \dots)
+\end{frame}
+
+\begin{frame}
+  \frametitle{Item Response Theory -- Partial Credit Model}
+
+The probability of person $j$ scoring $x$ on item $i$ is
+
+\begin{displaymath}
+\forall x \in \{0,1,\dots,m_i\}, \quad
+P_{ijx} =
+\frac{\exp\left[\ \displaystyle\sum_{k=0}^{x} \alpha_{ik}(\theta_j - \delta_{ik})\right]}
+{\displaystyle\sum_{h=0}^{m_i}
+\left[\exp\ \displaystyle\sum_{k=0}^{h}\alpha_{ik}(\theta_j - \delta_{ik})\right]}
+\end{displaymath}
+
+where $\theta_j$ is person $j$'s trait level,
+$\delta_{ik}$ is the difficulty of the item $i$ at category $k$,
+$\alpha_{ik}$ is the discrimination of the item $i$ at category $k$, and \dots
+\end{frame}
+
+\begin{frame}
+  \frametitle{Item Response Theory -- Partial Credit Model}
+
+\dots summing across all persons $j$,
+item parameters $\alpha$ and $\delta$ are centered at zero
+
+\begin{displaymath}
+\sum_j\alpha_{ij}(\theta - \delta_{ij}) \equiv 0.
+\end{displaymath}
+
+Unfortunately, no \textcolor{red}{R} implementation of GPCM is
+working well enough yet.
+Data were analyzed using the \textcolor{red}{eRm} package \cite{erm2011}, fixing $\alpha=1$.
+This is parameterization of GPCM is equivalent to the Partial Credit Model.
+\end{frame}
+
+\section{Results}
+\begin{frame}
+  \frametitle{Create fake data}
+\lstinputlisting{sim.R}
+\end{frame}
+
+\begin{frame}
+\frametitle{Demographics}
+Participants consisted of \Sexpr{dim(cms.latent)[[1]]} fake
+Charlottesville residents with
+\Sexpr{100*sum(cms.latent$train=="yes")/dim(cms.latent)[[1]]}\%
+ having some training in meditation/yoga.
+
+<<results=tex,echo=FALSE>>=
+tbl<-as.matrix(table(cms.latent$edu))
+dimnames(tbl)[[2]] <- c("Education")
+print(xtable(tbl, table.placement='!h'))
+@ 
+
+Other demographic data were not fabricated.
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Model fits}
+Subscales:
+
+\begin{itemize}
+\item Familiarity with complete mental silence
+
+<<echo=FALSE>>=
+logLik(fam.pcm1)
+@ 
+Single dimension, 1st eigenvalue of residual $= \Sexpr{round(fam.pcm1.res$values[1],2)}$\footnote{The threshold for 100 persons and 20 items is 1.74 \cite{raiche2005}.}
+\bigskip
+
+\item Context of complete mental silence
+
+<<echo=FALSE>>=
+logLik(ctx.pcm1)
+@ 
+Single dimension, 1st eigenvalue of residual $= \Sexpr{round(ctx.pcm1.res$values[1],2)}$
+\bigskip
+
+\item Relationship to flow
+
+\emph{Not simulated}
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+<<fig=TRUE,echo=FALSE,height=4>>=
+plotPImap(fam.pcm1, main="Familiarity with thoughtless awareness")
+@ 
+<<results=tex,echo=FALSE>>=
+print(xtable(t(as.matrix(summary(fam.pcm1$etapar))),
+             table.placement='!h', digits=c(2)), include.rownames=FALSE)
+@ 
+\end{frame}
+
+\begin{frame}
+Item fit sorted by Infit MSQ.
+<<results=tex,echo=FALSE>>=
+fit <- itemfit(fam.pcm1.p)
+fit.df <- as.data.frame(fit[c('i.outfitMSQ','i.outfitZ','i.infitMSQ','i.infitZ')])
+dimnames(fit.df)[[2]] <- c("Outfit MSQ", "Outfit t", "Infit MSQ", "Infit t")
+fit.df <- fit.df[order(fit.df$'Infit MSQ'),]
+fit.sum <- c(fmtMeanSD(fit.df$'Outfit MSQ'), '',
+             fmtMeanSD(fit.df$'Infit MSQ'), '')
+fit.df <- round(fit.df,2)
+fit.df <- rbind(fit.df, "Mean (SD)"=fit.sum)
+print(xtable(fit.df, table.placement='!h'),
+      hline.after=c(-1,0,nrow(fit.df)-1,nrow(fit.df)))
+@ 
+
+Liberal acceptable range for MSQ 1.4-0.6
+\end{frame}
+
+\begin{frame}
+<<fig=TRUE,echo=FALSE,height=3>>=
+print(myPlotICC(thresholds(fam.pcm1)$threshtable$'1'[2,2:3]) +
+  opts(title="Possible for anybody"))
+@ 
+
+Data for this item had the most variance (and underfit), simulating an
+item that was not answered very consistently with respect to latent trait level.
+\end{frame}
+
+\begin{frame}
+<<fig=TRUE,echo=FALSE,height=3>>=
+print(myPlotICC(thresholds(fam.pcm1)$threshtable$'1'[1,2:3]) +
+  opts(title="Does not make sense"))
+@ 
+
+Data for this item was the most overfit for both infit and outfit.
+\end{frame}
+
+\begin{frame}
+Summary of person parameters:
+
+<<results=tex,echo=FALSE>>=
+print(xtable(t(as.matrix(summary(fam.pcm1.p$theta.table$Person))),
+             digits=c(2)), include.rownames=FALSE)
+@ 
+\end{frame}
+
+\begin{frame}
+Person fit sorted by Infit MSQ.
+<<results=tex,echo=FALSE>>=
+fit <- personfit(fam.pcm1.p)
+fit.df <- as.data.frame(fit[c('p.outfitMSQ','p.outfitZ','p.infitMSQ','p.infitZ')])
+dimnames(fit.df)[[2]] <- c("Outfit MSQ", "Outfit t", "Infit MSQ", "Infit t")
+chunk <- 5
+fit.crazy <- rbind(fit.df[head(order(fit.df$'Infit MSQ'),n=chunk),],
+  fit.df[tail(order(fit.df$'Infit MSQ'),n=chunk),])
+print(xtable(round(fit.crazy,2), table.placement='!h'),
+      hline.after=c(-1,0,nrow(fit.crazy),chunk))
+@ 
+
+Liberal acceptable range for MSQ 1.4-0.6. Clearly there are some
+crazy people here.
+\end{frame}
+
+\begin{frame}
+A likely response pattern:
+<<results=tex,echo=FALSE>>=
+print(xtable(cms[c(3),1:6], table.placement='!h'))
+@ 
+
+Some unlikely response patterns:
+<<results=tex,echo=FALSE>>=
+print(xtable(cms[c(121,40,83,195,172,197),1:6], table.placement='!h'))
+@ 
+\end{frame}
+
+\begin{frame}
+Participants with training in meditation were suppose
+to have somewhat higher trait scores.
+
+Andersen LR $= \Sexpr{round(lrt$LR,2)},
+df = \Sexpr{round(lrt$df,2)}, p = \Sexpr{round(lrt$pvalue,2)}$.
+
+<<results=tex,echo=FALSE>>=
+beta <- cbind(lrt$betalist$'0', lrt$betalist$'1',
+              lrt$betalist$'1'-lrt$betalist$'0')
+dimnames(beta)[[1]] <- str_replace(dimnames(beta)[[1]], "beta ", '')
+dimnames(beta)[[2]] <- c("without","with","with-without")
+print(xtable(beta, table.placement='!h', digits=c(2)))
+@ 
+\end{frame}
+
+\begin{frame}
+<<fig=TRUE,echo=FALSE,height=3>>=
+print(plotInfo(thresholds(fam.pcm1)$threshtable$'1', c(-8,8)))
+@ 
+
+The information curve spans a reasonably wide range of trait scores.
+\end{frame}
+
+\begin{frame}
+<<fig=TRUE,echo=FALSE,height=4>>=
+plotPImap(ctx.pcm1, main="Context of thoughtless awareness")
+@ 
+<<results=tex,echo=FALSE>>=
+print(xtable(t(as.matrix(summary(ctx.pcm1$etapar))),
+             table.placement='!h', digits=c(2)), include.rownames=FALSE)
+@ 
+\end{frame}
+
+\begin{frame}
+<<fig=TRUE,echo=FALSE,height=4.5>>=
+p1 <- myPlotICC(thresholds(ctx.pcm1)$threshtable$'1'[4,2:5], xrange=c(-4,4)) +
+  opts(title="Relaxation")
+p2 <- myPlotICC(thresholds(ctx.pcm1)$threshtable$'1'[6,2:5], xrange=c(-4,4)) +
+  opts(title="Meditation")
+multiplot(p1,p2,cols=1)
+@ 
+
+Thresholds are out of order. This is bad. If the same thing is
+seen in real data then there are too many response options or
+the item needs refinement.
+\end{frame}
+
+\begin{frame}
+Item fit sorted by Infit MSQ.
+<<results=tex,echo=FALSE>>=
+fit <- itemfit(ctx.pcm1.p)
+fit.df <- as.data.frame(fit[c('i.outfitMSQ','i.outfitZ','i.infitMSQ','i.infitZ')])
+dimnames(fit.df)[[2]] <- c("Outfit MSQ", "Outfit t", "Infit MSQ", "Infit t")
+fit.df <- fit.df[order(fit.df$'Infit MSQ'),]
+fit.sum <- c(fmtMeanSD(fit.df$'Outfit MSQ'), '',
+             fmtMeanSD(fit.df$'Infit MSQ'), '')
+fit.df <- round(fit.df,2)
+fit.df <- rbind(fit.df, "Mean (SD)"=fit.sum)
+print(xtable(fit.df, table.placement='!h'),
+      hline.after=c(-1,0,nrow(fit.df)-1,nrow(fit.df)))
+@ 
+
+Liberal acceptable range for MSQ 1.4-0.6
+\end{frame}
+
+\begin{frame}
+Summary of person parameters:
+
+<<results=tex,echo=FALSE>>=
+print(xtable(t(as.matrix(summary(ctx.pcm1.p$theta.table$Person))),
+             digits=c(2)), include.rownames=FALSE)
+@ 
+\end{frame}
+
+\begin{frame}
+Person fit sorted by Infit MSQ.
+<<results=tex,echo=FALSE>>=
+fit <- personfit(ctx.pcm1.p)
+fit.df <- as.data.frame(fit[c('p.outfitMSQ','p.outfitZ','p.infitMSQ','p.infitZ')])
+dimnames(fit.df)[[2]] <- c("Outfit MSQ", "Outfit t", "Infit MSQ", "Infit t")
+chunk <- 5
+fit.crazy <- rbind(fit.df[head(order(fit.df$'Infit MSQ'),n=chunk),],
+  fit.df[tail(order(fit.df$'Infit MSQ'),n=chunk),])
+print(xtable(round(fit.crazy,2), table.placement='!h'),
+      hline.after=c(-1,0,nrow(fit.crazy),chunk))
+@ 
+
+Liberal acceptable range for MSQ 1.4-0.6. Again there are some
+crazy people here.
+\end{frame}
+
+\begin{frame}
+Some likely response pattern:
+<<results=tex,echo=FALSE>>=
+print(xtable(cms[c(45,180,18),7:13], table.placement='!h'), size='tiny')
+@ 
+
+Some unlikely response patterns:
+<<results=tex,echo=FALSE>>=
+print(xtable(cms[c(82,67,116),7:13], table.placement='!h'), size='tiny')
+@ 
+\end{frame}
+
+\begin{frame}
+<<fig=TRUE,echo=FALSE,height=3>>=
+print(plotInfo(thresholds(ctx.pcm1)$threshtable$'1', c(-6,6)))
+@ 
+
+At least with this fake data, the information curve is somewhat
+compressed between -2 and 2. If this happens with real data,
+it may be worth considering other questions to better measure
+the extremes of the trait.
+\end{frame}
+
+\section{Discussion}
+\begin{frame}
+
+The next step: collect real data.
+\end{frame}
+
+\bibliography{jpritikin} 
+\bibliographystyle{apacite}
+
+\end{document} 
