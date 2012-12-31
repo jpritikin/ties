@@ -1,0 +1,459 @@
+\SweaveOpts{prefix.string=gen/fig, eps=FALSE, keep.source=TRUE, echo=FALSE}
+\documentclass[doc]{apa}
+%\usepackage[margin=1.25in]{geometry}
+\usepackage{url}
+%\usepackage{hyperref}  ugly clashes with apa style
+\usepackage{color}
+\usepackage[usenames,dvipsnames]{xcolor}
+\usepackage{tikz}
+\usepackage{devanagari}
+% http://pravin.insanitybegins.com/files/devanagari.pdf
+\usepackage{pdfpages}
+\usepackage{listings}
+\lstset{
+language=R,
+basicstyle=\scriptsize\ttfamily,
+commentstyle=\color{OliveGreen},
+stringstyle=\color{BrickRed},
+numbers=left,
+numberstyle=\color{gray}}
+\usepackage{setspace}
+%\usepackage{multicol}
+
+\title{Complete mental silence: Folk familiarity and context}
+\author{Joshua N.\ Pritikin}
+\affiliation{University of Virginia}
+
+\abstract{Complete mental silence is identified as a
+  potentially important psychological construct that
+  may be a component of meditation, religion, spirituality,
+  problem solving, relaxation, and flow.
+A survey is developed to assess folk familiarity and context
+of complete mental silence.}
+
+\acknowledgements{Comments may be sent to the author at jpritikin@virginia.edu.
+
+I would like to thank Karen Schmidt and Steven Boker for guidance throughout this project,
+Susanna Williams for helpful comments on an early draft proposal,
+Jean Hu for her insight into the English language,
+and Mike Kubovy for suggesting the subjective passage of time
+as an amenable context.}
+
+\shorttitle{MENTAL SILENCE}
+
+\begin{document}
+\maketitle                            
+
+\doublespacing
+
+Researchers have struggled with the lack of agreement on a specific
+definition of meditation (\citeNP[p.~1]{ospina2007};
+\citeNP[pp.~601--602]{shapiro2009}).
+Meditation generally requires a quiet location.
+A comfortable posture is recommended.
+The practice generally has something to do with
+controlling the attention and being non-judgmental \cite{cdc2009}.
+This definition is fine, except that it also admits an activity like
+relaxing on the front porch enjoying the sunset with a beer.
+Compounding the confusion is the dual meanings of the term meditation.
+
+\begin{quotation}
+Because of a limitation in our vocabulary, the West refers to the simple
+psychological centering devices, the preliminary steps, as ``meditation.''
+We therefore give the same name to the techniques used to produce
+meditation as we do to the end state itself. According to the great
+meditative traditions, however, the centering techniques are not
+meditation. They are simply means toward the goal---which is meditation.
+These techniques are therefore more or less interchangeable, and the
+advanced practitioner will eventually discard all of them when he can
+achieve meditation directly. \cite[pp.~8--9]{carrington1977}
+\end{quotation}
+
+%% In terms of results, it is appropriate to consult ancient Indian
+%% literature as the Asians were seminal contributors to the notion
+%% of meditation.
+%% In India, meditation is closely associated with
+%% widely known cultural themes and the tradition of yoga.
+%% While yoga has since taken on many meanings,
+%% the original Sanskrit meaning is ``to join'' or ``union.''
+%% In Indian culture, it is understood that the goal of yoga/meditation
+%% is \emph{moksha}. ``Moksha is achieved when a person has overcome all
+%% tendencies to immoral, unethical, and self-destructive thoughts and behavior''
+%% \cite[p.~87]{manocha2009}.
+%% Aspirants are encouraged to develop qualities such as wisdom, courage, love,
+%% kindness, a sense of justice, temperance, and gratitude
+%% (\citeNP{mascaro2002}; \citeNP{mascaro1973}; \citeNP{mascaro1965}).
+%% After discounting for hyperbole, the Indian perspective suggests
+%% an expectation that meditation, in concert with yogic traditions,
+%% will promote diverse strengths of character,
+%% relaxation being seen as just one facet of the experience.
+
+In terms of psychological centering devices,
+the two methods best represented in current
+scientific literature can be broadly classified as mantra meditation
+and mindfulness meditation (\citeNP[pp.~28--32]{ospina2007}).
+Mantra meditation involves the use of a mantra.
+A mantra is a word or phrase repeated silently or aloud.
+Examples of mantra meditation include
+Relaxation Response \cite{benson1974}
+and Clinically Standardized Meditation \cite{carrington1978}.
+Mindfulness meditation consists of a variety of interrelated practices.
+For the purposes here, the most important aspect of mindfulness practice
+is the aim to curtail one's mental reaction to thoughts and events.
+The aspirant is to cultivate
+an attitude of non-judgment, patience, and acceptance.
+Among other benefits,
+this practice is thought to help disrupt negative thought-affect cycles
+\cite{baer2003}.
+
+Curiously, most research using mantra or mindfulness meditation
+has not dedicated sufficient consideration to the goal of meditation, that is,
+complete mental silence (a.k.a. thoughtless awareness).
+The notion of mental silence can be found in Hindu, Buddhist,
+German mystical, and Jewish mystical traditions (\citeNP{forman1997};
+\citeNP[pp.~93--102]{manocha2009}).
+To approach mental silence is to reduce mental content including
+re-presentations of sensory input, such as imagination.
+Mental silence is an experience in which one is no longer thinking and
+no longer feels the urge to continuously engage in thought.
+The experience occurs in a normal, lucid waking state;
+Mental silence is not similar to sleeping or unconsciousness.
+Complete mental silence subsumes other prescriptions
+imposing limitations on permissible thought.
+For example, the notion of choiceless awareness 
+considers the presence and action of choice as indicating
+confusion and, potentially, bias.
+If there are no thoughts then there are no choices
+(cf. \citeNP[pp.~105--110]{krishnamurti1975}).
+Another example is mindfulness meditation's emphasis
+on non-judgmental awareness.
+If there are no thoughts, and consequentially no judgments,
+then the remaining awareness is non-judgmental.
+Complete mental silence is the most stringent limitation
+on permissible types of thought.
+The notion of mental silence contradicts
+DesCartes' ``I think therefore I am.'' (for more discussion
+see \citeNP{damasio1995}).
+The notion of mental silence has attracted lucid discussion in artificial
+intelligence, studies of consciousness, and neurophysiology
+(\citeNP{fields2002}; \citeNP{forman1998}; \citeNP{ramamurthi1995}).
+
+\begin{quotation}
+A meditation session will often follow a certain progression. Starting
+with an active type of thought, it may move toward more quiet types of
+thinking, and sometimes this process leads to a state where no
+thinking seems to occur at all. In mantra meditation, the mantra may
+become increasingly soft and indistinct as the meditation session
+continues, until, no longer needed, it gives way to profound quiet. In
+breathing meditation, awareness of the breath may recede until it
+becomes almost imperceptible and silence is the all-encompassing
+experience.  According to the meditative tradition, at this point the
+mind is not focused on either thought or image, but is fully aware,
+conscious. The mind is said to be alert without having any
+\emph{object} of alertness.
+\cite[p.~91]{carrington1977}
+\end{quotation}
+
+While the ambiguity of the English word \emph{meditation} was identified as
+early as 1977 and perhaps earlier, little has been done to address the issue.
+The ambiguity still remains today, hampering meta-analysis \cite{bond2009}.
+Scientific studies are conducted oriented to a particular
+centering device, ignoring the critical question of whether participants
+experience complete mental silence.
+Since ancient times, Sanskrit literature has distinguished these
+two concepts without much difficulty.
+{\dn nirvicaara samaadhi} (nirvichar samadhi) denotes
+complete mental silence.
+{\dn samaadhi} (samadhi) literally means \emph{to acquire wholeness with}
+and is used mainly in the context yoga/meditation.
+{\dn samaadhi} (samadhi) is a compound word consisting of three parts:
+{\dn sam} (sum) means \emph{together} or \emph{integrated},
+{\dn aa} (ah) means \emph{towards},
+and {\dn dhi} (dhi) means \emph{to hold}.
+{\dn nirvicaara} (nirvichar) literally means \emph{without thought}.
+{\dn nirvicaara} (nirvichar) is a compound word consisting of two parts:
+{\dn nir} (nir) means \emph{no} and {\dn vicaara} (vichar) means \emph{thinking}.
+{\dn nirvicaara samaadhi} (nirvichar samadhi) is sometimes translated
+as \emph{thoughtless awareness}, however,
+this phrase is somewhat misleading because thoughtlessness
+can also connote carelessness.
+An alternate translation is \emph{mental silence}.
+Here \emph{complete mental silence} is used to emphasize that
+{\dn nirvicaara samaadhi} (nirvichar samadhi) is not merely
+a reduction in the intensity of thinking but the absence of thought.
+The absence of thought must be of long enough duration to disrupt
+the prevailing rhythm of mental activity and
+present a choice of whether to engage in thought or not.
+This can happen within the span of a subjective moment.
+If one is identified with thinking,
+a shift of identity occurs from ``I am the thinker'' to,
+approximately, ``I am the mental silence'' (cf. \citeNP{preston1982}).
+As for psychological centering devices,
+Sanskrit literature is generally
+specific about the type of practice prescribed and does not
+confuse centering devices with complete mental silence.
+Unambiguous terminology must be adopted if researchers
+are to communicate accurately about their research designs.
+
+%% Given that the clearest descriptions of thoughtless awareness
+%% have arguably come from Asia,
+%% anthropologists may wonder whether the experience only
+%% makes sense in an Indian or Asian cultural context.
+%% Researchers have argued that some medical and psychological syndromes
+%% are culture-bound to western cultures.
+%% For example, there is no specific pathogen that accounts for hypertension.
+%% It has been argued that hypertension is a culturally defined
+%% folk illness made up of about 50 concepts such as ``acute stress''
+%% and ``narrowed blood vessels'' in a network of supposed causation
+%% \cite{launer2003}. A similar case has been made for a number of
+%% so-called psychological disorders such as schizophrenia and anorexia
+%% (e.g., \citeNP{bentall2004}). Is thoughtless awareness similarly
+%% culture-bound?
+%%
+%% Can't decide yet because self-reports are too unreliable.
+
+A curious analogy can be drawn between mental silence and
+Heisenberg's uncertainty principle.
+Heisenberg's uncertainty principle is a result of quantum physics
+concerning the accuracy with which subatomic particles can be measured.
+Since the measurement itself perturbs a particle randomly,
+the accuracy to which certain physical properties of a particle
+can be measured is limited.
+Similarly, the accuracy of self-report on the experience
+of mental silence is constrained because
+thought, the medium of self-report, is excluded from
+the experience.
+Therefore, self-reports concerning the content of meditative experience
+must be considered, at best, analogical and only accurate to some
+limit (cf. \citeNP[p.~41]{forman1997}).\footnote{Heisenburg's
+uncertainty principle
+places a numerical limit on the accuracy of measurement.
+It seems unlikely that it will be possible to establish a quantitative
+bound on the precision of self-reports about mental silence.}
+
+For example, \citeA{forman1998} advanced the terminology
+``pure consciousness event'' as a label for the content
+of the experience of complete mental silence.
+However, it is not clear whether \emph{pure consciousness} is
+an entirely accurate characterization of the experience.
+``The pure consciousness event may be defined as a wakeful
+but contentless (non-intentional) consciousness''
+(\citeauthor{forman1998}, p.~72).
+The question is, what about affect?
+Some emotions are plausibly dependent on symbolic cognition \cite{occ88}.
+For example, \emph{guilt} most likely clashes with mental silence.
+Yet some simpler, less cognitive affects cannot be ruled out.
+Is an affective, but mentally silent experience, contentless?
+Instead of wrestling with such questions,
+here the experience is labeled by its sufficient condition
+rather than by its content.
+An abundance of plausible attempts to describe the content of
+mental silence are available in a recent anthology \cite{franke2007}.
+
+Given the difficulty with self-reports, it is
+important to consider other ways of
+assessing the experience of mental silence.
+Two reports are notable:
+A recent review summarized current research on
+the physiological correlates of meditation \cite{rubia2009}.
+Tentative evidence suggests that skin temperature
+can distinguish mental silence from rest \cite{manocha2010}.
+However, the paucity of investigations into mental silence
+allow for little certainly about its replicability,
+effect size, and importance.
+
+As of April 2012,
+PsycNET searches for empirical research on ``mental silence''
+or ``thoughtless awareness''
+turned up nothing besides articles by Ramesh Manocha and collaborators.
+In collections of scales related to spiritual and religious experience,
+no attempt was made to assess
+``mental silence'' or ``thoughtless awareness'' (\citeNP{fetzer1999};
+\citeNP{hill1999}; \citeNP{monod2011}).
+Some attempts to measure proximate concepts were identified.
+One scale asked participants to rate the amount of
+inner dialog experienced recently on a 7-point Likert scale
+(from \emph{none} to \emph{a great deal}) \cite{pekala1981}.
+This question has a somewhat different emphasis than of interest here.
+Most retrospective self-reports imply a discontinuity
+between thinking and mental silence.
+The 7-point Likert scale could be collapsed to a dichotomous response,
+but this would offer little insight into the mental silence experience.
+One scale asked whether ``True religious experience occurs in periods
+of profound silence'' \cite[p.~23]{maranell1974}. However, what is meant by
+``profound silence?'' Is the question asking about inner mental
+silence or outer environmental silence?
+Two scales asked whether the subject had had an experience that defied
+description.
+One phrasing was, ``Our verbal language isn't adequate
+to express or communicate real religious
+experience'' (\citeauthor{maranell1974}).
+Another phrasing was, ``I have had an experience that cannot
+be expressed in words'' \cite{hood1975}.
+Unfortunately, these questions can not inform about cause.
+It would be useful to know why an experience cannot be expressed in words.
+Was it an impoverished imagination or something else?
+Another measure asked people to read descriptions of experiences,
+compare their own experiences, and rate the degree of similarity.
+For example:
+
+\begin{quotation}
+My mind, deeply under the influence of the thoughts and emotions
+called up by the reading and talk, was calm and peaceful. I was in a
+state of quiet, almost passive enjoyment, not actually thinking but
+letting thoughts and emotions flow by themselves through my mind. All
+at once, without any warning, I found myself wrapped in a flame colored
+cloud. For an instant I thought a great fire might be in the nearby
+city; the next moment I knew that the fire was within myself. Directly
+afterward I felt a sense of exultation, of immense joy and
+intellectual insight impossible to describe. \cite[p.~223]{burris1999}
+\end{quotation}
+
+\noindent Narratives like this, while intriguing, offer almost no information
+about the structure of the experience.
+As Socrates suggested, we need to determine ``where the natural
+joints are, and not trying to break any part,
+after the manner of a bad carver''
+(\citeauthor{fowler1914}, trans.~\citeyearNP{fowler1914}, sec.~265e).
+\citeA{henry2004} gathered evidence from a decade of workshops and
+questionnaire studies asking non-clinical adults what methods and
+approaches have been efficacious in changing their lives for the
+better.
+A general strategy of ``quietening the mind'' was frequently endorsed.
+Unfortunately, this study did not try to discriminate
+precisely what was meant by ``quietening the mind.''
+
+\begin{figure}[tp]
+\begin{tikzpicture}[>=latex,line join=bevel]
+  \pgfsetlinewidth{1bp}
+\input{gen/flow.tex}
+\end{tikzpicture}
+\caption{The essential elements of optimal experience
+  on a spectrum of psychic order to disorder.}
+\label{fig:teleonomy-of-self}
+\end{figure}
+
+In two recent reviews of the state of the research on meditation/mindfulness,
+the possibility of mental silence or thoughtless awareness was not
+even acknowledged (\citeNP{baer2011}; \citeNP{shapiro2009}).
+Is the experience of mental silence so rare
+that it does not even merit a glossary entry in reference works on
+positive psychology and the psychology of religion
+(\citeNP{pargament1997}; \citeNP{peterson2004};
+\citeNP{sheldon2011}; \citeNP{snyder2009})?
+One goal of this article is to better integrate the notion of
+mental silence, independent of particular meditation technique,
+with other themes of positive psychology.
+
+At least two investigators have suggested that there may be a relationship
+between flow and meditation (\citeNP[p.~244]{carrington1977};
+\citeNP[p.~1219]{orme2008}).
+\emph{Flow} is an intrinsically rewarding experience in which a person
+is absorbed in the optimal performance of an activity. 
+The conditions and contrasts of flow are illustrated in
+Figure~\ref{fig:teleonomy-of-self}.
+A precondition of flow is a balance between the subjective challenge of an
+activity and the skill a person can bring to it.
+If challenge and skill are out of balance then either anxiety or
+boredom ensues.
+Immediate feedback and clear goals are important because 
+without them it would be hard to judge whether challenge
+and skill are closely matched.
+Concentration is necessary because a skill cannot be performed
+well when one is frequently distracted.
+As Figure~\ref{fig:teleonomy-of-self} suggests,
+flow is conceived of as the ordered side of a spectrum from
+psychic order to disorder.
+Excessive emotion, moodiness, or cognitive dissonance
+hinder performance and are antagonistic to flow \cite{csikszentmihalyi1988}.
+
+As a way to begin to relate the two concepts,
+let us conduct a thought experiment on whether
+mental silence can be a flow experience.
+Without preparation, the challenge of complete mental silence
+can be insurmountable;
+A naive thought suppression approach fails \cite{wegner2003}.
+However, \citeA{manocha2000} reported that participants in his
+Meditation Research Program ``consistently describe the
+ability to achieve this experience'' (p.~1137).
+Perhaps with the appropriate training,
+the challenge of mental silence can be made navigable.
+Certainly mental silence has a clear goal and immediate feedback.
+Concentration is implicit; without engrossment in mental silence,
+thinking is bound to resume.
+Therefore, it seems plausible that mental silence can meet the basic
+conditions of flow experience.
+
+Perhaps mental silence is a flow experience, but what about
+the other direction?
+Does flow experience implicitly involve mental silence?
+\citeA[p.~103]{csikszentmihalyi1991} remarked
+that yoga is ``one of the oldest and most systematic methods of
+producing the flow experience,''
+in the sense of facilitating flow in other activities
+besides yoga/meditation.
+
+\begin{quotation}
+The ability to experience flow may be due to individual differences
+that are in part inborn, but it certainly can be learned. Many
+techniques of meditation or spiritual discipline attempt to develop
+control over consciousness. For instance, the various yoga traditions
+train the ability to concentrate attention, to control memory, and to
+limit awareness to specific goals. When a person learns such skills,
+it becomes much easier to achieve the necessary balancing of
+challenges and skills. \cite[p.~31]{csikszentmihalyi1988}
+\end{quotation}
+
+Specifically what ability or abilities might yoga/meditation
+confer that facilitates flow?
+Is it the separable abilities of concentrating attention,
+controlling memory, and narrowing focus to specific goals?
+Or is it the combination and coordination of such skills?
+Given that a traditional aim of yoga/meditation is mental silence,
+perhaps mental silence facilitates flow or
+is even a latent component of flow.
+While mental silence has typically been discussed
+in the context of meditation, it seems plausible that the experience
+occurs outside the context of meditation as well,
+perhaps as a component of flow.
+Accidental mental silence may be more common than assumed.
+A potentially vital component of flow has received almost
+no psychological scrutiny.
+
+<<>>=
+#theme_set(theme_bw())
+table.placement <- 'tbp'
+@ 
+
+\section{Method}
+
+\subsection{Survey refinement during pilot}
+
+The survey was developed by the principle investigator
+drawing on his considerable personal experience.
+He has taught Sahaja Meditation for about 3 years and
+practiced meditation for more than 15 years.
+
+re-framed in the context of subjective passage of time to reduce
+demand characteristics and provide a plausible contrasting anchor to
+mental silence
+
+Since some people are unfamiliar with the notion of mental silence,
+it was necessary to define the conditions of this experience at
+the beginning of the survey.
+The description of mental silence were revised a number of times.
+Some participants expressed the opinion that mental silence was
+compatible with daydreaming. To counter this misunderstanding,
+re-presentations of sensory input (e.g. imagination) was explicitly
+ruled out.
+Some participants speculated that the conditions of mental silence
+ruled out life itself.
+To counter this misunderstanding,
+physical movement, sensory input, and affective states were explicitly
+mentioned as compatible with mental silence.
+
+``The idea of complete mental silence does not make sense.''
+
+\bibliography{jpritikin}
+
+\end{document} 
