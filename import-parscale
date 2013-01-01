@@ -1,0 +1,25 @@
+#!/usr/bin/perl
+
+use Modern::Perl '2012';
+use Text::CSV_XS;
+use constant PARSCALE_DIR => '/opt/tmp';
+
+my $csv = Text::CSV_XS->new ({ binary => 1, eol => "\n" }) or
+  die "Cannot use CSV: ".Text::CSV_XS->error_diag ();
+
+my $out = IO::File->new("scores.csv",'w');
+$csv->print($out, ['id','score','se']);
+
+my $skip=1;
+my $in = IO::File->new(PARSCALE_DIR."/mentalsilence.PH3",'r') or die $!;
+while (defined(my $l = $in->getline)) {
+    if ($l =~ /SUBJECT IDENTIFICATION/) {
+	$skip=0;
+    }
+    next if $skip;
+    if ($l =~ /^ (\d+)\s/) {
+	my $id = $1;
+	my @l = split /\s+/, $in->getline;
+	$csv->print($out, [$id, $l[8], $l[9]]);
+    }
+}
