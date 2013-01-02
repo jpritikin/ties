@@ -222,21 +222,13 @@ system("pdfjoin -q gen/data.vs.model-* -o data.vs.model.pdf")
 ######################################################
 # standardized residuals
 
-Zscore <- array(dim=c(sum(score.mask), length(ms.scale.items)))
-for (ix in 1:length(ms.scale.items)) {
-  scores <- espt$score[score.mask]
-  espt.prob <- (rpf.prob(i1, items[ix,], scores))
-  Escore <- apply(espt.prob, 1, function(r) sum(r * 1:i1@numOutcomes))
-  Vscore <- numeric(length(scores))
-  data <- espt[[ms.scale.items[ix]]]
-  data <- unclass(data[score.mask])
-  for (sx in 1:length(scores)) {
-    Vscore[sx] <- sum((1:i1@numOutcomes - data[sx])^2 * espt.prob[sx,])
-  }
-  Zscore[,ix] <- (data - Escore) / sqrt(Vscore)
-}
+Zscore <- rpf.1dim.residuals(list(i1,i1,i1,i1,i1, i1,i1,i1,i1,i1),
+              items[,1:5],
+              espt[score.mask, ms.scale.items],
+              espt$score[score.mask])
 
 espt$outfit[score.mask] <- apply(Zscore, 1, function(z) sum(z^2))/dim(Zscore)[2]
+summary(espt$outfit)
 items$outfit <- apply(Zscore, 2, function(z) sum(z^2))/dim(Zscore)[1]
 summary(items$outfit)
 
