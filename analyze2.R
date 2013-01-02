@@ -19,7 +19,11 @@ agreement.levels <- c('Agree','Agree somewhat','Not sure','Disagree somewhat','D
 for (col in c('msNotAny','msNotSelf','msMet','msAccident',
               'msShared','msCause','msTeach','msEvery','msPay',
               'msTrainTeach')) {
-  espt[[col]] <- ordered(espt[[col]], levels=agreement.levels)
+  levels <- agreement.levels
+  if (col == 'msNotAny' || col == 'msNotSelf' || col == 'msPay') {
+    levels <- rev(levels)
+  }
+  espt[[col]] <- ordered(espt[[col]], levels=levels)
 }
 
 boredom.levels <- c('True','Not sure','False')
@@ -112,28 +116,25 @@ i1 <- rpf.gpcm(5)
 
 ms.scale.items <- c('msNotAny','msNotSelf','msMet','msAccident','msShared','msCause',
 'msTeach','msEvery','msPay','msTrainTeach')
-ms.scale.reverse <- c(FALSE,FALSE, rep(TRUE,8))
 
 ms.scale <- espt[,ms.scale.items]
 #table(apply(is.na(ms.scale), 1, sum))
 na.filter <- apply(is.na(ms.scale), 1, sum) == 0
 ms.scale <- ms.scale[na.filter,]
-parscale.export10 <- function () {
-  foo <- sapply(ms.scale, as.integer)
-  foo[,ms.scale.reverse] <- 6 - foo[,ms.scale.reverse]
+parscale.export <- function (items) {
+  foo <- sapply(items, as.integer)
+  foo <- 1+max(foo) - foo   # parscale is backwards
   ms.responses <- apply(foo, 1, paste0, collapse='')
   cat(sprintf("%s %s\n", espt[na.filter,'id'], ms.responses), file="ms.dat", sep='')
   write.csv(foo, "ms.csv")
 }
-parscale.export8 <- function () {
+if (1) {
+  parscale.export(ms.scale)
+} else {
   small.ms <- ms.scale
   small.ms$msAccident <- NULL
   small.ms$msPay <- NULL
-  foo <- sapply(small.ms, as.integer)
-  foo[,3:8] <- 6 - foo[,3:8]  # reverse score items 1,2
-  ms.responses <- apply(foo, 1, paste0, collapse='')
-  cat(sprintf("%s %s\n", espt[na.filter,'id'], ms.responses), file="ms.dat", sep='')
-  write.csv(foo, "ms.csv")
+  parscale.export(small.ms)  
 }
 parscale.export.sim <- function () {
   param <- list()
@@ -143,12 +144,8 @@ parscale.export.sim <- function () {
     param[[ix]] <- c(1+ix/10, -.5+ix/10, -.25+ix/10, .5+ix/10, 2+ix/10)
   }
   foo <- rpf.sample(length(espt[na.filter,'id']), items, param)
-  bar <- sapply(foo, as.integer)
-  ms.responses <- apply(bar, 1, paste0, collapse='')
-  cat(sprintf("%s %s\n", espt[na.filter,'id'], ms.responses), file="ms.dat", sep='')
-  write.csv(foo, "ms.csv")
+  parscale.export(foo)
 }
-parscale.export10()
 
 scores <- read.csv("scores.csv", stringsAsFactors=FALSE)
 for (col in c("score","se")) {
@@ -163,6 +160,8 @@ ggplot(espt, aes(x=score)) + geom_histogram() + facet_grid(ppool ~ .)
 #pairs(~msPay+born+sex+edu+score, data=espt)
 
 ##############################################
+# data vs model ICC plots
+# TODO add to vignette
 items <- read.csv("items.csv", stringsAsFactors=FALSE)
 
 data.vs.model <- function(item.name, width=3, data.bins=10) {
@@ -170,7 +169,7 @@ data.vs.model <- function(item.name, width=3, data.bins=10) {
   pm <- rpf.prob(i1, items[item.x,], seq(-width, width, .1))
   icc <- as.data.frame(melt(pm, varnames=c("theta",'category')))
   icc$theta <- seq(-width, width, .1)
-  icc$category <- as.ordered(icc$category)
+  icc$category <- as.ordered(1+max(icc$category)-icc$category)
   icc$type <- 'model'
   
   pgrid <- seq(min(espt$score, na.rm=TRUE),
@@ -185,9 +184,7 @@ data.vs.model <- function(item.name, width=3, data.bins=10) {
   edf <- melt(as.data.frame(eout), id.vars=c('V1'),
               variable.name="category")
   head(edf$category, n=20)
-  kat <- unclass(edf$category)
-  if (ms.scale.reverse[item.x]) kat <- 6 - kat
-  edf$category <- ordered(kat)
+  edf$category <- ordered(unclass(edf$category))
   head(edf$category, n=20)
   edf$theta <- edf$V1
   edf$V1 <- NULL
@@ -203,7 +200,7 @@ data.vs.model <- function(item.name, width=3, data.bins=10) {
 }
 
 flush.plots <- function(plots, page) {
-  pdf(paste0("data.vs.model-",page,".pdf"))
+  pdf(paste0("gen/data.vs.model-",page,".pdf"))
   do.call(grid.arrange,plots)
   dev.off()
 }
@@ -219,4 +216,8 @@ for (ix in ms.scale.items) {
   }
 }
 if (length(plots)) flush.plots(plots,page)
-# pdfjoin data.vs.model-* -o d.vs.m.pdf
+system("pdfjoin gen/data.vs.model-* -o data.vs.model.pdf")
+
+######################################################
+# standardized residuals
+
