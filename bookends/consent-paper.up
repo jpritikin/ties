@@ -1,0 +1,109 @@
+#!/bin/sh
+tail --lines=+4 $0 | markdown | ssh jnp3bc@blue.unix.virginia.edu 'cat > public_html/subjectiveTime/paper.html'
+exit
+<head><title>Extremes of subjective passage of time</title></head>
+<div style="float: right; border: thin black solid; padding: 1ex; margin: .5ex;">
+IRB-SBS Identification<br/>
+http://www.virginia.edu/vpr/irb/sbs<br/>
+Protocol #2012-0156-00<br/>
+Approved from 2012 Sep 10 to 2013 Apr 30
+</div>
+Informed Consent Agreement
+==========================
+
+**Please read this consent agreement carefully before you decide to
+  participate in the study.**
+
+**Purpose of the research study:** The purpose of the study is to
+  learn more about the subjective passage of time.  While actual time
+  advances at a nearly constant rate, our subjective awareness of time
+  passing can vary greatly. When engrossed in an entertaining
+  activity, one can lose awareness of the passage of time. Hours can
+  pass without notice. At the other extreme, boredom can make us
+  uncomfortably attentive to time. Minutes can seem to drag on
+  forever.
+
+This study is concerned with the two extremes of subjective
+time. Suppose one extreme is boredom and the other extreme is complete
+mental silence. Boredom is probably familiar, but complete mental
+silence may need some explanation.
+
+To approach mental silence is to reduce mental content including
+re-presentations of sensory input, such as imagination.
+Complete mental silence (or "thoughtless awareness") is an experience
+in which one is no longer thinking and no longer feels the urge to
+continuously engage in thought. The experience occurs in a normal,
+lucid waking state; thoughtless awareness is not similar to sleeping
+or unconsciousness.
+The conditions of mental silence do not exclude everything.
+Physical movement, sensory input, and affective states are permitted.
+
+The actual period of mental silence may be momentary (e.g. a second or
+two) or prolonged (e.g. longer than 10 seconds). However, there is no
+subjective awareness of the passage of time during this experience.
+During the experience of mental silence, there are no thoughts, and
+therefore, no thoughts about actual time.
+
+**What you will do in the study:** The study consists of a
+  questionnaire or survey. You can skip any question that makes you feel
+  uncomfortable and you can stop answering the questionnaire at any
+  time.
+
+**Time required:** Most participants finish in less than 15 minutes.
+Since you will be completing the survey more than once, the total
+time will be less than 15 minutes per occasion.
+
+**Risks:** There are no anticipated risks in this study.
+
+**Benefits:** There are no direct benefits to you for participating in
+  this research study.  The study may help us understand what makes
+  some experiences more engaging and enjoyable than others.
+
+**Confidentiality:** You do not need to provide any contact
+  information. If you choose to provide contact information, this
+  information will be handled confidentially. When the study is
+  completed and the data have been analyzed, the data will be
+  anonymized. Your name will not be used in any report.
+
+**Voluntary participation:** Your participation in the study is
+  completely voluntary.
+
+**Right to withdraw from the study:** You have the right to withdraw
+  from the study at any time without penalty.
+
+**How to withdraw from the study:** If you want to withdraw from the study,
+  contact Joshua Pritikin (434) 906-9678 <jpritikin@virginia.edu>.
+  There is no penalty for withdrawing. 
+
+**Payment:** There is no payment for participating in the study.
+
+**If you have questions about the study, contact:**  
+Joshua Pritikin  
+University of Virginia, Psych Dept  
+485 McCormick Rd, Gilmer Hall Room 102  
+Charlottesville, VA 22903  
+434-982-4763  
+<jpritikin@virginia.edu>  
+
+Karen Schmidt  
+University of Virginia, Psych Dept  
+485 McCormick Rd, Gilmer Hall Room 102  
+Charlottesville, VA 22903  
+434-982-4763  
+<kschmidt@virginia.edu>  
+
+**If you have questions about your rights in the study, contact:**  
+Tonya R. Moon, Ph.D.  
+Chair, Institutional Review Board for the Social and Behavioral Sciences  
+One Morton Dr Suite 500  
+University of Virginia, P.O. Box 800392  
+Charlottesville, VA 22908-0392  
+Telephone:  (434) 924-5999  
+Email: <irbsbshelp@virginia.edu>  
+Website: [www.virginia.edu/vpr/irb/sbs](http://www.virginia.edu/vpr/irb/sbs)  
+
+<big>I freely consent to participate in this study.</big>
+
+<big>Sign:</big>
+
+<big>Date:</big>

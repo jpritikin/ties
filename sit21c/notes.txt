@@ -15,6 +15,24 @@ cite Cook & Beckman (2006) for validity
 IRT intro -- show 10 point Likert scale and discuss the assumption of
 equal intervals
 
+method
+
+results
+
+x descriptive stats
+x PCM model
+x item response curves
+x infit/outfit
+x response patterns
+x information summed across all items (?)
+x summary statistics of infit/outfit
+x summary statistics (mean, median, SD, min, max) of item and person parameters
+x which model estimation procedure?
+x distribution of person parameters
+  drop stuff that misfits (?)
+
+Discussion questions
+
 Who is causing mental silence? In Indian philosophy, individual
 identity is a composite of two concepts atma and paramatma. Points to
 problem with questions like ``Can you cause yourself to experience MS''
@@ -33,3 +51,26 @@ daydreaming; He defined prayer as the combination of daydreaming and
 mental silence.
 
 Any other proximate contrasts similar but different from mental silence?
+
+Collaborate on data collection?
+
+
++++ outline +++
+
+intro to mental silence
+intro to IRT
+discuss scale design and validity
+method
+results
++ item chisq fits
++ min & max SEs
++ item response curves, data vs model
++ outfit
++ plot total information of all items
++ distribution of person parameters conditional on recruiting
+discussion
++ proposed new items
++ qualitative discussion of various issues
+
+open science framework
+nosek's checklists

@@ -1,0 +1,61 @@
+#!/bin/sh
+tail --lines=+4 $0 | markdown | ssh jnp3bc@blue.unix.virginia.edu 'cat > public_html/subjectiveTime/debrief-paper.html'
+exit
+<head><title>Extremes of subjective passage of time</title></head>
+<big>Debriefing Form<br/><big><strong>Extremes of subjective passage of time</strong></big></big>
+
+Thank you for agreeing to participate in this study!
+
+Meditation has two distinct meanings. One meaning of meditation refers
+to a psychological centering device such as mantra recitation, focus
+on the breath, mindfulness, or a visual focus. Psychological centering
+devices help one feel more relaxed and centered. The other meaning of
+meditation is the experience of complete mental
+silence. Traditionally, the purpose of centering devices is to achieve
+complete mental silence.  Although the dual meanings of meditation
+have been documented since at least 1977, most studies involving
+meditation focus on centering devices and ignore the question of
+whether participants experience complete mental silence.
+
+Remarkably, the experience of complete mental silence is practically
+unstudied in psychology.
+
+As a first step, the questions on familiarity with mental silence will
+be analyzed using [Item Response
+Theory](http://en.wikipedia.org/wiki/Item_response_theory) to develop
+a scale that other researchers can use with confidence. To the best of
+our knowledge, no scale has been developed to assess this construct. A
+psychometically investigated scale will permit exploration of many
+questions such as the distribution of familiarity of mental silence
+within various populations.
+
+Recent reference works on positive psychology make no mention of
+mental silence. Our hypothesis is that mental silence is a prevalent
+and important component of various contexts like religion,
+spirituality, and meditation. Some people have suggested that mental
+silence adds a new dimension to awareness. If so, then people familiar
+with mental silence may experience mental silence during work,
+physical exercise, or daydreaming.
+
+Csikszentmihalyi suggested that yoga is "one of the oldest and most
+systematic methods of producing the flow experience" (1991). However,
+little is known about the relationship between yoga and flow. This
+study hopes to begin to explore how mental silence relates to flow and
+generate more specific hypotheses about this relationship.
+
+Thank you for your participation in this study.  If you have further
+questions about the study, please contact Joshua Pritikin (434)
+906-9678 or Karen Schmidt (434) 924-0694.  In addition, if you have
+any concerns about any aspect of the study, you may contact Tonya
+Moon, Ph.D., Chair, Institutional Review Board for the Social and
+Behavioral Sciences, One Morton Drive, Suite 500, University of
+Virginia, P.O. Box 800392, Charlottesville, VA 22908-0392. Telephone:
+(434) 924-5999.
+
+Additional Reading:
+
+* Forman, R. K. C. (1997). _The problem of pure consciousness: Mysticism and philosophy._ Oxford University Press.
+* Rubia, K. (2009). The neurobiology of meditation and its clinical effectiveness in psychiatric disorders. _Biological Psychology, 82_(1), 1-11.
+* Ready to experience complete mental silence?
+There are many paths, but you might try
+[http://coolcheck.org](http://coolcheck.org).
