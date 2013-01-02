@@ -89,6 +89,7 @@ table(espt$wave, espt$m.training)
 ########################################################
 # Check for crazy stuff. The vast majority of the data looks reasonable.
 # No need to exclude anything.
+# WARNING: THIS CODE IS STALE. Some items are reversed scored now. DANGER
 
 dis.logic <- cbind(
   msOpposite1=unclass(espt$msEvery) + unclass(espt$msNotAny)-6 < -2,
@@ -119,13 +120,13 @@ ms.scale.items <- c('msNotAny','msNotSelf','msMet','msAccident','msShared','msCa
 
 ms.scale <- espt[,ms.scale.items]
 #table(apply(is.na(ms.scale), 1, sum))
-na.filter <- apply(is.na(ms.scale), 1, sum) == 0
-ms.scale <- ms.scale[na.filter,]
+score.mask <- apply(is.na(ms.scale), 1, sum) == 0
+ms.scale <- ms.scale[score.mask,]
 parscale.export <- function (items) {
   foo <- sapply(items, as.integer)
   foo <- 1+max(foo) - foo   # parscale is backwards
   ms.responses <- apply(foo, 1, paste0, collapse='')
-  cat(sprintf("%s %s\n", espt[na.filter,'id'], ms.responses), file="ms.dat", sep='')
+  cat(sprintf("%s %s\n", espt[score.mask,'id'], ms.responses), file="ms.dat", sep='')
   write.csv(foo, "ms.csv")
 }
 if (1) {
@@ -143,7 +144,7 @@ parscale.export.sim <- function () {
     items[[ix]] <- i1
     param[[ix]] <- c(1+ix/10, -.5+ix/10, -.25+ix/10, .5+ix/10, 2+ix/10)
   }
-  foo <- rpf.sample(length(espt[na.filter,'id']), items, param)
+  foo <- rpf.sample(length(espt[score.mask,'id']), items, param)
   parscale.export(foo)
 }
 
@@ -216,8 +217,30 @@ for (ix in ms.scale.items) {
   }
 }
 if (length(plots)) flush.plots(plots,page)
-system("pdfjoin gen/data.vs.model-* -o data.vs.model.pdf")
+system("pdfjoin -q gen/data.vs.model-* -o data.vs.model.pdf")
 
 ######################################################
 # standardized residuals
 
+Zscore <- array(dim=c(sum(score.mask), length(ms.scale.items)))
+for (ix in 1:length(ms.scale.items)) {
+  scores <- espt$score[score.mask]
+  espt.prob <- (rpf.prob(i1, items[ix,], scores))
+  Escore <- apply(espt.prob, 1, function(r) sum(r * 1:i1@numOutcomes))
+  Vscore <- numeric(length(scores))
+  data <- espt[[ms.scale.items[ix]]]
+  data <- unclass(data[score.mask])
+  for (sx in 1:length(scores)) {
+    Vscore[sx] <- sum((1:i1@numOutcomes - data[sx])^2 * espt.prob[sx,])
+  }
+  Zscore[,ix] <- (data - Escore) / sqrt(Vscore)
+}
+
+espt$outfit[score.mask] <- apply(Zscore, 1, function(z) sum(z^2))/dim(Zscore)[2]
+items$outfit <- apply(Zscore, 2, function(z) sum(z^2))/dim(Zscore)[1]
+summary(items$outfit)
+
+options(width=300)
+by.outfit <- order(espt$outfit)
+outfit.person <- espt[by.outfit,c(ms.scale.items,'id','work','score','outfit')]
+write.csv(outfit.person, "outfit.person.csv")
