@@ -430,7 +430,7 @@ table.placement <- 'tbp'
 \subsection{Survey refinement during pilot}
 
 The survey was developed by the principle investigator
-drawing on his considerable personal experience.
+drawing on his personal experience.
 He has taught Sahaja Meditation for about 3 years and
 practiced meditation for more than 15 years.
 

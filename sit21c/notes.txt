@@ -1,37 +1,27 @@
-Is there a wakeful mental state during which there is a temporary
-cessation of thought?
-
 cite Tim Wilson's crazy book: Handbook of Self-Knowledge
 
-survey described and illustrated mental silence because worried about floor effects
+describe GPCM
 
-Just because you can't measure it doesn't mean that it doesn't
-exist. Cite Heisenburg paper
+x information summed across all items (?)
+x descriptive stats
+x summary statistics (mean, median, SD, min, max) of item and person parameters
+x which model estimation procedure?
+x item response curves
+x infit/outfit
+x summary statistics of infit/outfit
+x response patterns
+
+Discussion questions
 
 Are we really measuring mental silence?
 
-cite Cook & Beckman (2006) for validity
+How to distinguish mental silence and daydreaming?
 
-IRT intro -- show 10 point Likert scale and discuss the assumption of
-equal intervals
+One participant said that mental silence was important for
+daydreaming; He defined prayer as the combination of daydreaming and
+mental silence.
 
-method
-
-results
-
-x descriptive stats
-x PCM model
-x item response curves
-x infit/outfit
-x response patterns
-x information summed across all items (?)
-x summary statistics of infit/outfit
-x summary statistics (mean, median, SD, min, max) of item and person parameters
-x which model estimation procedure?
-x distribution of person parameters
-  drop stuff that misfits (?)
-
-Discussion questions
+Any other proximate contrasts similar but different from mental silence?
 
 Who is causing mental silence? In Indian philosophy, individual
 identity is a composite of two concepts atma and paramatma. Points to
@@ -43,17 +33,6 @@ mental silence can only be caused by the individuals own desire.
 Contrasts are important for validity. Looking for a context for each
 of mental silence and boredom where the target experience is
 difficult. Hard to find for mental silence.
-
-How to distinguish mental silence and daydreaming?
-
-One participant said that mental silence was important for
-daydreaming; He defined prayer as the combination of daydreaming and
-mental silence.
-
-Any other proximate contrasts similar but different from mental silence?
-
-Collaborate on data collection?
-
 
 +++ outline +++
 
@@ -72,5 +51,9 @@ discussion
 + proposed new items
 + qualitative discussion of various issues
 
+dig into free-form comments
+
 open science framework
 nosek's checklists
+
+anticipated data collection

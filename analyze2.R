@@ -69,7 +69,7 @@ for (col in c('m.training', 'm.regular', 'wave', 'ip.continent',
   espt[[col]] <- factor(espt[[col]])
 }
 espt$ppool <- factor(espt$wave == "ppool-20121230",
-                     levels=c(TRUE,FALSE), labels=c("UVa Human Subjects Pool","Web Surfers"))
+                     levels=c(TRUE,FALSE), labels=c("Subjects Pool","Web Surfers"))
 
 ########################################################
 # demographics
@@ -81,10 +81,15 @@ table(espt$wave, grepl("\\bstudent\\b", espt$work, ignore.case=TRUE))
 
 table(espt$wave, espt$sex)
 
-table(espt$born)
+table(espt$ppool)
 table(espt$wave, espt$rel)
 table(espt$edu)
 table(espt$wave, espt$m.training)
+table(espt$ppool, espt$sex)
+2012 - fivenum(espt[espt$ppool!='Web Surfers','born'])
+2012 - fivenum(espt[espt$ppool=='Web Surfers','born'])
+table(espt[espt$ppool=='Web Surfers','edu'])
+sort(table(espt[espt$ppool=='Web Surfers','ip.country']))
 
 ########################################################
 # Check for crazy stuff. The vast majority of the data looks reasonable.
@@ -153,21 +158,48 @@ for (col in c("score","se")) {
   espt[[col]] <- NA
   espt[[col]][match(scores$id, espt$id)] <- scores[[col]]
 }
+fivenum(espt$se)
 
 # compare sample distributions
-ggplot(espt, aes(x=score)) + geom_histogram() + facet_grid(ppool ~ .)
+hist.plot <- ggplot(espt, aes(x=score)) + geom_histogram() + facet_grid(ppool ~ .)
 
 # nothing obvious here
-#pairs(~msPay+born+sex+edu+score, data=espt)
+pairs(~score+born+sex+edu+rel, data=espt)
 
 ##############################################
 # data vs model ICC plots
 # TODO add to vignette
 items <- read.csv("items.csv", stringsAsFactors=FALSE)
+fivenum(items[,c(paste0('se',1:5))])
+fivenum(items[,'se'])
+
+plot.info <- function() {
+  grid <- seq(-3,3,.1)
+  df <- list(score=grid)
+  total <- numeric(length(grid))
+  for (ix in 1:dim(items)[1]) {
+    id <- items[ix,'id']
+    df[[id]] <- rpf.info(i1, items[ix,1:5], grid)
+    total <- total + df[[id]]
+  }
+  df$total <- total
+  df <- as.data.frame(df)
+  long<- melt(df, id.vars=c('score'), variable.name="item")
+  long$item <- factor(long$item)
+  ggplot(long, aes(score, value, group=item)) +
+    geom_line(size=1.1,aes(linetype=item, color=item)) + ylab("information")
+}
+
+if (0) {
+  print.style <- theme_bw(base_size=16)
+  svg("summaryplot.svg", width=10, height=3.5)
+  grid.arrange(plot.info() + print.style, hist.plot + print.style, ncol=2)
+  dev.off()
+}
 
 data.vs.model <- function(item.name, width=3, data.bins=10) {
   item.x <- match(item.name, ms.scale.items)
-  pm <- rpf.prob(i1, items[item.x,], seq(-width, width, .1))
+  pm <- rpf.prob(i1, items[item.x,1:5], seq(-width, width, .1))
   icc <- as.data.frame(melt(pm, varnames=c("theta",'category')))
   icc$theta <- seq(-width, width, .1)
   icc$category <- as.ordered(1+max(icc$category)-icc$category)
@@ -195,9 +227,10 @@ data.vs.model <- function(item.name, width=3, data.bins=10) {
   both$type <- factor(both$type)
 
   ggplot(both, aes(theta, value)) +
-              geom_line(aes(color=category)) + facet_wrap(~type) +
+              geom_line(aes(color=category, linetype=category)) + facet_wrap(~type) +
     ylim(0,1) + xlim(-width,width) +
-              labs(title=item.name, y="probability")
+              labs(title=paste0(items[item.x,'id'], ", slope = ",items[item.x,1]),
+                   y="probability", x="score")
 }
 
 flush.plots <- function(plots, page) {
@@ -219,6 +252,13 @@ for (ix in ms.scale.items) {
 if (length(plots)) flush.plots(plots,page)
 system("pdfjoin -q gen/data.vs.model-* -o data.vs.model.pdf")
 
+if (0) {
+  print.style <- theme_bw(base_size=16)
+  svg("pay-d-v-m.svg", width=10, height=3.5)
+  data.vs.model('msPay', width=3, data.bins=10) + print.style
+  dev.off()
+}
+
 ######################################################
 # standardized residuals
 
@@ -228,7 +268,7 @@ Zscore <- rpf.1dim.residuals(list(i1,i1,i1,i1,i1, i1,i1,i1,i1,i1),
               espt$score[score.mask])
 
 espt$outfit[score.mask] <- apply(Zscore, 1, function(z) sum(z^2))/dim(Zscore)[2]
-summary(espt$outfit)
+fivenum(espt$outfit)
 items$outfit <- apply(Zscore, 2, function(z) sum(z^2))/dim(Zscore)[1]
 summary(items$outfit)
 

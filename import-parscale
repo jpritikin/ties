@@ -28,36 +28,56 @@ sub grab_scores {
 
 sub grab_items {
     my $out = IO::File->new("items.csv",'w');
-    $csv->print($out, ['slope','b1', 'b2','b3','b4']);
+    $csv->print($out, ['slope','b1', 'b2','b3','b4','se2','se3','se4','se5','id','se1','se','chisq','df','p']);
 
     my @item;
+    my $cx = 0;
     my $mode;
     my $in = IO::File->new(PARSCALE_DIR."/mentalsilence10.PH2",'r') or die $!;
     while (defined(my $l = $in->getline)) {
+#	warn "[$mode] $l";
 	if ($l =~ /ITEM BLOCK/) {
 	    $mode='step';
 	}
 	next if !$mode;
+	if ($mode eq 'tbl' and $l =~ /SUMMARY STATISTICS/) {
+	    $mode = 'chisq';
+	}
+	if ($mode eq 'step' and $l =~ /^\+===/) {
+	    $mode = 'tbl';
+	    next;
+	}
 	if ($mode eq 'step' and $l =~ /STEP PARAMTER/) {
 	    my @l = split /\s+/, $l;
 	    my @step = @l[5..8];
 	    push @item, \@step;
 	    next;
 	}
-	if ($mode eq 'step' and $l =~ /^\+===/) {
-	    $mode = 'tbl';
+	if ($mode eq 'step' and $l =~ /S.E./ and $l !~ /\|/) {
+	    my @l = split /\s+/, $l;
+	    my @se = @l[4..7];
+	    my $i = $item[-1];
+	    push @$i, @se;
 	    next;
 	}
 	if ($mode eq 'tbl' and $l =~ /^\|/) {
 	    my @l = split /[\s|]+/, $l;
 	    my $i = $l[2] - 1;
+	    my $id = $l[1];
 	    my $slope = $l[3];
 	    my $loc = $l[5];
 	    my $p = $item[$i];
-	    for my $step (@$p) { $step = -($step - $loc) }
+	    push @$p, $id, $l[6],$l[4];
+	    for my $step ($p->[0],$p->[1],$p->[2],$p->[3]) { $step = -($step - $loc) }
 	    unshift @$p, $slope;
 	}
-	if ($mode eq 'tbl' and $l =~ /SUMMARY STATISTICS/) { last }
+	if ($mode eq 'chisq' and $l =~ /TOTAL   /) { last }
+	if ($mode eq 'chisq' and $l =~ /^ \|/) {
+	    my @l = split /[\s\|]+/, $l;
+	    next if $l[2] eq 'ITEM';
+	    my $i = $item[$cx++];
+	    push @$i, $l[3], $l[4], $l[5];
+	}
     }
     for my $p (@item) { $csv->print($out, $p); }
 }
