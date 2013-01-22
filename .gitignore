@@ -5,3 +5,13 @@
 /ms.dat
 /irb
 /ref
+*.aux
+*.bbl
+*.blg
+*.log
+*.nav
+*.out
+*.snm
+*.toc
+*.dn
+*.cache

@@ -1,0 +1,17 @@
+#!/bin/sh
+
+set -o errexit
+set -o nounset
+set -o noclobber
+
+name=extra
+
+# Re-run 3 times to get bibliographic changes through
+
+[ -d gen ] || mkdir gen
+R --no-save --restore <<EOF
+library(knitr)
+knit("$name.Rnw") #, tangle=TRUE)
+EOF
+pdflatex $name
+bibtex $name

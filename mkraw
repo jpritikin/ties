@@ -2,6 +2,7 @@
 
 ./sm2r web-20120527.csv \
   web-20120606.csv \
-  web-20121230.csv \
+  web-20130105.csv \
+  web-20130108.csv \
   ppool-20121230.csv \
   raw.csv
