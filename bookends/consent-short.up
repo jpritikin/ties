@@ -1,11 +1,11 @@
 #!/bin/sh
-tail --lines=+4 $0 | markdown | ssh jnp3bc@blue.unix.virginia.edu 'cat > public_html/subjectiveTime/consent-uva.html'
+tail --lines=+4 $0 | markdown | ssh jnp3bc@blue.unix.virginia.edu 'cat > public_html/subjectiveTime/consent-short.html'
 exit
-<head><title>Extremes of subjective passage of time</title></head>
+<head><title>Familiarity with Complete Mental Silence</title></head>
 <div style="float: right; border: thin black solid; padding: 1ex; margin: .5ex; font-size: 125%;">
 <a href="http://www.virginia.edu/vpr/irb/sbs">IRB-SBS Identification</a><br/>
 Protocol #2012-0156-00<br/>
-Approved from 2012 Sep 10 to 2013 Apr 30
+Approved from 2013 Jan 14 to 2013 Apr 30
 </div>
 Informed Consent Agreement
 ==========================
@@ -13,20 +13,8 @@ Informed Consent Agreement
 **Please read this consent agreement carefully before you decide to
   participate in the study.**
 
-**Purpose of the research study:** The purpose of the study is to
-  learn more about the subjective passage of time.  While actual time
-  advances at a nearly constant rate, our subjective awareness of time
-  passing can vary greatly. When engrossed in an entertaining
-  activity, one can lose awareness of the passage of time. Hours can
-  pass without notice. At the other extreme, boredom can make us
-  uncomfortably attentive to time. Minutes can seem to drag on
-  forever.
-
-This study is concerned with the two extremes of subjective
-time. Suppose one extreme is boredom and the other extreme is complete
-mental silence. Boredom is probably familiar, but complete mental
-silence may need some explanation.
-
+**Purpose of the research study:** This questionnaire is concerned
+with complete mental silence.
 To approach mental silence is to reduce mental content including
 re-presentations of sensory input, such as imagination.
 Complete mental silence (or "thoughtless awareness") is an experience
@@ -37,27 +25,16 @@ or unconsciousness.
 The conditions of mental silence do not exclude everything.
 Physical movement, sensory input, and affective states are permitted.
 
-The actual period of mental silence may be momentary (e.g. a second or
-two) or prolonged (e.g. longer than 10 seconds). However, there is no
-subjective awareness of the passage of time during this experience.
-During the experience of mental silence, there are no thoughts, and
-therefore, no thoughts about actual time.
+<strong>Illustration of complete mental silence</strong>
 
-<table border=0 width="100%"><tr>
-<td width="50%"><strong>Illustration of boredom</strong></td>
-<td width="50%"><strong>Illustration of complete mental silence</strong></td>
-</tr><tr>
-<td><img src="wall-clock-150.jpeg" alt="Boredom"/></td>
-<td><img src="mental.gif" alt="Complete mental silence"/></td>
-</tr></table>
+<img src="mental.gif" alt="Complete mental silence"/>
 
 **What you will do in the study:** The study consists of a
   questionnaire or survey. You can skip any question that makes you feel
   uncomfortable and you can stop answering the questionnaire at any
   time.
 
-**Time required:** The study will require about 30 minutes of your
-  time.
+**Time required:** Most participants finish in less than 5 minutes.
 
 **Risks:** There are no anticipated risks in this study.
 
@@ -84,10 +61,7 @@ therefore, no thoughts about actual time.
   withdraw after your responses have been submitted, please contact
   contact Joshua Pritikin (434) 906-9678 <jpritikin@virginia.edu>.
 
-**Payment:** If you are a University of Virginia undergraduate
-  participating via the UVa Psychology Participants subject pool, you
-  will receive 0.5 units of class participation credit. Otherwise,
-  there is no payment for participating in the study.
+**Payment:** There is no payment for participating in the study.
 
 **If you have questions about the study, contact:**  
 Joshua Pritikin  
@@ -115,6 +89,6 @@ Email: <irbsbshelp@virginia.edu>
 Website: [www.virginia.edu/vpr/irb/sbs](http://www.virginia.edu/vpr/irb/sbs)  
 
 [>> Clicking here is equivalent to agreeing to participate in the research
-study described above. <<](https://www.surveymonkey.com/s/TNVYQ87)
+study described above. <<](https://www.surveymonkey.com/s/JFGB3JS)
 
 .
