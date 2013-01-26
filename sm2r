@@ -55,6 +55,8 @@ sub mapHeader {
 		}
 	    } elsif ($t1 =~ /relationship status/) {
 		'rel'
+	    } elsif ($t1 eq 'How familiar are you with the notion of complete mental silence?') {
+		'msNotion'
 	    } elsif ($t1 eq 'Familiarity with complete mental silence') {
 		if ($t2 =~ /not possible for anybody/) {
 		    'msNotAny'
@@ -66,6 +68,8 @@ sub mapHeader {
 		    'msAccident'
 		} elsif ($t2 =~ /others in a shared context/) {
 		    'msShared'
+		} elsif ($t2 =~ /create favorable conditions to allow myself/) {
+		    'msEnv'
 		} elsif ($t2 =~ /intentionally cause myself/) {
 		    'msCause'
 		} elsif ($t2 =~ /teach other people/) {
@@ -77,6 +81,10 @@ sub mapHeader {
 		} elsif ($t2 =~ /train teachers/) {
 		    'msTrainTeach'
 		}
+	    } elsif ($t1 =~ /How certain are you about whether it is ethical to pay/) {
+		'msPaySure'
+	    } elsif ($t1 =~ /know how to train teachers who can teach people how to experience/) {
+		'msTrainTeach'
 	    } elsif ($t1 eq 'Familiarity with boredom') {
 		if ($t2 =~ /fidgety/) {
 		    'boreFidget'
@@ -258,7 +266,7 @@ for my $waveinfo (@data) {
 	    if ($value =~ /\btest\b/i and $value !~ /(taking a test|test-taking)/i) {
 		$skip = 1;
 	    }
-	    if ($key eq 'ip') {
+	    if ($key eq 'ip' and $GI) {
 		my $record = $GI->record_by_addr($value);
 		push @extra, ($record->continent_code,
 			      $record->country_name,

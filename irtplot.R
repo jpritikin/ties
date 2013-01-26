@@ -1,4 +1,4 @@
-plot.info <- function(spec, param, i.name, width=3) {
+plot.info <- function(spec, param, i.name, width=3, show.total=TRUE) {
   if (missing(i.name)) {
     i.name <- paste0('i', 1:length(spec))
   }
@@ -11,37 +11,42 @@ plot.info <- function(spec, param, i.name, width=3) {
     df[[id]] <- rpf.info(s, param[ix,1:s@numParam], grid)
     total <- total + df[[id]]
   }
-  df$total <- total
+  if (show.total) df$total <- total
   df <- as.data.frame(df)
   long<- melt(df, id.vars=c('score'), variable.name="item")
   long$item <- factor(long$item)
   ggplot(long, aes(score, value, group=item)) +
-    geom_line(size=1.1,aes(linetype=item, color=item)) + ylab("information")
+    geom_line(size=1.1,aes(color=item)) + ylab("information")
 }
+# linetype=item,
 
-data.vs.model <- function(spec1, param, espt, item.name, width=3, data.bins=10) {
+data.vs.model <- function(spec1, param, rawdata, score, item.name, width=3, data.bins=11, plot.rug=FALSE) {
   pm <- rpf.prob(spec1, param[1:spec1@numParam], seq(-width, width, .1))
   icc <- as.data.frame(melt(pm, varnames=c("theta",'category')))
   icc$theta <- seq(-width, width, .1)
-  icc$category <- as.ordered(1+max(icc$category)-icc$category)  #parscale reverses stuff
+  icc$category <- as.ordered(icc$category)
   icc$type <- 'model'
   
-  breaks <- seq(min(espt$score, na.rm=TRUE),
-                max(espt$score, na.rm=TRUE),
+  breaks <- seq(min(score, na.rm=TRUE),
+                max(score, na.rm=TRUE),
                 length.out=data.bins+1)
-  bin <- unclass(cut(espt$score, breaks, include.lowest = TRUE))
-  est <- tabulate(bin, length(levels(bin)))
-  if (any(est < 10)) {
-    warning("Some bins have less than 10 samples; try fewer data.bins")
-  }
+  bin <- unclass(cut(score, breaks, include.lowest = TRUE))
   
   eout <- array(dim=c(data.bins, spec1@numOutcomes+1))
+  est <- numeric(data.bins)
+
   for (px in 1:data.bins) {
-    t <- table(espt[[item.name]][bin==px], useNA="no")
+    t <- table(rawdata[[item.name]][bin==px])
+    est[px] <- sum(t)
     eout[px,2:(spec1@numOutcomes+1)] <- t / sum(t)
   }
   eout[,1] <- ((c(breaks,0) + c(0,breaks))/2)[2:(data.bins+1)]
-  
+
+  if (any(est < 10)) {
+    warning(paste0("For ", item.name, ", some bins have less than 10 samples; try fewer data.bins"))
+  }
+  rug <- data.frame(x=eout[,1], people=est)
+
   edf <- melt(as.data.frame(eout), id.vars=c('V1'),
               variable.name="category")
   edf$category <- ordered(unclass(edf$category))
@@ -52,9 +57,39 @@ data.vs.model <- function(spec1, param, espt, item.name, width=3, data.bins=10) 
   both <- rbind(edf, icc)
   both$type <- factor(both$type)
 
-  ggplot(both, aes(theta, value)) +
+  plot <- ggplot(both, aes(theta, value)) +
               geom_line(aes(color=category, linetype=category)) + facet_wrap(~type) +
-    ylim(0,1) + xlim(-width,width) + labs(y="probability", x="score")
+    ylim(0,1) + xlim(-width,width) + labs(y="probability")
+  if (plot.rug) {
+    plot <- plot + geom_rug(data=rug, aes(x,y=people,size=people), sides="b")
+  }
+  plot
+}
+
+flush.plots <- function(plots, page) {
+  if (length(plots) == 1) {
+    plots$filled <- 
+      ggplot(expand.grid(x=1:4, y=1:4), aes(x,y)) + geom_point()
+  }
+  
+  pdf(paste0("gen/data.vs.model-",page,".pdf"))
+  do.call(grid.arrange,plots)
+  dev.off()
+}
+
+data.vs.model.booklet <- function (plot.fn, args) {
+  page <- 1
+  plots <- list()
+  for (ix in args) {
+    plots[[ix]] <- plot.fn(ix)
+    if (length(plots) == 2) {
+      flush.plots(plots,page)
+      page <- page+1
+      plots <- list()    
+    }
+  }
+  if (length(plots)) flush.plots(plots,page)
+  system("pdfjoin -q gen/data.vs.model-* -o data.vs.model.pdf")
 }
 
 ## name <- 'msCause'
