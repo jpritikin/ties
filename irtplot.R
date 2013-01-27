@@ -21,10 +21,12 @@ plot.info <- function(spec, param, i.name, width=3, show.total=TRUE) {
 # linetype=item,
 
 data.vs.model <- function(spec1, param, rawdata, score, item.name, width=3, data.bins=11, plot.rug=FALSE) {
+  labels <- abbreviate(levels(rawdata[[item.name]]), minlength=16)
+
   pm <- rpf.prob(spec1, param[1:spec1@numParam], seq(-width, width, .1))
   icc <- as.data.frame(melt(pm, varnames=c("theta",'category')))
   icc$theta <- seq(-width, width, .1)
-  icc$category <- as.ordered(icc$category)
+  icc$category <- ordered(icc$category, labels=labels)
   icc$type <- 'model'
   
   breaks <- seq(min(score, na.rm=TRUE),
@@ -49,7 +51,7 @@ data.vs.model <- function(spec1, param, rawdata, score, item.name, width=3, data
 
   edf <- melt(as.data.frame(eout), id.vars=c('V1'),
               variable.name="category")
-  edf$category <- ordered(unclass(edf$category))
+  edf$category <- ordered(unclass(edf$category), labels=labels)
   edf$theta <- edf$V1
   edf$V1 <- NULL
   edf$type <- 'data'

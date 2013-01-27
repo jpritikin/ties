@@ -57,18 +57,18 @@ table(apply((dis.flow), 1, sum, na.rm=TRUE))
 ################################################################
 library(OpenMx)
 
-m2.items <- c('msNotion','msNotAny','msNotSelf','msMet','msAccident',
+m2.item.names <- c('msNotion','msNotAny','msNotSelf','msMet','msAccident',
               'msShared', 'msEnv','msCause', 'msPaySure', 'msTeach','msEvery',
               'msTrainTeach', 'wantLearn', 'freqCause', 'maxDuration')
 m2.spec <- list()
 m2.spec[1:15] <- rpf.gpcm(5)
 m2.spec[13:14] <- rpf.gpcm(4)
-m2.data <- espt[,m2.items]
+m2.data <- espt[,m2.item.names]
 m2.mask <- apply(m2.data, 1, function (r) !all(is.na(r)))
 m2.data <- m2.data[m2.mask,]
 
 m2 <- cache(function () {
-  m2.numItems <- length(m2.items)
+  m2.numItems <- length(m2.item.names)
   m2.param <- sapply(m2.spec, function (s) c(rep(TRUE, s@numOutcomes),
                                              rep(FALSE, 5-s@numOutcomes)))
   m2 <- mxModel(model="m2",
@@ -82,31 +82,33 @@ m2 <- cache(function () {
                 mxExpectationBA81(
                   ItemSpec="ItemSpec",
                   ItemParam="ItemParam",
-                  GHpoints=23),
+                  GHpoints=27),
                 mxFitFunctionBA81())
   m2 <- mxOption(m2, "Analytic Gradients", 'yes')
   m2 <- mxOption(m2, "Verify level", '-1')
   m2 <- mxOption(m2, "Function precision", '1.0E-5')
+  m2 <- mxOption(m2, "Calculate Hessian", "No")
+  m2 <- mxOption(m2, "Standard Errors", "No")
   m2 <- mxRun(m2)
 }, 'm2')
 
-if(0) {
-  m2@matrices$ItemParam@values
-  head(m2@output$ability)
-}
+m2.items <- t(m2@matrices$ItemParam@values)
+rownames(m2.items) <- m2.item.names
+espt[m2.mask, "m2.score"] <- m2@output$ability[,1]
+espt[m2.mask, "m2.se"] <- m2@output$ability[,2]
 
 if (0) {
   data.vs.model.booklet(function (name) {
-    item.x <- match(name, m2.items)
+    item.x <- match(name, m2.item.names)
     param <- m2@matrices$ItemParam@values[,item.x]
-    data.vs.model(m2.spec[[item.x]], param, m2.data, m2@output$ability[,1], name) +
+    data.vs.model(m2.spec[[item.x]], param, m2.data, m2@output$ability[,1], name, plot.rug=TRUE) +
       labs(x = "familiarity",
            title = paste0(name, ", slope = ", round(param[1],2)))
-  }, m2.items)
+  }, m2.item.names)
 }
 
 if (0) {
-  plot.info(m2.spec, t(m2@matrices$ItemParam@values), m2.items, show.total=FALSE)
+  plot.info(m2.spec, t(m2@matrices$ItemParam@values), m2.item.names, show.total=FALSE)
 }
 
 ################################################################
@@ -204,15 +206,17 @@ if (0) {
 
 ######################################################
 if (0) {
-  scores <- espt$score
-  params <- items[,c('slope',paste0('b',1:4))]
-  rownames(params) <- as.character(items$name)
-  responses <- ms.people[,as.character(ms.items$name)]
+  scores <- espt$m2.score
+  responses <- espt[,m2.item.names]
   
-  fit <- rpf.1dim.fit(spec, params, responses, scores, 2)
+  fit <- rpf.1dim.fit(m2.spec, m2.items, responses, scores, 2)
   fit[order(-fit$outfit),]
   
-  fit <- rpf.1dim.fit(spec, params, responses, scores, 1, wh.exact=FALSE)
+  fit <- rpf.1dim.fit(m2.spec, m2.items, responses, scores, 1, wh.exact=FALSE)
+  resid <- rpf.1dim.stdresidual(m2.spec, m2.items, responses, scores)
+  
+  report <- cbind(scores, fit$infit, espt[,m2.item.names], resid)
+  write.csv(report, "person-infit.csv")  
   
   for (col in c('infit','infit.z','outfit','outfit.z')) {
     espt[[col]] <- fit[[col]]
@@ -223,27 +227,4 @@ if (0) {
 #options(width=300)
 if (0) {
   write.csv(espt, "person-fit.csv")  
-}
-
-######################################################
-# openmx
-
-if (0) {
-  load("ms.openmx.rda")
-  ms1.items <- as.data.frame(t(ms1.items))
-  colnames(ms1.items) <- c('slope',paste0('b',1:4))
-  ms1.items$id <- items$id
-  ms1.items$name <- items$name
-  
-  omx.data.vs.model.plot <- function(id) {
-    item.x <- match(id, ms1.items$id)
-    param <- ms1.items[item.x, c('slope',paste0('b',1:4))]
-    data.vs.model(spec[[item.x]], param, espt, ms1.items[item.x,'name']) +
-      labs(title = paste0(id, ", slope = ",param[1]))
-  }
-  data.vs.model.booklet(function (ix) omx.data.vs.model.plot(ix), ms1.items$id)  
-  
-  cor(ms1.scores[,1], scores[!is.na(scores)])
-  cor(items$slope, ms1.items$slope)
-  cor(c(as.matrix(items[,c(paste0('b',1:4))])), c(as.matrix(ms1.items[,c(paste0('b',1:4))])))
 }

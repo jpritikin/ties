@@ -1,0 +1,14 @@
+#!/usr/bin/perl
+
+use Modern::Perl;
+use Color::Calc ();
+
+my $cc = Color::Calc->new(OutputFormat=>'hex');
+
+for my $c1 ('F00', '0F0') {
+    my @gradient;
+    for (my $s=.5; $s < .99; $s += 1/20) {
+	push @gradient, hex($cc->mix($c1, 'FFF', $s))
+    }
+    print(join(',', map { sprintf "%d", $_ } reverse @gradient)."\n")
+}

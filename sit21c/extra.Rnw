@@ -68,6 +68,16 @@ items <- prepare.items(items)
 i1 <- rpf.gpcm(5)
 spec <- list()
 spec[1:10] <- i1
+
+data.vs.model.plot <- function(id) {
+  item.x <- match(id, items$id)
+  param <- items[item.x, c('slope',paste0('b',1:4))]
+  data.vs.model(spec[[item.x]], param, espt, espt$score, items[item.x,'name']) +
+    labs(title = paste0(id, ", slope = ",param[1]),
+         x = "familiarity with mental silence")
+}
+data.vs.model.plot('CAUS')
+
 @ 
 
 \begin{frame}
@@ -139,48 +149,8 @@ print(xtable(fit), sanitize.rownames.function=function (n) n)
 
 \begin{frame}
 <<fig=TRUE, cache=TRUE, height=4>>=
-ggplot(espt, aes(x=score)) + geom_histogram(binwidth=.15) + facet_grid(ppool ~ .)
-@ 
-\end{frame}
-
-\begin{frame}
-<<fig=TRUE,cache=TRUE, height=4>>=
-plot.info(spec, items[,1:5], items[,'id'])
-@ 
-\end{frame}
-
-\begin{frame}
-<<fig=TRUE,cache=TRUE,height=4>>=
-data.vs.model.plot <- function(id) {
-  item.x <- match(id, items$id)
-  param <- items[item.x, c('slope',paste0('b',1:4))]
-  data.vs.model(spec[[item.x]], param, espt, espt$score, items[item.x,'name']) +
-    labs(title = paste0(id, ", slope = ",param[1]),
-         x = "familiarity with mental silence")
-}
-data.vs.model.plot('SHAR')
-@ 
-\end{frame}
-
-\begin{frame}
-<<fig=TRUE,cache=TRUE,height=4>>=
-data.vs.model.plot('PAY')
-@ 
-\end{frame}
-
-\begin{frame}
-<<results='asis'>>=
-ms.scale <- espt[,items[,'name']]
-#score.mask <- apply(is.na(ms.scale), 1, sum) == 0
-fit <- rpf.1dim.fit(spec, items[,1:5],
-                       espt[, items[,'name']],
-                       espt$score, 1)
-
-outfit <- rbind(fivenum(fit$infit),
-                fivenum(fit$outfit))
-rownames(outfit) <- c('Person infit', 'Person outfit')
-colnames(outfit) <- c('Min', '25th', 'Median', '75th', 'Max')
-print(xtable(outfit))
+ggplot(espt, aes(x=score)) + geom_histogram(binwidth=.15) +
+  facet_grid(ppool ~ .) + labs(x="familiarity with mental silence")
 @ 
 \end{frame}
 
@@ -196,10 +166,64 @@ data.vs.model.plot('TEAC')
 @ 
 \end{frame}
 
+\begin{frame}
+<<fig=TRUE,cache=TRUE,height=4>>=
+data.vs.model.plot('PAY')
+@ 
+\end{frame}
+
+\begin{frame}
+<<fig=TRUE,cache=TRUE, height=4>>=
+item.mask <- items[,'id'] != 'PAY'
+plot.info(spec[1:9], items[item.mask,1:5], items[item.mask,'id']) +
+  labs(x="familiarity with mental silence")
+@ 
+\end{frame}
+
+\begin{frame}
+<<results='asis'>>=
+ms.scale <- espt[,items[,'name']]
+fit <- rpf.1dim.fit(spec, items[,1:5],
+                       espt[, items[,'name']],
+                       espt$score, 1)
+
+outfit <- rbind(fivenum(fit$infit),
+                fivenum(fit$outfit))
+rownames(outfit) <- c('Person infit', 'Person outfit')
+colnames(outfit) <- c('Min', '25th', 'Median', '75th', 'Max')
+print(xtable(outfit))
+@ 
+\end{frame}
+
+\begin{frame}
+3 highest infits (response patterns that are least expected)
+
+<<results='asis'>>=
+fit.order <- order(-fit$infit)[1:3]
+fit.table <- rbind(round(fit$infit[fit.order],2),
+                   t(espt[fit.order, items$name]))
+rownames(fit.table)[1] <- 'Infit'
+print(xtable(fit.table))
+@ 
+\end{frame}
+\begin{frame}
+2 lowest infits (response patterns that are too good to be true)
+
+<<results='asis'>>=
+fit.order <- order(fit$infit)[1:2]
+fit.table <- rbind(round(fit$infit[fit.order],2),
+                   t(espt[fit.order, items$name]))
+rownames(fit.table)[1] <- 'Infit'
+print(xtable(fit.table))
+@ 
+\end{frame}
+
 \section{Conclusion}
 \begin{frame}
 \frametitle{Thank you}
-Jean Hu, Michael Kubovy, Susanna Williams
+\textbf{Your name here?}
+
+David Germano, Jean Hu, Michael Kubovy, Susanna Williams
 \end{frame}
 
 \begin{frame}
