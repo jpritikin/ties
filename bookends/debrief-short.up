@@ -1,13 +1,13 @@
 #!/bin/sh
 tail --lines=+4 $0 | markdown | ssh jnp3bc@blue.unix.virginia.edu 'cat > public_html/subjectiveTime/debrief-short.html'
 exit
-<head><title>Familiarity with Complete Mental Silence</title></head>
+<head><title>Mental Silence Disposition Scale</title></head>
 <div style="float: right; border: thin black solid; padding: 1ex; margin: .5ex; font-size: 125%;">
 <a href="http://www.virginia.edu/vpr/irb/sbs">IRB-SBS Identification</a><br/>
 Protocol #2012-0156-00<br/>
 Approved from 2013 Jan 14 to 2013 Apr 30
 </div>
-<big>Debriefing Form<br/><big><strong>Familiarity with Complete Mental Silence</strong></big></big>
+<big>Debriefing Form<br/><big><strong>Mental Silence Disposition Scale</strong></big></big>
 
 Thank you for agreeing to participate in this study!
 
@@ -25,7 +25,7 @@ whether participants experience complete mental silence.
 Remarkably, the experience of complete mental silence is practically
 unstudied in psychology.
 
-As a first step, the questions on familiarity with mental silence will
+As a first step, responses will
 be analyzed using [Item Response
 Theory](http://en.wikipedia.org/wiki/Item_response_theory) to develop
 a scale that other researchers can use with confidence. To the best of
@@ -34,16 +34,8 @@ psychometically investigated scale will permit exploration of many
 questions such as the distribution of familiarity of mental silence
 within various populations.
 
-Recent reference works on positive psychology make no mention of
-mental silence. Our hypothesis is that mental silence is a prevalent
-and important component of various contexts like religion,
-spirituality, and meditation. Some people have suggested that mental
-silence adds a new dimension to awareness. If so, then people familiar
-with mental silence may experience mental silence during work,
-physical exercise, or daydreaming.
-
-Enough participants have participated in this survey that I can say
-with some confidence that the results will be very interesting.
+Enough participants have participated in this survey that we can say
+with confidence that the results will be very interesting.
 However, many more participants are needed for the planned statistical
 analysis. If you enjoyed participating, please invite your friends to
 participate as well.  Here's what you might write: "I recently
@@ -53,7 +45,7 @@ http://tiny.cc/0g99qw"
 
 Thank you for your participation in this study.  If you have further
 questions about the study, please contact Joshua Pritikin (434)
-906-9678 or Karen Schmidt (434) 924-0694.  In addition, if you have
+218-2280 or Karen Schmidt (434) 924-0694.  In addition, if you have
 any concerns about any aspect of the study, you may contact Tonya
 Moon, Ph.D., Chair, Institutional Review Board for the Social and
 Behavioral Sciences, One Morton Drive, Suite 500, University of

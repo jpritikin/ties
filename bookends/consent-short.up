@@ -1,7 +1,7 @@
 #!/bin/sh
 tail --lines=+4 $0 | markdown | ssh jnp3bc@blue.unix.virginia.edu 'cat > public_html/subjectiveTime/consent-short.html'
 exit
-<head><title>Familiarity with Complete Mental Silence</title></head>
+<head><title>Mental Silence Disposition Scale</title></head>
 <div style="float: right; border: thin black solid; padding: 1ex; margin: .5ex; font-size: 125%;">
 <a href="http://www.virginia.edu/vpr/irb/sbs">IRB-SBS Identification</a><br/>
 Protocol #2012-0156-00<br/>
@@ -89,6 +89,6 @@ Email: <irbsbshelp@virginia.edu>
 Website: [www.virginia.edu/vpr/irb/sbs](http://www.virginia.edu/vpr/irb/sbs)  
 
 [>> Clicking here is equivalent to agreeing to participate in the research
-study described above. <<](https://www.surveymonkey.com/s/JFGB3JS)
+study described above. <<](https://www.surveymonkey.com/s/2VVBFKK)
 
 .
