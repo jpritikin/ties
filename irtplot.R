@@ -74,7 +74,7 @@ flush.plots <- function(plots, page) {
       ggplot(expand.grid(x=1:4, y=1:4), aes(x,y)) + geom_point()
   }
   
-  pdf(paste0("gen/data.vs.model-",page,".pdf"))
+  pdf(sprintf("gen/data.vs.model-%03d.pdf", page))
   do.call(grid.arrange,plots)
   dev.off()
 }

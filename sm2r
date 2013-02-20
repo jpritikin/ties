@@ -19,6 +19,68 @@ my %ContextMap = ('religious' => 're',
 		  'daydreaming' => 'dd',
 		  'flow' => 'fl');
 
+my %PersonMap;  # anonymized ID for longitudinal measurement
+
+sub msItems {
+    my ($t2) = @_;
+    if ($t2 eq 'I have met, in person, someone who is convincingly familiar with complete mental silence.') {
+	'msMet'
+    } elsif ($t2 eq 'I have met in person someone who is convincingly familiar with complete mental silence.') {
+	'msMet'
+    } elsif ($t2 eq 'At some time in my life, I have experienced complete mental silence.') {
+	'msAny'
+    } elsif ($t2 =~ /others in a shared context/) {
+	'msShared'
+    } elsif ($t2 =~ /create favorable conditions to allow myself/) {
+	'msEnv'
+    } elsif ($t2 eq 'Do you know how to intentionally cause yourself to experience complete mental silence?') {
+	'msCause0'
+    } elsif ($t2 eq 'I can intentionally cause myself to experience complete mental silence.') {
+	'msCause'
+    } elsif ($t2 =~ /teach other people/) {
+	'msTeach'
+    } elsif ($t2 =~ /possible for everybody/) {
+	'msEvery'
+    } elsif ($t2 =~ /ethical to pay money/) {
+	'msPay'
+    } elsif ($t2 =~ /train teachers/) {
+	'msTrainTeach'
+    } elsif ($t2 =~ /afraid of what will happen if I stop thinking/) {
+	'msAfraid'
+    } elsif ($t2 =~ /won't feel emotionally prepared to experience complete mental silence/) {
+	'msEmo'
+    } elsif ($t2 =~ /life circumstances prevent me from experiencing complete mental silence/) {
+	'msLife'
+    } elsif ($t2 =~ /never slow down long enough to experience complete mental silence/) {
+	'msFast'
+    } elsif ($t2 =~ /Descartes said, "I think therefore I am."/) {
+	'msDescarte'
+    } elsif ($t2 =~ /experience complete mental silence then I may lose an important aspect of who I am/) {
+	'msIdentity',
+    } elsif ($t2 eq 'At some time in my life, I have experienced complete mental silence accidentally.') {
+	'ignore'
+    } elsif ($t2 eq 'During the last few months, how often do you experience complete mental silence accidentally?') {
+	'ignore'
+    } elsif ($t2 eq 'I have experienced complete mental silence accidentally.') {
+	'ignore'
+    } elsif ($t2 eq 'Complete mental silence is not possible for myself.') {
+	'ignore'
+    } elsif ($t2 eq 'Complete mental silence is not possible for anybody.') {
+	'ignore'
+    }
+}
+
+sub boredItems {
+    my ($t2) = @_;
+    if ($t2 =~ /bored then you are likely fidgety/) {
+	'boreFidget'
+    } elsif ($t2 =~ /bored then you are likely cheerful/) {
+	'boreCheer'
+    } elsif ($t2 =~ /bored then you are likely lonely/) {
+	'boreLone'
+    }
+}
+
 # creates a map from col# to column name
 sub mapHeader {
     my ($h1, $h2) = @_;
@@ -27,17 +89,27 @@ sub mapHeader {
 	my $c0 = $c;
 	while (!$h1->[$c0] and $c0 > 0) { --$c0 }
 	my $t1 = $h1->[$c0];
-	my $t2 = $h2->[$c];
+	my $t2 = $h2->[$c] || '';
 	my $key = do {
 	    if ($t1 =~ /^(CollectorID|Email Address|First Name|LastName|Custom Data)$/) {
 		'ignore'
-	    } elsif ($t1 eq 'RespondentID') {
+	    } elsif ($t1 =~ /^(Duplicate|Time Taken|Response Status|Seq|External|Custom Var|Country Code|Region|This questionnaire)/) {
+		'ignore'
+	    } elsif ($t2 eq '' and $t1 =~ /^(Familiarity with)/) {
+		'ignore'
+	    } elsif ($t1 =~ /^Your experience of Complete Mental Silence/) {
+		'ignore'
+	    } elsif ($t1 eq 'RespondentID' or $t1 eq 'Response ID') {
 		'id'
+	    } elsif ($t1 eq 'Email Group Code') {
+		'groupcode'
+	    } elsif ($t1 eq 'Respondent Email') {
+		'email'
 	    } elsif ($t1 eq 'StartDate') {
 		'ignore'
-	    } elsif ($t1 eq 'EndDate') {
+	    } elsif ($t1 eq 'EndDate' or $t1 =~ /^Timestamp/) {
 		'end'
-	    } elsif ($t1 eq 'IP Address') {
+	    } elsif ($t1 eq 'IP Address' or $t1 eq 'IP Address') {
 		'ip'
 	    } elsif ($t1 =~ /male or female/) {
 		'sex'
@@ -58,49 +130,27 @@ sub mapHeader {
 	    } elsif ($t1 eq 'How familiar are you with the notion of complete mental silence?') {
 		'msNotion'
 	    } elsif ($t1 eq 'Familiarity with complete mental silence') {
-		if ($t2 =~ /not possible for anybody/) {
-		    'msNotAny'
-		} elsif ($t2 =~ /not possible for myself/) {
-		    'msNotSelf'
-		} elsif ($t2 =~ /I have met/) {
-		    'msMet'
-		} elsif ($t2 =~ /accidentally/) {
-		    'msAccident'
-		} elsif ($t2 =~ /others in a shared context/) {
-		    'msShared'
-		} elsif ($t2 =~ /create favorable conditions to allow myself/) {
-		    'msEnv'
-		} elsif ($t2 =~ /intentionally cause myself/) {
-		    'msCause'
-		} elsif ($t2 =~ /teach other people/) {
-		    'msTeach'
-		} elsif ($t2 =~ /possible for everybody/) {
-		    'msEvery'
-		} elsif ($t2 =~ /ethical to pay money/) {
-		    'msPay'
-		} elsif ($t2 =~ /train teachers/) {
-		    'msTrainTeach'
-		}
+		msItems($t2)
+	    } elsif ($t1 eq 'Please indicate your agreement or disagreement with the following statements.') {
+		msItems($t2)
 	    } elsif ($t1 =~ /How certain are you about whether it is ethical to pay/) {
 		'msPaySure'
 	    } elsif ($t1 =~ /know how to train teachers who can teach people how to experience/) {
 		'msTrainTeach'
 	    } elsif ($t1 eq 'Familiarity with boredom') {
-		if ($t2 =~ /fidgety/) {
-		    'boreFidget'
-		} elsif ($t2 =~ /cheerful/) {
-		    'boreCheer'
-		} elsif ($t2 =~ /lonely/) {
-		    'boreLone'
-		}
+		boredItems($t2)
 	    } elsif ($t1 =~ /do not know how to intentionally cause yourself/) {
 		'wantLearn'
+	    } elsif ($t1 eq 'How often do you experience complete mental silence accidentally?') {
+		'ignore'
 	    } elsif ($t1 =~ /often do you try to intentionally cause/) {
 		'freqCause'
 	    } elsif ($t1 =~ /what percentage of the time are you successful/) {
 		'pctSuccess'
-	    } elsif ($t1 =~ /often do you experience complete mental silence accidentally/) {
-		'freqAccident'
+	    } elsif ($t1 eq 'During the last few months, how often have you experienced complete mental silence accidentally?') {
+		'ignore'
+	    } elsif ($t1 eq 'During the last few months, how often have you experienced complete mental silence?') {
+		'msFreq'
 	    } elsif ($t1 =~ /characterize the actual duration of your experience/) {
 		'durationCharacter'
 	    } elsif ($t1 =~ /actual time did your longest experience/) {
@@ -159,6 +209,10 @@ sub mapHeader {
 		'ignore'
 	    } elsif ($t1 =~ /How TRUE or FALSE is each of the following statements/) {
 		'ignore'
+	    } elsif (msItems($t1)) {
+		msItems($t1)
+	    } elsif (boredItems($t1)) {
+		boredItems($t1)
 	    } else {
 		my $match = '';
 		keys %ContextMap; # reset iterator
@@ -218,23 +272,27 @@ my $dest = pop @ARGV;
 
 die "No files provided" if !@ARGV;
 
-my $maxCol=0;
-my $maxColIndex;
+my $outMap = {};
 for my $file (@ARGV) {
     open my $io, '<', $file;
     my $h1 = $csv->getline($io);
-    my $h2 = $csv->getline($io);
+    my $h2 = [];
+    if (@$h1 == 1 and $h1->[0] =~ /^Data Export/) {
+	$csv->getline($io);
+	$h1 = $csv->getline($io);
+    } else {
+	$h2 = $csv->getline($io);
+    }
     my $map = mapHeader($h1, $h2);
     next if !$map;
     push @data, [$file, $io, $map];
-    if ($maxCol < keys($map)) {
-	$maxCol = keys($map);
-	$maxColIndex = $#data;
-    }
+    for my $k (values %$map) { ++$outMap->{$k} }
 }
 
-# reverse to (column name -> col#)
-my $outMap = reverseMap($data[$maxColIndex][2]);
+{
+    my $cn = 0;
+    for my $k (sort keys %$outMap) { $outMap->{$k} = $cn++ }
+}
 
 my $out = IO::File->new();
 $out->open(">$dest") or die $?;
@@ -252,10 +310,12 @@ sub getHeader {
 
 $csv->print($out, getHeader($outMap));
 
+our %ID;
+
 for my $waveinfo (@data) {
     my ($file, $io, $map) = @$waveinfo;
     while (my $row = $csv->getline($io)) {
-	my @outRow;
+	my @outRow = ('') x scalar(keys(%$outMap));
 	my $wavename = $file;
 	$wavename =~ s/\.csv$//;
 	my @extra = ($wavename);
@@ -265,6 +325,25 @@ for my $waveinfo (@data) {
 	    my $key = $map->{$sk};
 	    if ($value =~ /\btest\b/i and $value !~ /(taking a test|test-taking)/i) {
 		$skip = 1;
+	    }
+	    if ($key eq 'groupcode' and $value !~ /^LIST/) {
+		$skip = 1;
+	    }
+	    if ($key eq 'id') {
+		if (exists $ID{$value}) {
+		    warn("ID $value observed ". ++$ID{$value});
+		} else {
+		    $ID{$value} = 1;
+		}
+	    }
+	    if ($key eq 'email') {
+		if (exists $PersonMap{$value}) {
+		    $value = $PersonMap{$value};
+		} else {
+		    my $id = keys %PersonMap;
+		    $PersonMap{$value} = $id;
+		    $value = $id;
+		}
 	    }
 	    if ($key eq 'ip' and $GI) {
 		my $record = $GI->record_by_addr($value);

@@ -92,6 +92,11 @@ data.vs.model.plot('CAUS')
 \end{frame}
 
 \begin{frame}
+  
+\emph{\large ``Complete mental silence'' is bunk. Anyone who thinks that he or she
+  has experienced ``complete mental silence'' needs to have his or her
+  head examined.}
+\vskip 7ex
 \centerline{\includegraphics[scale=2]{likert}}
 \end{frame}
 

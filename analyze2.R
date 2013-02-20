@@ -2,9 +2,11 @@ library(stringr)
 library(ggplot2)
 library(rpf)
 library(reshape2)
+library(plyr)
 library(gridExtra)
 source("jrs.R")
 options(jrsCacheDir='.cache')
+options(error = utils::recover)
 
 source("prepare.R")
 source('irtplot.R')
@@ -57,12 +59,18 @@ table(apply((dis.flow), 1, sum, na.rm=TRUE))
 ################################################################
 library(OpenMx)
 
-m2.item.names <- c('msNotion','msNotAny','msNotSelf','msMet','msAccident',
-              'msShared', 'msEnv','msCause', 'msPaySure', 'msTeach','msEvery',
-              'msTrainTeach', 'wantLearn', 'freqCause', 'maxDuration')
+m2.item.names <- c('msNotion','msFreq', 'msAny', 'msEvery', 'msCause0', 'wantLearn',
+                   'msAfraid', 'msEmo', 'msLife', 'msFast', 'msDescarte', 'msIdentity',
+                   'freqCause', 'maxDuration', 'msMet', 'msEnv', 'msCause',
+                   'msShared',  'msTeach', 'msTrainTeach')
 m2.spec <- list()
-m2.spec[1:15] <- rpf.gpcm(5)
+m2.spec[1:20] <- rpf.gpcm(5)
+m2.spec[2] <- rpf.gpcm(4)
+m2.spec[5] <- rpf.gpcm(3)
+m2.spec[6] <- rpf.gpcm(4)
 m2.spec[13:14] <- rpf.gpcm(4)
+m2.missing <- m2.item.names[is.na(match(m2.item.names, colnames(espt)))]
+if (length(m2.missing)) stop(paste("Columns missing:", m2.missing))
 m2.data <- espt[,m2.item.names]
 m2.mask <- apply(m2.data, 1, function (r) !all(is.na(r)))
 m2.data <- m2.data[m2.mask,]
@@ -72,12 +80,13 @@ m2 <- cache(function () {
   m2.param <- sapply(m2.spec, function (s) c(rep(TRUE, s@numOutcomes),
                                              rep(FALSE, 5-s@numOutcomes)))
   m2 <- mxModel(model="m2",
-                mxMatrix(name="ItemSpec", nrow=4, ncol=m2.numItems,
+                mxMatrix(name="ItemSpec", nrow=3, ncol=m2.numItems,
                          values=sapply(m2.spec, function(m) slot(m,'spec')),
                          free=FALSE, byrow=TRUE),
                 mxMatrix(name="ItemParam", nrow=5, ncol=m2.numItems,
                          values=c(1, rep(0,4)),
-                         free=m2.param),
+                         free=m2.param,
+                         lbound=c(1e-3,rep(-1e5,4))),
                 mxData(observed=m2.data, type="raw"),
                 mxExpectationBA81(
                   ItemSpec="ItemSpec",
@@ -108,8 +117,26 @@ if (0) {
 }
 
 if (0) {
+  ddply(espt, ~wave, function (slice) c(n=sum(!is.na(slice$m2.score)),
+                                          m=mean(slice$m2.score, na.rm=TRUE),
+                                        sd=sd(slice$m2.score, na.rm=TRUE)))
+  
   plot.info(m2.spec, t(m2@matrices$ItemParam@values), m2.item.names, show.total=FALSE)
 }
+
+# compare two items
+if (0) {
+  item.cor <- function(i1, i2) {
+    filter <- apply(!is.na(cbind(espt[[i1]], espt[[i2]])), 1, all)
+    cor(unclass(espt[filter,i1]), unclass(espt[filter,i2]))
+  }
+  item.loc <- function(i1) {
+    i1.x <- match(i1, rownames(m2.items))
+    optimize(function (w) -rpf.info(m2.spec[[i1.x]], m2.items[i1.x,], w), interval=c(-5,5))
+  }
+  plot.info(m2.spec[10], t(m2.items[10,]))
+}
+if (0) rpf.mean.info(m2.spec, m2.items)
 
 ################################################################
 i1 <- rpf.gpcm(5)
