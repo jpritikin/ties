@@ -1,11 +1,11 @@
 #!/bin/sh
 tail --lines=+4 $0 | markdown | ssh jnp3bc@blue.unix.virginia.edu 'cat > public_html/subjectiveTime/consent-lng.html'
 exit
-<head><title>Extremes of subjective passage of time</title></head>
+<head><title>Mental Silence Disposition Scale</title></head>
 <div style="float: right; border: thin black solid; padding: 1ex; margin: .5ex; font-size: 125%;">
 <a href="http://www.virginia.edu/vpr/irb/sbs">IRB-SBS Identification</a><br/>
 Protocol #2012-0156-00<br/>
-Approved from 2012 Sep 10 to 2013 Apr 30
+Approved from 2013 Mar 18 to 2013 Apr 30
 </div>
 Informed Consent Agreement
 ==========================
@@ -13,20 +13,8 @@ Informed Consent Agreement
 **Please read this consent agreement carefully before you decide to
   participate in the study.**
 
-**Purpose of the research study:** The purpose of the study is to
-  learn more about the subjective passage of time.  While actual time
-  advances at a nearly constant rate, our subjective awareness of time
-  passing can vary greatly. When engrossed in an entertaining
-  activity, one can lose awareness of the passage of time. Hours can
-  pass without notice. At the other extreme, boredom can make us
-  uncomfortably attentive to time. Minutes can seem to drag on
-  forever.
-
-This study is concerned with the two extremes of subjective
-time. Suppose one extreme is boredom and the other extreme is complete
-mental silence. Boredom is probably familiar, but complete mental
-silence may need some explanation.
-
+**Purpose of the research study:** This questionnaire is concerned
+with complete mental silence.
 To approach mental silence is to reduce mental content including
 re-presentations of sensory input, such as imagination.
 Complete mental silence (or "thoughtless awareness") is an experience
@@ -37,28 +25,18 @@ or unconsciousness.
 The conditions of mental silence do not exclude everything.
 Physical movement, sensory input, and affective states are permitted.
 
-The actual period of mental silence may be momentary (e.g. a second or
-two) or prolonged (e.g. longer than 10 seconds). However, there is no
-subjective awareness of the passage of time during this experience.
-During the experience of mental silence, there are no thoughts, and
-therefore, no thoughts about actual time.
+<strong>Illustration of complete mental silence</strong>
 
-<table border=0 width="100%"><tr>
-<td width="50%"><strong>Illustration of boredom</strong></td>
-<td width="50%"><strong>Illustration of complete mental silence</strong></td>
-</tr><tr>
-<td><img src="wall-clock-150.jpeg" alt="Boredom"/></td>
-<td><img src="mental.gif" alt="Complete mental silence"/></td>
-</tr></table>
+<img src="mental.gif" alt="Complete mental silence"/>
 
 **What you will do in the study:** The study consists of a
   questionnaire or survey. You can skip any question that makes you feel
   uncomfortable and you can stop answering the questionnaire at any
   time.
 
-**Time required:** Most participants finish in less than 15 minutes.
+**Time required:** Most participants finish in less than 5 minutes.
 Since you will be completing the survey more than once, the total
-time will be less than 15 minutes per occasion.
+time will be less than 5 minutes per occasion.
 
 **Risks:** There are no anticipated risks in this study.
 
@@ -113,6 +91,6 @@ Email: <irbsbshelp@virginia.edu>
 Website: [www.virginia.edu/vpr/irb/sbs](http://www.virginia.edu/vpr/irb/sbs)  
 
 [>> Clicking here is equivalent to agreeing to participate in the research
-study described above. <<](https://www.surveymonkey.com/s/RM7JVHZ)
+study described above. <<](https://www.surveymonkey.com/s/YXRR5KM)
 
 .
