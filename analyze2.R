@@ -22,6 +22,7 @@ espt <- prepare.espt(espt, scores)
 
 #table(espt$wave, grepl("\\bstudent\\b", espt$work, ignore.case=TRUE))
 if(0) {
+  table(espt$wave)
   table(espt$wave, espt$rel)
   table(espt$edu)
   table(espt$wave, espt$m.training)
@@ -35,6 +36,7 @@ if(0) {
 # No need to exclude anything.
 # WARNING: THIS CODE IS STALE. Some items are reversed scored now. DANGER
 
+if (0) {
 dis.logic <- cbind(
   msOpposite1=unclass(espt$msEvery) + unclass(espt$msNotAny)-6 < -2,
   msOpposite2=unclass(espt$msNotSelf) + unclass(espt$msCause)-6 < -2,
@@ -55,65 +57,98 @@ dis.flow <- cbind(
   pmax(unclass(espt$fl.subjTime)-3,0),
   pmax(3-unclass(espt$fl.b.gi),0))
 table(apply((dis.flow), 1, sum, na.rm=TRUE))
+}
 
 ################################################################
-library(OpenMx)
 
 m2.item.names <- c('msNotion','msFreq', 'msAny', 'msEvery', 'msCause0', 'wantLearn',
                    'msAfraid', 'msEmo', 'msLife', 'msFast', 'msDescarte', 'msIdentity',
-                   'freqCause', 'maxDuration', 'msMet', 'msEnv', 'msCause',
+                   'freqCause', 'maxDuration', 'msYearn', 'msMet', 'msEnv', 'msCause', 'msAllow',
                    'msShared',  'msTeach', 'msTrainTeach')
+
+gpcm <- function(outcomes) {
+  rpf.nrm(outcomes, T.c=lower.tri(diag(outcomes-1),TRUE) * -1)
+#   rpf.nrm(outcomes, T.c=diag(outcomes-1))
+}
+
 m2.spec <- list()
-m2.spec[1:20] <- rpf.gpcm(5)
-m2.spec[2] <- rpf.gpcm(4)
-m2.spec[5] <- rpf.gpcm(3)
-m2.spec[6] <- rpf.gpcm(4)
-m2.spec[13:14] <- rpf.gpcm(4)
+m2.spec[1:22] <- gpcm(5)
+m2.spec[2] <- gpcm(4)
+m2.spec[5] <- gpcm(3)
+m2.spec[6] <- gpcm(4)
+m2.spec[13:14] <- gpcm(4)
+
+#sapply(m2.spec, function(m) slot(m,'numOutcomes'))
+
 m2.missing <- m2.item.names[is.na(match(m2.item.names, colnames(espt)))]
 if (length(m2.missing)) stop(paste("Columns missing:", m2.missing))
 m2.data <- espt[,m2.item.names]
 m2.mask <- apply(m2.data, 1, function (r) !all(is.na(r)))
 m2.data <- m2.data[m2.mask,]
+for (c in colnames(m2.data)) { attr(m2.data[,c], 'mxFactor') <- attr(espt[,c], 'mxFactor') }
 
-m2 <- cache(function () {
+if (0) {
+  m2.fm <- sapply(m2.data, unclass) - 1
+  require(mirt)
+  mirt.fit <- mirt(m2.fm, 1, itemtype="gpcm", D=1)
+#  m2.fm[is.na(m2.fm)] <- -9
+#  write.table(m2.fm, file="ms-data.csv", row.names=FALSE, col.names=FALSE, quote=FALSE)
+  
+}
+
+m2.estimate <- function () {
   m2.numItems <- length(m2.item.names)
-  m2.param <- sapply(m2.spec, function (s) c(rep(TRUE, s@numOutcomes),
-                                             rep(FALSE, 5-s@numOutcomes)))
-  m2 <- mxModel(model="m2",
-                mxMatrix(name="ItemSpec", nrow=3, ncol=m2.numItems,
-                         values=sapply(m2.spec, function(m) slot(m,'spec')),
-                         free=FALSE, byrow=TRUE),
-                mxMatrix(name="ItemParam", nrow=5, ncol=m2.numItems,
-                         values=c(1, rep(0,4)),
-                         free=m2.param,
-                         lbound=c(1e-3,rep(-1e5,4))),
+  m2.maxParam <-max(sapply(m2.spec, rpf.numParam))
+  
+  ip.mat <- mxMatrix(name="ItemParam", nrow=m2.maxParam, ncol=m2.numItems,
+                     values=c(1, 1, rep(0, m2.maxParam-2)), free=FALSE)
+  ip.mat@labels[1,] <- 'a1'
+  ip.mat@free[1,] <- TRUE
+  for (ix in 1:m2.numItems) {
+    thr <- m2.spec[[ix]]@outcomes - 1
+    ip.mat@free[(2+thr):(1+2*thr), ix] <- TRUE
+  }
+  
+  #  m2.fmfit <- read.flexmirt("~/2012/sy/fm/ms-prm.txt")
+  #  ip.mat@values <- m2.fmfit$G1$param
+  
+  eip.mat <- mxAlgebra(ItemParam, name="EItemParam")
+  
+  m.mat <- mxMatrix(name="mean", nrow=1, ncol=1, values=0, free=FALSE)
+  cov.mat <- mxMatrix(name="cov", nrow=1, ncol=1, values=1, free=FALSE)
+  
+  m2 <- mxModel(model="m2", eip.mat, m.mat, cov.mat, ip.mat,
                 mxData(observed=m2.data, type="raw"),
-                mxExpectationBA81(
-                  ItemSpec="ItemSpec",
-                  ItemParam="ItemParam",
-                  GHpoints=27),
-                mxFitFunctionBA81())
-  m2 <- mxOption(m2, "Analytic Gradients", 'yes')
-  m2 <- mxOption(m2, "Verify level", '-1')
-  m2 <- mxOption(m2, "Function precision", '1.0E-5')
-  m2 <- mxOption(m2, "Calculate Hessian", "No")
-  m2 <- mxOption(m2, "Standard Errors", "No")
+                mxExpectationBA81(mean="mean", cov="cov",
+                                  ItemSpec=m2.spec,
+                                  ItemParam="ItemParam", EItemParam="EItemParam", scores="full"),
+                mxFitFunctionML(),
+                mxComputeIterate(steps=list(
+                  mxComputeOnce('expectation', context='EM'),
+                  #                  mxComputeGradientDescent(free.set='ItemParam', useGradient=TRUE),
+                  mxComputeNewtonRaphson(free.set='ItemParam'),
+                  mxComputeOnce('expectation'),
+                  mxComputeOnce('fitfunction', adjustStart=TRUE, free.set=c("mean", "cov"))
+                )))
+  #  m2 <- mxOption(m2, "Number of Threads", 1)
   m2 <- mxRun(m2)
-}, 'm2')
+}
+m2 <- cache(m2.estimate, 'm2')
 
 m2.items <- t(m2@matrices$ItemParam@values)
 rownames(m2.items) <- m2.item.names
-espt[m2.mask, "m2.score"] <- m2@output$ability[,1]
-espt[m2.mask, "m2.se"] <- m2@output$ability[,2]
+espt[m2.mask, "m2.score"] <- m2@expectation@scores.out[,1]
+espt[m2.mask, "m2.se"] <- m2@expectation@scores.out[,2]
 
 if (0) {
-  data.vs.model.booklet(function (name) {
+  dm.page <- function (name) {
     item.x <- match(name, m2.item.names)
     param <- m2@matrices$ItemParam@values[,item.x]
-    data.vs.model(m2.spec[[item.x]], param, m2.data, m2@output$ability[,1], name, plot.rug=TRUE) +
+    data.vs.model(m2.spec[[item.x]], param, m2.data, m2@expectation@scores.out[,1], name, plot.rug=TRUE) +
       labs(x = "familiarity",
            title = paste0(name, ", slope = ", round(param[1],2)))
-  }, m2.item.names)
+  }
+  data.vs.model.booklet(dm.page, m2.item.names)
 }
 
 if (0) {
@@ -121,7 +156,8 @@ if (0) {
                                           m=mean(slice$m2.score, na.rm=TRUE),
                                         sd=sd(slice$m2.score, na.rm=TRUE)))
   
-  plot.info(m2.spec, t(m2@matrices$ItemParam@values), m2.item.names, show.total=FALSE)
+  plot.info(m2.spec, t(m2@matrices$ItemParam@values), m2.item.names,
+            width=4, show.total=FALSE)
 }
 
 # compare two items
@@ -139,40 +175,18 @@ if (0) {
 if (0) rpf.mean.info(m2.spec, m2.items)
 
 ################################################################
-i1 <- rpf.gpcm(5)
-spec <- list()
-spec[1:10] <- i1
-items <- read.csv("sit21c/items.csv", stringsAsFactors=FALSE)
-items <- prepare.items(items)
-
-ms.scale.items <- items[,'name']
-ms.scale <- espt[,ms.scale.items]
-#table(apply(is.na(ms.scale), 1, sum))
-score.mask <- apply(is.na(ms.scale), 1, sum) == 0
-ms.scale <- ms.scale[score.mask,]
-parscale.export <- function (items) {
-  foo <- sapply(items, as.integer)
-  ms.responses <- apply(foo, 1, paste0, collapse='')
-  cat(sprintf("%s %s\n", espt[score.mask,'id'], ms.responses), file="ms.dat", sep='')
-  write.csv(foo, "ms.csv")
-}
-if (1) {
-  parscale.export(ms.scale)
-} else {
-  small.ms <- ms.scale
-  small.ms$msAccident <- NULL
-  small.ms$msPay <- NULL
-  parscale.export(small.ms)  
-}
-parscale.export.sim <- function () {
-  param <- list()
-  items <- list()
-  for (ix in 1:10) {
-    items[[ix]] <- i1
-    param[[ix]] <- c(1+ix/10, -.5+ix/10, -.25+ix/10, .5+ix/10, 2+ix/10)
-  }
-  foo <- rpf.sample(length(espt[score.mask,'id']), items, param)
-  parscale.export(foo)
+if (0) {
+  i1 <- rpf.gpcm(5)
+  spec <- list()
+  spec[1:10] <- i1
+  items <- read.csv("sit21c/items.csv", stringsAsFactors=FALSE)
+  items <- prepare.items(items)
+  
+  ms.scale.items <- items[,'name']
+  ms.scale <- espt[,ms.scale.items]
+  #table(apply(is.na(ms.scale), 1, sum))
+  score.mask <- apply(is.na(ms.scale), 1, sum) == 0
+  ms.scale <- ms.scale[score.mask,]
 }
 
 # compare sample distributions
@@ -188,9 +202,11 @@ if (0) {
 ##############################################
 # data vs model ICC plots
 # TODO add to vignette
-items <- read.csv("sit21c/items.csv", stringsAsFactors=FALSE)
-items <- prepare.items(items)
-items$name <- ms.scale.items
+if (0) {
+  items <- read.csv("sit21c/items.csv", stringsAsFactors=FALSE)
+  items <- prepare.items(items)
+  items$name <- ms.scale.items
+}
 
 if (0) {
   print.style <- theme_bw(base_size=16)
@@ -236,22 +252,20 @@ if (0) {
   scores <- espt$m2.score
   responses <- espt[,m2.item.names]
   
-  fit <- rpf.1dim.fit(m2.spec, m2.items, responses, scores, 2)
-  fit[order(-fit$outfit),]
+  fit <- rpf.1dim.fit(m2.spec, t(m2.items), responses, scores, 2, wh.exact=FALSE)
+  fit[order(-fit$infit),]
+  #fit[order(-fit$outfit),]
+  #mean(fit$infit)
+  #mean(fit$outfit)
+  write.csv(t(fit), "item-infit.csv")  
   
-  fit <- rpf.1dim.fit(m2.spec, m2.items, responses, scores, 1, wh.exact=FALSE)
-  resid <- rpf.1dim.stdresidual(m2.spec, m2.items, responses, scores)
+  fit <- rpf.1dim.fit(m2.spec, t(m2.items), responses, scores, 1, wh.exact=FALSE)
+  resid <- rpf.1dim.stdresidual(m2.spec, t(m2.items), responses, scores)
   
-  report <- cbind(scores, fit$infit, espt[,m2.item.names], resid)
+  report <- cbind(scores, fit$infit, fit$outfit, espt[,'wave'], espt[,m2.item.names], resid)
   write.csv(report, "person-infit.csv")  
   
   for (col in c('infit','infit.z','outfit','outfit.z')) {
     espt[[col]] <- fit[[col]]
   }
-}
-#fivenum(fit$infit)
-
-#options(width=300)
-if (0) {
-  write.csv(espt, "person-fit.csv")  
 }

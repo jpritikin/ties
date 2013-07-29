@@ -1,16 +1,25 @@
 #!/bin/sh
 
-./sm2r web-20120527.csv \
-  web-20120606.csv \
-  web-20130105.csv \
-  web-20130108.csv \
-  ppool-20121230.csv \
-  germano1.csv \
-  long-20130125.csv \
-  short-20130215.csv \
-  ppool-20130210.csv \
-  ppool-20130213.csv \
-  ppool-20130219.csv \
-  short-20130219.csv \
-  ppool-20130220-p.csv \
-  raw.csv
+#  germano1.csv
+
+input='web-20120527.csv
+  web-20120606.csv
+  web-20130105.csv
+  web-20130108.csv
+  ppool-20121230.csv
+  short-20130215.csv
+  ppool-20130210.csv
+  ppool-20130213.csv
+  ppool-20130219.csv
+  short-20130219.csv
+  ppool-20130220.csv
+  long-20130221.csv
+  long-20130226.csv
+  grad-20130725.csv
+  short-20130725-p.csv'
+
+sha1sum -c input.sha1
+
+./sm2r $input raw.csv
+
+./germano2013 >> raw.csv

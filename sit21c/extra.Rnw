@@ -231,46 +231,6 @@ print(xtable(fit.table))
 David Germano, Jean Hu, Michael Kubovy, Susanna Williams
 \end{frame}
 
-\begin{frame}
-
-How familiar are you with the notion of complete mental silence?
-
-\begin{itemize}
-\item This is the first time I have thought about it.
-\item The notion has crossed my mind, but I'm not sure what it means to me.
-\item I have discussed it with friends.
-\item I have read something about it.
-\item I study the topic with interest.
-\end{itemize}
-\end{frame}
-
-\begin{frame}
-
-I intentionally create favorable conditions to allow myself to experience complete mental silence.
-
-\begin{itemize}
-\item Agree
-\item Agree somewhat
-\item Not sure
-\item Disagree somewhat
-\item Disagree
-\end{itemize}
-
-\end{frame}
-
-\begin{frame}
-How certain are you about whether it is ethical to pay money in exchange for learning how to experience complete mental silence?
-
-\begin{itemize}
-\item This is the first time I have thought about it.
-\item The question has crossed my mind but I'm not sure.
-\item I have discussed it with friends but I'm not sure.
-\item I have a gut feeling about whether it is ethical.
-\item My mind is made up about whether it is ethical.
-\end{itemize}
-
-\end{frame}
-
 \bibliography{jpritikin} 
 \bibliographystyle{apacite}
 

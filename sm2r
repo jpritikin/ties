@@ -31,13 +31,13 @@ sub msItems {
 	'msAny'
     } elsif ($t2 =~ /others in a shared context/) {
 	'msShared'
-    } elsif ($t2 =~ /create favorable conditions to allow myself/) {
+    } elsif ($t2 eq 'I intentionally create favorable conditions to allow myself to experience complete mental silence.') {
 	'msEnv'
     } elsif ($t2 eq 'Do you know how to intentionally cause yourself to experience complete mental silence?') {
 	'msCause0'
     } elsif ($t2 eq 'I can intentionally cause myself to experience complete mental silence.') {
 	'msCause'
-    } elsif ($t2 =~ /teach other people/) {
+    } elsif ($t2 eq 'I am able to teach other people how to experience complete mental silence.') {
 	'msTeach'
     } elsif ($t2 =~ /possible for everybody/) {
 	'msEvery'
@@ -67,6 +67,10 @@ sub msItems {
 	'ignore'
     } elsif ($t2 eq 'Complete mental silence is not possible for anybody.') {
 	'ignore'
+    } elsif ($t2 eq 'I intentionally yearn for the experience of complete mental silence.') {
+	'msYearn'
+    } elsif ($t2 eq 'I can intentionally allow myself to experience complete mental silence.') {
+	'msAllow'
     }
 }
 
@@ -83,21 +87,31 @@ sub boredItems {
 
 # creates a map from col# to column name
 sub mapHeader {
-    my ($h1, $h2) = @_;
+    my ($h1, $h2, $file) = @_;
     my %map;
     for (my $c=0; $c < @$h1; $c++) {
 	my $c0 = $c;
 	while (!$h1->[$c0] and $c0 > 0) { --$c0 }
 	my $t1 = $h1->[$c0];
 	my $t2 = $h2->[$c] || '';
+	if ($t1 =~ /\s-\s/ and !$t2) {
+	    my @part = split(/\s-\s/, $t1);
+	    if (@part != 2) { die $t1 }
+	    $t1 = $part[0];
+	    $t2 = $part[1];
+	}
 	my $key = do {
 	    if ($t1 =~ /^(CollectorID|Email Address|First Name|LastName|Custom Data)$/) {
 		'ignore'
 	    } elsif ($t1 =~ /^(Duplicate|Time Taken|Response Status|Seq|External|Custom Var|Country Code|Region|This questionnaire)/) {
 		'ignore'
+	    } elsif ($t1 eq 'In order to link your responses before and after the class, please provide identifying information. Data will be anonymized after data collection is complete.') {
+		'ignore'
 	    } elsif ($t2 eq '' and $t1 =~ /^(Familiarity with)/) {
 		'ignore'
 	    } elsif ($t1 =~ /^Your experience of Complete Mental Silence/) {
+		'ignore'
+	    } elsif ($t1 eq 'Continuity') {
 		'ignore'
 	    } elsif ($t1 eq 'RespondentID' or $t1 eq 'Response ID') {
 		'id'
@@ -139,7 +153,7 @@ sub mapHeader {
 		'msTrainTeach'
 	    } elsif ($t1 eq 'Familiarity with boredom') {
 		boredItems($t2)
-	    } elsif ($t1 =~ /do not know how to intentionally cause yourself/) {
+	    } elsif ($t1 eq 'If you do not know how to intentionally cause yourself to experience complete mental silence, would it be useful to learn?') {
 		'wantLearn'
 	    } elsif ($t1 eq 'How often do you experience complete mental silence accidentally?') {
 		'ignore'
@@ -242,10 +256,17 @@ sub mapHeader {
 		$match
 	    }
 	};
-	if (!$key) {
-	    warn "$t1 | $t2";
-	} elsif ($key eq 'ignore') {
+	if ($t1 eq 'ignore') {
 	    #
+	} elsif (!$key) {
+	    warn "$file: $t1 | $t2";
+	} elsif ($key eq 'ignore') {
+	    our %Ignored;
+	    my $ikey = "$t1|$t2";
+	    if (!exists $Ignored{$ikey}) {
+		$Ignored{$ikey} = 1;
+		#warn "$t1 | $t2 ignored"
+	    }
 	} else {
 	    $map{$c} = $key
 	}
@@ -283,7 +304,7 @@ for my $file (@ARGV) {
     } else {
 	$h2 = $csv->getline($io);
     }
-    my $map = mapHeader($h1, $h2);
+    my $map = mapHeader($h1, $h2, $file);
     next if !$map;
     push @data, [$file, $io, $map];
     for my $k (values %$map) { ++$outMap->{$k} }
@@ -304,7 +325,7 @@ sub getHeader {
     while (my ($k,$v) = each %$h) {
 	$h[$v] = $k;
     }
-    push @h, qw(wave ip.continent ip.country ip.region ip.city); # for @extra
+    push @h, qw(wave ip.continent ip.country ip.region ip.city email); # for @extra
     \@h;
 }
 

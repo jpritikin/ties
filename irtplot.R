@@ -8,7 +8,7 @@ plot.info <- function(spec, param, i.name, width=3, show.total=TRUE) {
   for (ix in 1:length(spec)) {
     id <- i.name[ix]
     s <- spec[[ix]]
-    df[[id]] <- rpf.info(s, param[ix,1:s@numParam], grid)
+    df[[id]] <- rpf.info(s, param[ix,1:rpf.numParam(s)], t(grid))
     total <- total + df[[id]]
   }
   if (show.total) df$total <- total
@@ -22,25 +22,25 @@ plot.info <- function(spec, param, i.name, width=3, show.total=TRUE) {
 
 data.vs.model <- function(spec1, param, rawdata, score, item.name, width=3, data.bins=11, plot.rug=FALSE) {
   labels <- abbreviate(levels(rawdata[[item.name]]), minlength=16)
-
-  pm <- rpf.prob(spec1, param[1:spec1@numParam], seq(-width, width, .1))
+  
+  pm <- t(rpf.prob(spec1, param[1:rpf.numParam(spec1)], seq(-width, width, .1)))
   icc <- as.data.frame(melt(pm, varnames=c("theta",'category')))
   icc$theta <- seq(-width, width, .1)
   icc$category <- ordered(icc$category, labels=labels)
   icc$type <- 'model'
-  
+
   breaks <- seq(min(score, na.rm=TRUE),
                 max(score, na.rm=TRUE),
                 length.out=data.bins+1)
   bin <- unclass(cut(score, breaks, include.lowest = TRUE))
   
-  eout <- array(dim=c(data.bins, spec1@numOutcomes+1))
+  eout <- array(dim=c(data.bins, spec1@outcomes+1))
   est <- numeric(data.bins)
 
   for (px in 1:data.bins) {
     t <- table(rawdata[[item.name]][bin==px])
     est[px] <- sum(t)
-    eout[px,2:(spec1@numOutcomes+1)] <- t / sum(t)
+    eout[px,2:(spec1@outcomes+1)] <- t / sum(t)
   }
   eout[,1] <- ((c(breaks,0) + c(0,breaks))/2)[2:(data.bins+1)]
 
@@ -91,7 +91,7 @@ data.vs.model.booklet <- function (plot.fn, args) {
     }
   }
   if (length(plots)) flush.plots(plots,page)
-  system("pdfjoin -q gen/data.vs.model-* -o data.vs.model.pdf")
+  system("pdfunite  gen/data.vs.model-*  data.vs.model.pdf")
 }
 
 ## name <- 'msCause'
