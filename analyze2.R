@@ -88,10 +88,20 @@ m2.data <- m2.data[m2.mask,]
 for (c in colnames(m2.data)) { attr(m2.data[,c], 'mxFactor') <- attr(espt[,c], 'mxFactor') }
 
 if (0) {
+  g.wave1 <- espt[,'wave'] == 'germano2013-1'
+  g.wave2 <- espt[,'wave'] == 'germano2013-2'
+  g.wave3 <- espt[,'wave'] == 'germano2013-3'
+  other <- !(g.wave1 | g.wave2 | g.wave3)
+  col.mask <- apply(!is.na(m2.data[g.wave1[m2.mask],]), 2, any)
+  which(apply(!is.na(m2.data[g.wave1[m2.mask],]), 2, any))
+  
   m2.fm <- sapply(m2.data, unclass) - 1
-  require(mirt)
-  mirt.fit <- mirt(m2.fm, 1, itemtype="gpcm", D=1)
-#  m2.fm[is.na(m2.fm)] <- -9
+  m2.fm[is.na(m2.fm)] <- -9
+  write.table(m2.fm[g.wave1[m2.mask],col.mask], file="fm-ms-g1.csv", row.names=FALSE, col.names=FALSE, quote=FALSE)
+  write.table(m2.fm[g.wave2[m2.mask],col.mask], file="fm-ms-g2.csv", row.names=FALSE, col.names=FALSE, quote=FALSE)
+  write.table(m2.fm[g.wave3[m2.mask],col.mask], file="fm-ms-g3.csv", row.names=FALSE, col.names=FALSE, quote=FALSE)
+  write.table(m2.fm[other[m2.mask],col.mask], file="fm-ms-main.csv", row.names=FALSE, col.names=FALSE, quote=FALSE)
+  
 #  write.table(m2.fm, file="ms-data.csv", row.names=FALSE, col.names=FALSE, quote=FALSE)
   
 }
@@ -146,7 +156,7 @@ if (0) {
     param <- m2@matrices$ItemParam@values[,item.x]
     data.vs.model(m2.spec[[item.x]], param, m2.data, m2@expectation@scores.out[,1], name, plot.rug=TRUE) +
       labs(x = "familiarity",
-           title = paste0(name, ", slope = ", round(param[1],2)))
+           title = paste0(item.x,": ",name, ", slope = ", round(param[1],2)))
   }
   data.vs.model.booklet(dm.page, m2.item.names)
 }

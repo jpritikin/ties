@@ -1,0 +1,73 @@
+<Project>
+  Title = "MS";
+  Description = "MS Desc";
+
+<Options>
+  Mode = Calibration;
+  Progress = No;
+  SavePRM = Yes;
+  Quadrature = 21, 5.0;
+  Processors = 2;
+  FactorLoadings = Yes;
+
+<Groups>
+  %G1%
+  File = "ms-data.csv";
+  Varnames = i1-i22;
+  Missing = -9;
+  N = 1940;
+  Dimensions = 2;
+
+  Ncats(i1-i22) = 5;
+  Ncats(i2, i6, i13-i14) = 4;
+  Ncats(i5) = 3;
+
+  Model(i1-i22) = Nominal(5);
+  Model(i2,i6,i13-i14) = Nominal(4);
+  Model(i5) = Nominal(3);
+
+  Tc(i1-i22) = 
+  (
+    0  0  0  0,
+   -1  0  0  0,
+   -1 -1  0  0,
+   -1 -1 -1  0,
+   -1 -1 -1 -1
+  );
+
+  Tc(i2,i6,i13-i14) = 
+  (
+    0  0  0,
+   -1  0  0,
+   -1 -1  0,
+   -1 -1 -1
+  );
+
+  Tc(i5) = 
+  (
+    0  0,
+   -1  0,
+   -1 -1
+  );
+
+<Constraints> 
+  Fix (i5), ScoringFn;
+  Fix (i2,i6,i13-i14), ScoringFn;
+  Fix (i1,i3-i4,i7-i12,i15-i22), ScoringFn;
+
+  Fix (i1-i22), Slope;
+
+  // 1 == knowledge
+  // 2 == desire
+  Free (i2-i5,i14-i22), Slope(1);
+  Free (i1,i4,i5-i17,i19), Slope(2);
+
+//  Equal (i2-i5,i14-i22), Slope(1);
+//  Equal (i1,i4,i5-i17,i19), Slope(2);
+
+  Free (i1-i22), Intercept(1);
+  Free (i1-i22), Intercept(2);
+  Free (i2,i6,i13-i14), Intercept(3);
+  Free (i1,i3-i4,i7-i12,i15-i22), Intercept(4);
+
+  Free Cov(2,1);

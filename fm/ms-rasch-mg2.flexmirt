@@ -1,0 +1,166 @@
+<Project>
+  Title = "MS";
+  Description = "MS Desc";
+
+<Options>
+  Mode = Calibration;
+  Progress = No;
+  SavePRM = Yes;
+
+<Groups>
+  %Main%
+  File = "fm-ms-main.csv";
+  Varnames = i1,i4,i6,i13-i14,i16-i18,i20-i22;  // remove i2, i3, i5, i7-i12, i15, i19
+  Missing = -9;
+  N = 1396;
+
+  Ncats(i1,i4,i6,i13-i14,i16-i18,i20-i22) = 5;
+  Ncats(i6, i13-i14) = 4;
+
+  Model(i1,i4,i6,i13-i14,i16-i18,i20-i22) = Nominal(5);
+  Model(i6,i13-i14) = Nominal(4);
+
+  Tc(i1,i4,i6,i13-i14,i16-i18,i20-i22) = 
+  (
+    0  0  0  0,
+   -1  0  0  0,
+   -1 -1  0  0,
+   -1 -1 -1  0,
+   -1 -1 -1 -1
+  );
+
+  Tc(i6,i13-i14) = 
+  (
+    0  0  0,
+   -1  0  0,
+   -1 -1  0,
+   -1 -1 -1
+  );
+
+  %G1%
+  File = "fm-ms-g1.csv";
+  Varnames = i1,i4,i6,i13-i14,i16-i18,i20-i22;
+  Missing = -9;
+  N = 175;
+
+  Ncats(i1,i4,i6,i13-i14,i16-i18,i20-i22) = 5;
+  Ncats(i6, i13-i14) = 4;
+
+  Model(i1,i4,i6,i13-i14,i16-i18,i20-i22) = Nominal(5);
+  Model(i6,i13-i14) = Nominal(4);
+
+  Tc(i1,i4,i6,i13-i14,i16-i18,i20-i22) = 
+  (
+    0  0  0  0,
+   -1  0  0  0,
+   -1 -1  0  0,
+   -1 -1 -1  0,
+   -1 -1 -1 -1
+  );
+
+  Tc(i6,i13-i14) = 
+  (
+    0  0  0,
+   -1  0  0,
+   -1 -1  0,
+   -1 -1 -1
+  );
+
+  %G2%
+  File = "fm-ms-g2.csv";
+  Varnames = i1,i4,i6,i13-i14,i16-i18,i20-i22;
+  Missing = -9;
+  N = 191;
+
+  Ncats(i1,i4,i6,i13-i14,i16-i18,i20-i22) = 5;
+  Ncats( i6, i13-i14) = 4;
+
+  Model(i1,i4,i6,i13-i14,i16-i18,i20-i22) = Nominal(5);
+  Model(i6,i13-i14) = Nominal(4);
+
+  Tc(i1,i4,i6,i13-i14,i16-i18,i20-i22) = 
+  (
+    0  0  0  0,
+   -1  0  0  0,
+   -1 -1  0  0,
+   -1 -1 -1  0,
+   -1 -1 -1 -1
+  );
+
+  Tc(i6,i13-i14) = 
+  (
+    0  0  0,
+   -1  0  0,
+   -1 -1  0,
+   -1 -1 -1
+  );
+
+  %G3%
+  File = "fm-ms-g3.csv";
+  Varnames = i1,i4,i6,i13-i14,i16-i18,i20-i22;
+  Missing = -9;
+  N = 178;
+
+  Ncats(i1,i4,i6,i13-i14,i16-i18,i20-i22) = 5;
+  Ncats(i6, i13-i14) = 4;
+
+  Model(i1,i4,i6,i13-i14,i16-i18,i20-i22) = Nominal(5);
+  Model(i6,i13-i14) = Nominal(4);
+
+  Tc(i1,i4,i6,i13-i14,i16-i18,i20-i22) = 
+  (
+    0  0  0  0,
+   -1  0  0  0,
+   -1 -1  0  0,
+   -1 -1 -1  0,
+   -1 -1 -1 -1
+  );
+
+  Tc(i6,i13-i14) = 
+  (
+    0  0  0,
+   -1  0  0,
+   -1 -1  0,
+   -1 -1 -1
+  );
+
+<Constraints> 
+  Fix Main, (i6,i13-i14), ScoringFn;
+  Fix Main, (i1,i4,i16-i18,i20-i22), ScoringFn;
+  Fix G1, (i6,i13-i14), ScoringFn;
+  Fix G1, (i1,i4,i16-i18,i20-i22), ScoringFn;
+  Fix G2, (i6,i13-i14), ScoringFn;
+  Fix G2, (i1,i4,i16-i18,i20-i22), ScoringFn;
+  Fix G3, (i6,i13-i14), ScoringFn;
+  Fix G3, (i1,i4,i16-i18,i20-i22), ScoringFn;
+
+  Equal Main, (i1,i4,i6,i13-i14,i16-i18,i20-i22), Slope : G1, (i1,i4,i6,i13-i14,i16-i18,i20-i22), Slope : G2, (i1,i4,i6,i13-i14,i16-i18,i20-i22), Slope : G3, (i1,i4,i6,i13-i14,i16-i18,i20-i22), Slope;
+
+  Free Main, (i1,i4,i6,i13-i14,i16-i18,i20-i22), Intercept(1);
+  Free Main, (i1,i4,i6,i13-i14,i16-i18,i20-i22), Intercept(2);
+  Free Main, (i6,i13-i14), Intercept(3);
+  Free Main, (i1,i4,i16-i18,i20-i22), Intercept(4);
+  Free G1, (i1,i4,i6,i13-i14,i16-i18,i20-i22), Intercept(1);
+  Free G1, (i1,i4,i6,i13-i14,i16-i18,i20-i22), Intercept(2);
+  Free G1, (i6,i13-i14), Intercept(3);
+  Free G1, (i1,i4,i16-i18,i20-i22), Intercept(4);
+  Free G2, (i1,i4,i6,i13-i14,i16-i18,i20-i22), Intercept(1);
+  Free G2, (i1,i4,i6,i13-i14,i16-i18,i20-i22), Intercept(2);
+  Free G2, (i6,i13-i14), Intercept(3);
+  Free G2, (i1,i4,i16-i18,i20-i22), Intercept(4);
+  Free G3, (i1,i4,i6,i13-i14,i16-i18,i20-i22), Intercept(1);
+  Free G3, (i1,i4,i6,i13-i14,i16-i18,i20-i22), Intercept(2);
+  Free G3, (i6,i13-i14), Intercept(3);
+  Free G3, (i1,i4,i16-i18,i20-i22), Intercept(4);
+
+  Equal Main, (i1,i4,i6,i13-i14,i16-i18,i20-i22), Intercept(1) : G1, (i1,i4,i6,i13-i14,i16-i18,i20-i22), Intercept(1) : G2, (i1,i4,i6,i13-i14,i16-i18,i20-i22), Intercept(1) : G3, (i1,i4,i6,i13-i14,i16-i18,i20-i22), Intercept(1);
+  Equal Main, (i1,i4,i6,i13-i14,i16-i18,i20-i22), Intercept(2) : G1, (i1,i4,i6,i13-i14,i16-i18,i20-i22), Intercept(2) : G2, (i1,i4,i6,i13-i14,i16-i18,i20-i22), Intercept(2) : G3, (i1,i4,i6,i13-i14,i16-i18,i20-i22), Intercept(2);
+  Equal Main, (i6,i13-i14), Intercept(3) : G1, (i6,i13-i14), Intercept(3) : G2, (i6,i13-i14), Intercept(3) : G3, (i6,i13-i14), Intercept(3);
+  Equal Main, (i1,i4,i16-i18,i20-i22), Intercept(4) : G1, (i1,i4,i16-i18,i20-i22), Intercept(4) : G2, (i1,i4,i16-i18,i20-i22), Intercept(4) : G3, (i1,i4,i16-i18,i20-i22), Intercept(4);
+
+  Free G1, Mean(1);
+  Free G1, Cov(1,1);
+  Free G2, Mean(1);
+  Free G2, Cov(1,1);
+  Free G3, Mean(1);
+  Free G3, Cov(1,1);
