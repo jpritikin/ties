@@ -1,13 +1,13 @@
 #!/bin/sh
 tail --lines=+4 $0 | markdown | ssh jnp3bc@blue.unix.virginia.edu 'cat > public_html/subjectiveTime/debrief-uva.html'
 exit
-<head><title>Extremes of subjective passage of time</title></head>
+<head><title>Mental silence disposition scale</title></head>
 <div style="float: right; border: thin black solid; padding: 1ex; margin: .5ex; font-size: 125%;">
 <a href="http://www.virginia.edu/vpr/irb/sbs">IRB-SBS Identification</a><br/>
 Protocol #2012-0156-00<br/>
 Approved from 2012 Sep 10 to 2014 Apr 30
 </div>
-<big>Debriefing Form<br/><big><strong>Extremes of subjective passage of time</strong></big></big>
+<big>Debriefing Form<br/><big><strong>Mental silence disposition scale</strong></big></big>
 
 Thank you for agreeing to participate in this study!
 
@@ -25,28 +25,13 @@ whether participants experience complete mental silence.
 Remarkably, the experience of complete mental silence is practically
 unstudied in psychology.
 
-As a first step, the questions on familiarity with mental silence will
-be analyzed using [Item Response
+Participant responses will be analyzed using [Item Response
 Theory](http://en.wikipedia.org/wiki/Item_response_theory) to develop
 a scale that other researchers can use with confidence. To the best of
 our knowledge, no scale has been developed to assess this construct. A
 psychometically investigated scale will permit exploration of many
 questions such as the distribution of familiarity of mental silence
 within various populations.
-
-Recent reference works on positive psychology make no mention of
-mental silence. Our hypothesis is that mental silence is a prevalent
-and important component of various contexts like religion,
-spirituality, and meditation. Some people have suggested that mental
-silence adds a new dimension to awareness. If so, then people familiar
-with mental silence may experience mental silence during work,
-physical exercise, or daydreaming.
-
-Csikszentmihalyi suggested that yoga is "one of the oldest and most
-systematic methods of producing the flow experience" (1991). However,
-little is known about the relationship between yoga and flow. This
-study hopes to begin to explore how mental silence relates to flow and
-generate more specific hypotheses about this relationship.
 
 Thank you for your participation in this study.  If you have further
 questions about the study, please contact Joshua Pritikin (434)
