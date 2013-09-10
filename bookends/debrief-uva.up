@@ -1,5 +1,5 @@
 #!/bin/sh
-tail --lines=+4 $0 | markdown | ssh jnp3bc@blue.unix.virginia.edu 'cat > public_html/subjectiveTime/debrief-uva.html'
+tail --lines=+4 $0 | markdown > $HOME/uva/public_html/subjectiveTime/debrief-uva.html
 exit
 <head><title>Mental silence disposition scale</title></head>
 <div style="float: right; border: thin black solid; padding: 1ex; margin: .5ex; font-size: 125%;">
@@ -9,7 +9,7 @@ Approved from 2012 Sep 10 to 2014 Apr 30
 </div>
 <big>Debriefing Form<br/><big><strong>Mental silence disposition scale</strong></big></big>
 
-Thank you for agreeing to participate in this study!
+Thank you participating in this study!
 
 Meditation has two distinct meanings. One meaning of meditation refers
 to a psychological centering device such as mantra recitation, focus
@@ -24,6 +24,8 @@ whether participants experience complete mental silence.
 
 Remarkably, the experience of complete mental silence is practically
 unstudied in psychology.
+An educational benefit of this questionnaire is to demonstrate
+how to ask people about ephemeral psychological states like mental silence.
 
 Participant responses will be analyzed using [Item Response
 Theory](http://en.wikipedia.org/wiki/Item_response_theory) to develop
@@ -32,6 +34,11 @@ our knowledge, no scale has been developed to assess this construct. A
 psychometically investigated scale will permit exploration of many
 questions such as the distribution of familiarity of mental silence
 within various populations.
+Another an educational benefit of this study is to suggest
+[Item Response
+Theory](http://en.wikipedia.org/wiki/Item_response_theory) as
+a suitable analysis technique for the kind of data obtained
+in this questionnaire.
 
 Thank you for your participation in this study.  If you have further
 questions about the study, please contact Joshua Pritikin (434)
