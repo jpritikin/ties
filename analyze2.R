@@ -11,10 +11,10 @@ options(error = utils::recover)
 source("prepare.R")
 source('irtplot.R')
 espt <- read.csv("raw.csv", stringsAsFactors=FALSE)
-scores <- read.csv("sit21c/scores.csv", stringsAsFactors=FALSE)
-espt <- prepare.espt(espt, scores)
+espt <- prepare.espt(espt)
+save(espt, file="espt.rda")
 
-########################################################
+#######################################################
 # demographics
 
 # do participants accurately self report their location? looks good:
@@ -122,16 +122,14 @@ m2.estimate <- function () {
   #  m2.fmfit <- read.flexmirt("~/2012/sy/fm/ms-prm.txt")
   #  ip.mat@values <- m2.fmfit$G1$param
   
-  eip.mat <- mxAlgebra(ItemParam, name="EItemParam")
-  
   m.mat <- mxMatrix(name="mean", nrow=1, ncol=1, values=0, free=FALSE)
   cov.mat <- mxMatrix(name="cov", nrow=1, ncol=1, values=1, free=FALSE)
   
-  m2 <- mxModel(model="m2", eip.mat, m.mat, cov.mat, ip.mat,
+  m2 <- mxModel(model="m2", m.mat, cov.mat, ip.mat,
                 mxData(observed=m2.data, type="raw"),
                 mxExpectationBA81(mean="mean", cov="cov",
                                   ItemSpec=m2.spec,
-                                  ItemParam="ItemParam", EItemParam="EItemParam", scores="full"),
+                                  ItemParam="ItemParam", scores="full"),
                 mxFitFunctionML(),
                 mxComputeIterate(steps=list(
                   mxComputeOnce('expectation', context='EM'),
@@ -149,6 +147,16 @@ m2.items <- t(m2@matrices$ItemParam@values)
 rownames(m2.items) <- m2.item.names
 espt[m2.mask, "m2.score"] <- m2@expectation@scores.out[,1]
 espt[m2.mask, "m2.se"] <- m2@expectation@scores.out[,2]
+
+if (0) {
+  got <- list()
+  for (item in m2.item.names) {
+    for (l in levels(espt[[item]])) {
+      got[[paste(item, l, sep="=")]] <- mean(espt[espt[[item]] == l, 'm2.score'], na.rm=TRUE)
+    }
+  }
+  do.call(rbind, got)
+}
 
 if (0) {
   dm.page <- function (name) {

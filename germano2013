@@ -99,7 +99,7 @@ sub flush_data {
     my ($email, $end, $data) = @_;
     return if $email eq 'sw9uw@virginia.edu'; # researcher
     if (!exists $Demog{$email}) {
-	warn "$email not found in demographics";
+	#warn "$email not found in demographics"; TODO
 	#return;
     }
     if ($email eq 'lx4ue@virginia.edu') {

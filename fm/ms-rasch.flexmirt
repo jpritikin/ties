@@ -6,6 +6,7 @@
   Mode = Calibration;
   Progress = No;
   SavePRM = Yes;
+  GOF = Extended;
 
 <Groups>
   %G1%

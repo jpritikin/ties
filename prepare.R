@@ -144,6 +144,12 @@ prepare.espt <- function(espt, scores) {
     obsolete <- difftime(when, revision1)
     head(espt[obsolete, 'msAccident'])
   }
+  
+  ethical.mask <- !is.na(espt$msPay) & !is.na(espt$msPaySure)
+  ethical.levels <- apply(expand.grid(levels(espt$msPay), levels(espt$msPaySure)), 1, paste, collapse="+")
+  espt$ethical[ethical.mask] <- apply(as.matrix(espt[ethical.mask, c("msPay", "msPaySure")]),
+                                    1, paste, collapse="+")
+  espt$ethical <- mxFactor(espt$ethical, levels=ethical.levels)
 
   return(espt)
 }
