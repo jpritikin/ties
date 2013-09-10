@@ -101,7 +101,7 @@ sub mapHeader {
 	    $t2 = $part[1];
 	}
 	my $key = do {
-	    if ($t1 =~ /^(CollectorID|Email Address|First Name|LastName|Custom Data)$/) {
+	    if ($t1 =~ /^(CollectorID|First Name|LastName|Custom Data)$/) {
 		'ignore'
 	    } elsif ($t1 =~ /^(Duplicate|Time Taken|Response Status|Seq|External|Custom Var|Country Code|Region|This questionnaire)/) {
 		'ignore'
@@ -118,6 +118,14 @@ sub mapHeader {
 	    } elsif ($t1 eq 'Email Group Code') {
 		'groupcode'
 	    } elsif ($t1 eq 'Respondent Email') {
+		'email'
+	    } elsif ($t1 eq 'Email Address') {
+		'email'
+	    } elsif ($t1 eq 'Phone') {
+		'ignore'
+	    } elsif ($t1 eq 'Address') {
+		'ignore'
+	    } elsif ($t1 eq 'If you are a University of Virginia undergraduate participating via the UVa Psychology Participants subject pool, you must enter your UVa email address to receive class participation credit (e.g., jnp3bc@virginia.edu).') {
 		'email'
 	    } elsif ($t1 eq 'StartDate') {
 		'ignore'
@@ -325,7 +333,7 @@ sub getHeader {
     while (my ($k,$v) = each %$h) {
 	$h[$v] = $k;
     }
-    push @h, qw(wave ip.continent ip.country ip.region ip.city email); # for @extra
+    push @h, qw(wave ip.continent ip.country ip.region ip.city); # for @extra
     \@h;
 }
 
@@ -350,14 +358,19 @@ for my $waveinfo (@data) {
 	    if ($key eq 'groupcode' and $value !~ /^LIST/) {
 		$skip = 1;
 	    }
-	    if ($key eq 'id') {
+	    if ($key eq 'id' and $value ne '') {
 		if (exists $ID{$value}) {
 		    warn("ID $value observed ". ++$ID{$value});
 		} else {
 		    $ID{$value} = 1;
 		}
 	    }
-	    if ($key eq 'email') {
+	    if (0 and $key eq 'email') {
+		if ($value eq 'jnp3bc@virginia.edu' or $value =~ /^throwaway/) {
+		    warn "Ignoring $value";
+		    $skip = 1;
+		}
+		# anonymizer
 		if (exists $PersonMap{$value}) {
 		    $value = $PersonMap{$value};
 		} else {
