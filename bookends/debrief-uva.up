@@ -1,5 +1,5 @@
 #!/bin/sh
-tail --lines=+4 $0 | markdown > $HOME/uva/public_html/subjectiveTime/debrief-uva.html
+tail --lines=+4 $0 | markdown > $HOME/UVa/public_html/subjectiveTime/debrief-uva.html
 exit
 <head><title>Mental silence disposition scale</title></head>
 <div style="float: right; border: thin black solid; padding: 1ex; margin: .5ex; font-size: 125%;">
@@ -9,7 +9,7 @@ Approved from 2012 Sep 10 to 2014 Apr 30
 </div>
 <big>Debriefing Form<br/><big><strong>Mental silence disposition scale</strong></big></big>
 
-Thank you participating in this study!
+Thank you for participating in this study!
 
 Meditation has two distinct meanings. One meaning of meditation refers
 to a psychological centering device such as mantra recitation, focus
