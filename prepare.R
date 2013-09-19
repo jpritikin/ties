@@ -37,7 +37,7 @@ prepare.espt <- function(espt, scores) {
                      'My mind is made up about whether it is ethical.')
   for (col in c('msAny','msMet','msYearn','msAllow',
                 'msShared','msEnv','msCause','msTeach','msEvery','msPay',
-                'msTrainTeach', 'msAfraid', 'msEmo', 'msLife', 'msFast',
+                'msTrainTeach', 'msAfraid', 'msEmo', 'msLife', 'msFast', 'msEffort',
                 'msDescarte', 'msIdentity')) {
     if (!any(colnames(espt) == col)) {
 #      warning(paste(col, "not found, skipping"))
@@ -46,7 +46,7 @@ prepare.espt <- function(espt, scores) {
     levels <- agreement.levels
     revraw <- FALSE
     if (is.na(match(col, c('msNotAny', 'msNotSelf', 'msPay',
-                         'msAfraid', 'msEmo', 'msLife', 'msFast',
+                         'msAfraid', 'msEmo', 'msLife', 'msFast', 'msEffort',
                          'msDescarte', 'msIdentity')))) {
       levels <- rev(levels)
       revraw <- TRUE

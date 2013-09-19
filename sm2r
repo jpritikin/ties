@@ -53,6 +53,8 @@ sub msItems {
 	'msLife'
     } elsif ($t2 =~ /never slow down long enough to experience complete mental silence/) {
 	'msFast'
+    } elsif ($t2 eq 'It takes too much effort for me to experience complete mental silence.') {
+	'msEffort'
     } elsif ($t2 =~ /Descartes said, "I think therefore I am."/) {
 	'msDescarte'
     } elsif ($t2 =~ /experience complete mental silence then I may lose an important aspect of who I am/) {
@@ -162,6 +164,8 @@ sub mapHeader {
 	    } elsif ($t1 eq 'Familiarity with boredom') {
 		boredItems($t2)
 	    } elsif ($t1 eq 'If you do not know how to intentionally cause yourself to experience complete mental silence, would it be useful to learn?') {
+		'wantLearn'  # TODO compare item param before/after phrasing change TODO
+	    } elsif ($t1 eq 'If you do not know how to intentionally cause yourself to experience complete mental silence, do you want to learn?') {
 		'wantLearn'
 	    } elsif ($t1 eq 'How often do you experience complete mental silence accidentally?') {
 		'ignore'

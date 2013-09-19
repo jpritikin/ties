@@ -17,7 +17,8 @@ input='web-20120527.csv
   long-20130226.csv
   grad-20130725.csv
   short-20130725.csv
-  yogaville/201309.csv'
+  yogaville/201309.csv
+  ppool-20130919.csv'
 
 sha1sum -c input.sha1
 
