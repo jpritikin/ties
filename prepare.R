@@ -1,22 +1,17 @@
 library(OpenMx)
 
-lax.ordered <- function(df, col, levels, rawrev=FALSE) {
-  if (all(is.na(df[[col]]))) {
-    return(df[[col]])
-  }
+lax.ordered <- function(df, col, levels, old.levels=c()) {
+    if (!missing(old.levels)) {
+        if (any(!is.na(match(old.levels, levels)))) stop("levels and old.levels overlap")
+        df[[col]][which(!is.na(match(df[[col]], old.levels)))] <- ''
+    }
   levels <- tolower(levels)
-  is.raw <- str_detect(df[[col]], "^\\d$")
-  is.raw[is.na(is.raw)] <- FALSE
-  if (rawrev) {
-    df[[col]][is.raw] <- 1 + length(levels) - as.numeric(df[[col]][is.raw])
-  }
-  df[[col]][!is.raw] <- tolower(df[[col]][!is.raw])
-  no.match <- is.na(match(df[[col]][!is.raw], c('',levels)))
+  df[[col]] <- tolower(df[[col]])
+  no.match <- is.na(match(df[[col]], c('',levels)))
   if (any(no.match)) {
-    stop(paste("In", col, "unknown levels:", unique(df[[col]][!is.raw][no.match])))
+    stop(paste("In", col, "unknown levels:", unique(df[[col]][no.match])))
   }
-  df[[col]][!is.raw] <- mxFactor(df[[col]][!is.raw], levels=levels)
-  mxFactor(df[[col]], levels=1:length(levels), labels=levels)
+  df[[col]] <- mxFactor(df[[col]], levels=levels)
 }
 
 prepare.espt <- function(espt, scores) {
@@ -49,9 +44,8 @@ prepare.espt <- function(espt, scores) {
                          'msAfraid', 'msEmo', 'msLife', 'msFast', 'msEffort',
                          'msDescarte', 'msIdentity')))) {
       levels <- rev(levels)
-      revraw <- TRUE
     }
-    espt[[col]] <- lax.ordered(espt, col, levels, revraw)
+    espt[[col]] <- lax.ordered(espt, col, levels)
   }
 
   if (any(colnames(espt) == 'msNotion')) {
@@ -64,9 +58,12 @@ prepare.espt <- function(espt, scores) {
   cause0.levels <- c('Yes', 'No, but working on it', 'No, I do not')
   espt$msCause0 <- lax.ordered(espt, 'msCause0', rev(cause0.levels))
 
-  learn.levels <- c('No', 'Not Sure', 'Yes',
+  learn.levels <- c('No', 'Not Sure',
+                    'Yes, if it was easy to learn',
+                    'Yes, I am moderately curious',
+                    'Yes, I am keenly curious',
                     "I know how to cause myself to experience complete mental silence.")
-  espt$wantLearn <- lax.ordered(espt, 'wantLearn', learn.levels)
+  espt$wantLearn <- lax.ordered(espt, 'wantLearn', learn.levels, c('Yes'))
 
   freqCause.levels <- c("I don't try to cause myself to experience complete mental silence",
                         'Infrequently', 'Weekly', 'Daily')
@@ -77,14 +74,14 @@ prepare.espt <- function(espt, scores) {
   espt$msFreq <- lax.ordered(espt, 'msFreq', msFreq.levels)
 
   maxDuration.levels <- c('A moment (e.g., a second or shorter)',
-                          '10 seconds',
-                          '1-2 minutes',
-                          'More than 10 minutes',
-                          'I have not experienced complete mental silence')
-  espt$maxDuration <- lax.ordered(espt, 'maxDuration', maxDuration.levels)
-  # remove old data
-  espt$maxDuration[espt$maxDuration=='i have not experienced complete mental silence'] <- NA
-  espt$maxDuration <- mxFactor(espt$maxDuration, levels(espt$maxDuration)[1:4])
+                          'Longer than a moment but shorter than 10 seconds',
+                          'Between 10 seconds and 1 minute',
+                          'Between 1 minute and 10 minutes',
+                          'More than 10 minutes')
+  maxDuration.oldlevels <- c('10 seconds',
+                             '1-2 minutes',
+                             'I have not experienced complete mental silence')
+  espt$maxDuration <- lax.ordered(espt, 'maxDuration', maxDuration.levels, maxDuration.oldlevels)
 
   boredom.levels <- c('True','Not sure','False')
   for (col in c('boreFidget', 'boreCheer', 'boreLone')) {
