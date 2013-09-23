@@ -130,7 +130,7 @@ sub mapHeader {
 	    } elsif ($t1 eq 'If you are a University of Virginia undergraduate participating via the UVa Psychology Participants subject pool, you must enter your UVa email address to receive class participation credit (e.g., jnp3bc@virginia.edu).') {
 		'email'
 	    } elsif ($t1 eq 'StartDate') {
-		'ignore'
+		'start'
 	    } elsif ($t1 eq 'EndDate' or $t1 =~ /^Timestamp/) {
 		'end'
 	    } elsif ($t1 eq 'IP Address' or $t1 eq 'IP Address') {
@@ -169,7 +169,7 @@ sub mapHeader {
 		'wantLearn'
 	    } elsif ($t1 eq 'How often do you experience complete mental silence accidentally?') {
 		'ignore'
-	    } elsif ($t1 =~ /often do you try to intentionally cause/) {
+	    } elsif ($t1 =~ /How often do you try to intentionally cause yourself to experience complete mental silence/) {
 		'freqCause'
 	    } elsif ($t1 =~ /what percentage of the time are you successful/) {
 		'pctSuccess'
@@ -179,7 +179,7 @@ sub mapHeader {
 		'msFreq'
 	    } elsif ($t1 =~ /characterize the actual duration of your experience/) {
 		'durationCharacter'
-	    } elsif ($t1 =~ /actual time did your longest experience/) {
+	    } elsif ($t1 eq 'Approximately how much actual time did your longest experience of complete mental silence last?') {
 		'maxDuration'
 	    } elsif ($t1 =~ /practice religion/) {
 		'religion'
@@ -337,21 +337,41 @@ sub getHeader {
     while (my ($k,$v) = each %$h) {
 	$h[$v] = $k;
     }
-    push @h, qw(wave ip.continent ip.country ip.region ip.city); # for @extra
+    push @h, qw(wave instrument ip.continent ip.country ip.region ip.city); # for @extra
     \@h;
 }
 
 $csv->print($out, getHeader($outMap));
 
+our %Instrument = ('web-20120527.csv' => '2012-05-22',
+		   'web-20120606.csv' => '2012-05-27',
+		   'web-20130105.csv' => '2012-06-06',
+		   'web-20130108.csv' => '2012-06-06',
+		   'ppool-20121230.csv' => '2012-06-06',
+		   'short-20130215.csv' => '2013-01-09',
+		   'ppool-20130210.csv' => '2013-01-09',
+		   'ppool-20130213.csv' => '2013-02-12',  # added interest page
+		   'ppool-20130219.csv' => '2013-02-13',
+		   'short-20130219.csv' => '2013-02-13',
+		   'ppool-20130220.csv' => '2013-02-19',
+		   'long-20130221.csv' => '2013-02-19',
+		   'long-20130226.csv' => '2013-02-19',
+		   'grad-20130725.csv' => '2013-07-25',
+		   'short-20130725.csv' => '2013-07-25',
+		   'yogaville/201309.csv' => '2012-11-01',
+		   'ppool-20130912.csv' => '2013-08-15',
+		   'ppool-20130919.csv' => '2013-09-12');
 our %ID;
 
 for my $waveinfo (@data) {
     my ($file, $io, $map) = @$waveinfo;
     while (my $row = $csv->getline($io)) {
 	my @outRow = ('') x scalar(keys(%$outMap));
+	my $instr = $Instrument{$file};
+	die "Which instrument for $file" if !length $instr;
 	my $wavename = $file;
 	$wavename =~ s/\.csv$//;
-	my @extra = ($wavename);
+	my @extra = ($wavename, $instr);
 	my $skip;
 	for my $sk (keys %$map) {
 	    my $value = $row->[$sk];

@@ -9,10 +9,11 @@ options(jrsCacheDir='.cache')
 options(error = utils::recover)
 
 source("prepare.R")
-source('irtplot.R')
 espt <- read.csv("raw.csv", stringsAsFactors=FALSE)
 espt <- prepare.espt(espt)
 save(espt, file="espt.rda")
+
+source('irtplot.R')
 
 #######################################################
 # demographics

@@ -116,8 +116,14 @@ sub flush_data {
 	}
 	my @rec;
 	$rec[ $OutMap->{'email'} ] = $email;
-	$rec[ $OutMap->{'end'} ] = $end->[$wave - 1];
+	if ($end->[$wave - 1]) {
+	    # these are in MM/DD/YYYY format, ugh TODO
+	    $rec[ $OutMap->{'end'} ] = $end->[$wave - 1];
+	} else {
+	    $rec[ $OutMap->{'end'} ] = '2013-03-10';
+	}
 	$rec[ $OutMap->{'wave'} ] = "germano2013-$wave";
+	$rec[ $OutMap->{instrument} ] = '2013-01-09';
 	if ($dg) {
 	    for my $k (keys %$dg) {
 		die $k if !exists $OutMap->{$k};

@@ -9,28 +9,48 @@ gpcm <- function(outcomes) {
   #   rpf.nrm(outcomes, T.c=diag(outcomes-1))
 }
 
-item.names <- c('msNotion','msFreq', 'msAny', 'msEvery', 'msCause0', 'wantLearn',
-                   'msAfraid', 'msEmo', 'msLife', 'msFast', 'msDescarte', 'msIdentity',
-                   'freqCause', 'maxDuration', 'msYearn', 'msMet', 'msEnv', 'msCause', 'msAllow',
-                   'msShared',  'msTeach', 'msTrainTeach')
+# 'msEvery'  possibly too vague, better measured by other items
+#     # too much missingness, revisit later
+# 'msAllow',                  # drop this or msCause, need larger sample
+# 'msDescarte'               # poor performer, revisit later
+# 'msCause0'    # redundent
+# 'msCause', 'msTeach', 'msTrainTeach' -- replace with causeTeach testlet
+# 'causeTeach'                # testlet item, too much missingness
+# 'skipExp'   # sample size problem
+
+item.names <- c('skipInt', 'msNotion','msFreq', 'msAny', 'wantLearn',
+                   'msAfraid', 'msEmo', 'msLife', 'msFast', 'msIdentity', 'msEffort',
+                'maxDuration', 'freqCause', 'msYearn', 'msShared', 'msMet', 'msEnv',
+                'msCause', 'msTeach', 'msTrainTeach')
 
 # ensure we have the data we think we have
 missing <- item.names[is.na(match(item.names, colnames(espt)))]
 if (length(missing)) stop(paste("Columns missing:", missing))
 
+sapply(espt[item.names], function (c) sum(!is.na(c)))  # per item sample size
+
 spec <- list()
 spec[1:length(item.names)] <- gpcm(5)
 names(spec) <- item.names
 spec["msFreq"] <- gpcm(4)
-spec["msCause0"] <- gpcm(3)
-spec["wantLearn"] <- gpcm(4)
-spec["freqCause"] <- gpcm(4)
-spec["maxDuration"] <- gpcm(4)
+if (!is.na(match("msCause0", item.names))) spec["msCause0"] <- gpcm(3)
+#if (!is.na(match("wantLearn", item.names))) spec["wantLearn"] <- gpcm(6)
+if (!is.na(match("freqCause", item.names))) spec["freqCause"] <- gpcm(4)
+#spec["maxDuration"] <- gpcm(4)
 #spec["ethical"] <- rpf.nrm(25, factors=2)
+if (!is.na(match("skipInt", item.names))) spec["skipInt"] <- rpf.grm(outcomes=2, factors=2)
+if (!is.na(match("skipExp", item.names))) spec["skipExp"] <- rpf.grm(outcomes=2, factors=2)
+
+if (!is.na(match('causeTeach', item.names)))
+  spec['causeTeach'] <- gpcm(length(levels(espt$causeTeach)))
 
 #sapply(spec, function(m) slot(m,'numOutcomes'))
 
-data <- espt[,item.names]
+when <- strptime(espt[['instrument']], "%Y-%m-%d")
+revision1 <- strptime("2013-02-11", "%Y-%m-%d")
+ver.mask <- difftime(when, revision1) > 0
+
+data <- espt[ver.mask, item.names]
 for (c in colnames(data)) { attr(data[,c], 'mxFactor') <- attr(espt[,c], 'mxFactor') }
 
 if (0) {
@@ -69,9 +89,10 @@ rownames(ip.mat@free) <- c("interest", "experience", rep(NA, maxParam-2))
 #                        "msDescarte", "msIdentity", "freqCause",
 #                        "maxDuration", "msYearn", "msMet", "msEnv",
 #                        "msAllow", "ethical")] <- TRUE
-interest <- c("msNotion","msAfraid","msEmo","msLife", "msFast",
+interest <- c('wantLearn', "msAfraid", "msEmo","msLife", "msFast","msEffort",
             "msDescarte", "msIdentity")
-experience <- c("msAny", "maxDuration", "msCause0","msCause","msAllow","msShared","msTeach","msTrainTeach")
+experience <- c('skipExp', "msAny", "maxDuration", "msYearn", "msCause0","msCause",
+                "msAllow","msShared","msTeach","msTrainTeach", "causeTeach")
 ip.mat@free["interest", setdiff(item.names, experience)] <- TRUE
 ip.mat@free["experience", setdiff(item.names, interest)] <- TRUE
 #ip.mat@free[4,] <- TRUE  # just for fun
@@ -99,13 +120,13 @@ m2 <- mxModel(model="2d",
               mxData(observed=data, type="raw"),
               mxExpectationBA81(mean="mean", cov="cov",
                                 ItemSpec=spec, ItemParam="ItemParam",
-                                qpoints=21, qwidth=5, scores="full"),
+                                qpoints=21, qwidth=5), #, scores="full"
               mxFitFunctionML(),
               mxComputeSequence(steps=list(
                 mxComputeIterate(verbose=1L, steps=list(
                   mxComputeOnce('expectation', context='EM'),
                   #                  mxComputeGradientDescent(free.set='ItemParam', useGradient=TRUE),
-                  mxComputeNewtonRaphson(free.set='ItemParam'),
+                  mxComputeNewtonRaphson(free.set='ItemParam', carefully=TRUE),
                   mxComputeOnce('expectation'),
                   mxComputeOnce('fitfunction', free.set=c("mean", "cov"), maxAbsChange=TRUE)
                 )),
@@ -113,33 +134,22 @@ m2 <- mxModel(model="2d",
   #  m2 <- mxOption(m2, "Number of Threads", 1)
 m2.est <- mxRun(m2)
 print(m2.est@fitfunction@result)
-print(m2.est@matrices$ItemParam@values)
+rownames(m2.est@matrices$ItemParam@values) <- c("interest", "experience", rep(NA, maxParam-2))
+print(m2.est@matrices$ItemParam@values[1:2,])
 print(m2.est@matrices$cov@values)
 
 latentVars <- c("interest", "experience")
-grp <- list(spec=spec, param=m2.est@matrices$ItemParam@values,
+grp <- list(spec=spec,
+            param=m2.est@matrices$ItemParam@values,
+            free=apply(ip.mat@free, 2, sum),
             mean=m2.est@matrices$mean@values, cov=m2.est@matrices$cov@values)
-# design needed for two-tier TODO
+# design needed for two-tier? TODO
 colnames(grp$mean) <- latentVars
 dimnames(grp$cov) <- list(latentVars, latentVars)
 
-thetaComb <- function(theta, nfact)
-{
-  if (nfact == 1L){
-    Theta <- matrix(theta)
-  } else {
-    thetalist <- vector('list', nfact)
-    for(i in 1L:nfact)
-      thetalist[[i]] <- theta
-    Theta <- as.matrix(expand.grid(thetalist))
-  }	
-  return(Theta)
-}
-chen.thissen.1997 <- function(grp, data, qwidth=6, qpoints=49) {
-  theta <- thetaComb(seq(-qwidth,qwidth,length.out=qpoints), length(grp$mean))
-  prior <- mvtnorm::dmvnorm(theta, grp$mean, grp$cov)
-  prior <- prior/sum(prior)
-}
+got <- chen.thissen.1997(grp, data)
+
+max(abs(got$std[!is.na(got$std)]))
 
 if (0) {
   # try to figure out ethical items
@@ -173,3 +183,4 @@ if (0) {
 #rownames(items) <- item.names
 #espt[mask, "score"] <- m2@expectation@scores.out[,1]
 #espt[mask, "se"] <- m2@expectation@scores.out[,2]
+

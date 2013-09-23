@@ -14,6 +14,54 @@ lax.ordered <- function(df, col, levels, old.levels=c()) {
   df[[col]] <- mxFactor(df[[col]], levels=levels)
 }
 
+cause.teach.testlet <- function(df) {
+  items <- c("msCause",'msTeach','msTrainTeach')
+  col <- rep(NA, dim(df)[1])
+  col[df$msCause == 'disagree'] <- 'disagree'
+  col[df$msCause == 'disagree somewhat'] <- 'disagree somewhat'
+  col[df$msCause == 'not sure'] <- 'not sure'
+
+  # Round down and reduce to 3 categories:
+  msTeach <- df$msTeach
+  msTeach[msTeach == 'disagree somewhat'] <- 'disagree'
+  msTeach[msTeach == 'agree somewhat'] <- 'not sure'
+  df$msTeach <- msTeach
+  msTteach <- df$msTrainTeach
+  msTteach[msTteach == 'disagree somewhat'] <- 'disagree'
+  msTteach[msTteach == 'agree somewhat'] <- 'not sure'
+  df$msTrainTeach <- msTteach
+  
+  mask <- is.na(col) & df$msCause < msTeach
+  mask <- mask & !is.na(mask)
+  col[mask] <- as.character(df$msCause[mask])
+  mask <- is.na(col) & !is.na(df$msCause) & msTeach < msTteach
+  mask <- mask & !is.na(mask)
+  col[mask] <- apply(as.matrix(df[mask, c("msCause",'msTeach')]), 1, paste, collapse="+")
+  mask <- is.na(col) & !is.na(df$msCause) & (msTeach == 'disagree' | msTeach == 'disagree somewhat')
+  mask <- mask & !is.na(mask)
+  col[mask] <- apply(as.matrix(df[mask, c("msCause",'msTeach')]), 1, paste, collapse="+")
+  # deal with NAs
+  mask <- is.na(col) & !is.na(df$msCause) & is.na(msTeach)
+  col[mask] <- as.character(df$msCause[mask])
+  mask <- is.na(col) & !is.na(df$msCause) & !is.na(msTeach) & is.na(msTteach)
+  col[mask] <- apply(as.matrix(df[mask, c("msCause",'msTeach')]), 1, paste, collapse="+")
+  # everything else
+  mask <- is.na(col)
+  col[mask] <- apply(as.matrix(df[mask, items]), 1, paste, collapse="+")
+  col[is.na(df$msCause)] <- NA
+  #  length(table(col))
+  #  sort(table(col[ver.mask]))
+  
+  layer <- c('', levels(df$msCause))
+  levels <- apply(expand.grid(layer, layer, layer)[3:1], 1, function(wh) {
+    while (length(wh) && wh[length(wh)] == '') { wh <- wh[-length(wh)] }
+    paste(wh, collapse="+")
+  })
+  lev.order <- levels[sort(match(unique(col), levels))]
+  
+  mxFactor(col, levels=lev.order)
+}
+
 prepare.espt <- function(espt, scores) {
   for (col in c('edu','sex','rel')) {
     espt[[col]] <- factor(espt[[col]])
@@ -58,12 +106,14 @@ prepare.espt <- function(espt, scores) {
   cause0.levels <- c('Yes', 'No, but working on it', 'No, I do not')
   espt$msCause0 <- lax.ordered(espt, 'msCause0', rev(cause0.levels))
 
+  oldlearn.levels <- c('Yes',
+                       "I know how to cause myself to experience complete mental silence.")
+  # Don't ask them if they know how to cause here MS because we ask them later.
   learn.levels <- c('No', 'Not Sure',
                     'Yes, if it was easy to learn',
                     'Yes, I am moderately curious',
-                    'Yes, I am keenly curious',
-                    "I know how to cause myself to experience complete mental silence.")
-  espt$wantLearn <- lax.ordered(espt, 'wantLearn', learn.levels, c('Yes'))
+                    'Yes, I am keenly curious')
+  espt$wantLearn <- lax.ordered(espt, 'wantLearn', learn.levels, oldlearn.levels)
 
   freqCause.levels <- c("I don't try to cause myself to experience complete mental silence",
                         'Infrequently', 'Weekly', 'Daily')
@@ -147,10 +197,65 @@ prepare.espt <- function(espt, scores) {
   espt$ethical[ethical.mask] <- apply(as.matrix(espt[ethical.mask, c("msPay", "msPaySure")]),
                                     1, paste, collapse="+")
   espt$ethical <- mxFactor(espt$ethical, levels=ethical.levels)
+  
+  espt$causeTeach <- cause.teach.testlet(espt)
+  
+  espt$skipInt <- NA
+  espt$skipExp <- NA
+  
+  mask <- (espt$instrument == "2013-02-19" |
+             espt$instrument == "2013-02-13" |
+             espt$instrument == "2013-02-12")
+  if (all(!mask)) stop("Can't find instrument")
+  espt$skipInt[mask] <-
+    apply(is.na(espt[mask,c('msAfraid', 'msEmo', 'msLife',
+                            'msFast', "msDescarte", 'msIdentity')]), 1, all)
+  espt$skipExp[mask] <-
+    apply(is.na(espt[mask, c('freqCause', 'maxDuration', 'msMet',
+                             'msEnv', 'msAllow', 'msCause', 'msShared', 'msTeach',
+                             'msTrainTeach')]), 1, all)
+  
+  mask <- espt$instrument == "2013-07-25"
+  if (all(!mask)) stop("Can't find instrument")
+  espt$skipInt[mask] <-
+    apply(is.na(espt[mask,c('msAfraid', 'msEmo', 'msLife',
+                            'msFast', "msDescarte", 'msIdentity')]), 1, all)
+  espt$skipExp[mask] <-
+    apply(is.na(espt[mask, c('freqCause', 'maxDuration', 'msYearn','msMet',
+                             'msEnv', 'msAllow', 'msCause', 'msShared', 'msTeach',
+                             'msTrainTeach')]), 1, all)
+  
+  mask <- espt$instrument == "2013-08-15"
+  if (all(!mask)) stop("Can't find instrument")
+  espt$skipInt[mask] <-
+    apply(is.na(espt[mask,c('msAfraid', 'msEmo', 'msLife',
+                            'msFast', "msDescarte", 'msIdentity')]), 1, all)
+  espt$skipExp[mask] <-
+    apply(is.na(espt[mask, c('freqCause', 'maxDuration', 'msYearn','msMet',
+                             'msEnv', 'msAllow', 'msCause', 'msShared', 'msTeach',
+                             'msTrainTeach')]), 1, all)
+  
+  mask <- espt$instrument == "2013-09-12"
+  if (all(!mask)) stop("Can't find instrument")
+  espt$skipInt[mask] <-
+    apply(is.na(espt[mask,c('msAfraid', 'msEffort', 'msEmo', 'msLife',
+                            'msFast', "msDescarte", 'msIdentity')]), 1, all)
+  espt$skipExp[mask] <-
+    apply(is.na(espt[mask, c('freqCause', 'maxDuration', 'msYearn','msMet',
+                             'msEnv', 'msAllow', 'msCause', 'msShared', 'msTeach',
+                             'msTrainTeach')]), 1, all)
+  
+  mask <- espt$skipInt & espt$skipExp
+  espt$skipExp[mask] <- NA
+  espt$skipInt[mask] <- NA
 
+  espt$skipInt <- mxFactor(espt$skipInt, levels=c(FALSE, TRUE))
+  espt$skipExp <- mxFactor(espt$skipExp, levels=c(TRUE, FALSE))
+  
   return(espt)
 }
 
+# for snapshot of sit21c data
 prepare.items <- function(items) {
   items$name <- c('msNotAny','msNotSelf','msMet','msAccident','msShared','msCause',
                   'msTeach','msEvery','msPay','msTrainTeach')
