@@ -3,6 +3,17 @@
 \usepackage{soul}
 \usepackage[backgroundcolor=yellow,shadow,textwidth=1in]{todonotes}
 
+<<echo=FALSE>>=
+library(knitr)
+#knit("hw-template.Rnw", tangle=TRUE)  # to extract only the R chunks
+rm(list=ls())  # clear the workspace
+opts_knit$set(stop_on_error=2, verbose=TRUE)
+opts_chunk$set(echo=FALSE)
+#options(error = NULL)  # default behavior
+#options(error = utils::recover)   # uncomment for more help with debugging
+library(xtable)
+@ 
+
 \begin{document}
 
 \setlength{\parindent}{0cm}
@@ -22,7 +33,8 @@ UVa Status (job title, student status, etc.: \\
 3rd year graduate student in the quantitative area (Masters will be completed upon start date of proposed work.)
 
 Other Participants (list name, title and affiliation for each): \\
-Karen Schmidt, Professor of Quantitative Psychology
+Karen Schmidt, Professor of Quantitative Psychology at UVa \\
+Ramesh Manocha, Senior Lecturer at University of Sydney
 
 \break
 
@@ -31,12 +43,41 @@ Karen Schmidt, Professor of Quantitative Psychology
 \section{Abstract}
 % less than 250 words
 
-Not written yet
+Self-report measures can act like a bridge to foster reciprocal
+partnerships between scientists, humanistic scholars, and practitioners.
+We aim to publish a new self-report instrument to assess interest in
+and experience of mental silence.
+Journal editors expect to see evidence showing that a new scale
+really measures what it claims to measure.
+Two kinds of evidence will be assembled.
+Pre- and post-intervention measurements will be administered
+for interventions designed to foster mental silence.
+An experimental paradigm is necessary to argue that
+measured change on the scale is \ul{caused} by the experience of mental silence.
+The intervention studies constitute this type of evidence.
+Secondly, a collection of related published measures will be administered to a large
+and diverse sample to investigate correlations.
+Finding correlations in the expected directions will support the validity of our new scale.
+Our funding needs are roughly split between these two types of evidence.
+We ask for money to cover the logistic costs associated with
+an important intervention study in Australia
+and, in the correlational study, to compensate participants for
+completing a collection of surveys.
 
 \section{Goals}
 
 A self-report scale is \emph{valid} when it measures what it claims to measure.
-Our \ul{goal} is to examine the convergent and discriminant validity of our new mental
+Our \ul{goal} is to assemble data to support the validity of our new mental silence disposition scale.
+Evidence supporting the validity of a measure comes in many forms.
+We proposed 2 types of studies, intervention studies and a cross-sectional correlation study.
+One intervention study will be conducted as part of the Buddhist Meditation class
+offered by the Religious Studies department at UVa.
+We anticipate another intervention study conducted in collaboration
+with Dr.~Manocha in Australia.
+Interventions designed to facilitate mental silence should
+cause participants to have more frequent and profound experiences of mental silence.
+
+A cross-sectional study will examine the convergent and discriminant validity of our new mental
 silence disposition scale compared with a broad selection of popular
 psychological measures. Convergent and discriminant validity refer to
 the positive and negative correlation, respectively, of scores
@@ -47,11 +88,30 @@ Finding correlations in the expected directions will support the validity of our
 
 \section{Plan/method}
 
-Approximately 40 related psychological measures will be included.
-A sample of 1000 participants will each complete this battery of measures.
-The administration of many psychological scales on a single occasion
-is a taxing experience for participants. 
-Therefore, we will compensate participants with \$10.
+For the intervention studies,
+we will administer the Reflection/Rumination scale \cite{trapnell1999},
+the DASS-21 \cite{lovibond1996}, the Pittsburgh Sleep Quality Index \cite{buysse1989},
+and our new mental silence disposition scale.
+The Sahaja Yoga organization in Australia will allow us to administer
+our measures before and after a 4 week course attended by 70-100 participants.
+The Sahaja Yoga style of meditation is designed to facilitate mental silence.
+We expect to measure a medium to large increase in experience of mental silence.
+Participants will complete the pre-test on paper and receive
+a post-test with a postage paid envelope to return their
+response at the end of the 4 week course.
+The logistics and data entry will be managed by our collaborator Dr.~Manocha.
+The pre-test will be completed by the time this proposal is reviewed.
+
+For the cross-sectional study,
+we will recruit a sample of 1000 participants from
+outside the University of Virginia psychology subject pool.
+College students are too homogeneous a population for the traits of interest.
+In addition to the measures already mentioned,
+we will administer the Mindful Attention Awareness Scale \cite{brown2003},
+the PANAS \cite{watson1988}, the Warwick-Edinburgh Mental Wellbeing Scale \cite{stewart2008},
+a big five personality inventory \cite{goldberg1999},
+and the SF36 \cite{hawthorne2007}.
+We will compensate participants with \$10.
 Once data are obtained,
 we are well prepared to perform the requisite data analysis.
 
@@ -77,15 +137,15 @@ In the above quotation, \emph{meditation} takes on its traditional meaning,
 often described as \emph{mental silence} or \emph{thoughtless awareness} \cite{manocha2008}.
 As part of our pilot data collection,
 we asked participants about their familiarity with the notion of complete mental silence.
-In a sample of 1164 responses,
-25\% reported that, ``this is the first time i have thought about it.''
+Among our sample of 1164 respondents,
+25\% reported that, ``this is the first time I have thought about it [mental silence].''
 To introduce the idea, we developed a description that we use
 in the introduction of our survey:
 
 \begin{quotation}
 \noindent To approach mental silence is to reduce mental content including
 re­presentations of sensory input, such as imagination. Complete
-mental silence (or "thoughtless awareness") is an experience in which
+mental silence (or ``thoughtless awareness'') is an experience in which
 one is no longer thinking and no longer feels the urge to continuously
 engage in thought. The experience occurs in a normal, lucid waking
 state. Thoughtless awareness is not sleep or unconsciousness. The
@@ -101,7 +161,8 @@ positive psychology and the psychology of religion
 (\citeNP{pargament1997}; \citeNP{peterson2004};
 \citeNP{sheldon2011}; \citeNP{snyder2009}).
 
-\textbf{The question appears unresolved: is \emph{complete mental silence} a
+\textbf{At least in Western psychology,
+the question appears unresolved: is \emph{complete mental silence} a
 potential psychological state?}
 
 In our review of scales related to spiritual and religious experience,
@@ -114,15 +175,9 @@ We need to convince
 reviewers that the new scale is valid---that the scale measures what
 it claims to measure.
 Preliminary results were presented at the conference Spirituality in the
-21st Century \todo{Update citation} \cite{pritikin2013}.
-The measure was substantially revised in early 2013.
-We are currently conducting intervention studies in Australia in
-collaboration with Ramesh Manocha and as part of the Buddhist
-Meditation class offered by the Religious Studies department at UVa.
-To examine concurrent validity, in addition to the mental silence scale,
-we administer the State-Trait Anxiety
-Inventory, Reflection-Rumination scale, and Pittsburgh Sleep Quality
-Index \cite{buysse1989,spielberger1983,trapnell1999}.
+21st Century \cite{pritikin2013}.
+The measure was substantially revised in early 2013
+to improve its psychometric properties.
 
 \section{CSC Justification}
 
@@ -148,7 +203,7 @@ conscious. The mind is said to be alert without having any
 
 The Contemplative Sciences Center should fund this project because
 a self-report measure for mental silence will make it easier to design
-and perform research in contemplative sciences.
+and perform research in the contemplative sciences.
 This in turn will help foster reciprocal
 partnerships between scientists, humanistic scholars, and practitioners.
 We already have some means of assessing the effectiveness of interventions
@@ -159,7 +214,7 @@ By supporting this research, UVa will benefit by being at the
 epicenter of a new, important self-report scale. UVa will gain reputation as a
 premiere institution for the study of contemplative sciences and this
 will attract more funding to the university. If requested by the CSC,
-we are willing to name the measure to include the name of the university.
+we are willing to name our measure to include the name of the university.
 
 \section{Dissemination plans}
 
@@ -174,14 +229,21 @@ We have no plans for additional funding.
 
 \section{Budget}
 
-License fees for measures and scales -- \$?
+<<results='asis'>>=
+budget <- c(500, 120 * 25, 1000 * 10)
+tbl <- matrix(c(budget, sum(budget)), ncol=1)
+rownames(tbl) <- c("Prepaid postage", "Research assistant, 120 hours at 25 AUD/hr", "1000 surveys at $10 per survey", "Total")
+print(xtable(tbl, align=c("l","r")), include.colnames=FALSE, hline.after=c(0,nrow(tbl)-1, nrow(tbl)))
+@
 
-Incentives for 1000 participation at \$10 per participant
+To run the intervention study, Dr.~Manocha will hire a research assistant at 25~AUD/hr.
+Prepaid postage will cost 500~AUD.
+The assistant will phone participants to remind them to complete the post-test
+and perform data entry of 150-200 completed survey packets.
+We anticipate that this work will take 2-3 weeks (80-120 hours).
 
-may include applicant effort, support personnel, consulting services,
-supplies, incentives for student/subject participation, cost-share,
-and so forth. In addition to the tabular budget, please include a
-narrative justification.
+For the cross-sectional correlation study,
+we will need incentive payments for 1000 participants at \$10 per participant.
 
 \bibliographystyle{apacite}
 \bibliography{jpritikin}
