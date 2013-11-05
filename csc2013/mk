@@ -1,4 +1,6 @@
 #!/bin/sh
 
-pdflatex proposal
-bibtex proposal
+name=proposal
+Rscript -e "library(knitr); knit('$name.Rnw')"
+pdflatex $name
+bibtex $name

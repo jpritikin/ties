@@ -1,7 +1,9 @@
 \documentclass[12pt]{article}
 \usepackage{apacite}
 \usepackage{soul}
+\usepackage{pdfpages}
 \usepackage[backgroundcolor=yellow,shadow,textwidth=1in]{todonotes}
+\usepackage[margin=1in]{geometry}
 
 <<echo=FALSE>>=
 library(knitr)
@@ -23,7 +25,7 @@ library(xtable)
 
 Title of Proposal: \textbf{Mental Silence Disposition Scale}
 
-Dates of Proposed work: Jan 2014 - May 2015
+Dates of Proposed work: Jan 2014 - Jan 2015
 
 Name: Joshua N. Pritikin
 
@@ -33,8 +35,8 @@ UVa Status (job title, student status, etc.: \\
 3rd year graduate student in the quantitative area (Masters will be completed upon start date of proposed work.)
 
 Other Participants (list name, title and affiliation for each): \\
-Karen Schmidt, Professor of Quantitative Psychology at UVa \\
-Ramesh Manocha, Senior Lecturer at University of Sydney
+Karen Schmidt, Associate Professor of Quantitative Psychology at UVa \\
+Ramesh Manocha, Senior Lecturer at University of Sydney, Australia
 
 \break
 
@@ -46,7 +48,9 @@ Ramesh Manocha, Senior Lecturer at University of Sydney
 Self-report measures can act like a bridge to foster reciprocal
 partnerships between scientists, humanistic scholars, and practitioners.
 We aim to publish a new self-report instrument to assess interest in
-and experience of mental silence.
+and experience of \emph{mental silence}
+(an experience practically unknown in the West but familiar
+to oriental thinkers; \citeNP{ramamurthi1995}).
 Journal editors expect to see evidence showing that a new scale
 really measures what it claims to measure.
 Two kinds of evidence will be assembled.
@@ -58,7 +62,7 @@ The intervention studies constitute this type of evidence.
 Secondly, a collection of related published measures will be administered to a large
 and diverse sample to investigate correlations.
 Finding correlations in the expected directions will support the validity of our new scale.
-Our funding needs are roughly split between these two types of evidence.
+Our funding needs are roughly split between the experimental phase and validation phase of our project.
 We ask for money to cover the logistic costs associated with
 an important intervention study in Australia
 and, in the correlational study, to compensate participants for
@@ -73,7 +77,7 @@ We proposed 2 types of studies, intervention studies and a cross-sectional corre
 One intervention study will be conducted as part of the Buddhist Meditation class
 offered by the Religious Studies department at UVa.
 We anticipate another intervention study conducted in collaboration
-with Dr.~Manocha in Australia.
+with Dr.~Manocha at University of Sydney in Australia.
 Interventions designed to facilitate mental silence should
 cause participants to have more frequent and profound experiences of mental silence.
 
@@ -82,8 +86,8 @@ silence disposition scale compared with a broad selection of popular
 psychological measures. Convergent and discriminant validity refer to
 the positive and negative correlation, respectively, of scores
 obtained from our new scale and previously published scales.
-For example, we expect a positive correlation between \emph{sleep quality} and \emph{mental silence},
-and a negative correlation between \emph{anxiety} and \emph{mental silence}.
+For example, we expect a positive correlation between \emph{sleep quality} (e.g., a lack of difficulty falling asleep or maintaining sleep) and \emph{mental silence},
+and a negative correlation between \emph{anxiety} (e.g., worry and nervousness) and \emph{mental silence}.
 Finding correlations in the expected directions will support the validity of our new scale.
 
 \section{Plan/method}
@@ -100,22 +104,33 @@ Participants will complete the pre-test on paper and receive
 a post-test with a postage paid envelope to return their
 response at the end of the 4 week course.
 The logistics and data entry will be managed by our collaborator Dr.~Manocha.
-The pre-test will be completed by the time this proposal is reviewed.
+This plan is approved by the UVa Institutional Review Board under protocol \#2013-0407-00.
+The pre-test was already administered and the post-test will be administered
+by the time this grant proposal is reviewed.
+Dr.~Manocha is paying data collection expenses out of his pocket
+and hopes for full or partial reimbursement.
 
 For the cross-sectional study,
-we will recruit a sample of 1000 participants from
+college students are too homogeneous a population for the traits of interest.
+We will recruit a sample of 1000 participants from
 outside the University of Virginia psychology subject pool.
-College students are too homogeneous a population for the traits of interest.
 In addition to the measures already mentioned,
 we will administer the Mindful Attention Awareness Scale \cite{brown2003},
 the PANAS \cite{watson1988}, the Warwick-Edinburgh Mental Wellbeing Scale \cite{stewart2008},
-a big five personality inventory \cite{goldberg1999},
-and the SF36 \cite{hawthorne2007}.
+a big five personality inventory (measuring openness, conscientiousness,
+extraversion, agreeableness, and neuroticism, believed to be the
+major dimensions of personality; \citeNP{goldberg1999}),
+and a measure of physical health (e.g., SF36; \citeNP{hawthorne2007}).
 We will compensate participants with \$10.
 Once data are obtained,
 we are well prepared to perform the requisite data analysis.
 
 \section{Background}
+
+The West has adopted many techniques from Buddhism and Eastern traditions designed
+to facilitate psychological centering. Mantra repetition, focusing on breath (pranayam),
+physical yoga postures, prayer, and mindfulness can all be used for the purpose of
+psychological centering.
 
 \begin{quotation}
 \noindent Because of a limitation in our vocabulary, the West refers to the simple
@@ -137,7 +152,7 @@ In the above quotation, \emph{meditation} takes on its traditional meaning,
 often described as \emph{mental silence} or \emph{thoughtless awareness} \cite{manocha2008}.
 As part of our pilot data collection,
 we asked participants about their familiarity with the notion of complete mental silence.
-Among our sample of 1164 respondents,
+Among our pilot sample of 1164 respondents,
 25\% reported that, ``this is the first time I have thought about it [mental silence].''
 To introduce the idea, we developed a description that we use
 in the introduction of our survey:
@@ -165,7 +180,7 @@ positive psychology and the psychology of religion
 the question appears unresolved: is \emph{complete mental silence} a
 potential psychological state?}
 
-In our review of scales related to spiritual and religious experience,
+In our review of measurement scales related to spiritual and religious experience,
 we found no focused attempt to assess
 ``mental silence'' or ``thoughtless awareness'' (\citeNP{fetzer1999};
 \citeNP{hill1999}; \citeNP{monod2011}).
@@ -176,8 +191,12 @@ reviewers that the new scale is valid---that the scale measures what
 it claims to measure.
 Preliminary results were presented at the conference Spirituality in the
 21st Century \cite{pritikin2013}.
-The measure was substantially revised in early 2013
+With insight gained from about 1500 responses,
+the measure was substantially revised in early 2013
 to improve its psychometric properties.
+With another 500 responses on the 2013 version,
+we are confident that the scale is performing well and is ready
+for the next step toward publication.
 
 \section{CSC Justification}
 
@@ -206,6 +225,10 @@ a self-report measure for mental silence will make it easier to design
 and perform research in the contemplative sciences.
 This in turn will help foster reciprocal
 partnerships between scientists, humanistic scholars, and practitioners.
+Given the centrality of mental silence to contemplation,
+it would help research design if we could measure mental silence
+independently of other factors to began to explore the relationship
+between mental silence and contemplative practices embedded in traditional contexts.
 We already have some means of assessing the effectiveness of interventions
 designed to foster peace of mind.
 A measure of mental silence could serve as another important yardstick.
@@ -233,7 +256,7 @@ We have no plans for additional funding.
 budget <- c(500, 120 * 25, 1000 * 10)
 tbl <- matrix(c(budget, sum(budget)), ncol=1)
 rownames(tbl) <- c("Prepaid postage", "Research assistant, 120 hours at 25 AUD/hr", "1000 surveys at $10 per survey", "Total")
-print(xtable(tbl, align=c("l","r")), include.colnames=FALSE, hline.after=c(0,nrow(tbl)-1, nrow(tbl)))
+print(xtable(tbl, align=c("l","r"), digits=0), include.colnames=FALSE, hline.after=c(0,nrow(tbl)-1, nrow(tbl)))
 @
 
 To run the intervention study, Dr.~Manocha will hire a research assistant at 25~AUD/hr.
@@ -247,5 +270,7 @@ we will need incentive payments for 1000 participants at \$10 per participant.
 
 \bibliographystyle{apacite}
 \bibliography{jpritikin}
+
+\includepdf[pages=1-2]{/home/joshua/share/cv/pritikin.pdf}
 
 \end{document}
