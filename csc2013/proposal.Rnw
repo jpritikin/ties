@@ -50,7 +50,7 @@ partnerships between scientists, humanistic scholars, and practitioners.
 We aim to publish a new self-report instrument to assess interest in
 and experience of \emph{mental silence}
 (an experience practically unknown in the West but familiar
-to oriental thinkers; \citeNP{ramamurthi1995}).
+to Oriental thinkers; \citeNP{ramamurthi1995}).
 Journal editors expect to see evidence showing that a new scale
 really measures what it claims to measure.
 Two kinds of evidence will be assembled.
@@ -107,8 +107,6 @@ The logistics and data entry will be managed by our collaborator Dr.~Manocha.
 This plan is approved by the UVa Institutional Review Board under protocol \#2013-0407-00.
 The pre-test was already administered and the post-test will be administered
 by the time this grant proposal is reviewed.
-Dr.~Manocha is paying data collection expenses out of his pocket
-and hopes for full or partial reimbursement.
 
 For the cross-sectional study,
 college students are too homogeneous a population for the traits of interest.
@@ -227,7 +225,7 @@ This in turn will help foster reciprocal
 partnerships between scientists, humanistic scholars, and practitioners.
 Given the centrality of mental silence to contemplation,
 it would help research design if we could measure mental silence
-independently of other factors to began to explore the relationship
+independently of other factors to begin to explore the relationship
 between mental silence and contemplative practices embedded in traditional contexts.
 We already have some means of assessing the effectiveness of interventions
 designed to foster peace of mind.
@@ -253,17 +251,19 @@ We have no plans for additional funding.
 \section{Budget}
 
 <<results='asis'>>=
-budget <- c(500, 120 * 25, 1000 * 10)
+budget <- c(80 * 25, 1000 * 10)
 tbl <- matrix(c(budget, sum(budget)), ncol=1)
-rownames(tbl) <- c("Prepaid postage", "Research assistant, 120 hours at 25 AUD/hr", "1000 surveys at $10 per survey", "Total")
+rownames(tbl) <- c("Research assistant, 80 hours at 25 AUD/hr", "1000 surveys at $10 per survey", "Total")
 print(xtable(tbl, align=c("l","r"), digits=0), include.colnames=FALSE, hline.after=c(0,nrow(tbl)-1, nrow(tbl)))
 @
 
-To run the intervention study, Dr.~Manocha will hire a research assistant at 25~AUD/hr.
-Prepaid postage will cost 500~AUD.
-The assistant will phone participants to remind them to complete the post-test
-and perform data entry of 150-200 completed survey packets.
-We anticipate that this work will take 2-3 weeks (80-120 hours).
+Dr.~Manocha commenced his intervention study because it is a once-in-a-year opportunity.
+He will hire a research assistant at 25~AUD/hr
+to phone participants to remind them to complete the post-test and send it back.
+By the time this grant is reviewed,
+Dr.~Manocha will have paid this expense out of pocket.
+Our remaining cost is data entry of 150 completed survey packets.
+We anticipate that data entry will take 2 weeks (80 hours).
 
 For the cross-sectional correlation study,
 we will need incentive payments for 1000 participants at \$10 per participant.
@@ -272,5 +272,6 @@ we will need incentive payments for 1000 participants at \$10 per participant.
 \bibliography{jpritikin}
 
 \includepdf[pages=1-2]{/home/joshua/share/cv/pritikin.pdf}
+\includepdf[pages=1-2]{KMS2PAGECV.pdf}
 
 \end{document}

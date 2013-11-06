@@ -1,6 +1,6 @@
 #!/bin/sh
 
-name=proposal
+name=${1:-proposal}
 Rscript -e "library(knitr); knit('$name.Rnw')"
 pdflatex $name
 bibtex $name
