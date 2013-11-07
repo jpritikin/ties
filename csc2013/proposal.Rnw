@@ -273,5 +273,6 @@ we will need incentive payments for 1000 participants at \$10 per participant.
 
 \includepdf[pages=1-2]{/home/joshua/share/cv/pritikin.pdf}
 \includepdf[pages=1-2]{KMS2PAGECV.pdf}
+\includepdf[pages=1-2]{manocha-2pg.pdf}
 
 \end{document}
