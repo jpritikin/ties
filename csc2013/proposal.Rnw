@@ -114,7 +114,7 @@ We will recruit a sample of 1000 participants from
 outside the University of Virginia psychology subject pool.
 In addition to the measures already mentioned,
 we will administer the Mindful Attention Awareness Scale \cite{brown2003},
-the PANAS \cite{watson1988}, the Warwick-Edinburgh Mental Wellbeing Scale \cite{stewart2008},
+the PANAS \cite{watson1988}, the Warwick-Edinburgh Mental Wellbeing Scale \cite{tennant2007},
 a big five personality inventory (measuring openness, conscientiousness,
 extraversion, agreeableness, and neuroticism, believed to be the
 major dimensions of personality; \citeNP{goldberg1999}),
@@ -139,7 +139,7 @@ meditative traditions, however, the centering techniques are not
 meditation. They are simply means toward the goal---which is meditation.
 These techniques are therefore more or less interchangeable, and the
 advanced practitioner will eventually discard all of them when he can
-achieve meditation directly. \cite[pp.~8--9]{carrington1977}
+achieve meditation directly \cite[pp.~8--9]{carrington1977}.
 \end{quotation}
 
 We agree with Carrington, but many
@@ -214,8 +214,7 @@ becomes almost imperceptible and silence is the all-encompassing
 experience.  According to the meditative tradition, at this point the
 mind is not focused on either thought or image, but is fully aware,
 conscious. The mind is said to be alert without having any
-\emph{object} of alertness.
-\cite[p.~91]{carrington1977}
+\emph{object} of alertness \cite[p.~91]{carrington1977}.
 \end{quotation}
 
 The Contemplative Sciences Center should fund this project because
@@ -257,11 +256,11 @@ rownames(tbl) <- c("Research assistant, 80 hours at 25 AUD/hr", "1000 surveys at
 print(xtable(tbl, align=c("l","r"), digits=0), include.colnames=FALSE, hline.after=c(0,nrow(tbl)-1, nrow(tbl)))
 @
 
-Dr.~Manocha commenced his intervention study because it is a once-in-a-year opportunity.
+Dr.~Manocha commenced his intervention study before this grant application
+could be reviewed because access to these participants is a once-in-a-year opportunity.
 He will hire a research assistant at 25~AUD/hr
 to phone participants to remind them to complete the post-test and send it back.
-By the time this grant is reviewed,
-Dr.~Manocha will have paid this expense out of pocket.
+Dr.~Manocha is paying these expenses out of pocket.
 Our remaining cost is data entry of 150 completed survey packets.
 We anticipate that data entry will take 2 weeks (80 hours).
 
