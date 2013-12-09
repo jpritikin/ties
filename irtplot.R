@@ -1,3 +1,22 @@
+library(ggplot2)
+
+item.map <- function(grp, factor=1) {
+  item.mask <- grp$param[factor,] > 0
+  result <- NULL
+  for (ix in which(item.mask)) {
+    lev <- levels(data[,ix])
+    for (ox in 1:length(lev)) {
+      mask <- data[,ix]==lev[ox]
+      mask <- !is.na(mask) & mask
+      if (all(!mask)) next
+      result <- rbind(result, data.frame(item=ix, item.name=colnames(grp$param)[ix],
+                                         outcome=ox, outcome.name=lev[ox],
+                                         score=mean(grp$score[mask, factor])))
+    }
+  }
+  result
+}
+
 plot.info <- function(spec, param, i.name, width=3, show.total=TRUE) {
   if (missing(i.name)) {
     i.name <- paste0('i', 1:length(spec))
