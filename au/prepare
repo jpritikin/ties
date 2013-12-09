@@ -1,0 +1,420 @@
+#!/usr/bin/perl
+
+use Modern::Perl '2012';
+use autodie;
+use IO::File;
+use Text::CSV_XS;
+use Date::Manip;
+use Date::Manip::Delta;
+use Term::ANSIColor;
+use Scalar::Util 'looks_like_number';
+use List::Util qw(sum);
+use Data::Dumper;
+use constant MISSING => 13;
+use constant FIRST_MEASUREMENT => '2013-10';
+binmode(STDOUT, ":utf8");
+binmode(STDERR, ":utf8");
+
+our %Name2ID;
+our %Email2ID;
+our %ValidID;
+
+our $out = IO::File->new("> 2013combined.csv");
+binmode($out, ":utf8");
+
+sub load_idmap {
+    my $csv = Text::CSV_XS->new({auto_diag=>2, diag_verbose=>1});
+    open my $fh, "2013idmap.csv";
+    while (my $row = $csv->getline($fh)) {
+	my $id = $row->[0];
+	my $valid;
+	if (length $row->[1]) {
+	    $Name2ID{$row->[1]} = $id;
+	    $valid=1;
+	}
+	if (length $row->[2]) {
+	    if (exists $Email2ID{$row->[2]}) {
+		$Email2ID{$row->[2]} = '?';
+	    } else {
+		$Email2ID{$row->[2]} = $id;
+	    }
+	    $valid=1;
+	}
+	if ($valid) {
+	    $ValidID{$id} = 1;
+	}
+    }
+}
+
+sub as_hash {
+    my ($header, $data) = @_;
+    my $h = {};
+    for my $x (0..$#$header) {
+	if (length $data->[$x]) {
+	    $h->{$header->[$x]} = $data->[$x];
+	}
+    }
+    $h
+}
+
+our @EduItem = ('Less than high school degree',
+		'High school degree or equivalent',
+		'Some college but no degree',
+		'Associate degree',
+		'Bachelor degree',
+		'Graduate degree');
+our @GenderItem = ('male', 'female');
+our @RelaItem = ('Single',
+		 'In a long-term relationship (i.e. together more than a year)',
+		 'Other');
+our @MonthName = qw(jan feb mar apr may jun jul aug sep oct nov dec);
+our %Demogr;
+
+sub uncode {
+    my ($which, $choice) = @_;
+    if (!length $which) { '' }
+    else {
+	if ($which < 1 or $which > @$choice) { die "$which out of range" }
+	$choice->[$which - 1]
+    }
+}
+
+our @SYPracticeItem = ('more often than twice daily',
+		       'twice daily',
+		       'between twice and once a day',
+		       'less than once a day but more than 3 times a week',
+		       'between 3 times a week and once a week',
+		       'between once a week and once a month',
+		       'less than once a month');
+
+our @RRQItem = ('Strongly disagree',
+		'Disagree',
+		'Neutral',
+		'Agree',
+		'Strongly Agree');
+
+our @SleepItem = ('Not during the past month',
+		  'Less than once a week',
+		  'Once or twice a week',
+		  'Three or more times a week');
+
+our @SleepQualityItem = ('Very good',
+			 'Fairly good',
+			 'Fairly bad',
+			 'Very bad');
+
+our @SleepEnthItem = ('No problem at all',
+		      'Only a very slight problem',
+		      'Somewhat of a problem',
+		      'A very big problem');
+
+our @DASSItem = ('Did not apply to me at all',
+		 'Applied to me to some degree, or some of the time',
+		 'Applied to me to a considerable degree, or a good part of time',
+		 'Applied to me very much, or most of the time');
+
+our @NotionItem = ('This is the first time I have thought about it.',
+                     "The notion has crossed my mind, but I'm not sure what it means to me.",
+                     'I have discussed it with friends.',
+                     'I have read something about it.',
+                     'I study the topic with interest.');
+
+our @msFreqItem = ( 'Daily', 'Weekly', 'Infrequently',
+		     "i haven't experienced complete mental silence.");
+our @MSAgreementItem = ('Agree','Agree somewhat','Not sure','Disagree somewhat','Disagree');
+
+our @LearnItem = ('No', 'Not Sure',
+                    'Yes, if it was easy to learn',
+                    'Yes, I am moderately curious',
+                    'Yes, I am keenly curious',
+		    "I know how to cause myself to experience complete mental silence.");
+
+our @freqCauseItem = ('Daily', 'Weekly', 'Infrequently',
+			"I don't try to cause myself to experience complete mental silence");
+
+our @maxDurationItem = ('A moment (e.g., a second or shorter)',
+                          'Longer than a moment but shorter than 10 seconds',
+                          'Between 10 seconds and 1 minute',
+                          'Between 1 minute and 10 minutes',
+                          'More than 10 minutes');
+
+sub hours_slept {
+    my ($bedtime, $wake) = @_;
+#    warn "calc $bedtime -> $wake";
+    my $err;
+    my @time_fields = split(/\:/, $bedtime);
+    return '' if !looks_like_number($time_fields[0]);
+    my $day = $time_fields[0] > 12? '01' : '02';
+    my $d1 = ParseDate("2001-01-$day ".$bedtime);
+    my $d2 = ParseDate('2001-01-02 '.$wake);
+    #	warn "$d1 $d2";
+    my $slept = DateCalc($d1, $d2, \$err, 1);
+    my $hrs = Delta_Format($slept, 'approx', 2, '%ht');
+    if ($hrs and $hrs < 0) {
+	warn "calc $bedtime -> $wake";
+	die $hrs
+    }
+    $hrs
+}
+
+sub to24hour {
+    my ($tm) = @_;
+    if ($tm =~ s/\s*PM$//) {
+	my @part = split /\:/, $tm;
+	$part[0] += 12;
+	$tm = join(':', @part);
+    } elsif ($tm =~ s/\s*AM$//) {
+	my @part = split /\:/, $tm;
+	if ($part[0] == 12) {
+	    $part[0] = '00';
+	}
+	$tm = join(':', @part);
+    }
+    $tm;
+}
+
+sub uncode_manocha {
+    my (@item) = @_;
+    for (my $x=0; $x < 4; ++$x) {
+	$item[$x] = uncode($item[$x], \@SYPracticeItem)
+    }
+    for (my $x=5; $x < 5+24; ++$x) {
+	$item[$x] = uncode($item[$x], \@RRQItem)
+    }
+    if ($item[31] eq 'on time!') {
+	$item[31] = '';
+    }
+    if (length $item[29] and length $item[31]) {
+#	warn "$item[29] $item[31]";
+	$item[29] = hours_slept(to24hour($item[29]), to24hour($item[31]));
+	$item[31] = '';
+    } else {
+	$item[29] = '';
+	$item[31] = '';
+    }
+    for (my $x=33; $x < 42; ++$x) {
+	$item[$x] = uncode($item[$x], \@SleepItem)
+    }
+    $item[43] = uncode($item[43], \@SleepItem);
+    $item[44] = uncode($item[44], \@SleepQualityItem);
+    for (my $x=45; $x < 43+4; ++$x) {
+	$item[$x] = uncode($item[$x], \@SleepItem);
+    }
+    $item[47] = uncode($item[47], \@SleepEnthItem);
+    for (my $x=48; $x < 48+21; ++$x) {
+	$item[$x] = uncode($item[$x], \@DASSItem);
+    }
+    $item[69] = uncode($item[69], \@NotionItem);
+    $item[70] = uncode($item[70], \@msFreqItem);
+    for my $x (71..72) {
+	$item[$x] = uncode($item[$x], \@MSAgreementItem);
+    }
+    $item[73] = uncode($item[73], \@LearnItem);
+    for my $x (74..80) {
+	$item[$x] = uncode($item[$x], \@MSAgreementItem);
+    }
+    $item[81] = uncode($item[81], \@freqCauseItem);
+    $item[83] = uncode($item[83], \@maxDurationItem);
+    for my $x (84..91) {
+	$item[$x] = uncode($item[$x], \@MSAgreementItem);
+    }
+    @item
+}
+
+sub rm_qualification {
+    my ($tm) = @_;
+    $tm =~ s/^(around|about)\s*//i;
+    $tm;
+}
+
+sub missing_hm_sep {
+    my ($tm, $pm) = @_;
+    if ($tm !~ /[.:]/ and $tm > 100) {
+	my $h = int($tm / 100);
+	if ($h > 6 and $h < 12) { $h += $pm }
+	my $m = int($tm % 100);
+	$tm = sprintf("%02d:%02d", $h, $m);
+    }
+    $tm;
+}
+
+sub decode_pm {
+    my ($tm) = @_;
+    $tm = rm_qualification($tm);
+    if ($tm =~ s/\s*a\.?m//i) {
+	my @parts = split(/[:.]/, $tm);
+	if (@parts == 1) { push @parts, '00' }
+	$tm = join(':', @parts)
+    } elsif ($tm =~ s/\s*p\.?m//i) {
+	my @parts = split(/[:.]/, $tm);
+	$parts[0] += 12;
+	if (@parts == 1) { push @parts, '00' }
+	$tm = join(':', @parts)
+    }
+    $tm = missing_hm_sep($tm, 12);
+    $tm;
+}
+
+sub decode_am {
+    my ($tm) = @_;
+    $tm = rm_qualification($tm);
+    if ($tm =~ s/\s*[pa]\.?m//i) {
+	my @parts = split(/[:.]/, $tm);
+	if (@parts == 1) { push @parts, '00' }
+	$tm = join(':', @parts)
+    }
+    $tm = missing_hm_sep($tm);
+    $tm;
+}
+
+sub numeric_mean {
+    my ($f) = @_;
+    my @got = split /[^\d.]/, $f;
+    @got = grep { looks_like_number($_) } @got;
+    if (@got == 0) {
+	$f = '';
+    } else {
+	my $m = sum(@got)/@got;
+	#warn "$f -> $m";
+	$f = $m;
+    }
+    $f
+}
+
+sub uncode_sm {
+    my (@item) = @_;
+    if ($item[29] eq 'every day') {
+	$item[29] = '';
+	$item[31] = '';
+    }
+    if (length $item[29] and length $item[31]) {
+#	warn "|$item[29]|$item[31]|";
+	my $hrs = hours_slept(decode_pm($item[29]), decode_am($item[31]));
+	$item[29] = $hrs;
+	$item[31] = '';
+    }
+    if (length $item[30]) {
+	$item[30] = numeric_mean($item[30]);
+    }
+    if (length $item[32]) {
+	$item[32] = numeric_mean($item[32]);
+    }
+    @item
+}
+
+sub findMonth {
+    my ($which) = @_;
+    for my $m (0..$#MonthName) {
+	if ($which =~ /^$MonthName[$m]/i) {
+	    return 1+$m;
+	}
+    }
+    die "Can't find $which";
+}
+
+sub filter_missing {
+    my ($row) = @_;
+    # ID is in first column and there is an ID=13!
+    for (my $x=1; $x < @$row; ++$x) {
+	my $f = $row->[$x];
+	if ($f and ($f eq 'NA' or $f eq MISSING)) {
+	    $row->[$x] = '';
+	}
+    }
+    $row;
+}
+
+our @MSColumn = qw(msNotion msFreq msAny msEvery wantLearn
+		   msEffort msEmo msDescarte msAfraid msFast msLife msIdentity
+		   freqCause pctSuccess maxDuration
+		   msYearn msMet msEnv msAllow msCause msShared msTeach msTrainTeach);
+
+sub load_data {
+    my $csv = Text::CSV_XS->new({auto_diag=>2, diag_verbose=>1, binary=>1});
+    open my $pre, "2013pretest.csv";  # TODO, load participants who do not have a posttest
+    open my $post, "2013posttest.csv";
+    my $preHead = $csv->getline($pre);
+    my $postHead = $csv->getline($post);
+    for my $x (0..7) {
+	#warn "$x] $preHead->[$x]";
+    }
+    for my $x (0..8) {
+	#warn "$x] $postHead->[$x]";
+    }
+    for my $x (8..$#$preHead) {
+	my $y = $x + 2;
+	#print "$x $preHead->[$x]\n$postHead->[$y]\n";  #TODO remove
+    }
+    my @fields = (qw(time id age edu occupation sex rel syMonths),
+		  @$preHead[8..$#$preHead]);
+    for my $x (0..$#MSColumn) {
+	$fields[$x + 77] = $MSColumn[$x];
+    }
+    $csv->print($out, \@fields);
+	$out->print("\n");
+    while (my $row = $csv->getline($pre)) {
+	$row = filter_missing($row);
+	my $h = as_hash($preHead, $row);
+	my $id = $h->{ID};
+#	if (!$ValidID{$id}) { die "Who is $h->{ID}" }
+	my $age = '';
+	if ($h->{'1. Year born'}) {
+	    $age = 2013 - $h->{'1. Year born'};
+	}
+	my $sy = '';
+	my $syYear = $h->{'6.2 Time started SY2'};
+	my $syMon = $h->{'6. Time started SY'};
+	if ($syYear and $syYear eq 'Not yet') {
+	    $syYear = 2013;
+	    $syMon = 'Oct';
+	}
+	if ($syYear) {
+	    if (!length $syMon) {
+		if ($syYear == 2013) {
+		    $syMon = 10;
+		} else {
+		    $syMon = 6;
+		}
+	    } else {
+		$syMon = findMonth($syMon)
+	    }
+	    $sy = sprintf("%04d-%02d", $syYear, $syMon);
+	    #print "$h->{'6.2 Time started SY2'} $h->{'6. Time started SY'} -> $sy\n";
+	}
+	my $demogr = { age=>$age,
+			 edu => uncode($h->{'2. Education'}, \@EduItem),
+			 occupation => $h->{'3. Current occupation'},
+			 sex => uncode($h->{'4. Gender'}, \@GenderItem),
+			 relationship => uncode($h->{'5. Relationship'}, \@RelaItem),
+			 syStart => $sy
+		       };
+	$Demogr{$id} = $demogr if $id;
+	my $err;
+	my $dc = DateCalc(ParseDate($sy), FIRST_MEASUREMENT, \$err, 1);
+	my $months = Delta_Format($dc, 2, '%MyM');
+	$csv->print($out, [1, $id, $demogr->{age}, $demogr->{edu}, $demogr->{occupation}, $demogr->{sex},
+			  $demogr->{relationship}, $months, uncode_manocha(@$row[8..$#$row])]);
+	$out->print("\n");
+    }
+    while (my $row = $csv->getline($post)) {
+	my $h = as_hash($postHead, $row);
+	my $id = $Email2ID{$h->{'Email Address'}};
+	if (!$id or $id eq '?') {
+	    my $name = join(' ', $h->{'First Name'}, $h->{'LastName'});
+	    $id = $Name2ID{$name};
+	    if (!$id) { die "Can't find $name" }
+	}
+	my $demogr = $Demogr{$id};
+	my $err;
+	my $dc = DateCalc(ParseDate($demogr->{syStart}), $h->{EndDate}, \$err, 1);
+	my $months = Delta_Format($dc, 2, '%MyM');
+	$csv->print($out, [2, $id, $demogr->{age}, $demogr->{edu}, $demogr->{occupation}, $demogr->{sex},
+			   $demogr->{relationship}, $months, uncode_sm(@$row[10..$#$row])]);
+	$out->print("\n");
+    }
+}
+
+load_idmap();
+load_data();
+
+#warn Dumper(\%Name2ID);
