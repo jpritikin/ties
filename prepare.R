@@ -64,7 +64,7 @@ cause.teach.testlet <- function(df) {
 
 prepare.espt <- function(espt, scores) {
   for (col in c('edu','sex','rel')) {
-    espt[[col]] <- factor(espt[[col]])
+    espt[[col]] <- factor(tolower(espt[[col]]))
   }
 
   agreement.levels <- c('Agree','Agree somewhat','Not sure','Disagree somewhat','Disagree')
@@ -133,6 +133,12 @@ prepare.espt <- function(espt, scores) {
                              'I have not experienced complete mental silence')
   espt$maxDuration <- lax.ordered(espt, 'maxDuration', maxDuration.levels, maxDuration.oldlevels)
 
+  durChar.levels <- c('Mostly moments (e.g. an isolated second or two)',
+                      'Sometimes moments and sometimes continuous (e.g. isolated seconds and sometimes ten seconds or longer)',
+                      'Mostly continuous (e.g. usually ten seconds or longer)')
+  espt$durationCharacter <- lax.ordered(espt, 'durationCharacter', durChar.levels,
+                                        'I have not experienced complete mental silence')
+  
   boredom.levels <- c('True','Not sure','False')
   for (col in c('boreFidget', 'boreCheer', 'boreLone')) {
     espt[[col]] <- lax.ordered(espt, col, boredom.levels)

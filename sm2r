@@ -6,8 +6,9 @@ use Text::CSV_XS;
 use Fatal qw(open);
 use IO::File;
 use Term::ANSIColor;
-use Geo::IP;
-our $GI = Geo::IP->open("/tmp/chromium/GeoIP-20121204/GeoLiteCity.dat", GEOIP_STANDARD);
+use Geo::IPfree;
+our $GI;
+# $GI = Geo::IPfree->new();
 
 my %ContextMap = ('religious' => 're',
 		  'spiritual' => 'sp',
@@ -329,6 +330,7 @@ for my $file (@ARGV) {
 
 my $out = IO::File->new();
 $out->open(">$dest") or die $?;
+binmode($out, ":utf8");
 
 # outputs an array of column headers
 sub getHeader {
@@ -361,7 +363,8 @@ our %Instrument = ('web-20120527.csv' => '2012-05-22',
 		   'yogaville/201309.csv' => '2012-11-01',
 		   'ppool-20130912.csv' => '2013-08-15',
 		   'ppool-20130919.csv' => '2013-09-12',
-		   'short-20130912.csv' => '2013-08-15');
+		   'short-20130912.csv' => '2013-08-15',
+		   'ppool-20131209.csv' => '2013-09-12');
 our %ID;
 
 for my $waveinfo (@data) {
