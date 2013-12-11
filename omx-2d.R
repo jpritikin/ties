@@ -5,7 +5,7 @@ source('irtplot.R')
 load("espt.rda")
 
 gpcm <- function(outcomes) {
-  rpf.nrm(outcomes, T.c=lower.tri(diag(outcomes-1),TRUE) * -1, factors=2)
+  rpf.nrm(outcomes, factors=2)
   #   rpf.nrm(outcomes, T.c=diag(outcomes-1))
 }
 
@@ -16,12 +16,13 @@ gpcm <- function(outcomes) {
 # 'msCause0'    # redundent
 # 'msCause', 'msTeach', 'msTrainTeach' -- replace with causeTeach testlet
 # 'causeTeach'                # testlet item, too much missingness
-# 'skipExp'   # sample size problem
+# 'durationCharacter' ??
+# 'msAny'  # weak item
+# 'skipExp'   # redundent
 
-item.names <- c('skipInt', 'msNotion','msFreq', 'msAny', 'wantLearn',
-                   'msAfraid', 'msEmo', 'msLife', 'msFast', 'msIdentity', 'msEffort',
-                'maxDuration', 'freqCause', 'msYearn', 'msShared', 'msMet', 'msEnv',
-                'msCause', 'msTeach', 'msTrainTeach')
+item.names <- c('skipInt', 'msFreqTestlet','msDescarte',
+                   'msIdAfraidLearn', 'msFastEffortLife',
+                'msFreqDur', 'msYEC', 'msMetSharedTeach')
 
 # ensure we have the data we think we have
 missing <- item.names[is.na(match(item.names, colnames(espt)))]
@@ -30,19 +31,15 @@ if (length(missing)) stop(paste("Columns missing:", missing))
 sapply(espt[item.names], function (c) sum(!is.na(c)))  # per item sample size
 
 spec <- list()
-spec[1:length(item.names)] <- gpcm(5)
+for (n in 1:length(item.names)) {
+  lev <- length(levels(espt[[ item.names[n] ]]))
+  if (lev == 2) {
+    spec[n] <- rpf.grm(outcomes=2, factors=2)
+  } else {
+    spec[n] <- gpcm(lev)
+  }
+}
 names(spec) <- item.names
-spec["msFreq"] <- gpcm(4)
-if (!is.na(match("msCause0", item.names))) spec["msCause0"] <- gpcm(3)
-#if (!is.na(match("wantLearn", item.names))) spec["wantLearn"] <- gpcm(6)
-if (!is.na(match("freqCause", item.names))) spec["freqCause"] <- gpcm(4)
-#spec["maxDuration"] <- gpcm(4)
-#spec["ethical"] <- rpf.nrm(25, factors=2)
-if (!is.na(match("skipInt", item.names))) spec["skipInt"] <- rpf.grm(outcomes=2, factors=2)
-if (!is.na(match("skipExp", item.names))) spec["skipExp"] <- rpf.grm(outcomes=2, factors=2)
-
-if (!is.na(match('causeTeach', item.names)))
-  spec['causeTeach'] <- gpcm(length(levels(espt$causeTeach)))
 
 #sapply(spec, function(m) slot(m,'numOutcomes'))
 
@@ -50,27 +47,12 @@ when <- strptime(espt[['instrument']], "%Y-%m-%d")
 revision1 <- strptime("2013-02-11", "%Y-%m-%d")
 ver.mask <- difftime(when, revision1) > 0
 
-data <- espt[ver.mask, item.names]
-for (c in colnames(data)) { attr(data[,c], 'mxFactor') <- attr(espt[,c], 'mxFactor') }
+manocha2013.mask <- (espt$time == 2 | (espt$time == 1 & !(espt$id %in% espt[espt$time == 2, 'id'])))
+ver.mask[espt$wave == "manocha2013"] <- manocha2013.mask[espt$wave == "manocha2013"]
 
-if (0) {
-  g.wave1 <- espt[,'wave'] == 'germano2013-1'
-  g.wave2 <- espt[,'wave'] == 'germano2013-2'
-  g.wave3 <- espt[,'wave'] == 'germano2013-3'
-  other <- !(g.wave1 | g.wave2 | g.wave3)
-  col.mask <- apply(!is.na(data[g.wave1[mask],]), 2, any)
-  which(apply(!is.na(data[g.wave1[mask],]), 2, any))
-  
-  fm <- sapply(data, unclass) - 1
-  fm[is.na(fm)] <- -9
-  write.table(fm[g.wave1[mask],col.mask], file="fm-ms-g1.csv", row.names=FALSE, col.names=FALSE, quote=FALSE)
-  write.table(fm[g.wave2[mask],col.mask], file="fm-ms-g2.csv", row.names=FALSE, col.names=FALSE, quote=FALSE)
-  write.table(fm[g.wave3[mask],col.mask], file="fm-ms-g3.csv", row.names=FALSE, col.names=FALSE, quote=FALSE)
-  write.table(fm[other[mask],col.mask], file="fm-ms-main.csv", row.names=FALSE, col.names=FALSE, quote=FALSE)
-  
-  #  write.table(fm, file="ms-data.csv", row.names=FALSE, col.names=FALSE, quote=FALSE)
-  
-}
+data <- espt[ver.mask, item.names]
+
+sapply(data, function(r) sum(!is.na(r)))  # per item sample size
 
 numItems <- length(item.names)
 maxParam <- max(sapply(spec, rpf.numParam))
@@ -80,57 +62,68 @@ ip.mat@free[,] <- FALSE
 colnames(ip.mat@free) <- item.names
 colnames(ip.mat@values) <- item.names
 rownames(ip.mat@free) <- c("interest", "experience", rep(NA, maxParam-2))
-# ip.mat@free["know",c("msFreq", "msAny", "msEvery", "msCause0",    #fm 1
-#                      "maxDuration", "msYearn", "msMet", "msEnv",
-#                      "msCause", "msAllow", "msShared", "msTeach",
-#                      "msTrainTeach", "ethical")] <- TRUE
-# ip.mat@free["desire",c("msNotion","msEvery", "msCause0","wantLearn",    #fm 2
-#                        "msAfraid","msEmo","msLife", "msFast",
-#                        "msDescarte", "msIdentity", "freqCause",
-#                        "maxDuration", "msYearn", "msMet", "msEnv",
-#                        "msAllow", "ethical")] <- TRUE
-interest <- c('wantLearn', "msAfraid", "msEmo","msLife", "msFast","msEffort",
-            "msDescarte", "msIdentity")
-experience <- c('skipExp', "msAny", "maxDuration", "msYearn", "msCause0","msCause",
-                "msAllow","msShared","msTeach","msTrainTeach", "causeTeach")
+interest <- c('wantLearn', "msAfraid", "msEmo","msLife", "msFastEffort", "msFastEffortLife",
+            "msDescarte", "msIdentity", 'msIdAfraidLearn', 'msFreqTestlet')
+experience <- c('skipInt', 'msNotion', "msAny", "maxDuration", 'skipExp', "msYearn", "msCause0","msCause",
+                "msAllow", "msMetShared", "msMet", "msEnv","msShared","msTeach","msTrainTeach", "causeTeach",
+                "msFreqDur", "msYearnEnv", "msMetSharedTeach", "msYEC")
 ip.mat@free["interest", setdiff(item.names, experience)] <- TRUE
 ip.mat@free["experience", setdiff(item.names, interest)] <- TRUE
 #ip.mat@free[4,] <- TRUE  # just for fun
 for (ix in 1:numItems) {
   i <- rpf.paramInfo(spec[[ix]])
   ptype <- unlist(i)[seq(match('type', rownames(i)),length(i),length(rownames(i)))]
-  ip.mat@values[which(ptype==0), ix] <- 1
-  ip.mat@values[which(ptype==1), ix] <- 0
-  ip.mat@free[which(ptype==1), ix] <- TRUE
+  ip.mat@values[which(ptype==1), ix] <- 1
+  ip.mat@values[which(ptype==2), ix] <- 0
+  ip.mat@free[which(ptype==2), ix] <- TRUE
 }
-#ip.mat@free[4,"ethical"] <- TRUE
-#ip.mat@free[48:50,"ethical"] <- FALSE
 ip.mat@values[!ip.mat@free] <- 0
 ip.mat@values[3,] <- 1
 
-#  fmfit <- read.flexmirt("~/2012/sy/fm/ms-prm.txt")
-#  ip.mat@values <- fmfit$G1$param
+set.nominal.rank <- function(ip.mat, name, a, c) {
+  spec1 <- spec[[name]]
+  if (is.null(spec1)) {
+    return(ip.mat)
+  }
+  thresh <- spec1@outcomes-1
+  free <- rep(FALSE, spec1@factors + 2 * thresh)
+  base <- spec1@factors+1
+  free[base:(base + thresh * a - 1)] <- TRUE
+  base <- base + thresh
+  free[base:(base + thresh * c - 1)] <- TRUE
+  ip.mat@free[1:length(free),name] <- free
+  ip.mat
+}
+ip.mat <- set.nominal.rank(ip.mat, 'causeTeach', .27, .5)
+ip.mat <- set.nominal.rank(ip.mat, 'msIdAfraid', .27, .5)
+ip.mat <- set.nominal.rank(ip.mat, 'msFastEffort', .27, .5)
+ip.mat <- set.nominal.rank(ip.mat, 'msFastEffortLife', .27, .5)
+ip.mat <- set.nominal.rank(ip.mat, 'msIdAfraidLearn', .27, .5)
+ip.mat <- set.nominal.rank(ip.mat, 'msFreqTestlet', .27, .5)
+ip.mat <- set.nominal.rank(ip.mat, 'msIdAfraidLearn', .4, .5)
+ip.mat <- set.nominal.rank(ip.mat, 'msLife', .27, 1)
+ip.mat <- set.nominal.rank(ip.mat, 'msMetShared', .27, .5)
+ip.mat <- set.nominal.rank(ip.mat, 'msFreqDur', .27, .5)
+ip.mat <- set.nominal.rank(ip.mat, 'msYearnEnv', .27, .5)
+ip.mat <- set.nominal.rank(ip.mat, 'msMetSharedTeach', .27, .4)
+ip.mat <- set.nominal.rank(ip.mat, 'msYEC', .27, .4)
 
 m.mat <- mxMatrix(name="mean", nrow=1, ncol=2, values=c(0,0), free=FALSE)
+est.cov <- ip.mat@values[1,] %*% ip.mat@values[2,] != 0
 cov.mat <- mxMatrix("Symm", name="cov", nrow=2, ncol=2, values=diag(2),
-                    free=c(FALSE,TRUE,FALSE), labels=c("v1","cov12","v2"))
+                    free=c(FALSE,est.cov,FALSE), labels=c("v1","cov12","v2"))
 
 m2 <- mxModel(model="2d",
               m.mat, cov.mat, ip.mat,
               mxData(observed=data, type="raw"),
               mxExpectationBA81(mean="mean", cov="cov",
                                 ItemSpec=spec, ItemParam="ItemParam",
-                                qpoints=21, qwidth=5), #, scores="full"
+                                qpoints=21, qwidth=5, scores="full"),
               mxFitFunctionML(),
-              mxComputeSequence(steps=list(
-                mxComputeIterate(verbose=1L, steps=list(
-                  mxComputeOnce('expectation', context='EM'),
-                  #                  mxComputeGradientDescent(free.set='ItemParam', useGradient=TRUE),
-                  mxComputeNewtonRaphson(free.set='ItemParam', carefully=TRUE),
-                  mxComputeOnce('expectation'),
-                  mxComputeOnce('fitfunction', free.set=c("mean", "cov"), maxAbsChange=TRUE)
-                )),
-               mxComputeOnce('fitfunction', free.set=c("mean", "cov"), fit=TRUE))))
+              mxComputeEM('expectation',
+                          mxComputeNewtonRaphson(free.set='ItemParam'),
+                          mxComputeOnce('fitfunction', free.set=c("mean", "cov"), fit=TRUE),
+                          verbose=2L))
   #  m2 <- mxOption(m2, "Number of Threads", 1)
 m2.est <- mxRun(m2)
 print(m2.est@fitfunction@result)
@@ -138,18 +131,61 @@ rownames(m2.est@matrices$ItemParam@values) <- c("interest", "experience", rep(NA
 print(m2.est@matrices$ItemParam@values[1:2,])
 print(m2.est@matrices$cov@values)
 
+if (0) {
+  fixed.ip <- m2.est@matrices$ItemParam
+  fixed.ip@free[,] <- FALSE
+  eap <- mxModel(m2, fixed.ip, mxData(observed=espt[espt$wave == "manocha2013", item.names], type="raw"),
+                 mxComputeOnce('expectation', context='EM'))
+  eap.est <- mxRun(eap)
+  manocha2013sc <- eap.est@expectation@scores.out[,1:2]
+  save(manocha2013sc, file="manocha2013sc.rda")
+}
+
 latentVars <- c("interest", "experience")
 grp <- list(spec=spec,
             param=m2.est@matrices$ItemParam@values,
             free=apply(ip.mat@free, 2, sum),
-            mean=m2.est@matrices$mean@values, cov=m2.est@matrices$cov@values)
+            mean=m2.est@matrices$mean@values,
+            cov=m2.est@matrices$cov@values,
+            scores=m2.est@expectation@scores.out,
+            data=data)
+
+print(cor(grp$scores[,1], grp$scores[,2]))
+
 # design needed for two-tier? TODO
 colnames(grp$mean) <- latentVars
 dimnames(grp$cov) <- list(latentVars, latentVars)
 
-got <- chen.thissen.1997(grp, data)
+if (0) {
+  # doesn't make sense
+  got <- chen.thissen.1997(grp, data)
+  max(got$pval[!is.na(got$pval)])
+}
 
-max(abs(got$std[!is.na(got$std)]))
+#p <- rpf.plot(grp, "causeTeach", width=4, data.bins=13, basis=c(0,1), factor=2)
+#print(p)
+
+booklet(function(item) {
+  rpf.plot(grp, item, width=4, data.bins=12, basis=c(1,0), factor=1)
+}, item.names[grp$param[1,] > 0], output="interest.pdf")
+
+booklet(function(item) {
+  rpf.plot(grp, item, width=4, data.bins=12, basis=c(0,1), factor=2)
+}, item.names[grp$param[2,] > 0], output="experience.pdf")
+
+if (0) {
+  map1 <- item.map(grp, 1)
+  ggplot(map1, aes(x=score, y=item.name, label=outcome)) + geom_text()
+  map2 <- item.map(grp, 2)
+  ggplot(map2, aes(x=score, y=item.name, label=outcome)) + geom_text()
+}
+
+if (0) {
+  got1 <- chen.thissen.1997(grp, data, item.names[m2.est@matrices$ItemParam@values[1,] != 0])
+  got2 <- chen.thissen.1997(grp, data, item.names[m2.est@matrices$ItemParam@values[2,] != 0])
+  
+  c(max(got1$pval[!is.na(got1$pval)]), max(got2$pval[!is.na(got2$pval)]))
+}
 
 if (0) {
   # try to figure out ethical items
@@ -184,3 +220,17 @@ if (0) {
 #espt[mask, "score"] <- m2@expectation@scores.out[,1]
 #espt[mask, "se"] <- m2@expectation@scores.out[,2]
 
+if (0) {
+  sc <- m2.est@expectation@scores.out
+  for (l in 1:3) {
+    mask <- espt$durationCharacter==levels(espt$durationCharacter)[l]
+    mask <- !is.na(mask) & mask
+    print(paste(l, mean(sc[mask,1]), mean(sc[mask,2])))
+  }
+}
+
+if (0) {
+  v1 <- got$detail$"msTrainTeach:msTeach"
+  chisq(v1$observed, v1$expected)
+  ptw2011.gof.test(v1$observed, v1$expected)
+}

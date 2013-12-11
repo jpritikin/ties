@@ -1,4 +1,6 @@
 library(ggplot2)
+library(reshape2)
+library(gridExtra)
 
 item.map <- function(grp, factor=1) {
   item.mask <- grp$param[factor,] > 0
@@ -15,6 +17,63 @@ item.map <- function(grp, factor=1) {
     }
   }
   result
+}
+
+# new version of data vs model plot
+rpf.plot <- function(grp, item.name, width=3, data.bins=11, basis=c(1), factor=1) {
+  ix <- match(item.name, colnames(grp$param))
+  if (length(ix) != 1 || is.na(ix)) stop(paste("Can't find"), item.name)
+  
+  labels <- levels(grp$data[[item.name]])
+  spec1 <- grp$spec[[ix]]
+  pm <- t(rpf.prob(spec1, grp$param[1:rpf.numParam(spec1),ix], basis %*% t(seq(-width, width, .1))))
+  icc <- as.data.frame(melt(pm, varnames=c("theta",'category')))
+  icc$theta <- seq(-width, width, .1)
+  icc$category <- ordered(icc$category, labels=labels)
+  icc$type <- 'model'
+  
+  score <- grp$score[,factor]
+  breaks <- seq(min(score, na.rm=TRUE),
+                max(score, na.rm=TRUE),
+                length.out=data.bins+1)
+  bin <- unclass(cut(score, breaks, include.lowest = TRUE))
+  
+  eout <- array(dim=c(data.bins, spec1@outcomes+1))
+  est <- numeric(data.bins)
+  
+  for (px in 1:data.bins) {
+    t <- table(grp$data[[item.name]][bin==px])
+    est[px] <- sum(t)
+    eout[px,2:(spec1@outcomes+1)] <- t / sum(t)
+  }
+  eout[,1] <- ((c(breaks,0) + c(0,breaks))/2)[2:(data.bins+1)]
+  bin.n <- data.frame(n=est, theta=eout[,1])
+  
+  edf <- melt(as.data.frame(eout), id.vars=c('V1'),
+              variable.name="category")
+  edf$category <- ordered(unclass(edf$category), labels=labels)
+  edf$theta <- edf$V1
+  edf$V1 <- NULL
+  edf$type <- 'data'
+  
+  both <- rbind(edf, icc)
+  both$type <- factor(both$type)
+  
+  plot <- ggplot(both, aes(theta, value)) +
+     facet_wrap(~type) +
+    ylim(0,1) + xlim(-width,width) + labs(y="probability") +
+    geom_text(data=bin.n, aes(label=n, x=theta), y = 1, size=1.5)
+  guide.style <- guide_legend(keywidth=.1, keyheight=.5, direction = "horizontal", title.position = "top",
+                              label.position="bottom", label.hjust = 0.5, label.vjust = .5,
+                              label.theme = element_text(angle = 90, size=8))
+  if (length(labels) <= 12) {
+    plot <- plot + geom_line(aes(color=category, linetype=category)) +
+      guides(color = guide.style, linetype = guide.style)
+  } else {
+    plot <- plot + geom_line(aes(color=category)) + 
+      guides(color = guide.style)
+  }
+  plot + labs(title = paste0(ix,": ",item.name))
 }
 
 plot.info <- function(spec, param, i.name, width=3, show.total=TRUE) {
@@ -93,12 +152,13 @@ flush.plots <- function(plots, page) {
       ggplot(expand.grid(x=1:4, y=1:4), aes(x,y)) + geom_point()
   }
   
-  pdf(sprintf("gen/data.vs.model-%03d.pdf", page))
+  pdf(sprintf("gen/page-%03d.pdf", page))
   do.call(grid.arrange,plots)
   dev.off()
 }
 
-data.vs.model.booklet <- function (plot.fn, args) {
+booklet <- function (plot.fn, args, output="booklet.pdf") {
+  unlink("gen/page-*.pdf")
   page <- 1
   plots <- list()
   for (ix in args) {
@@ -110,7 +170,7 @@ data.vs.model.booklet <- function (plot.fn, args) {
     }
   }
   if (length(plots)) flush.plots(plots,page)
-  system("pdfunite  gen/data.vs.model-*  data.vs.model.pdf")
+  system(paste("pdfunite  gen/page-*", output))
 }
 
 ## name <- 'msCause'

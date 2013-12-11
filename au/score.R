@@ -1,6 +1,7 @@
 library(ggplot2)
 
 manocha2013 <- read.csv("2013combined.csv", stringsAsFactors=FALSE)
+rawcols <- colnames(manocha2013[9:length(manocha2013)])
 haveboth <- match(manocha2013$id, manocha2013[manocha2013$time==2,'id'])
 
 mean.or.na <- function(mat, n.min) {
@@ -83,6 +84,8 @@ psqi.6 <- unclass(manocha2013[[37 + 17]]) - 1
 psqi.daytime <- unclass(manocha2013[[37 + 18]]) + unclass(manocha2013[[37 + 19]]) - 2
 psqi.7 <- unclass(cut(psqi.daytime, c(0,.9,2,4,6), ordered_result=TRUE)) - 1
 
+# 0 indicates no difficulty
+# 21 indicates severe difficulty
 manocha2013$psqi <- 
   apply(cbind(psqi.1, psqi.2, psqi.3, psqi.4, psqi.5, psqi.6, psqi.7), 1, sum)
 
@@ -121,3 +124,48 @@ if (0) {
   df$time <- factor(df$time)
   ggplot(df, aes(time, dass.na, group=id, color=id)) + geom_line()
 }
+
+######################################### SY practices
+
+SYPracticeItem = c('more often than twice daily',
+                       'twice daily',
+                       'between twice and once a day',
+                       'less than once a day but more than 3 times a week',
+                       'between 3 times a week and once a week',
+                       'between once a week and once a month',
+                       'less than once a month')
+
+for (col in 9:12) {
+  manocha2013[[col]] <- ordered(manocha2013[[col]], levels=SYPracticeItem)
+}
+
+manocha2013$sypractice <- mean.or.na(sapply(manocha2013[,9:12], unclass), 3)
+
+######################################### Mental silence
+
+load("../manocha2013sc.rda")
+manocha2013$msInterest <- manocha2013sc[,1]
+manocha2013$msExperience <- manocha2013sc[,2]
+
+if (0) {
+  df <- manocha2013[which(!is.na(haveboth)), c('id', 'time', 'msInterest', 'msExperience')]
+  df$id <- factor(df$id)
+  df$time <- factor(df$time)
+  ggplot(df, aes(time, msExperience, group=id, color=id)) + geom_line()
+}
+
+######################################### Change scores
+
+for (col in rawcols) { manocha2013[[col]] <- NULL }
+
+measures <- c("rumination", "reflection", "psqi", "dass.d", "dass.a", "dass.s",  "dass.na",
+              "sypractice", "msInterest", "msExperience")
+
+t1 <- manocha2013[!is.na(haveboth) & manocha2013$time==1,measures]
+t2 <- manocha2013[!is.na(haveboth) & manocha2013$time==2,measures]
+chg <- cbind(manocha2013[!is.na(haveboth) & manocha2013$time==1,colnames(manocha2013)[2:8]], t2-t1)
+write.table(chg, file="change.csv", sep="\t", row.names=FALSE)
+
+cor(chg$msInterest, chg$msExperience)
+options(width=60)
+chg[chg$msInterest >= 0 & chg$msExperience >= 0,measures]

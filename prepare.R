@@ -1,6 +1,14 @@
 library(OpenMx)
 
+mean.or.na <- function(mat, n.min) {
+  size <- apply(mat, 1, function(r) sum(!is.na(r)))
+  score <- apply(mat, 1, function(r) sum(r, na.rm=TRUE))
+  score[size < n.min] <- NA
+  score / size
+}
+
 lax.ordered <- function(df, col, levels, old.levels=c()) {
+  if (is.null(df[[col]])) return(NULL)
     if (!missing(old.levels)) {
         if (any(!is.na(match(old.levels, levels)))) stop("levels and old.levels overlap")
         df[[col]][which(!is.na(match(df[[col]], old.levels)))] <- ''
@@ -9,7 +17,7 @@ lax.ordered <- function(df, col, levels, old.levels=c()) {
   df[[col]] <- tolower(df[[col]])
   no.match <- is.na(match(df[[col]], c('',levels)))
   if (any(no.match)) {
-    stop(paste("In", col, "unknown levels:", unique(df[[col]][no.match])))
+    stop(paste("In", col, "unknown levels:", paste(unique(df[[col]][no.match]), collapse=" ")))
   }
   df[[col]] <- mxFactor(df[[col]], levels=levels)
 }
@@ -156,29 +164,36 @@ prepare.espt <- function(espt, scores) {
   for (context in c('re','sp','ps','rx','pe','wo','me','dd','fl')) {
     for (col in c(paste(context,'ms.pf',sep='.'),
                   paste(context,'b.pf',sep='.'))) {
+      if (is.null(espt[[col]])) next
       espt[[col]] <- mxFactor(espt[[col]], levels=freq.levels)
     }
     col <- paste(context,'subjTime',sep='.')
+    if (is.null(espt[[col]])) next
     espt[[col]] <- mxFactor(espt[[col]], levels=subj.time.levels)
     for (col in c(paste(context,'ms.gi',sep='.'),
                   paste(context,'b.gi',sep='.'))) {
+      if (is.null(espt[[col]])) next
       espt[[col]] <- mxFactor(espt[[col]], levels=importance.levels)
     }
   }
 
-  thinking.levels <- c('None', 'A little thinking',
-                       'Some moderate thinking',
-                       'Rigorous, intensive thinking')
-  espt$flow.think <- mxFactor(espt$flow.think, levels=thinking.levels)
+  if (!is.null(espt[["flow.think"]])) {
+    thinking.levels <- c('None', 'A little thinking',
+                         'Some moderate thinking',
+                         'Rigorous, intensive thinking')
+    espt$flow.think <- mxFactor(espt$flow.think, levels=thinking.levels)
+  }
 
   prepare.levels <- c('Yes', 'Yes, somewhat', 'Not sure / maybe',
                       'Probably not', 'No')
   for (col in c('ms.flow', 'flow.ms')) {
+    if (is.null(espt[[col]])) next
     espt[[col]] <- mxFactor(espt[[col]], levels=prepare.levels)
   }
 
   for (col in c('m.training', 'm.regular', 'wave', 'ip.continent',
                 'ip.country', 'ip.region', 'ip.city')) {
+    if (is.null(espt[[col]])) next
     espt[[col]] <- factor(espt[[col]])
   }
 #  espt$ppool <- factor(espt$wave == "ppool-20121230",
@@ -198,11 +213,13 @@ prepare.espt <- function(espt, scores) {
     head(espt[obsolete, 'msAccident'])
   }
   
-  ethical.mask <- !is.na(espt$msPay) & !is.na(espt$msPaySure)
-  ethical.levels <- apply(expand.grid(levels(espt$msPay), levels(espt$msPaySure)), 1, paste, collapse="+")
-  espt$ethical[ethical.mask] <- apply(as.matrix(espt[ethical.mask, c("msPay", "msPaySure")]),
-                                    1, paste, collapse="+")
-  espt$ethical <- mxFactor(espt$ethical, levels=ethical.levels)
+  if (!is.null(espt$msPay)) {
+    ethical.mask <- !is.na(espt$msPay) & !is.na(espt$msPaySure)
+    ethical.levels <- apply(expand.grid(levels(espt$msPay), levels(espt$msPaySure)), 1, paste, collapse="+")
+    espt$ethical[ethical.mask] <- apply(as.matrix(espt[ethical.mask, c("msPay", "msPaySure")]),
+                                        1, paste, collapse="+")
+    espt$ethical <- mxFactor(espt$ethical, levels=ethical.levels)
+  }
   
   espt$causeTeach <- cause.teach.testlet(espt)
   
@@ -257,6 +274,26 @@ prepare.espt <- function(espt, scores) {
 
   espt$skipInt <- mxFactor(espt$skipInt, levels=c(FALSE, TRUE))
   espt$skipExp <- mxFactor(espt$skipExp, levels=c(TRUE, FALSE))
+  
+  # testlets
+  espt$msIdAfraid <- ordered(10 - unclass(espt$msAfraid) - unclass(espt$msIdentity), levels=seq(8,0,-1))
+  espt$msIdAfraidLearn <- ordered(unclass(espt$wantLearn) - (10 - unclass(espt$msAfraid) - unclass(espt$msIdentity)),
+                                  levels=seq(-7,5,1))
+  espt$msFastEffort <- ordered(10 - unclass(espt$msFast) - unclass(espt$msEffort), levels=seq(8,0,-1))
+  espt$msFastEffortLife <- ordered(15 - unclass(espt$msFast) - unclass(espt$msEffort) - unclass(espt$msLife),
+                                   levels=seq(13,0,-1))
+  freqItems <- cbind(unclass(espt$msFreq), unclass(espt$freqCause))
+  espt$msFreqTestlet <- ordered(mean.or.na(freqItems, 1), levels=seq(1,4,.5))
+  espt$msMetShared <- ordered(unclass(espt$msMet) + unclass(espt$msShared) - 1, levels=1:9)
+  espt$msFreqDur <- ordered(unclass(espt$freqCause) + unclass(espt$maxDuration) - 1, levels=1:8)
+  espt$msYearnEnv <- ordered(unclass(espt$msYearn) + unclass(espt$msEnv) - 1, levels=1:9)
+  
+  # try testlet split between social and non-social
+  metShared <- round(mean.or.na(cbind(unclass(espt$msMet), unclass(espt$msShared)), 1))
+  adjTeach <- apply(cbind(unclass(espt$msTeach), metShared), 1, min)
+  adjTrain <- apply(cbind(unclass(espt$msTrainTeach), adjTeach), 1, min)
+  espt$msMetSharedTeach <- ordered(metShared + adjTeach + adjTrain - 2, levels=1:13)
+  espt$msYEC <- ordered(unclass(espt$msYearn) + unclass(espt$msEnv) + unclass(espt$msCause) -2, levels=1:13)
   
   return(espt)
 }

@@ -35,7 +35,7 @@ sub msItems {
     } elsif ($t2 eq 'I intentionally create favorable conditions to allow myself to experience complete mental silence.') {
 	'msEnv'
     } elsif ($t2 eq 'Do you know how to intentionally cause yourself to experience complete mental silence?') {
-	'msCause0'
+	'msCause0'  # removed
     } elsif ($t2 eq 'I can intentionally cause myself to experience complete mental silence.') {
 	'msCause'
     } elsif ($t2 eq 'I am able to teach other people how to experience complete mental silence.') {
@@ -364,7 +364,9 @@ our %Instrument = ('web-20120527.csv' => '2012-05-22',
 		   'ppool-20130912.csv' => '2013-08-15',
 		   'ppool-20130919.csv' => '2013-09-12',
 		   'short-20130912.csv' => '2013-08-15',
-		   'ppool-20131209.csv' => '2013-09-12');
+		   'ppool-20131209.csv' => '2013-09-12',
+		   'short-20131209p.csv' => '2013-09-12',
+		  );
 our %ID;
 
 for my $waveinfo (@data) {

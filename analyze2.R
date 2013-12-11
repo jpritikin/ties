@@ -12,7 +12,9 @@ options(error = utils::recover)
 source("prepare.R")
 raw <- read.csv("raw.csv", stringsAsFactors=FALSE)
 manocha2013 <- read.csv("au/2013combined.csv", stringsAsFactors=FALSE)
-combined <- smartbind(raw, manocha2013[manocha2013$time == 1,], fill="")
+manocha2013$wave <- 'manocha2013'
+manocha2013$instrument <- '2013-09-12'
+combined <- smartbind(raw, manocha2013, fill="")
 espt <- prepare.espt(combined)
 save(espt, file="espt.rda")
 
