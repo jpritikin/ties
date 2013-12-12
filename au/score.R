@@ -81,8 +81,8 @@ psqi.disturb <- sapply(manocha2013[c((37+6):(37+13), 37+15)], unclass) - 1
 psqi.disturb.mean <- mean.or.na(psqi.disturb, 8)
 psqi.5 <- unclass(cut(psqi.disturb.mean, c(-1, .9, 9, 18, 30)/9)) - 1
 psqi.6 <- unclass(manocha2013[[37 + 17]]) - 1
-psqi.daytime <- unclass(manocha2013[[37 + 18]]) + unclass(manocha2013[[37 + 19]]) - 2
-psqi.7 <- unclass(cut(psqi.daytime, c(0,.9,2,4,6), ordered_result=TRUE)) - 1
+psqi.daytime <- sapply(manocha2013[c(37 + 18, 37 + 19)], unclass)
+psqi.7 <-ceiling(mean.or.na(psqi.daytime, 1) - 1)
 
 # 0 indicates no difficulty
 # 21 indicates severe difficulty
@@ -156,16 +156,22 @@ if (0) {
 
 ######################################### Change scores
 
-for (col in rawcols) { manocha2013[[col]] <- NULL }
+scores <- manocha2013
+for (col in rawcols) { scores[[col]] <- NULL }
 
 measures <- c("rumination", "reflection", "psqi", "dass.d", "dass.a", "dass.s",  "dass.na",
               "sypractice", "msInterest", "msExperience")
 
-t1 <- manocha2013[!is.na(haveboth) & manocha2013$time==1,measures]
-t2 <- manocha2013[!is.na(haveboth) & manocha2013$time==2,measures]
-chg <- cbind(manocha2013[!is.na(haveboth) & manocha2013$time==1,colnames(manocha2013)[2:8]], t2-t1)
-write.table(chg, file="change.csv", sep="\t", row.names=FALSE)
+write.table(scores[!is.na(haveboth),], file="scores.csv", sep="\t", row.names=FALSE)
 
-cor(chg$msInterest, chg$msExperience)
-options(width=60)
-chg[chg$msInterest >= 0 & chg$msExperience >= 0,measures]
+t1 <- scores[!is.na(haveboth) & scores$time==1,measures]
+t2 <- scores[!is.na(haveboth) & scores$time==2,measures]
+chg <- cbind(scores[!is.na(haveboth) & scores$time==1,colnames(scores)[2:8]], t2-t1)
+
+if (0) {
+  write.table(chg, file="change.csv", sep="\t", row.names=FALSE)
+  
+  cor(chg$msInterest, chg$msExperience)
+  options(width=60)
+  chg[chg$msInterest >= 0 & chg$msExperience >= 0,measures]
+}

@@ -143,7 +143,7 @@ sub hours_slept {
 #    warn "calc $bedtime -> $wake";
     my $err;
     my @time_fields = split(/\:/, $bedtime);
-    return '' if !looks_like_number($time_fields[0]);
+    return undef if !looks_like_number($time_fields[0]);
     my $day = $time_fields[0] > 12? '01' : '02';
     my $d1 = ParseDate("2001-01-$day ".$bedtime);
     my $d2 = ParseDate('2001-01-02 '.$wake);
@@ -288,8 +288,24 @@ sub uncode_sm {
 	$item[31] = '';
     }
     if (length $item[29] and length $item[31]) {
-#	warn "|$item[29]|$item[31]|";
+	# need special cases because I didn't have constrained data entry
+	if ($item[31] eq '6 - 6.30am') {
+	    $item[31] = '6:15 am'
+	}
+	if ($item[31] eq '5.50-6.10') {
+	    $item[31] = '6:00 am'
+	}
+	if ($item[29] eq '11-00pm---- 1-00am.') {
+	    $item[29] = '12:00 pm';
+	}
+	if ($item[31] eq '7-00am to 7-30am') {
+	    $item[31] = '7:15 am';
+	}
+	if ($item[29] eq 'Between 9-11pm, 8.30-10am when on night shift') {
+	    $item[29] = '10:00 pm';
+	}
 	my $hrs = hours_slept(decode_pm($item[29]), decode_am($item[31]));
+	warn "|$item[29]|$item[31]|" if !defined $hrs;
 	$item[29] = $hrs;
 	$item[31] = '';
     }
