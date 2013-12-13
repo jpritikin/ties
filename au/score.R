@@ -164,14 +164,23 @@ measures <- c("rumination", "reflection", "psqi", "dass.d", "dass.a", "dass.s", 
 
 write.table(scores[!is.na(haveboth),], file="scores.csv", sep="\t", row.names=FALSE)
 
-t1 <- scores[!is.na(haveboth) & scores$time==1,measures]
-t2 <- scores[!is.na(haveboth) & scores$time==2,measures]
-chg <- cbind(scores[!is.na(haveboth) & scores$time==1,colnames(scores)[2:8]], t2-t1)
+t1.order <- which(!is.na(haveboth) & scores$time==1)
+t1.order <- t1.order[order(scores$id[t1.order])]
+t2.order <- which(!is.na(haveboth) & scores$time==2)
+t2.order <- t2.order[order(scores$id[t2.order])]
+t1 <- scores[t1.order, measures]
+t2 <- scores[t2.order, measures]
+chg <- cbind(scores[t1.order,colnames(scores)[2:8]], t2-t1)
 
 if (0) {
   write.table(chg, file="change.csv", sep="\t", row.names=FALSE)
   
   cor(chg$msInterest, chg$msExperience)
   options(width=60)
-  chg[chg$msInterest >= 0 & chg$msExperience >= 0,measures]
+  success <- chg$msInterest >= 0 & chg$msExperience >= 0
+  chg[success,measures]
+  
+  whysuccess <- cbind(success=success, t1)
+  m1 <- glm(success ~ ., data=whysuccess, family=binomial(link=logit))
 }
+

@@ -304,6 +304,9 @@ sub uncode_sm {
 	if ($item[29] eq 'Between 9-11pm, 8.30-10am when on night shift') {
 	    $item[29] = '10:00 pm';
 	}
+	if ($item[31] eq '7') {
+	    $item[31] = '7:00 am';
+	}
 	my $hrs = hours_slept(decode_pm($item[29]), decode_am($item[31]));
 	warn "|$item[29]|$item[31]|" if !defined $hrs;
 	$item[29] = $hrs;

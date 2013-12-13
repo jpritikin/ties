@@ -131,7 +131,7 @@ rownames(m2.est@matrices$ItemParam@values) <- c("interest", "experience", rep(NA
 print(m2.est@matrices$ItemParam@values[1:2,])
 print(m2.est@matrices$cov@values)
 
-if (0) {
+if (1) {
   fixed.ip <- m2.est@matrices$ItemParam
   fixed.ip@free[,] <- FALSE
   eap <- mxModel(m2, fixed.ip, mxData(observed=espt[espt$wave == "manocha2013", item.names], type="raw"),
