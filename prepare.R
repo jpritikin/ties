@@ -281,7 +281,7 @@ prepare.espt <- function(espt, scores) {
                                   levels=seq(-7,5,1))
   espt$msFastEffort <- ordered(10 - unclass(espt$msFast) - unclass(espt$msEffort), levels=seq(8,0,-1))
   espt$msFastEffortLife <- ordered(15 - unclass(espt$msFast) - unclass(espt$msEffort) - unclass(espt$msLife),
-                                   levels=seq(13,0,-1))
+                                   levels=seq(12,0,-1))
   freqItems <- cbind(unclass(espt$msFreq), unclass(espt$freqCause))
   espt$msFreqTestlet <- ordered(mean.or.na(freqItems, 1), levels=seq(1,4,.5))
   espt$msMetShared <- ordered(unclass(espt$msMet) + unclass(espt$msShared) - 1, levels=1:9)

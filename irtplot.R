@@ -6,9 +6,9 @@ item.map <- function(grp, factor=1) {
   item.mask <- grp$param[factor,] > 0
   result <- NULL
   for (ix in which(item.mask)) {
-    lev <- levels(data[,ix])
+    lev <- levels(grp$data[,ix])
     for (ox in 1:length(lev)) {
-      mask <- data[,ix]==lev[ox]
+      mask <- grp$data[,ix]==lev[ox]
       mask <- !is.na(mask) & mask
       if (all(!mask)) next
       result <- rbind(result, data.frame(item=ix, item.name=colnames(grp$param)[ix],
@@ -76,17 +76,17 @@ rpf.plot <- function(grp, item.name, width=3, data.bins=11, basis=c(1), factor=1
   plot + labs(title = paste0(ix,": ",item.name))
 }
 
-plot.info <- function(spec, param, i.name, width=3, show.total=TRUE) {
-  if (missing(i.name)) {
-    i.name <- paste0('i', 1:length(spec))
-  }
+plot.info <- function(grp, width=3, show.total=TRUE) {
+  spec <- grp$spec
+  param <- grp$param
+  i.name <- names(spec)
   grid <- seq(-width,width,.1)
   df <- list(score=grid)
   total <- numeric(length(grid))
   for (ix in 1:length(spec)) {
     id <- i.name[ix]
     s <- spec[[ix]]
-    df[[id]] <- rpf.info(s, param[ix,1:rpf.numParam(s)], t(grid))
+    df[[id]] <- rpf.info(s, param[1:rpf.numParam(s),ix], t(grid))
     total <- total + df[[id]]
   }
   if (show.total) df$total <- total

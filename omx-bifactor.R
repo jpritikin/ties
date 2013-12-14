@@ -144,8 +144,6 @@ booklet(function(item) {
   rpf.plot(grp2, item, width=4, data.bins=12, basis=basis, factor=2)
 }, inames, output="interest.pdf")
 
-stop("ok")
-
 if (0) {
   fixed.ip <- m2.est@matrices$ItemParam
   fixed.ip@free[,] <- FALSE
@@ -156,37 +154,11 @@ if (0) {
   save(manocha2013sc, file="manocha2013sc.rda")
 }
 
-latentVars <- c("interest", "experience")
-grp <- list(spec=spec,
-            param=m2.est@matrices$ItemParam@values,
-            free=apply(ip.mat@free, 2, sum),
-            mean=m2.est@matrices$mean@values,
-            cov=m2.est@matrices$cov@values,
-            scores=m2.est@expectation@scores.out,
-            data=data)
-
-print(cor(grp$scores[,1], grp$scores[,2]))
-
-# design needed for two-tier? TODO
-colnames(grp$mean) <- latentVars
-dimnames(grp$cov) <- list(latentVars, latentVars)
-
 if (0) {
-  # doesn't make sense
-  got <- chen.thissen.1997(grp, data)
-  max(got$pval[!is.na(got$pval)])
+  booklet(function(item) {
+    rpf.plot(grp, item, width=4, data.bins=12, basis=c(0,1), factor=2)
+  }, item.names[grp$param[2,] > 0], output="experience.pdf")
 }
-
-#p <- rpf.plot(grp, "causeTeach", width=4, data.bins=13, basis=c(0,1), factor=2)
-#print(p)
-
-booklet(function(item) {
-  rpf.plot(grp, item, width=4, data.bins=12, basis=c(1,0), factor=1)
-}, item.names[grp$param[1,] > 0], output="interest.pdf")
-
-booklet(function(item) {
-  rpf.plot(grp, item, width=4, data.bins=12, basis=c(0,1), factor=2)
-}, item.names[grp$param[2,] > 0], output="experience.pdf")
 
 if (0) {
   map1 <- item.map(grp, 1)
