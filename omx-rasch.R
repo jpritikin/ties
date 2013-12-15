@@ -36,7 +36,6 @@ set.starting <- function(ispec, ip.mat) {
 
 is.true <- function(v) v & !is.na(v)
 
-
 # 'msEvery'  possibly too vague, better measured by other items
 #     # too much missingness, revisit later
 # 'msAllow',                  # drop this or msCause, need larger sample
@@ -66,6 +65,12 @@ sapply(idata, function(r) sum(!is.na(r)))  # per item sample size
 
 edata <- espt[ver.mask, enames]
 sapply(edata, function(r) sum(!is.na(r)))  # per item sample size
+
+if (FALSE && !is.null(idata$wantLearn)) {
+  idata$wantLearn[idata$wantLearn == "yes, if it was easy to learn"] <- "not sure"
+  idata$wantLearn[idata$wantLearn == "yes, i am moderately curious"] <- "not sure"
+  idata$wantLearn <- ordered(idata$wantLearn, levels=levels(idata$wantLearn)[c(-3,-4)])
+}
 
 ispec <- create.spec(inames, idata)
 espec <- create.spec(enames, edata)

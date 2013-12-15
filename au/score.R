@@ -1,8 +1,16 @@
 library(ggplot2)
 
+is.true <- function(v) v & !is.na(v)
+
 manocha2013 <- read.csv("2013combined.csv", stringsAsFactors=FALSE)
 rawcols <- colnames(manocha2013[9:length(manocha2013)])
+#mask <- apply(is.na(manocha2013[,rawcols]), 1, sum)
+#manocha2013$id[manocha2013$time==2 & mask > 60]
 haveboth <- match(manocha2013$id, manocha2013[manocha2013$time==2,'id'])
+
+# store todo list for mkreport
+write.table(manocha2013[manocha2013$time==2,'id'], file="report-todo.csv",
+              row.names=FALSE, col.names=FALSE)
 
 mean.or.na <- function(mat, n.min) {
   size <- apply(mat, 1, function(r) sum(!is.na(r)))
@@ -136,14 +144,16 @@ SYPracticeItem = c('more often than twice daily',
                        'less than once a month')
 
 for (col in 9:12) {
-  manocha2013[[col]] <- ordered(manocha2013[[col]], levels=SYPracticeItem)
+  manocha2013[[col]] <- ordered(manocha2013[[col]], levels=rev(SYPracticeItem))
 }
 
 manocha2013$sypractice <- mean.or.na(sapply(manocha2013[,9:12], unclass), 3)
+manocha2013$sypractice[manocha2013$syMonths <= 2 & is.na(manocha2013$sypractice)] <- 1
 
 ######################################### Mental silence
 
 load("../manocha2013sc.rda")
+if (dim(manocha2013sc)[1] != length(manocha2013$id)) stop("scores are stale")
 manocha2013$msInterest <- manocha2013sc[,1]
 manocha2013$msExperience <- manocha2013sc[,2]
 
@@ -175,12 +185,14 @@ chg <- cbind(scores[t1.order,colnames(scores)[2:8]], t2-t1)
 if (0) {
   write.table(chg, file="change.csv", sep="\t", row.names=FALSE)
   
-  cor(chg$msInterest, chg$msExperience)
+  plot(chg$msInterest, chg$msExperience)
   options(width=60)
-  success <- chg$msInterest >= 0 & chg$msExperience >= 0
+  success <- is.true(chg$msInterest >= 0 & chg$msExperience >= 0)
   chg[success,measures]
   
   whysuccess <- cbind(success=success, t1)
   m1 <- glm(success ~ ., data=whysuccess, family=binomial(link=logit))
+  
+  chg[(is.true(chg$dass.na > 0) | is.true(chg$psqi > 1)) & !success, measures]
 }
 

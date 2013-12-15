@@ -1,0 +1,23 @@
+#!/usr/bin/perl
+
+use Modern::Perl '2012';
+use autodie qw(:all);
+use IO::File;
+use constant REPORT_DIR => 'report';
+
+our @ID = split /\s+/, `cat report-todo.csv`;
+
+-d REPORT_DIR || mkdir REPORT_DIR;
+unlink glob(REPORT_DIR."/*.pdf");
+
+for my $id (@ID) {
+    my $out = IO::File->new("> reportid.csv");
+    $out->print("$id\n");
+    $out->close;
+    system(q[Rscript -e "library(knitr); knit('report.Rnw')"]);
+    system("pdflatex -interaction=nonstopmode report");
+    rename "report.pdf", sprintf("%s/report-%03d.pdf", REPORT_DIR, $id);
+}
+
+unlink("report-all.pdf");
+system(sprintf('pdfunite %s/report*.pdf report-all.pdf', REPORT_DIR));

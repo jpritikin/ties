@@ -1,0 +1,108 @@
+\documentclass[12pt]{article}
+\usepackage{mathtools}
+\usepackage{enumerate}
+\usepackage{dsfont}
+\usepackage{bold-extra}
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+
+\setlength{\headheight}{6\baselineskip}
+\addtolength{\textheight}{-2\baselineskip}
+\setlength{\footskip}{4\baselineskip}
+
+\setlength{\voffset}{-4\baselineskip}
+\fancyhfoffset[L,R]{.5in}
+
+\lhead{\includegraphics[width=.65in]{uva-logo} \includegraphics[width=1.93in]{uva-name} \\
+\smallskip
+{\Large\bfseries\scshape Department of Psychology}}
+\renewcommand{\headrulewidth}{1pt}
+
+\cfoot{\fbox{\parbox{\headwidth}{
+\begin{center}\small\textsc{102 Gilmer Hall $\cdot$ P.O. Box 400400 $\cdot$ Charlottesville, VA  22904-4400 USA \\
+Phone +1 434-982-4750 $\cdot$ Fax +1 434-982-4766} $\cdot$ psychology@virginia.edu
+\end{center}
+}}}
+
+\setlength{\parindent}{0cm}
+\setlength{\parskip}{.75\baselineskip plus 2pt minus 2pt}
+
+\begin{document}
+<<echo=FALSE, warning=FALSE, message=FALSE>>=
+library(knitr)
+#knit("hw-template.Rnw", tangle=TRUE)  # to extract only the R chunks
+rm(list=ls())  # clear the workspace
+opts_knit$set(stop_on_error=2, verbose=TRUE)
+opts_chunk$set(echo=FALSE)
+#options(error = NULL)  # default behavior
+#options(error = utils::recover)   # uncomment for more help with debugging
+library(xtable)
+source("score.R")
+idmap <- read.csv("2013idmap.csv", header=FALSE, stringsAsFactors=FALSE)
+colnames(idmap) <- c('id', 'name', 'email')
+id <- read.table("reportid.csv")[[1]]
+@ 
+
+%\vspace*{1\baselineskip}
+\hfill \today
+\bigskip
+
+Dear \Sexpr{idmap[idmap$id==id,'name']},
+
+Thank you for completing both the initial and the followup surveys
+as part of our Sahaja Yoga Observational Study.
+As promised, we report your scores.
+
+<<results='asis'>>=
+df <- cbind(t(scores[scores$id == id & scores$time == 1, measures]),
+            t(scores[scores$id == id & scores$time == 2, measures]),
+            t(chg[chg$id == id, measures]))
+colnames(df) <- c("Before", "After", "Change")
+rownames(df)[3:10] <- c("sleep disturbance", 'depression', 'anxiety', 'stress',
+                        'negative affect', 'Sahaja Yoga practices', 'interest in mental silence',
+                        'experience of mental silence')
+print(xtable(df))
+@
+
+
+Rumination and reflection distinguish between neurotic
+and philosophical self-attention, respectively.
+Rumination ranges from 1 (less neurotic) to 5 (more neurotic).
+Similarly, reflection ranges from 1 (less philosphic) to
+5 (more philosphic). An absolute change larger than 1.5
+is statistically significant.
+
+Sleep disturbance ranges from 0 (no sleep disturbance) to 21
+(extreme sleep disturbance). An absolute change larger
+than 10 is statistcally significant.
+
+Depression ranges from 1 (no depression) to 7 (extreme depression).
+Anxiety ranges from 1 (no anxiety) to 7 (extreme anxiety).
+Stress ranges from 1 (no stress) to 7 (extreme stress).
+Negative affect consists of the mean depression, anxiety,
+and stress scores. It ranges from 1 (no negative affect) to 7 (extreme negative affect).
+
+Sahaja Yoga practices represents the mean of the intensity of
+your practice of meditation, foot soaking, group meditation,
+and listening to Shri Mataji's talks.
+It ranges from 1 (less than once a month)
+to 7 (more often than twice daily).
+
+Interest in and experience of mental silence are scaled to
+a standard Normal distribution,
+meaning that scores of zero represent average scores in
+the broad population.
+Negative scores indicate less interest or less experience
+than average.
+Positive scores indicate more interest or more experience
+than average.
+An absolute change larger than 2 is statistically significant.
+
+Cordially,
+
+Joshua N.~Pritikin\\
+Karen Schmidt\\
+\emph{Conducted under Univeristy of Virginia IRB-SBS Protocol \#2013-0407-00 \\
+Approved from November 13, 2013 to October 31, 2014}
+
+\end{document}

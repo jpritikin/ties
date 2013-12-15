@@ -427,8 +427,12 @@ sub load_data {
 	my $err;
 	my $dc = DateCalc(ParseDate($demogr->{syStart}), $h->{EndDate}, \$err, 1);
 	my $months = Delta_Format($dc, 2, '%MyM');
+	my @data = uncode_sm(@$row[10..$#$row]);
+	if (sum(map { length($_) > 1 } @data) < 5) {
+	    next;
+	}
 	$csv->print($out, [2, $id, $demogr->{age}, $demogr->{edu}, $demogr->{occupation}, $demogr->{sex},
-			   $demogr->{relationship}, $months, uncode_sm(@$row[10..$#$row])]);
+			   $demogr->{relationship}, $months, @data]);
 	$out->print("\n");
     }
 }
