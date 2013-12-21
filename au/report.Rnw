@@ -58,45 +58,17 @@ df <- cbind(t(scores[scores$id == id & scores$time == 1, measures]),
             t(scores[scores$id == id & scores$time == 2, measures]),
             t(chg[chg$id == id, measures]))
 colnames(df) <- c("Before", "After", "Change")
-rownames(df)[3:10] <- c("sleep disturbance", 'depression', 'anxiety', 'stress',
-                        'negative affect', 'Sahaja Yoga practices', 'interest in mental silence',
-                        'experience of mental silence')
+rownames(df)[1:10] <- c("unconstructive thinking", "constructive thinking",
+  "sleep quality", 'depressive feelings', 'anxious feelings', 'stress level',
+                        'negative emotion', 'Sahaja Yoga practices', 'interest in mental silence',
+                        'mental silence')
+df <- df[-c(8,9),]
+df <- as.data.frame(df)
+df$Range <- c("0=none 4=extreme", "0=none 4=extreme", "0=disrupted 4=refreshing",
+              "0=light 6=heavy", "0=light 6=heavy", "0=light 6=heavy", "0=light 6=heavy",
+              "-=less 0=average +=more")
 print(xtable(df))
 @
-
-
-Rumination and reflection distinguish between neurotic
-and philosophical self-attention, respectively.
-Rumination ranges from 1 (less neurotic) to 5 (more neurotic).
-Similarly, reflection ranges from 1 (less philosphic) to
-5 (more philosphic). An absolute change larger than 1.5
-is statistically significant.
-
-Sleep disturbance ranges from 0 (no sleep disturbance) to 21
-(extreme sleep disturbance). An absolute change larger
-than 10 is statistcally significant.
-
-Depression ranges from 1 (no depression) to 7 (extreme depression).
-Anxiety ranges from 1 (no anxiety) to 7 (extreme anxiety).
-Stress ranges from 1 (no stress) to 7 (extreme stress).
-Negative affect consists of the mean depression, anxiety,
-and stress scores. It ranges from 1 (no negative affect) to 7 (extreme negative affect).
-
-Sahaja Yoga practices represents the mean of the intensity of
-your practice of meditation, foot soaking, group meditation,
-and listening to Shri Mataji's talks.
-It ranges from 1 (less than once a month)
-to 7 (more often than twice daily).
-
-Interest in and experience of mental silence are scaled to
-a standard Normal distribution,
-meaning that scores of zero represent average scores in
-the broad population.
-Negative scores indicate less interest or less experience
-than average.
-Positive scores indicate more interest or more experience
-than average.
-An absolute change larger than 2 is statistically significant.
 
 Cordially,
 

@@ -164,6 +164,16 @@ if (0) {
   ggplot(df, aes(time, msExperience, group=id, color=id)) + geom_line()
 }
 
+######################################### Standardize
+
+manocha2013$rumination <- (manocha2013$rumination - 1)
+manocha2013$reflection <- (manocha2013$reflection - 1)
+manocha2013$psqi <- (21 - manocha2013$psqi) / 5.25
+manocha2013$dass.d <- manocha2013$dass.d - 1
+manocha2013$dass.a <- manocha2013$dass.a - 1
+manocha2013$dass.s <- manocha2013$dass.s - 1
+manocha2013$dass.na <- manocha2013$dass.na - 1
+
 ######################################### Change scores
 
 scores <- manocha2013
