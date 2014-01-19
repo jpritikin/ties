@@ -1,0 +1,120 @@
+#!/usr/bin/perl
+
+use Modern::Perl '2012';
+
+our @neurPos = ('Often feel blue.',
+		'Dislike myself.',
+		'Am often down in the dumps.',
+		'Have frequent mood swings.',
+		'Panic easily.',
+		'Am filled with doubts about things.',
+		'Feel threatened easily.',
+		'Get stressed out easily.',
+		'Fear for the worst.',
+		'Worry about things.');
+
+our @neurNeg = ('Seldom feel blue.',
+		'Feel comfortable with myself.',
+		'Rarely get irritated.',
+		'Am not easily bothered by things.',
+		'Am very pleased with myself.',
+		'Am relaxed most of the time.',
+		'Seldom get mad.',
+		'Am not easily frustrated.',
+		'Remain calm under pressure.',
+		'Rarely lose my composure.');
+
+our @extraPos = ('Feel comfortable around people.',
+		 'Make friends easily.',
+		 'Am skilled in handling social situations.',
+		 'Am the life of the party.',
+		 'Know how to captivate people.',
+		 'Start conversations.',
+		 'Warm up quickly to others.',
+		 'Talk to a lot of different people at parties.',
+		 "Don't mind being the center of attention.",
+		 'Cheer people up.');
+
+our @extraNeg = ('Have little to say.',
+		 'Keep in the background.',
+		 'Would describe my experiences as somewhat dull.',
+		 "Don't like to draw attention to myself.",
+		 "Don't talk a lot.",
+		 'Avoid contacts with others.',
+		 'Am hard to get to know.',
+		 'Retreat from others.',
+		 'Find it difficult to approach others.',
+		 'Keep others at a distance.');
+
+our @openPos = ('Believe in the importance of art.',
+		'Have a vivid imagination.',
+		'Tend to vote for liberal political candidates.',
+		'Carry the conversation to a higher level.',
+		'Enjoy hearing new ideas.',
+		'Enjoy thinking about things.',
+		'Can say things beautifully.',
+		'Enjoy wild flights of fantasy.',
+		'Get excited by new ideas.',
+		'Have a rich vocabulary.');
+
+our @openNeg = ('Am not interested in abstract ideas.',
+		'Do not like art.',
+		'Avoid philosophical discussions.',
+		'Do not enjoy going to art museums.',
+		'Tend to vote for conservative political candidates.',
+		'Do not like poetry.',
+		'Rarely look for a deeper meaning in things.',
+		'Believe that too much tax money goes to support artists.',
+		'Am not interested in theoretical discussions.',
+		'Have difficulty understanding abstract ideas.');
+
+our @agreePos = ('Have a good word for everyone.',
+		 'Believe that others have good intentions.',
+		 'Respect others.',
+		 'Accept people as they are.',
+		 'Make people feel at ease.',
+		 'Am concerned about others.',
+		 'Trust what people say.',
+		 "Sympathize with others' feelings.",
+		 'Am easy to satisfy.',
+		 'Treat all people equally.');
+
+our @agreeNeg = ('Have a sharp tongue.',
+		 'Cut others to pieces.',
+		 'Suspect hidden motives in others.',
+		 'Get back at others.',
+		 'Insult people.',
+		 'Believe that I am better than others.',
+		 'Contradict others.',
+		 'Make demands on others.',
+		 'Hold a grudge.',
+		 'Am out for my own personal gain.');
+
+our @consPos = ('Am always prepared.',
+		'Pay attention to details.',
+		'Get chores done right away.',
+		'Carry out my plans.',
+		'Make plans and stick to them.',
+		'Complete tasks successfully.',
+		'Do things according to a plan.',
+		'Am exacting in my work.',
+		'Finish what I start.',
+		'Follow through with my plans.');
+
+our @consNeg = ('Waste my time.',
+		'Find it difficult to get down to work.',
+		'Do just enough work to get by.',
+		"Don't see things through.",
+		'Shirk my duties.',
+		'Mess things up.',
+		'Leave things unfinished.',
+		"Don't put my mind on the task at hand.",
+		'Make a mess of things.',
+		'Need a push to get started.');
+
+for my $factor (\@neurPos, \@neurNeg, \@extraPos, \@extraNeg, \@openPos,
+		\@openNeg, \@agreePos, \@agreeNeg, \@consPos, \@consNeg) {
+    for my $x (0..4) {
+	print $factor->[$x]."\n";
+    }
+}

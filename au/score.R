@@ -197,7 +197,7 @@ if (0) {
   
   plot(chg$msInterest, chg$msExperience)
   options(width=60)
-  success <- is.true(chg$msInterest >= 0 & chg$msExperience >= 0)
+  success <- is.true(chg$msInterest >= -1e4 & chg$msExperience >= -1e4)
   chg[success,measures]
   
   whysuccess <- cbind(success=success, t1)

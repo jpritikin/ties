@@ -150,7 +150,7 @@ grp <- list(spec=spec,
             scores=m2.est@expectation@scores.out,
             data=data)
 
-print(cor(grp$scores[,1], grp$scores[,2]))
+print(cor(grp$scores[,1], grp$scores[,2], use="complete.obs"))
 
 # design needed for two-tier? TODO
 colnames(grp$mean) <- latentVars

@@ -263,7 +263,7 @@ sub decode_am {
 	if (@parts == 1) { push @parts, '00' }
 	$tm = join(':', @parts)
     }
-    $tm = missing_hm_sep($tm);
+    $tm = missing_hm_sep($tm, 0);
     $tm;
 }
 
@@ -287,6 +287,12 @@ sub uncode_sm {
 	$item[29] = '';
 	$item[31] = '';
     }
+    if ($item[29] eq 'after midnight') {
+	$item[29] = '';
+    }
+    if ($item[31] eq 'late morning') {
+	$item[31] = '';
+    }
     if (length $item[29] and length $item[31]) {
 	# need special cases because I didn't have constrained data entry
 	if ($item[31] eq '6 - 6.30am') {
@@ -295,7 +301,7 @@ sub uncode_sm {
 	if ($item[31] eq '5.50-6.10') {
 	    $item[31] = '6:00 am'
 	}
-	if ($item[29] eq '11-00pm---- 1-00am.') {
+	if ($item[29] eq '11-00pm---- 1-00am.' or $item[29] eq 'Midnight') {
 	    $item[29] = '12:00 pm';
 	}
 	if ($item[31] eq '7-00am to 7-30am') {
@@ -306,6 +312,15 @@ sub uncode_sm {
 	}
 	if ($item[31] eq '7') {
 	    $item[31] = '7:00 am';
+	}
+	if ($item[31] eq '6') {
+	    $item[31] = '6:00 am';
+	}
+	if ($item[29] eq '10.30') {
+	    $item[29] = '10:30 pm';
+	}
+	if ($item[29] eq '11.30') {
+	    $item[29] = '11:30 pm';
 	}
 	my $hrs = hours_slept(decode_pm($item[29]), decode_am($item[31]));
 	warn "|$item[29]|$item[31]|" if !defined $hrs;
@@ -350,19 +365,21 @@ our @MSColumn = qw(msNotion msFreq msAny msEvery wantLearn
 
 sub load_data {
     my $csv = Text::CSV_XS->new({auto_diag=>2, diag_verbose=>1, binary=>1});
-    open my $pre, "2013pretest.csv";  # TODO, load participants who do not have a posttest
-    open my $post, "2013posttest.csv";
+    open my $pre, "2013pretest.csv";
+    open my $post1, "2013posttest-sm.csv";
+    open my $post2, "2013posttest-paper.csv";
     my $preHead = $csv->getline($pre);
-    my $postHead = $csv->getline($post);
+    my $post1Head = $csv->getline($post1);
+    $csv->getline($post2); # ignore header
     for my $x (0..7) {
 	#warn "$x] $preHead->[$x]";
     }
     for my $x (0..8) {
-	#warn "$x] $postHead->[$x]";
+	#warn "$x] $post1Head->[$x]";
     }
     for my $x (8..$#$preHead) {
 	my $y = $x + 2;
-	#print "$x $preHead->[$x]\n$postHead->[$y]\n";  #TODO remove
+	#print "$x $preHead->[$x]\n$post1Head->[$y]\n";  #TODO remove
     }
     my @fields = (qw(time id age edu occupation sex rel syMonths),
 		  @$preHead[8..$#$preHead]);
@@ -415,8 +432,8 @@ sub load_data {
 			  $demogr->{relationship}, $months, uncode_manocha(@$row[8..$#$row])]);
 	$out->print("\n");
     }
-    while (my $row = $csv->getline($post)) {
-	my $h = as_hash($postHead, $row);
+    while (my $row = $csv->getline($post1)) {
+	my $h = as_hash($post1Head, $row);
 	my $id = $Email2ID{$h->{'Email Address'}};
 	if (!$id or $id eq '?') {
 	    my $name = join(' ', $h->{'First Name'}, $h->{'LastName'});
@@ -433,6 +450,19 @@ sub load_data {
 	}
 	$csv->print($out, [2, $id, $demogr->{age}, $demogr->{edu}, $demogr->{occupation}, $demogr->{sex},
 			   $demogr->{relationship}, $months, @data]);
+	$out->print("\n");
+    }
+    while (my $row = $csv->getline($post2)) {
+	$row = filter_missing($row);
+	my $h = as_hash($preHead, $row);
+	my $id = $h->{ID};
+	my $demogr = $Demogr{$id};
+	if (!$demogr) { die $id }
+	my $err;
+	my $dc = DateCalc(ParseDate($demogr->{syStart}), "2014-01-15", \$err, 1);
+	my $months = Delta_Format($dc, 2, '%MyM');
+	$csv->print($out, [2, $id, $demogr->{age}, $demogr->{edu}, $demogr->{occupation}, $demogr->{sex},
+			  $demogr->{relationship}, $months, uncode_manocha(@$row[1..$#$row])]);
 	$out->print("\n");
     }
 }

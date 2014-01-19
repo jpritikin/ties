@@ -1,0 +1,7 @@
+To score and prepare reports:
+
+./prepare
+../analyze2.R
+../omx-2d.R
+./score.R
+./mkreport
