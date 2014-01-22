@@ -1,0 +1,6 @@
+#!/bin/sh
+
+name=agreport
+Rscript -e "library(knitr); knit('$name.Rnw')"
+pdflatex $name
+biber $name

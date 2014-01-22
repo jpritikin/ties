@@ -1,8 +1,24 @@
 library(ggplot2)
 
+EduItem = c('Less than high school degree',
+		'High school degree or equivalent',
+		'Some college but no degree',
+		'Associate degree',
+		'Bachelor degree',
+		'Graduate degree')
+RelaItem = c('Single',
+		 'In a long-term relationship (i.e. together more than a year)',
+		 'Other')
+RelaItemShort = c('Single',
+             'Together',
+             'Other')
+
 is.true <- function(v) v & !is.na(v)
 
 manocha2013 <- read.csv("2013combined.csv", stringsAsFactors=FALSE)
+manocha2013$edu <- ordered(manocha2013$edu, levels=EduItem)
+manocha2013$rel <- ordered(manocha2013$rel, levels=RelaItem, labels=RelaItemShort)
+
 rawcols <- colnames(manocha2013[9:length(manocha2013)])
 #mask <- apply(is.na(manocha2013[,rawcols]), 1, sum)
 #manocha2013$id[manocha2013$time==2 & mask > 60]
@@ -197,7 +213,7 @@ if (0) {
   
   plot(chg$msInterest, chg$msExperience)
   options(width=60)
-  success <- is.true(chg$msInterest >= -1e4 & chg$msExperience >= -1e4)
+  success <- is.true(chg$msInterest >= -1e-4 & chg$msExperience >= -1e-4)
   chg[success,measures]
   
   whysuccess <- cbind(success=success, t1)

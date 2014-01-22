@@ -1,0 +1,233 @@
+\documentclass[doc]{apa6}
+\usepackage[american]{babel}
+\usepackage{csquotes}
+\usepackage[style=apa,sortcites=true,sorting=nyt,apabackref=true,backend=biber]{biblatex}
+\DeclareLanguageMapping{american}{american-apa}
+\addbibresource{jpritikin.bib}
+\usepackage{hyperref}
+\usepackage[backgroundcolor=yellow,shadow,textwidth=1in]{todonotes}
+\usepackage{mathtools}
+\usepackage{xspace}
+
+% work around biblatex-apa bug
+% http://tex.stackexchange.com/questions/141507/biblatex-messing-up-citation-entry-with-lots-of-authors
+%
+\DeclareNameFormat{apaauthor}{%
+  \ifthenelse{\value{listcount}=\maxprtauth\AND\value{listcount}<\value{listtotal}}
+    {\addcomma\addspace\ldots\addspace}
+    {\ifthenelse{\value{listcount}>\maxprtauth\AND\value{listcount}<\value{listtotal}}
+      {}
+      {\ifthenelse{\iffieldequalstr{doubtfulauthor}{true}}
+        {\mkbibbrackets{\usebibmacro{name:apa:last-first}{#1}{#3}{#4}{#5}{#7}?}}
+        {\usebibmacro{name:apa:last-first}{#1}{#3}{#4}{#5}{#7}}}}%
+  \ifthenelse{\value{listcount}=\value{listtotal}}% this test is new
+    {\ifmorenames{\andothersdelim\bibstring{andothers}}{}}{}}
+
+<<echo=FALSE>>=
+library(knitr)
+#knit("hw-template.Rnw", tangle=TRUE)  # to extract only the R chunks
+rm(list=ls())  # clear the workspace
+# https://github.com/yihui/knitr/issues/707#issuecomment-32718629
+knit_hooks$set(chunk.local = local({
+  env = NULL
+  function(before, options, envir) {
+    knitr:::.knitEnv$knit_global = if (before) {
+      env <<- knit_global()  # store the current global env, and restore later
+      new.env(parent = env)  # an empty environment
+    } else env
+  }
+}))
+knit_hooks$set(inline=function (x) {
+  if (is.null(x) || any(is.na(x))) return(paste("\\textbf{TODO}\\xspace"))
+  if (is.numeric(x))
+        x = round(x, getOption("digits"))
+    paste(as.character(x), collapse = ", ")
+})
+opts_knit$set(error=TRUE, verbose=TRUE, cache=FALSE)
+opts_chunk$set(echo=FALSE)
+#options(error = NULL)  # default behavior
+#options(error = utils::recover)   # uncomment for more help with debugging
+loadlib <- function () {
+library(ggplot2)
+library(grid)
+library(gridExtra)
+library(xtable)
+}
+suppressPackageStartupMessages(loadlib())
+options("xtable.caption.placement"="top")
+options("xtable.table.placement"="tbp")
+@ 
+
+<<>>=
+dir <- setwd("..")
+source("score.R")
+setwd(dir)
+@
+
+\title{Mediational analysis of meditation: \\ \smallskip The stepping stone of complete mental silence}
+\shorttitle{Mediation \& meditation}
+\threeauthors{Joshua N.~Pritikin}{Ramesh Manocha}{Karen Schmidt}
+% David Germano? TODO
+\threeaffiliations{University of Virginia}{University of Sydney}{University of Virginia}
+
+\begin{document}
+\maketitle
+\abstract{Write abstract, TODO}
+
+\section{Introduction}
+
+\begin{figure}
+\includegraphics{mediate}
+\caption{In Model 1, there is only a direct positive correlation between
+the contemplative practice and the benefits. This direct correlation
+vanishes when mental silence is added to the model as a mediator.
+Correlations shown here illustrate our hypothesis and are not based on actual data.}
+\label{fig:mediate}
+\end{figure}
+  
+Probably the most thorough and up to date review of meditation research lamented
+that little research has examined effect modifiers \parencite{ospina2007}.
+That is, what specific characteristics of the practitioner or meditation
+practice influence outcomes?
+For example, is mantra recitation the end goal or a supportive practice
+that facilitates the end goal?
+We propose that the active ingredient in contemplative practice is
+the experience of mental silence
+\parencite[an experience little known in the West but familiar
+to Oriental thinkers;][]{ramamurthi1995}.
+This hypothesis has a long history \parencite{manocha2008},
+but has not been investigated systematically.
+We follow the statistical framework of
+mediation analysis \parencite{baron1986}.
+If mental silence mediates the benefits of contemplative
+practice then Model~2 of Figure \ref{fig:mediate} will
+fit data better than Model~1.
+After adding mental silence to the model,
+the direct correlation should vanish.
+To explore this hypothesis,
+we need some measure of whether
+participants are experiencing mental silence.
+A self-report measure is not a panacea,
+but it is a place to start.
+Since no self-report measure was available,
+we developed our own.\todo{TODO: Document development of measure}
+
+Measurement of mental silence addresses
+a related weakness in current intervention studies of contemplative practices.
+Even in a carefully designed intervention study,
+a mental silence group will consist of some participants who
+adhere to the intervention wholeheartedly
+and those who adhere somewhat less earnestly.
+Mental silence may not be like taking medicine,
+wherein the influence of doubt on efficacy is small.
+Ingested acetaminophen usually works as an analgesic whether the patient believes it or not.
+In contrast, many Sahaja Yoga Meditation (SYM) teachers contend that
+the ability to sustain mental silence is contingent on a genuine desire
+to experience it.
+Therefore, vigilance about potentially
+low rates of adherence in a mental silence oriented meditation group is warranted.
+
+\section{Method}
+
+\subsection{Participants}
+
+<<results='asis'>>=
+democol <- function(tm) {
+  age.5 <- fivenum(scores[scores$time==tm,]$age)
+  names(age.5) <- list("age, min","\\quad 25th","\\quad  median","\\quad  75th","\\quad  max")
+  sex.tab <- table(scores[scores$time==tm,]$sex)
+  edu.tab <- table(scores[scores$time==tm,]$edu)
+  rel.tab <- table(scores[scores$time==tm,]$rel)
+  c(as.array(age.5),
+    100*sex.tab/sum(sex.tab),
+    100*edu.tab/sum(edu.tab),
+    100*rel.tab/sum(rel.tab))
+}
+# symonths ? TODO
+tbl <- cbind(democol(1), democol(2))
+colnames(tbl) <- c('start', 'end')
+print(xtable(tbl,
+             paste("Age distribution and demographics at the beginning and end of the study.",
+             "Age is in years and demographics are in percentages."),
+             "tab:demog",
+             "lcc",
+             digits=0),
+      sanitize.rownames.function = function(x) x,
+      hline.after=c(-1,0,5,7,13,nrow(tbl)))
+@
+
+A free public lecture and workshop to introduce SYM
+was advertised to the public and circulated among
+mailing lists accumulated from past public programs
+in the geographic area of New South Wales, Australia.
+The lecture took place on 28 October 2013
+and attracted 140 people.
+Of these, \Sexpr{sum(scores$time==1)} agreed to
+participate in our study.
+Of these, 70 people agreed to complete an identical followup
+survey after 1 month.
+Despite ample email reminders and urging by phone,
+we received only \Sexpr{sum(scores$time==2)} completed followup surveys.
+Demographic data for the initial measurement
+and final measurement are given in Table~\ref{tab:demog}.
+
+\subsection{Materials}
+
+We administered the Reflection/Rumination scale \parencite{trapnell1999},
+the DASS-21 \parencite{lovibond1996},
+the Pittsburgh Sleep Quality Index \parencite[PSI;][]{buysse1989},
+and our new mental silence disposition scale.
+The Reflection/Rumination scale measures productive and unproductive
+thinking, respectively.
+For example, a reflection item is, ``I'm very self-inquisitive by nature''
+and a rumination item is, ``I often find myself re-evaluating something I've done.''
+The DASS is a 21 item scale that measures depression, anxiety, and stress.
+For example, a depression item is, ``I couldn't seem to experience any positive feeling at all'';
+an anxiety item is, ``I felt that I was using a lot of nervous energy'';
+and a stress item is, ``I was worried about situations in which I might panic and make a fool of myself.''
+The PSQI combines measurements of sleep time and sleep quality into an overall score.
+For example, one item on the PSQI is, ``During the past month, how many hours of actual sleep did you get at night?
+ (This may be different than the number of hours you spend in bed.)''
+The mental silence disposition scale assess interest in
+and experience of complete mental silence.
+For example, an interest item is ``I never slow down long enough to experience
+complete mental silence.''~(reverse scored)
+and an experience item is ``Approximately how much actual time did your
+longest experience of complete mental silence last?''
+
+\subsection{Procedure}
+
+With the promise learning a meditation style that would
+relieve stress and show the way to joyous living,
+participants journeyed to a centrally located lecture hall. \todo{Where exactly?}
+After preliminaries and a brief introduction to SYM,
+Dr.~Manocha administered the first survey.
+Participants were asked if they were willing to complete a followup survey
+after 1 month.
+In compensation, each participant would receive a
+report with their before and after scores.
+The presentation continued to conclusion and participants returned home.
+No deception was involved.
+Neither Dr.~Manocha nor any of the other authors had
+any further contact with the participants.
+Participants were urged to attend free follow up meetings nearby
+their home on a weekly basis and encouraged to practice meditation at home.
+All SYM meetings were run by unpaid volunteers.
+After 1 month,
+we email'd participants who agreed to complete the followup survey online
+and mailed out paper survey packets to the remainder with postage paid return envelopes.
+Participants were free to complete the followup survey in the privacy of their own homes.
+
+\section{Results}
+
+<<>>=
+success <- is.true(chg$msInterest >= -1e-4 & chg$msExperience >= -1e-4)
+apply(chg[success,measures], 2, mean, na.rm=TRUE)
+apply(chg[!success,measures], 2, mean, na.rm=TRUE)
+@
+
+% mention scale problem
+
+\printbibliography
+
+\end{document}
