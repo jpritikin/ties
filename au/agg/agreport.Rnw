@@ -228,20 +228,21 @@ composite sleep quality index, rumination, anxiety, and depression.
 
 \section{Results}
 
-After partitioning the sample by the signs of interest in and
-experience of mental silence,
-there were too few samples to conduct any inferential tests (see Table~\ref{tab:by-type}).
 Rumination and reflection range from 1=none to 5=extreme.
 PSQI ranges from 0=no difficulty to 21=severe difficulty.
 DASS measures range from 1=light to 7=heavy.
-Initial scores and change scores are given in Tables~\ref{tab:adhered}-\ref{tab:poorfit}
+The sample was partitioned by the signs of interest in and
+experience of mental silence (Table~\ref{tab:by-type}).
+Generally, there was improvement on PSQI, rumination, anxiety, and depression (Table~\ref{tab:overall}).
+Scores are given in Tables~\ref{tab:adhered}-\ref{tab:poorfit}
 for each change combination.
+
 
 <<results="asis">>=
 tbl <- table(chg$msInterest >= 0, chg$msExperience >= 0)
 df <- melt(tbl)
 colnames(df) <- c('gained interest','gained experience','count')
-rownames(df) <- c('poor fit', 'humbled', 'lost interest', 'adhered')
+rownames(df) <- c('poor fit', 'disabused', 'challenged', 'adhered')
 print(xtable(df,
              paste("Number of participants in each classification category.",
                    "The indicators here are interest in and experience of mental silence."),
@@ -259,8 +260,13 @@ mk.tbl <- function(mask) {
                  final=final)
     mat
 }
+print(xtable(mk.tbl(TRUE), paste("Scores for all participants."),
+             "tab:overall"))
+@
+
+<<results="asis">>=
 mask <- is.true(chg$msInterest >= 0 & chg$msExperience >= 0)
-print(xtable(mk.tbl(mask), paste("Initial and change scores for the Adhered group.",
+print(xtable(mk.tbl(mask), paste("Scores for the Adhered group.",
                         "As hypothesized, there was improvement on PSQI,",
                         "rumination, anxiety, and depression."),
              "tab:adhered"))
@@ -268,35 +274,69 @@ print(xtable(mk.tbl(mask), paste("Initial and change scores for the Adhered grou
 
 <<results="asis">>=
 mask <- is.true(chg$msInterest < 0 & chg$msExperience >= 0)
-print(xtable(mk.tbl(mask), paste("Initial and change scores for the Lost Interest group. "),
-             "tab:lost"))
+print(xtable(mk.tbl(mask), paste("Scores for the Challenged group.",
+                                 "This group experienced slightly worse sleep quality",
+                                 "and more stress. However, they still attempted to",
+                                 "adhere to SYM with an increase in sypractice."),
+             "tab:challenged"))
 @
 
 <<results="asis">>=
 mask <- is.true(chg$msInterest >= 0 & chg$msExperience < 0)
-print(xtable(mk.tbl(mask), paste("Initial and change scores for the Humbled group. "),
-             "tab:humbled"))
+print(xtable(mk.tbl(mask), paste("Scores for the Disabused group.",
+                                 "Possibly, this group came into the study with a",
+                                 "confused idea about the nature of mental silence.",
+                                 "Sleep quality improved dramatically."),
+             "tab:disabused"))
 @
 
 <<results="asis">>=
 mask <- is.true(chg$msInterest < 0 & chg$msExperience < 0)
-print(xtable(mk.tbl(mask), paste("Initial and change scores for the Poor Fit group. "),
+print(xtable(mk.tbl(mask), paste("Scores for the Poor Fit group.",
+                                 "Maybe we should call this the Sleepless group."),
              "tab:poorfit"))
 @
 
 \clearpage
 
-\section{Discussion}
-
-Categorizing participants by change is probably the wrong
+Categorizing participants by change quadrant is probably the wrong
 way to look at the data.
 For example,
 a participant with high interest and high experience
-may not exhibit any increase but we would still expect to see the
+may not exhibit any increase but we would still expect to see a strong
 effect of mental silence.
+Let \emph{msComposite} be the minimum of \emph{msInterest} and \emph{msExperience}.
+We can fit a regression model with the assumption that factor scores are exact.
+Looking only at the final measurement, we obtain
 
-% apply(chg[!success,measures], 2, mean, na.rm=TRUE)
-% mention scale problem
+\begin{verbatim}
+ #|                     name|                         From / To|Estimate|Std.Error
+--+-------------------------+----------------------------------+--------+---------
+ 0|          VAR_msComposite|       msComposite <-> msComposite| 0.63017|  0.11318
+ 1|                      rrq|rumination <-> rumination (+other)| 0.47057|  0.06075
+ 2|                     dass|        dass.d <-> dass.d (+other)| 0.40715|  0.03656
+ 3|                 psql_var|                     psqi <-> psqi|15.02922|  2.94747
+ 4|      const_TO_rumination|                   mean rumination| 3.51522|  0.09429
+ 5|      const_TO_reflection|                   mean reflection| 3.53799|  0.09429
+ 6|            const_TO_psqi|                         mean psqi| 6.86943|  0.58412
+ 7|          const_TO_dass.d|                       mean dass.d| 1.73864|  0.08684
+ 8|          const_TO_dass.a|                       mean dass.a| 1.54594|  0.08684
+ 9|          const_TO_dass.s|                       mean dass.s| 1.99871|  0.08684
+10|         const_TO_dass.na|                      mean dass.na| 1.76096|  0.08684
+11|msComposite_TO_rumination|        msComposite --> rumination|-0.41990|  0.11799
+12|msComposite_TO_reflection|        msComposite --> reflection|-0.07955|  0.11799
+13|      msComposite_TO_psqi|              msComposite --> psqi|-2.25326|  0.68255
+14|    msComposite_TO_dass.d|            msComposite --> dass.d|-0.38417|  0.10939
+15|    msComposite_TO_dass.a|            msComposite --> dass.a|-0.18795|  0.10939
+16|    msComposite_TO_dass.s|            msComposite --> dass.s|-0.45314|  0.10939
+17|   msComposite_TO_dass.na|           msComposite --> dass.na|-0.34216|  0.10939
+
+Observed Statistics           : 85.0
+estimated Parameters          : 18
+Restricted Degrees of Freedom : 67.0
+Minus Two Log Likelihood      : 583.42
+Number of Observations        : 31.0
+\end{verbatim}
 
 \printbibliography
 

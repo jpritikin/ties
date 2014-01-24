@@ -249,11 +249,19 @@ if (0) {
   
   chg[(is.true(chg$dass.na > 0) | is.true(chg$psqi > 1)) & !success, measures]
   
-  mask <- scores$time==2 & !is.na(scores$msInterest)
-  effect <- apply(scores[mask, c('msInterest','msExperience')], 1, mean)
-  rank <- order(-effect)
-  df <- scores[mask, measures]
-  apply(df[rank[2:9],], 2, mean, na.rm=TRUE)
+  scores$msComposite <- pmin(scores$msInterest, scores$msExperience)
+  
+  mask <- scores$time==2 & !is.na(scores$msInterest) & !is.na(scores$msExperience)
+  df <- scores[mask, c(measures, "msComposite")]
+  write.table(df, file="time2.csv", row.names =FALSE)
+  
+  mask <- scores$time==1 & !is.na(scores$msInterest) & !is.na(scores$msExperience)
+  df <- scores[mask, c(measures, "msComposite")]
+  write.table(df, file="time1.csv", row.names =FALSE)
+  
+  rank <- order(-scores$msComposite[mask])
+  cor(df, use="pairwise.complete.obs")
+  apply(df[rank[1:8],], 2, mean, na.rm=TRUE)
   apply(df[rank[24:32],], 2, mean, na.rm=TRUE)
 }
 
