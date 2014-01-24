@@ -15,6 +15,7 @@ use constant FIRST_MEASUREMENT => '2013-10';
 binmode(STDOUT, ":utf8");
 binmode(STDERR, ":utf8");
 
+our $UID=1;
 our %Name2ID;
 our %Email2ID;
 our %ValidID;
@@ -381,10 +382,17 @@ sub load_data {
 	my $y = $x + 2;
 	#print "$x $preHead->[$x]\n$post1Head->[$y]\n";  #TODO remove
     }
-    my @fields = (qw(time id age edu occupation sex rel syMonths),
+    my @fields = (qw(uid time id age edu occupation sex rel syMonths),
 		  @$preHead[8..$#$preHead]);
+    my $msStart;
+    for my $x (0..$#fields) {
+	if ($fields[$x] eq '76. Familiarity with mental silence') {
+	    $msStart = $x;
+	    last;
+	}
+    }
     for my $x (0..$#MSColumn) {
-	$fields[$x + 77] = $MSColumn[$x];
+	$fields[$x + $msStart] = $MSColumn[$x];
     }
     $csv->print($out, \@fields);
 	$out->print("\n");
@@ -428,7 +436,7 @@ sub load_data {
 	my $err;
 	my $dc = DateCalc(ParseDate($sy), FIRST_MEASUREMENT, \$err, 1);
 	my $months = Delta_Format($dc, 2, '%MyM');
-	$csv->print($out, [1, $id, $demogr->{age}, $demogr->{edu}, $demogr->{occupation}, $demogr->{sex},
+	$csv->print($out, [++$UID, 1, $id, $demogr->{age}, $demogr->{edu}, $demogr->{occupation}, $demogr->{sex},
 			  $demogr->{relationship}, $months, uncode_manocha(@$row[8..$#$row])]);
 	$out->print("\n");
     }
@@ -448,7 +456,7 @@ sub load_data {
 	if (sum(map { length($_) > 1 } @data) < 5) {
 	    next;
 	}
-	$csv->print($out, [2, $id, $demogr->{age}, $demogr->{edu}, $demogr->{occupation}, $demogr->{sex},
+	$csv->print($out, [++$UID, 2, $id, $demogr->{age}, $demogr->{edu}, $demogr->{occupation}, $demogr->{sex},
 			   $demogr->{relationship}, $months, @data]);
 	$out->print("\n");
     }
@@ -461,7 +469,7 @@ sub load_data {
 	my $err;
 	my $dc = DateCalc(ParseDate($demogr->{syStart}), "2014-01-15", \$err, 1);
 	my $months = Delta_Format($dc, 2, '%MyM');
-	$csv->print($out, [2, $id, $demogr->{age}, $demogr->{edu}, $demogr->{occupation}, $demogr->{sex},
+	$csv->print($out, [++$UID, 2, $id, $demogr->{age}, $demogr->{edu}, $demogr->{occupation}, $demogr->{sex},
 			  $demogr->{relationship}, $months, uncode_manocha(@$row[1..$#$row])]);
 	$out->print("\n");
     }

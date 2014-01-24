@@ -1,4 +1,4 @@
-\documentclass[doc]{apa6}
+\documentclass[doc,draftfirst]{apa6}
 \usepackage[american]{babel}
 \usepackage{csquotes}
 \usepackage[style=apa,sortcites=true,sorting=nyt,apabackref=true,backend=biber]{biblatex}
@@ -52,6 +52,7 @@ library(ggplot2)
 library(grid)
 library(gridExtra)
 library(xtable)
+library(reshape2)
 }
 suppressPackageStartupMessages(loadlib())
 options("xtable.caption.placement"="top")
@@ -64,7 +65,7 @@ source("score.R")
 setwd(dir)
 @
 
-\title{Mediational analysis of meditation: \\ \smallskip The stepping stone of complete mental silence}
+\title{The stepping stone of complete mental silence: \\ \smallskip Mediational analysis of meditation}
 \shorttitle{Mediation \& meditation}
 \threeauthors{Joshua N.~Pritikin}{Ramesh Manocha}{Karen Schmidt}
 % David Germano? TODO
@@ -78,15 +79,15 @@ setwd(dir)
 
 \begin{figure}
 \includegraphics{mediate}
-\caption{In Model 1, there is only a direct positive correlation between
-the contemplative practice and the benefits. This direct correlation
+\caption{In Model 1, there is a direct positive correlation between
+the contemplative practice and benefits. This direct correlation
 vanishes when mental silence is added to the model as a mediator.
 Correlations shown here illustrate our hypothesis and are not based on actual data.}
 \label{fig:mediate}
 \end{figure}
   
 Probably the most thorough and up to date review of meditation research lamented
-that little research has examined effect modifiers \parencite{ospina2007}.
+that little attention has been paid to effect modifiers \parencite{ospina2007}.
 That is, what specific characteristics of the practitioner or meditation
 practice influence outcomes?
 For example, is mantra recitation the end goal or a supportive practice
@@ -113,7 +114,7 @@ Since no self-report measure was available,
 we developed our own.\todo{TODO: Document development of measure}
 
 Measurement of mental silence addresses
-a related weakness in current intervention studies of contemplative practices.
+a related weakness in current intervention studies of mental silence oriented meditation.
 Even in a carefully designed intervention study,
 a mental silence group will consist of some participants who
 adhere to the intervention wholeheartedly
@@ -218,14 +219,83 @@ we email'd participants who agreed to complete the followup survey online
 and mailed out paper survey packets to the remainder with postage paid return envelopes.
 Participants were free to complete the followup survey in the privacy of their own homes.
 
+\subsection{Planned analyses}
+
+We defined participants with positive change for interest in and
+experience of mental silence as the Adhered group. We hypothesized
+that the Adhered group will enjoy improvement on the
+composite sleep quality index, rumination, anxiety, and depression.
+
 \section{Results}
 
-<<>>=
-success <- is.true(chg$msInterest >= -1e-4 & chg$msExperience >= -1e-4)
-apply(chg[success,measures], 2, mean, na.rm=TRUE)
-apply(chg[!success,measures], 2, mean, na.rm=TRUE)
+After partitioning the sample by the signs of interest in and
+experience of mental silence,
+there were too few samples to conduct any inferential tests (see Table~\ref{tab:by-type}).
+Rumination and reflection range from 1=none to 5=extreme.
+PSQI ranges from 0=no difficulty to 21=severe difficulty.
+DASS measures range from 1=light to 7=heavy.
+Initial scores and change scores are given in Tables~\ref{tab:adhered}-\ref{tab:poorfit}
+for each change combination.
+
+<<results="asis">>=
+tbl <- table(chg$msInterest >= 0, chg$msExperience >= 0)
+df <- melt(tbl)
+colnames(df) <- c('gained interest','gained experience','count')
+rownames(df) <- c('poor fit', 'humbled', 'lost interest', 'adhered')
+print(xtable(df,
+             paste("Number of participants in each classification category.",
+                   "The indicators here are interest in and experience of mental silence."),
+             "tab:by-type"))
+@ 
+
+<<results="asis">>=
+mk.tbl <- function(mask) {
+    initial <- apply(scores[scores$time==1 & scores$id %in% chg[mask,'id'], measures], 2, mean, na.rm=TRUE)
+    final <- apply(scores[scores$time==2 & scores$id %in% chg[mask,'id'], measures], 2, mean, na.rm=TRUE)
+    # This is wrong because NAs on 1 side can knock out both sides at the individual level
+    # change=apply(chg[mask,measures], 2, mean, na.rm=TRUE)
+    mat <- cbind(initial=initial,
+                 change=final-initial,
+                 final=final)
+    mat
+}
+mask <- is.true(chg$msInterest >= 0 & chg$msExperience >= 0)
+print(xtable(mk.tbl(mask), paste("Initial and change scores for the Adhered group.",
+                        "As hypothesized, there was improvement on PSQI,",
+                        "rumination, anxiety, and depression."),
+             "tab:adhered"))
 @
 
+<<results="asis">>=
+mask <- is.true(chg$msInterest < 0 & chg$msExperience >= 0)
+print(xtable(mk.tbl(mask), paste("Initial and change scores for the Lost Interest group. "),
+             "tab:lost"))
+@
+
+<<results="asis">>=
+mask <- is.true(chg$msInterest >= 0 & chg$msExperience < 0)
+print(xtable(mk.tbl(mask), paste("Initial and change scores for the Humbled group. "),
+             "tab:humbled"))
+@
+
+<<results="asis">>=
+mask <- is.true(chg$msInterest < 0 & chg$msExperience < 0)
+print(xtable(mk.tbl(mask), paste("Initial and change scores for the Poor Fit group. "),
+             "tab:poorfit"))
+@
+
+\clearpage
+
+\section{Discussion}
+
+Categorizing participants by change is probably the wrong
+way to look at the data.
+For example,
+a participant with high interest and high experience
+may not exhibit any increase but we would still expect to see the
+effect of mental silence.
+
+% apply(chg[!success,measures], 2, mean, na.rm=TRUE)
 % mention scale problem
 
 \printbibliography

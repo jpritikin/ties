@@ -138,6 +138,7 @@ if (1) {
                  mxComputeOnce('expectation', context='EM'))
   eap.est <- mxRun(eap)
   manocha2013sc <- eap.est@expectation@scores.out[,1:2]
+  manocha2013sc <- cbind(espt[espt$wave == "manocha2013", 'uid'], manocha2013sc)
   save(manocha2013sc, file="manocha2013sc.rda")
 }
 
