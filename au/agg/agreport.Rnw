@@ -27,16 +27,6 @@
 library(knitr)
 #knit("hw-template.Rnw", tangle=TRUE)  # to extract only the R chunks
 rm(list=ls())  # clear the workspace
-# https://github.com/yihui/knitr/issues/707#issuecomment-32718629
-knit_hooks$set(chunk.local = local({
-  env = NULL
-  function(before, options, envir) {
-    knitr:::.knitEnv$knit_global = if (before) {
-      env <<- knit_global()  # store the current global env, and restore later
-      new.env(parent = env)  # an empty environment
-    } else env
-  }
-}))
 knit_hooks$set(inline=function (x) {
   if (is.null(x) || any(is.na(x))) return(paste("\\textbf{TODO}\\xspace"))
   if (is.numeric(x))
@@ -306,7 +296,8 @@ a participant with high interest and high experience
 may not exhibit any increase but we would still expect to see a strong
 effect of mental silence.
 Let \emph{msComposite} be the minimum of \emph{msInterest} and \emph{msExperience}.
-We can fit a regression model with the assumption that factor scores are exact.
+With an assumption that factor scores are exact,
+we can fit a regression model.
 Looking only at the final measurement, we obtain
 
 \begin{verbatim}
