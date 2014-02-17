@@ -187,8 +187,9 @@ sub uncode_manocha {
     }
     if (length $item[29] and length $item[31]) {
 #	warn "$item[29] $item[31]";
-	$item[29] = hours_slept(to24hour($item[29]), to24hour($item[31]));
-	$item[31] = '';
+	$item[29] =~ s/\:00\s(.m)/ $1/i;
+	$item[31] =~ s/\:00\s(.m)/ $1/i;
+#	warn "$item[29] $item[31]";
     } else {
 	$item[29] = '';
 	$item[31] = '';
@@ -324,9 +325,11 @@ sub uncode_sm {
 	    $item[29] = '11:30 pm';
 	}
 	my $hrs = hours_slept(decode_pm($item[29]), decode_am($item[31]));
+#	warn $hrs;
 	warn "|$item[29]|$item[31]|" if !defined $hrs;
-	$item[29] = $hrs;
-	$item[31] = '';
+	$item[29] = "01:00 AM";
+	$item[31] = sprintf("%02d:%02d AM", int(1 + $hrs), int(60 * ($hrs - int($hrs))));
+#	warn $item[31]
     }
     if (length $item[30]) {
 	$item[30] = numeric_mean($item[30]);

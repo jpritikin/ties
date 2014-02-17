@@ -7,7 +7,7 @@ library(gridExtra)
 library(gtools)
 source("jrs.R")
 options(jrsCacheDir='.cache')
-options(error = utils::recover)
+#options(error = utils::recover)
 
 source("prepare.R")
 raw <- read.csv("raw.csv", stringsAsFactors=FALSE)

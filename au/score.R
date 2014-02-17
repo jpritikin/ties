@@ -1,4 +1,6 @@
 library(ggplot2)
+library(digest)
+source("../measures.R")
 
 EduItem = c('Less than high school degree',
 		'High school degree or equivalent',
@@ -36,27 +38,10 @@ mean.or.na <- function(mat, n.min) {
 }
 
 ######################################### RRQ
-RRQItem <- c('Strongly disagree',
-             'Disagree',
-             'Neutral',
-             'Agree',
-             'Strongly Agree')
-
 base <- 15
-for (col in base:(base+23)) {
-  rrq.index <- 1 + col - base
-  levels <- RRQItem
-  if (any(rrq.index %in% c(6,9,10,13,14,17,20,24))) {
-    levels <- RRQItem[5:1]
-  }
-  manocha2013[[col]] <- ordered(manocha2013[[col]], levels=levels)
-}
-
-rum <- sapply(manocha2013[,base:(base+11)], unclass)
-manocha2013$rumination <- mean.or.na(rum, 8)
-
-ref <- sapply(manocha2013[,(base+12):(base+23)], unclass)
-manocha2013$reflection <- mean.or.na(ref, 8)
+got <- score.rrq(manocha2013[base:(base+23)])
+manocha2013$rumination <- got$rumination
+manocha2013$reflection <- got$reflection
 
 if (0) {
   rrq <- manocha2013[which(!is.na(haveboth)), c('id', 'time', 'reflection', 'rumination')]
@@ -67,53 +52,8 @@ if (0) {
 }
 
 ##################################################### PSQI
-SleepItem <- c('Not during the past month',
-                  'Less than once a week',
-                  'Once or twice a week',
-                  'Three or more times a week')
-
-SleepQualityItem = c('Very good',
-                         'Fairly good',
-                         'Fairly bad',
-                         'Very bad');
-
-SleepEnthItem = c('No problem at all',
-                      'Only a very slight problem',
-                      'Somewhat of a problem',
-                      'A very big problem');
-
-#colnames(manocha2013)[38:56]
-
-base <- 38
-for (col in (base+5):(base+19)) {
-  psqi.index <- col - base
-  levels <- SleepItem
-  if (psqi.index == 16) {
-    levels <- SleepQualityItem
-  } else if (psqi.index == 19) {
-    levels <- SleepEnthItem
-  }
-  manocha2013[[col]] <- ordered(manocha2013[[col]], levels=levels)
-}
-
-psqi.1 <- unclass(manocha2013[[base + 16]])-1
-psqi.time.to.sleep <- cut(manocha2013[[base + 2]], breaks=c(0, 15, 30, 60, 3600), ordered_result=TRUE)
-psqi.2 <- (unclass(manocha2013[[base + 5]]) + unclass(psqi.time.to.sleep) - 1) %/% 2
-psqi.sleep.duration <- cut(manocha2013[[base + 4]], c(0,5,6,7,24), right=FALSE, ordered_result=TRUE)
-psqi.3 <- 4 - unclass(psqi.sleep.duration)
-psqi.efficiency <- cut(manocha2013[[base + 4]] / manocha2013[[base + 1]], c(0,.65,.75,.85, 2), ordered_result=TRUE)
-psqi.4 <- 4 - unclass(psqi.efficiency)
-psqi.disturb <- sapply(manocha2013[c((base+6):(base+13), base+15)], unclass) - 1
-psqi.disturb.mean <- mean.or.na(psqi.disturb, 8)
-psqi.5 <- unclass(cut(psqi.disturb.mean, c(-1, .9, 9, 18, 30)/9)) - 1
-psqi.6 <- unclass(manocha2013[[base + 17]]) - 1
-psqi.daytime <- sapply(manocha2013[c(base + 18, base + 19)], unclass)
-psqi.7 <-ceiling(mean.or.na(psqi.daytime, 1) - 1)
-
-# 0 indicates no difficulty
-# 21 indicates severe difficulty
-manocha2013$psqi <- 
-  apply(cbind(psqi.1, psqi.2, psqi.3, psqi.4, psqi.5, psqi.6, psqi.7), 1, sum)
+base <- 39
+manocha2013$psqi <- score.psqi(manocha2013[base:(base+18)])
 
 if (0) {
   psqi <- manocha2013[which(!is.na(haveboth)), c('id', 'time', 'psqi')]
@@ -124,26 +64,12 @@ if (0) {
 
 ##################################################### DASS-21
 
-DASSItem = c('Did not apply to me at all',
-                 'Applied to me to some degree, or some of the time',
-                 'Applied to me to a considerable degree, or a good part of time',
-                 'Applied to me very much, or most of the time')
-
 base <- 58
-for (col in base:(base+20)) {
-  manocha2013[[col]] <- ordered(manocha2013[[col]], levels=DASSItem)
-}
-
-#colnames(manocha2013)[57:(56+21)]
-
-# based on Henry & Crawford (2005), Figure 1
-dass.d <- sapply(manocha2013[base+c(3,5,10,13,16,17,21)-1], unclass)  # depression
-dass.a <- sapply(manocha2013[base+c(2,4,7,9,15,19,20)-1], unclass)  # anxiety
-dass.s <- sapply(manocha2013[base+c(1,6,8,11,12,14,18)-1], unclass)  # stress
-manocha2013$dass.d <- mean.or.na(dass.d, 6)
-manocha2013$dass.a <- mean.or.na(dass.a, 6)
-manocha2013$dass.s <- mean.or.na(dass.s, 6)
-manocha2013$dass.na <- mean.or.na(cbind(dass.d, dass.a, dass.s), 18)
+got <- score.dass(manocha2013[base:(base+20)])
+manocha2013$dass.d <- got$d
+manocha2013$dass.a <- got$a
+manocha2013$dass.s <- got$s
+manocha2013$dass.na <- got$na
 
 if (0) {
   df <- manocha2013[which(!is.na(haveboth)), c('id', 'time', 'dass.na', 'dass.d', 'dass.a', 'dass.s')]
@@ -205,6 +131,30 @@ if (0) {
 # dass.a - 1=light, 7=heavy
 # dass.s - 1=light, 7=heavy
 # dass.na - 1=light, 7=heavy
+
+# cat(deparse(round(fivenum(manocha2013$rumination),3)))
+expect_equal(fivenum(manocha2013$rumination), c(1.833, 3.273, 3.667, 4, 5), tolerance=.03)
+expect_equal(digest(manocha2013$rumination), "2df787d0b6f70252bbb8ecfee9b72ba4")
+
+# cat(deparse(round(fivenum(manocha2013$reflection),3)))
+expect_equal(fivenum(manocha2013$reflection), c(2.167, 3.167, 3.583, 4, 5), tolerance=.03)
+expect_equal(digest(manocha2013$reflection), "ddd1130db7c4ec9fc93d72ddba132057")
+
+# cat(deparse(round(fivenum(manocha2013$psqi),3)))
+expect_equal(fivenum(manocha2013$psqi), c(0, 4, 6, 9, 19), tolerance=.03)
+expect_equal(digest(manocha2013$psqi), "a648e1d886e61c117da0f979bb5374b4")
+
+# cat(deparse(round(fivenum(manocha2013$dass.d),3)))
+expect_equal(fivenum(manocha2013$dass.d), c(1, 1.226, 1.643, 2.286, 4), tolerance=.03)
+expect_equal(digest(manocha2013$dass.d), "8fb9b42a8fd88220b2aadd5046874ce1")
+
+# cat(deparse(round(fivenum(manocha2013$dass.a),3)))
+expect_equal(fivenum(manocha2013$dass.a), c(1, 1.286, 1.429, 2.071, 3.714), tolerance=.03)
+expect_equal(digest(manocha2013$dass.a), "9a4a22e80018217c8eca5dc55f8e68c0")
+
+# cat(deparse(round(fivenum(manocha2013$dass.s),3)))
+expect_equal(fivenum(manocha2013$dass.s), c(1, 1.571, 2, 2.571, 4), tolerance=.03)
+expect_equal(digest(manocha2013$dass.s), "bad0f212378801c145efda4b30c201ea")
 
 ######################################### Change scores
 

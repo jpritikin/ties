@@ -1,5 +1,8 @@
 #!/usr/bin/perl
 
+# This is a bad design. A better way is to create a separate script
+# for every version and hardcode the column order.
+
 use strict;
 use warnings;
 use Text::CSV_XS;

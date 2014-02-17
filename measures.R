@@ -1,0 +1,124 @@
+mean.or.na <- function(mat, n.min) {
+  size <- apply(mat, 1, function(r) sum(!is.na(r)))
+  score <- apply(mat, 1, function(r) sum(r, na.rm=TRUE))
+  score[size < n.min] <- NA
+  score / size
+}
+
+score.rrq <- function(raw) {
+    if (ncol(raw) != 24) stop("Expecting 24 columns")
+
+    RRQItem <- c('Strongly disagree',
+                 'Disagree',
+                 'Neutral',
+                 'Agree',
+                 'Strongly Agree')
+
+    base <- 1
+    for (col in base:(base+23)) {
+        rrq.index <- 1 + col - base
+        levels <- RRQItem
+        if (any(rrq.index %in% c(6,9,10,13,14,17,20,24))) {
+            levels <- RRQItem[5:1]
+        }
+        raw[[col]] <- ordered(raw[[col]], levels=levels)
+    }
+
+    rum <- sapply(raw[,base:(base+11)], unclass)
+    ref <- sapply(raw[,(base+12):(base+23)], unclass)
+    list(rumination=mean.or.na(rum, 8),
+         reflection=mean.or.na(ref, 8))
+}
+
+rsubstr <- function(str, start, end) {
+  len <- nchar(str)
+  substr(str, len + start, len + end)
+}
+
+in.bed <- function(from, to) {
+    if (length(from) != length(to)) stop("length mismatch")
+    mapply(function(from1, to1) {
+        if (nchar(from1) == 0) return(NA)
+        if (nchar(to1) == 0) return(NA)
+        side <- toupper(rsubstr(from1, -1, 0))
+        if (side != "PM" && side != "AM") stop(side)
+        sleep.day <- ifelse(side=="PM", "2014-01-01", "2014-01-02")
+        hr <- (strptime(paste("2014-01-02", to1),
+                        format="%Y-%m-%d %I:%M %p") -
+               strptime(paste(sleep.day, from1),
+                        format="%Y-%m-%d %I:%M %p"))
+        as.numeric(hr)
+    }, from, to)
+}
+
+score.psqi <- function(raw) {
+    if (ncol(raw) != 19) stop("Expecting 19 columns")
+
+    SleepItem <- c('Not during the past month',
+                   'Less than once a week',
+                   'Once or twice a week',
+                   'Three or more times a week')
+
+    SleepQualityItem = c('Very good',
+        'Fairly good',
+        'Fairly bad',
+        'Very bad');
+
+    SleepEnthItem = c('No problem at all',
+        'Only a very slight problem',
+        'Somewhat of a problem',
+        'A very big problem');
+
+    base <- 0
+    for (col in (base+5):(base+19)) {
+        psqi.index <- col - base
+        levels <- SleepItem
+        if (psqi.index == 16) {
+            levels <- SleepQualityItem
+        } else if (psqi.index == 19) {
+            levels <- SleepEnthItem
+        }
+        raw[[col]] <- ordered(raw[[col]], levels=levels)
+    }
+
+    psqi.1 <- unclass(raw[[base + 16]])-1
+    psqi.time.to.sleep <- cut(raw[[base + 2]], breaks=c(0, 15, 30, 60, 3600), ordered_result=TRUE)
+    psqi.2 <- (unclass(raw[[base + 5]]) + unclass(psqi.time.to.sleep) - 1) %/% 2
+    psqi.sleep.duration <- cut(raw[[base + 4]], c(0,5,6,7,24), right=FALSE, ordered_result=TRUE)
+    psqi.3 <- 4 - unclass(psqi.sleep.duration)
+    psqi.efficiency <- cut(raw[[base + 4]] / in.bed(raw[[base + 1]], raw[[base + 3]]), c(0,.65,.75,.85, 2), ordered_result=TRUE)
+    psqi.4 <- 4 - unclass(psqi.efficiency)
+    psqi.disturb <- sapply(raw[c((base+6):(base+13), base+15)], unclass) - 1
+    psqi.disturb.mean <- mean.or.na(psqi.disturb, 8)
+    psqi.5 <- unclass(cut(psqi.disturb.mean, c(-1, .9, 9, 18, 30)/9)) - 1
+    psqi.6 <- unclass(raw[[base + 17]]) - 1
+    psqi.daytime <- sapply(raw[c(base + 18, base + 19)], unclass)
+    psqi.7 <-ceiling(mean.or.na(psqi.daytime, 1) - 1)
+
+                                        # 0 indicates no difficulty
+                                        # 21 indicates severe difficulty
+    apply(cbind(psqi.1, psqi.2, psqi.3, psqi.4, psqi.5, psqi.6, psqi.7), 1, sum)
+}
+
+score.dass <- function(raw) {
+    if (ncol(raw) != 21) stop("Expecting 21 columns")
+
+    DASSItem = c('Did not apply to me at all',
+        'Applied to me to some degree, or some of the time',
+        'Applied to me to a considerable degree, or a good part of time',
+        'Applied to me very much, or most of the time')
+
+    base <- 1
+    for (col in base:(base+20)) {
+        raw[[col]] <- ordered(raw[[col]], levels=DASSItem)
+    }
+
+                                        # based on Henry & Crawford (2005), Figure 1
+    dass.d <- sapply(raw[base+c(3,5,10,13,16,17,21)-1], unclass)  # depression
+    dass.a <- sapply(raw[base+c(2,4,7,9,15,19,20)-1], unclass)  # anxiety
+    dass.s <- sapply(raw[base+c(1,6,8,11,12,14,18)-1], unclass)  # stress
+    list(d=mean.or.na(dass.d, 6),
+         a=mean.or.na(dass.a, 6),
+         s=mean.or.na(dass.s, 6),
+         na=mean.or.na(cbind(dass.d, dass.a, dass.s), 18))
+}
