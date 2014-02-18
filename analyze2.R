@@ -3,25 +3,30 @@ library(ggplot2)
 library(rpf)
 library(reshape2)
 library(plyr)
-library(gridExtra)
 library(gtools)
-source("jrs.R")
-options(jrsCacheDir='.cache')
-#options(error = utils::recover)
+source("measures.R")
+
+# collect the calibration sample
 
 source("prepare.R")
 raw <- read.csv("raw.csv", stringsAsFactors=FALSE)
+espt <- prepare.espt(raw)
+
 manocha2013 <- read.csv("au/2013combined.csv", stringsAsFactors=FALSE)
 manocha2013$wave <- 'manocha2013'
-manocha2013$instrument <- '2013-09-12'
-combined <- smartbind(raw, manocha2013, fill="")
-espt <- prepare.espt(combined)
+manocha2013.cms <- cbind(prep.cms201309(manocha2013[,79:101]), uid=manocha2013$uid)
+espt <- smartbind(espt, manocha2013.cms)
+
+espt$freqCause <- NULL  # response options changed 2013-12
+load("germano2014/germano2014-cms.rda")
+espt <- smartbind(espt, germano2014.cms)
+
 if (length(unique(espt$uid[!is.na(espt$uid)])) != sum(!is.na(espt$uid))) stop("mismatch")
 next.uid <- 1+max(espt$uid, na.rm=TRUE)
 espt$uid[is.na(espt$uid)] <- seq(next.uid, next.uid+sum(is.na(espt$uid)) - 1)
 save(espt, file="espt.rda")
 
-source('irtplot.R')
+#source('irtplot.R')
 
 #######################################################
 # demographics

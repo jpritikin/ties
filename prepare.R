@@ -191,7 +191,7 @@ prepare.espt <- function(espt, scores) {
     espt[[col]] <- mxFactor(espt[[col]], levels=prepare.levels)
   }
 
-  for (col in c('m.training', 'm.regular', 'wave', 'ip.continent',
+  for (col in c('m.training', 'm.regular', 'ip.continent',
                 'ip.country', 'ip.region', 'ip.city')) {
     if (is.null(espt[[col]])) next
     espt[[col]] <- factor(espt[[col]])

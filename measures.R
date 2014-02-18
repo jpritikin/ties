@@ -122,3 +122,128 @@ score.dass <- function(raw) {
          s=mean.or.na(dass.s, 6),
          na=mean.or.na(cbind(dass.d, dass.a, dass.s), 18))
 }
+
+NotionItem = c('This is the first time I have thought about it.',
+               "The notion has crossed my mind, but I'm not sure what it means to me.",
+               'I have discussed it with friends.',
+               'I have read something about it.',
+               'I study the topic with interest.')
+
+MSAgreementItem = c('Agree','Agree somewhat','Not sure','Disagree somewhat','Disagree')
+
+LearnItem = c('No', 'Not Sure',
+              'Yes, if it was easy to learn',
+              'Yes, I am moderately curious',
+              'Yes, I am keenly curious')
+
+MSFrequencyItem <- c("more than 2 times a day",
+                     "1-2 times a day",
+                     "4-6 times a week",
+                     "1-3 times a week",
+                     "1-3 times a month",
+                     "I don't try to cause myself to experience complete mental silence")
+
+maxDurationItem = c('A moment (e.g., a second or shorter)',
+                    'Longer than a moment but shorter than 10 seconds',
+                    'Between 10 seconds and 1 minute',
+                    'Between 1 minute and 10 minutes',
+                    'More than 10 minutes')
+
+safe.ordered <- function(df, levels, old.levels=c()) {
+  if (!missing(old.levels)) {
+    if (any(!is.na(match(old.levels, levels)))) stop("levels and old.levels overlap")
+    df[which(!is.na(match(df, old.levels)))] <- ''
+  }
+  levels <- tolower(levels)
+  df <- tolower(df)
+  no.match <- is.na(match(df, c('',levels)))
+  if (any(no.match)) {
+    stop(paste("In", col, "unknown levels:", paste(unique(df[no.match]), collapse=" ")))
+  }
+  ordered(df, levels=levels)
+}
+
+prep.cms201309 <- function(raw) {
+  if (ncol(raw) != 23) stop("Expecting 23 columns")
+  
+  df <- data.frame(
+    msNotion=safe.ordered(raw[[1]], NotionItem),
+    # 2=msFreq, item removed
+    msAny=safe.ordered(raw[[3]], MSAgreementItem),
+    msEvery=safe.ordered(raw[[4]], MSAgreementItem),
+    wantLearn=safe.ordered(raw[[5]], LearnItem,
+                           "I know how to cause myself to experience complete mental silence.")
+  )
+  
+  item1 <- c("msEffort", "msEmo", "msDescarte", "msAfraid", "msFast", "msLife", "msIdentity")
+  for (x1 in 1:7) {
+    df[,item1[x1]] <- safe.ordered(raw[[5+x1]], rev(MSAgreementItem))
+  }
+  df$skipInt <- apply(df[,item1], 1, function(t) all(is.na(t)))
+  
+  # freqCause response options changed raw[[13]]
+  df$pctSuccess <- raw[[14]]
+  # table(df$pctSuccess[unclass(df$freqCause) == 6])   #crazy?
+  df$maxDuration <- safe.ordered(raw[[15]], maxDurationItem)
+
+  item2 <- c("msYearn", 'msMet', "msEnv", "msAllow", "msCause",
+             'msShared', 'msTeach', 'msTrainTeach')
+  for (x2 in 1:8) {
+    df[,item2[x2]] <- safe.ordered(raw[[15+x2]], MSAgreementItem)
+  }
+  
+  df$skipExp <- apply(df[,c(item2, 'pctSuccess', 'maxDuration')], 1, function(t) all(is.na(t)))
+  df$instrument <- "2013-09-12"
+  
+  mask <- df$skipInt & df$skipExp
+  df$skipExp[mask] <- NA
+  df$skipInt[mask] <- NA
+  df$skipInt <- mxFactor(df$skipInt, levels=c(FALSE, TRUE))
+  df$skipExp <- mxFactor(df$skipExp, levels=c(TRUE, FALSE))
+  
+  df
+}
+
+prep.cms201312 <- function(raw) {
+  if (ncol(raw) != 26) stop("Expecting 26 columns")
+
+  df <- data.frame(
+    msNotion=safe.ordered(raw[[1]], NotionItem),
+    msAny=safe.ordered(raw[[2]], MSAgreementItem),
+    msEvery=safe.ordered(raw[[3]], MSAgreementItem),
+    wantLearn=safe.ordered(raw[[4]], LearnItem,
+                      "I know how to cause myself to experience complete mental silence.")
+  )
+
+  item1 <- c("msEffort", "msEmo", "msDescarte", "msAfraid", "msFast", "msLife", "msIdentity")
+  for (x1 in 1:7) {
+    df[,item1[x1]] <- safe.ordered(raw[[4+x1]], rev(MSAgreementItem))
+  }
+  df$skipInt <- apply(df[,item1], 1, function(t) all(is.na(t)))
+
+  item2 <- c("msYearn", "msEnv", "msAllow", "msCause")
+  for (x2 in 1:4) {
+    df[,item2[x2]] <- safe.ordered(raw[[11+x2]], MSAgreementItem)
+  }
+  df$freqCause <- safe.ordered(raw[[16]], MSFrequencyItem)
+  df$pctSuccess <- raw[[17]]
+  # table(df$pctSuccess[unclass(df$freqCause) == 6])   #crazy?
+  df$maxDuration <- safe.ordered(raw[[18]], maxDurationItem)
+
+  item3 <- c('msMet', 'msShared', 'msTeach', 'msTrainTeach')
+  for (x3 in 1:4) {
+    df[, item3[x3]] <- safe.ordered(raw[[17+x3*2]], MSAgreementItem)
+    df[, paste(item3[x3], "Num", sep="")] <- raw[[18+x3*2]]
+  }
+  df$skipExp <- apply(df[,c(item2, 'freqCause', 'pctSuccess', 'maxDuration',
+              item3, paste(item3[x3], "Num", sep=""))], 1, function(t) all(is.na(t)))
+  df$instrument <- "2013-12"
+
+  mask <- df$skipInt & df$skipExp
+  df$skipExp[mask] <- NA
+  df$skipInt[mask] <- NA
+  df$skipInt <- mxFactor(df$skipInt, levels=c(FALSE, TRUE))
+  df$skipExp <- mxFactor(df$skipExp, levels=c(TRUE, FALSE))
+
+  df
+}

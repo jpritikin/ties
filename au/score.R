@@ -134,27 +134,27 @@ if (0) {
 
 # cat(deparse(round(fivenum(manocha2013$rumination),3)))
 expect_equal(fivenum(manocha2013$rumination), c(1.833, 3.273, 3.667, 4, 5), tolerance=.03)
-expect_equal(digest(manocha2013$rumination), "2df787d0b6f70252bbb8ecfee9b72ba4")
+expect_equal(digest(manocha2013$rumination, ascii=TRUE), "a4c55e306c5773f5149f00ceb9c372c8")
 
 # cat(deparse(round(fivenum(manocha2013$reflection),3)))
 expect_equal(fivenum(manocha2013$reflection), c(2.167, 3.167, 3.583, 4, 5), tolerance=.03)
-expect_equal(digest(manocha2013$reflection), "ddd1130db7c4ec9fc93d72ddba132057")
+expect_equal(digest(manocha2013$reflection, ascii=TRUE), "71f66160c428de3c59458d8167e2de48")
 
 # cat(deparse(round(fivenum(manocha2013$psqi),3)))
 expect_equal(fivenum(manocha2013$psqi), c(0, 4, 6, 9, 19), tolerance=.03)
-expect_equal(digest(manocha2013$psqi), "a648e1d886e61c117da0f979bb5374b4")
+expect_equal(digest(manocha2013$psqi, ascii=TRUE), "12b3900b3ff11900d656cfa788470c2f")
 
 # cat(deparse(round(fivenum(manocha2013$dass.d),3)))
 expect_equal(fivenum(manocha2013$dass.d), c(1, 1.226, 1.643, 2.286, 4), tolerance=.03)
-expect_equal(digest(manocha2013$dass.d), "8fb9b42a8fd88220b2aadd5046874ce1")
+expect_equal(digest(manocha2013$dass.d, ascii=TRUE), "ce5d1bcd88693c78bb12e27c22d6e5f2")
 
 # cat(deparse(round(fivenum(manocha2013$dass.a),3)))
 expect_equal(fivenum(manocha2013$dass.a), c(1, 1.286, 1.429, 2.071, 3.714), tolerance=.03)
-expect_equal(digest(manocha2013$dass.a), "9a4a22e80018217c8eca5dc55f8e68c0")
+expect_equal(digest(manocha2013$dass.a, ascii=TRUE), "54f30ef3957e8bfc5854b0c89b85c199")
 
 # cat(deparse(round(fivenum(manocha2013$dass.s),3)))
 expect_equal(fivenum(manocha2013$dass.s), c(1, 1.571, 2, 2.571, 4), tolerance=.03)
-expect_equal(digest(manocha2013$dass.s), "bad0f212378801c145efda4b30c201ea")
+expect_equal(digest(manocha2013$dass.s, ascii=TRUE), "fccf4fb24159247e547a0299547495ab")
 
 ######################################### Change scores
 
