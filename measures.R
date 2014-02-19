@@ -235,9 +235,10 @@ prep.cms201312 <- function(raw) {
     df[, item3[x3]] <- safe.ordered(raw[[17+x3*2]], MSAgreementItem)
     df[, paste(item3[x3], "Num", sep="")] <- raw[[18+x3*2]]
   }
-  df$skipExp <- apply(df[,c(item2, 'freqCause', 'pctSuccess', 'maxDuration',
-              item3, paste(item3[x3], "Num", sep=""))], 1, function(t) all(is.na(t)))
-  df$instrument <- "2013-12"
+  exp.items <- c(item2, 'freqCause', 'pctSuccess', 'maxDuration',
+    item3, paste(item3[x3], "Num", sep=""))
+  df$skipExp <- apply(df[,exp.items], 1, function(t) all(is.na(t)))
+  df$instrument <- "2013-12-16"
 
   mask <- df$skipInt & df$skipExp
   df$skipExp[mask] <- NA

@@ -1,6 +1,11 @@
 library(ggplot2)
 library(digest)
-source("../measures.R")
+{
+  wd <- setwd("..")
+  source("measures.R")
+  source("cms-score.R")
+  setwd(wd)
+}
 
 raw1 <- read.csv("wave1-anon.csv", stringsAsFactors=FALSE)
 
@@ -14,6 +19,8 @@ RelaItemShort = c('Single',
                   'Other')
 
 wave1 <- data.frame(
+  id=raw1$id,
+  uid=raw1$uid,
   born=raw1[[3]],
   sex=factor(raw1[[4]], levels=SexItem, labels=tolower(SexItem)),
   rel=factor(raw1[[5]], levels=RelaItem, labels=tolower(RelaItemShort)))
@@ -32,4 +39,9 @@ wave1$dass.na <- got$na
 
 germano2014.cms <- cbind(prep.cms201312(raw1[70:95]), uid=raw1$uid)
 germano2014.cms$wave <- "germano2014"
-save(germano2014.cms, file="germano2014-cms.rda")
+if (0) {
+  save(germano2014.cms, file="germano2014-cms.rda")
+}
+
+wave1 <- cbind(wave1, cms.score(germano2014.cms))
+apply(wave1, 2, function (c) sum(is.na(c)))

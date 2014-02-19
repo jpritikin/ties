@@ -62,7 +62,7 @@ rpf.plot <- function(grp, item.name, width=3, data.bins=11, basis=c(1), factor=1
   plot <- ggplot(both, aes(theta, value)) +
      facet_wrap(~type) +
     ylim(0,1) + xlim(-width,width) + labs(y="probability") +
-    geom_text(data=bin.n, aes(label=n, x=theta), y = 1, size=1.5)
+    geom_text(data=bin.n, aes(label=n, x=theta), y = 1, size=1.5, angle=90)
   guide.style <- guide_legend(keywidth=.1, keyheight=.5, direction = "horizontal", title.position = "top",
                               label.position="bottom", label.hjust = 0.5, label.vjust = .5,
                               label.theme = element_text(angle = 90, size=8))
@@ -170,7 +170,11 @@ booklet <- function (plot.fn, args, output="booklet.pdf") {
     }
   }
   if (length(plots)) flush.plots(plots,page)
-  system(paste("pdfunite  gen/page-*", output))
+  if (length(plots) == 0 && page == 2) {
+    file.rename("gen/page-001.pdf", output)
+  } else {
+    system(paste("pdfunite  gen/page-*", output))
+  }
 }
 
 ## name <- 'msCause'

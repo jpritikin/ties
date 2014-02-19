@@ -12,6 +12,11 @@ source("prepare.R")
 raw <- read.csv("raw.csv", stringsAsFactors=FALSE)
 espt <- prepare.espt(raw)
 
+when <- strptime(espt[['instrument']], "%Y-%m-%d")
+revision1 <- strptime("2013-02-11", "%Y-%m-%d")
+ver.mask <- difftime(when, revision1) > 0
+espt <- espt[ver.mask,]
+
 manocha2013 <- read.csv("au/2013combined.csv", stringsAsFactors=FALSE)
 manocha2013$wave <- 'manocha2013'
 manocha2013.cms <- cbind(prep.cms201309(manocha2013[,79:101]), uid=manocha2013$uid)
