@@ -1,4 +1,5 @@
 mean.or.na <- function(mat, n.min) {
+  mat <- as.data.frame(lapply(mat, unclass))
   size <- apply(mat, 1, function(r) sum(!is.na(r)))
   score <- apply(mat, 1, function(r) sum(r, na.rm=TRUE))
   score[size < n.min] <- NA
@@ -24,10 +25,8 @@ score.rrq <- function(raw) {
         raw[[col]] <- ordered(raw[[col]], levels=levels)
     }
 
-    rum <- sapply(raw[,base:(base+11)], unclass)
-    ref <- sapply(raw[,(base+12):(base+23)], unclass)
-    list(rumination=mean.or.na(rum, 8),
-         reflection=mean.or.na(ref, 8))
+    list(rumination=mean.or.na(raw[,base:(base+11)], 8),
+         reflection=mean.or.na(raw[,(base+12):(base+23)], 8))
 }
 
 rsubstr <- function(str, start, end) {
@@ -88,11 +87,11 @@ score.psqi <- function(raw) {
     psqi.3 <- 4 - unclass(psqi.sleep.duration)
     psqi.efficiency <- cut(raw[[base + 4]] / in.bed(raw[[base + 1]], raw[[base + 3]]), c(0,.65,.75,.85, 2), ordered_result=TRUE)
     psqi.4 <- 4 - unclass(psqi.efficiency)
-    psqi.disturb <- sapply(raw[c((base+6):(base+13), base+15)], unclass) - 1
-    psqi.disturb.mean <- mean.or.na(psqi.disturb, 8)
+    psqi.disturb <- raw[c((base+6):(base+13), base+15)]
+    psqi.disturb.mean <- mean.or.na(psqi.disturb, 8) - 1
     psqi.5 <- unclass(cut(psqi.disturb.mean, c(-1, .9, 9, 18, 30)/9)) - 1
     psqi.6 <- unclass(raw[[base + 17]]) - 1
-    psqi.daytime <- sapply(raw[c(base + 18, base + 19)], unclass)
+    psqi.daytime <- raw[c(base + 18, base + 19)]
     psqi.7 <-ceiling(mean.or.na(psqi.daytime, 1) - 1)
 
                                         # 0 indicates no difficulty
@@ -113,10 +112,10 @@ score.dass <- function(raw) {
         raw[[col]] <- ordered(raw[[col]], levels=DASSItem)
     }
 
-                                        # based on Henry & Crawford (2005), Figure 1
-    dass.d <- sapply(raw[base+c(3,5,10,13,16,17,21)-1], unclass)  # depression
-    dass.a <- sapply(raw[base+c(2,4,7,9,15,19,20)-1], unclass)  # anxiety
-    dass.s <- sapply(raw[base+c(1,6,8,11,12,14,18)-1], unclass)  # stress
+    # based on Henry & Crawford (2005), Figure 1
+    dass.d <- raw[base+c(3,5,10,13,16,17,21)-1]  # depression
+    dass.a <- raw[base+c(2,4,7,9,15,19,20)-1]    # anxiety
+    dass.s <- raw[base+c(1,6,8,11,12,14,18)-1]   # stress
     list(d=mean.or.na(dass.d, 6),
          a=mean.or.na(dass.a, 6),
          s=mean.or.na(dass.s, 6),

@@ -1,5 +1,6 @@
 library(rpf)
 library(OpenMx)
+source("measures.R")
 
 mkspec <- function(espt, items) {
   spec <- list()
@@ -41,14 +42,6 @@ num2cat <- function(num) {
   kat[zero] <- 0
   kat[high] <- round(level.coef * log10(1000))+1
   kat
-}
-
-mean.or.na <- function(mat, n.min) {
-  mat <- as.data.frame(lapply(mat, unclass))
-  size <- apply(mat, 1, function(r) sum(!is.na(r)))
-  score <- apply(mat, 1, function(r) sum(r, na.rm=TRUE))
-  score[size < n.min] <- NA
-  score / size
 }
 
 # "msNotion" -- same question better measured by other items

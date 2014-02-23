@@ -1,3 +1,4 @@
+library(testthat)
 library(ggplot2)
 library(digest)
 source("../measures.R")
@@ -29,13 +30,6 @@ haveboth <- match(manocha2013$id, manocha2013[manocha2013$time==2,'id'])
 # store todo list for mkreport
 write.table(manocha2013[manocha2013$time==2,'id'], file="report-todo.csv",
               row.names=FALSE, col.names=FALSE)
-
-mean.or.na <- function(mat, n.min) {
-  size <- apply(mat, 1, function(r) sum(!is.na(r)))
-  score <- apply(mat, 1, function(r) sum(r, na.rm=TRUE))
-  score[size < n.min] <- NA
-  score / size
-}
 
 ######################################### RRQ
 base <- 15
