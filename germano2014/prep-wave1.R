@@ -1,3 +1,5 @@
+library(testthat)
+library(digest)
 library(ggplot2)
 library(digest)
 {
@@ -44,4 +46,15 @@ if (0) {
 }
 
 wave1 <- cbind(wave1, cms.score(germano2014.cms))
-apply(wave1, 2, function (c) sum(is.na(c)))
+if (0) {
+  apply(wave1, 2, function (c) sum(is.na(c)))
+}
+
+verify.col <- c("reflection", "rumination", "psqi", "dass.d", "dass.a", "dass.s",  "dass.na")
+verify.digest <- c("5c048a9bde4fe7d45a2feea10894cdb4", "8e01999b6cedb96e28c7141e2237610e",
+                   "40200e2e00b9ffbf1bf00a00afa92d9e", "c762151cc430e67eecd463e32088aa13",
+                   "031af9ac8379ef50e25b583f8b3097bf", "5fca0690cad3c7c67ee36780703e227f",
+                   "40ceca7f66dbb3dfbafa18db5e6c25fe")
+for (c in 1:length(verify.col)) {
+  expect_equal(digest(wave1[[verify.col[[c]]]]), verify.digest[[c]], info=verify.col[[c]])
+}
