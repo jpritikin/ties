@@ -77,15 +77,3 @@ dis.flow <- cbind(
   pmax(3-unclass(espt$fl.b.gi),0))
 table(apply((dis.flow), 1, sum, na.rm=TRUE))
 }
-
-################################################################
-# compare sample distributions
-if (0) {
-  hist.plot <- ggplot(espt, aes(x=score)) + geom_histogram() + facet_grid(ppool ~ .)  
-}
-
-# nothing obvious here
-if (0) {
-  pairs(~score+born+sex+edu+rel, data=espt)  
-}
-

@@ -176,7 +176,7 @@ prep.cms201309 <- function(raw) {
   
   item1 <- c("msEffort", "msEmo", "msDescarte", "msAfraid", "msFast", "msLife", "msIdentity")
   for (x1 in 1:7) {
-    df[,item1[x1]] <- safe.ordered(raw[[5+x1]], rev(MSAgreementItem))
+    df[,item1[x1]] <- safe.ordered(raw[[5+x1]], MSAgreementItem)
   }
   df$skipInt <- apply(df[,item1], 1, function(t) all(is.na(t)))
   
@@ -188,7 +188,7 @@ prep.cms201309 <- function(raw) {
   item2 <- c("msYearn", 'msMet', "msEnv", "msAllow", "msCause",
              'msShared', 'msTeach', 'msTrainTeach')
   for (x2 in 1:8) {
-    df[,item2[x2]] <- safe.ordered(raw[[15+x2]], MSAgreementItem)
+    df[,item2[x2]] <- safe.ordered(raw[[15+x2]], rev(MSAgreementItem))
   }
   
   df$skipExp <- apply(df[,c(item2, 'pctSuccess', 'maxDuration')], 1, function(t) all(is.na(t)))
@@ -216,34 +216,35 @@ prep.cms201312 <- function(raw) {
 
   item1 <- c("msEffort", "msEmo", "msDescarte", "msAfraid", "msFast", "msLife", "msIdentity")
   for (x1 in 1:7) {
-    df[,item1[x1]] <- safe.ordered(raw[[4+x1]], rev(MSAgreementItem))
+    df[,item1[x1]] <- safe.ordered(raw[[4+x1]], MSAgreementItem)
   }
   df$skipInt <- apply(df[,item1], 1, function(t) all(is.na(t)))
 
   item2 <- c("msYearn", "msEnv", "msAllow", "msCause")
   for (x2 in 1:4) {
-    df[,item2[x2]] <- safe.ordered(raw[[11+x2]], MSAgreementItem)
+    df[,item2[x2]] <- safe.ordered(raw[[11+x2]], rev(MSAgreementItem), "I don't understand this question.")
   }
-  df$freqCause <- safe.ordered(raw[[16]], MSFrequencyItem)
+  evItems <- c('freqCause', 'pctSuccess', 'maxDuration')
+  df$freqCause <- safe.ordered(raw[[16]], rev(MSFrequencyItem))
   df$pctSuccess <- raw[[17]]
   # table(df$pctSuccess[unclass(df$freqCause) == 6])   #crazy?
   df$maxDuration <- safe.ordered(raw[[18]], maxDurationItem)
-
   item3 <- c('msMet', 'msShared', 'msTeach', 'msTrainTeach')
   for (x3 in 1:4) {
-    df[, item3[x3]] <- safe.ordered(raw[[17+x3*2]], MSAgreementItem)
+    df[, item3[x3]] <- safe.ordered(raw[[17+x3*2]], rev(MSAgreementItem))
     df[, paste(item3[x3], "Num", sep="")] <- raw[[18+x3*2]]
   }
-  exp.items <- c(item2, 'freqCause', 'pctSuccess', 'maxDuration',
-    item3, paste(item3[x3], "Num", sep=""))
-  df$skipExp <- apply(df[,exp.items], 1, function(t) all(is.na(t)))
-  df$instrument <- "2013-12-16"
+  trainItems <- c(item2, item3, paste(item3[x3], "Num", sep=""))
+  
+  df$skipExp <- apply(df[,c(evItems, trainItems)], 1, function(t) all(is.na(t)))
+
+  df$instrument <- "2013-12-16"  # also works for 2014-01
 
   mask <- df$skipInt & df$skipExp
   df$skipExp[mask] <- NA
   df$skipInt[mask] <- NA
   df$skipInt <- mxFactor(df$skipInt, levels=c(FALSE, TRUE))
   df$skipExp <- mxFactor(df$skipExp, levels=c(TRUE, FALSE))
-
+  
   df
 }

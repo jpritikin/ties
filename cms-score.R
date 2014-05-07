@@ -7,24 +7,21 @@ load("cms-fit.rda")
 ifa.score <- function(grp, df) {
   ip.mat <- mxMatrix(name="ItemParam", values=grp$param)
   m.mat <- mxMatrix(name="mean", nrow=1, ncol=length(grp$mean), values=grp$mean)
-  cov.mat <- mxMatrix("Symm", name="cov", values=grp$cov)
+  rownames(m.mat) <- 'f'
+  cov.mat <- mxMatrix("Symm", name="cov", values=grp$cov, dimnames=list('f','f'))
   
   items <- colnames(grp$param)
   ba.data <- df[,items]
-  ba.mask <- apply(ba.data, 1, function(r) any(!is.na(r)))
   
   ba <- mxModel(model="score",
                 m.mat, cov.mat, ip.mat,
-                mxData(observed=ba.data[ba.mask,], type="raw"),
-                mxExpectationBA81(mean="mean", cov="cov",
-                                  ItemSpec=grp$spec, ItemParam="ItemParam", scores="full"),
+                mxData(observed=ba.data, type="raw"),
+                mxExpectationBA81(mean="mean", cov="cov", minItemsPerScore=grp$minItems,
+                                  ItemSpec=grp$spec, ItemParam="ItemParam", scores="full", naAction="pass"),
                 mxComputeOnce('expectation'))
   ba.est <- mxRun(ba, silent=TRUE)
 
-  sc <- ba.est@expectation@output$scores
-  got <- matrix(NA, nrow(df), ncol(sc))
-  got[ba.mask,] <- sc
-  got
+  ba.est@expectation@output$scores
 }
 
 cms.score <- function(df) {
@@ -53,6 +50,20 @@ cms.score <- function(df) {
   }
   lim <- cms.testlets(lim)
   cms[df$skipExp==TRUE,'training'] <- ifa.score(tr.grp, lim)[,1]
+  
+  eventNames <- c('freqCause', 'successCat', 'maxDuration')
+  lim <- df[1,eventNames]
+  for (c in 1:ncol(lim)) {
+    if (is.factor(lim[1,c])) lim[1,c] <- levels(lim[1,c])[1]
+    else lim[1,c] <- 0
+  }
+  lim <- cms.testlets(lim)
+  lowest <- apply(df[,eventNames], 1, function(row) {
+    if (all(is.na(row))) return(TRUE)
+    all(row[!is.na(row)] == lim[!is.na(row)])
+  })
+  # df[which(lowest), eventNames]
+  cms[lowest, 'event'] <- ifa.score(ev.grp, lim)[,1]
   cms
 }
 

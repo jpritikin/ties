@@ -6,9 +6,10 @@ source("cms-score-lib.R")
 load("espt.rda")
 espt <- cms.testlets(espt)
 
+# not specific enough: "msAny", "msEvery"
 barrier.items <- c('msIdAfraidLearn', 'msFastEffortLife')
 training.items <- c("yearnEnv", "allowCause", "trainSkill", "trainNum")
-event.items <- c("msAny", "msEvery", "freqCause", "successCat", "maxDuration")
+event.items <- c("freqCause", "successCat", "maxDuration")
 
 all.items <- c(barrier.items, training.items, event.items)
 
@@ -34,8 +35,7 @@ numItems <- length(barrier.items)
 maxParam <- max(sapply(spec, rpf.numParam))
 
 ip.mat <- mxMatrix(name="ItemParam", nrow=maxParam, ncol=numItems, free=FALSE)
-colnames(ip.mat@free) <- barrier.items
-colnames(ip.mat@values) <- barrier.items
+colnames(ip.mat) <- barrier.items
 
 ip.mat <- set.nominal.rank(spec, ip.mat, 'msIdAfraid', .27, .5)
 ip.mat <- set.nominal.rank(spec, ip.mat, 'msIdAfraidLearn', .27, .5)
@@ -44,23 +44,21 @@ ip.mat <- set.nominal.rank(spec, ip.mat, 'msFastEffortLife', .27, .5)
 ip.mat <- set.nominal.rank(spec, ip.mat, 'msDescarte', .5, .5)
 
 m.mat <- mxMatrix(name="mean", nrow=1, ncol=1, values=0)
-cov.mat <- mxMatrix("Symm", name="cov", nrow=1, ncol=1, values=diag(1))
+rownames(m.mat) <- "barrier"
+cov.mat <- mxMatrix("Symm", name="cov", nrow=1, ncol=1, values=diag(1),
+                    dimnames=list("barrier", "barrier"))
 
 ba.data <- espt[,barrier.items]
-ba.mask <- apply(ba.data[,barrier.items], 1, function(r) any(!is.na(r)))
 
 ba <- mxModel(model="barrier",
               m.mat, cov.mat, ip.mat,
-              mxData(observed=ba.data[ba.mask,], type="raw"),
+              mxData(observed=ba.data, type="raw"),
               mxExpectationBA81(mean="mean", cov="cov",
-                                ItemSpec=spec, ItemParam="ItemParam", scores="full"),
+                                ItemSpec=spec, ItemParam="ItemParam", scores="full", naAction="pass"),
               mxFitFunctionML(),
               mxComputeSequence(steps=list(
-                mxComputeEM('expectation',
-                            mxComputeNewtonRaphson(free.set='ItemParam'),
-                            mxComputeOnce('fitfunction', free.set=c("mean", "cov"), fit=TRUE)),
-                mxComputeOnce('expectation'),
-                mxComputeOnce('fitfunction', information=TRUE, info.method="meat"),
+                mxComputeEM('expectation', 'scores', mxComputeNewtonRaphson()),
+                mxComputeOnce('fitfunction', 'information', "meat"),
                 mxComputeStandardError(),
                 mxComputeHessianQuality())
                 ))
@@ -69,15 +67,15 @@ ba.est@output$conditionNumber
 
 ba.grp <- list(spec=spec,
             param=ba.est@matrices$ItemParam@values,
-            free=apply(ip.mat@free, 2, sum),
+#            free=apply(ip.mat@free, 2, sum),
             mean=ba.est@matrices$mean@values,
             cov=ba.est@matrices$cov@values,
             scores=ba.est@expectation@output$scores,
-            data=ba.data[ba.mask,])
+            data=ba.data, minItems=1L)
 
 if (0) {
   got <- chen.thissen.1997(ba.grp)
-  max(got$pval[!is.na(got$pval)])  # -2.14
+  max(got$pval[!is.na(got$pval)])  # -1.87, try relaxing testlets?
 }
 
 booklet(function(item) {
@@ -91,8 +89,7 @@ numItems <- length(training.items)
 maxParam <- max(sapply(spec, rpf.numParam))
 
 ip.mat <- mxMatrix(name="ItemParam", nrow=maxParam, ncol=numItems, free=FALSE)
-colnames(ip.mat@free) <- training.items
-colnames(ip.mat@values) <- training.items
+colnames(ip.mat) <- training.items
 
 ip.mat <- set.nominal.rank(spec, ip.mat, 'msNotion', .51, 1)
 ip.mat <- set.nominal.rank(spec, ip.mat, 'msYearn', .51, 1)
@@ -105,20 +102,18 @@ ip.mat <- set.nominal.rank(spec, ip.mat, 'trainSkill', .2, .2)
 ip.mat <- set.nominal.rank(spec, ip.mat, 'trainNum', .1, .1)
 
 tr.data <- espt[,training.items]
-tr.mask <- apply(tr.data[,training.items], 1, function(r) any(!is.na(r)))
 
+minItems <- 2L
 train <- mxModel(model="training",
               m.mat, cov.mat, ip.mat,
-              mxData(observed=tr.data[tr.mask,], type="raw"),
+              mxData(observed=tr.data, type="raw"),
               mxExpectationBA81(mean="mean", cov="cov",
-                                ItemSpec=spec, ItemParam="ItemParam", scores="full"),
+                                ItemSpec=spec, ItemParam="ItemParam", scores="full",
+                                naAction="pass", minItemsPerScore=minItems),
               mxFitFunctionML(),
               mxComputeSequence(steps=list(
-                mxComputeEM('expectation',
-                            mxComputeNewtonRaphson(free.set='ItemParam'),
-                            mxComputeOnce('fitfunction', free.set=c("mean", "cov"), fit=TRUE)),
-                mxComputeOnce('expectation'),
-                mxComputeOnce('fitfunction', information=TRUE, info.method="meat"),
+                mxComputeEM('expectation', 'scores', mxComputeNewtonRaphson()),
+                mxComputeOnce('fitfunction', 'information', "meat"),
                 mxComputeStandardError(),
                 mxComputeHessianQuality())
               ))
@@ -127,11 +122,11 @@ tr.est@output$conditionNumber
 
 tr.grp <- list(spec=spec,
             param=tr.est@matrices$ItemParam@values,
-            free=apply(ip.mat@free, 2, sum),
+#            free=apply(ip.mat@free, 2, sum),
             mean=tr.est@matrices$mean@values,
             cov=tr.est@matrices$cov@values,
             scores=tr.est@expectation@output$scores,
-            data=tr.data[tr.mask,])
+            data=tr.data, minItems=minItems)
 
 if (0) {
   got <- chen.thissen.1997(tr.grp)
@@ -149,8 +144,7 @@ numItems <- length(event.items)
 maxParam <- max(sapply(spec, rpf.numParam))
 
 ip.mat <- mxMatrix(name="ItemParam", nrow=maxParam, ncol=numItems, free=FALSE)
-colnames(ip.mat@free) <- event.items
-colnames(ip.mat@values) <- event.items
+colnames(ip.mat) <- event.items
 
 ip.mat <- set.nominal.rank(spec, ip.mat, 'msAny', .51, 1)
 ip.mat <- set.nominal.rank(spec, ip.mat, 'msEvery', .51, 1)
@@ -159,20 +153,17 @@ ip.mat <- set.nominal.rank(spec, ip.mat, 'successCat', .35, .5)
 ip.mat <- set.nominal.rank(spec, ip.mat, 'maxDuration', .51, 1)
 
 ev.data <- espt[,event.items]
-ev.mask <- apply(ev.data[,event.items], 1, function(r) any(!is.na(r)))
 
+minItems <- 2L
 ev <- mxModel(model="event",
                  m.mat, cov.mat, ip.mat,
-                 mxData(observed=ev.data[ev.mask,], type="raw"),
-                 mxExpectationBA81(mean="mean", cov="cov",
+                 mxData(observed=ev.data, type="raw"),
+                 mxExpectationBA81(mean="mean", cov="cov", naAction="pass", minItemsPerScore=minItems,
                                    ItemSpec=spec, ItemParam="ItemParam", scores="full"),
                  mxFitFunctionML(),
                  mxComputeSequence(steps=list(
-                   mxComputeEM('expectation',
-                               mxComputeNewtonRaphson(free.set='ItemParam'),
-                               mxComputeOnce('fitfunction', free.set=c("mean", "cov"), fit=TRUE)),
-                   mxComputeOnce('expectation'),
-                   mxComputeOnce('fitfunction', information=TRUE, info.method="meat"),
+                   mxComputeEM('expectation', 'scores', mxComputeNewtonRaphson()),
+                   mxComputeOnce('fitfunction', 'information', "meat"),
                    mxComputeStandardError(),
                    mxComputeHessianQuality())
                  ))
@@ -181,11 +172,11 @@ ev.est@output$conditionNumber
 
 ev.grp <- list(spec=spec,
             param=ev.est@matrices$ItemParam@values,
-            free=apply(ip.mat@free, 2, sum),
+#            free=apply(ip.mat@free, 2, sum),
             mean=ev.est@matrices$mean@values,
             cov=ev.est@matrices$cov@values,
             scores=ev.est@expectation@output$scores,
-            data=ev.data[ev.mask,])
+            data=ev.data, minItems=minItems)
 
 booklet(function(item) {
   rpf.plot(ev.grp, item, width=plot.width, data.bins=12, basis=c(1), factor=1)
@@ -193,7 +184,7 @@ booklet(function(item) {
 
 if (0) {
   got <- chen.thissen.1997(ev.grp)
-  max(got$pval[!is.na(got$pval)])  # 25.9
+  max(got$pval[!is.na(got$pval)])  # -4.3
 }
 
 #-------------------------------------------------------------------------

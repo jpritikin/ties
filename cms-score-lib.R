@@ -50,12 +50,12 @@ num2cat <- function(num) {
 
 cms.testlets <- function(df) {
   if (!is.null(df$wantLearn)) {
-    df$msIdAfraid <- ordered(10 - unclass(df$msAfraid) - unclass(df$msIdentity), levels=seq(8,0,-1))
-    df$msIdAfraidLearn <- ordered(unclass(df$wantLearn) - (10 - unclass(df$msAfraid) - unclass(df$msIdentity)),
+    df$msIdAfraid <- ordered(unclass(df$msAfraid) + unclass(df$msIdentity) - 10, levels=seq(-8,0,1))
+    df$msIdAfraidLearn <- ordered(unclass(df$wantLearn) + unclass(df$msAfraid) + unclass(df$msIdentity) - 10,
                                   levels=seq(-7,5,1))
-    df$msFastEffort <- ordered(10 - unclass(df$msFast) - unclass(df$msEffort), levels=seq(8,0,-1))
-    df$msFastEffortLife <- ordered(15 - unclass(df$msFast) - unclass(df$msEffort) - unclass(df$msLife),
-                                   levels=seq(12,0,-1))
+    df$msFastEffort <- ordered(unclass(df$msFast) + unclass(df$msEffort) - 10, levels=seq(-8,0,1))
+    df$msFastEffortLife <- ordered(unclass(df$msFast) + unclass(df$msEffort) + unclass(df$msLife) - 15,
+                                   levels=seq(-12,0,1))
   }
   if (!is.null(df$msCause)) {
     df$trainSkill <- ordered(unclass(df$msMet) + unclass(df$msShared) +
