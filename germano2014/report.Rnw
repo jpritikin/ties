@@ -1,0 +1,107 @@
+\documentclass[doc,12pt]{apa6}
+\usepackage[american]{babel}
+\usepackage{csquotes}
+\usepackage[style=apa,sortcites=true,sorting=nyt,apabackref=true,backend=biber]{biblatex}
+\DeclareLanguageMapping{american}{american-apa}
+\addbibresource{jpritikin.bib}
+\usepackage{hyperref}
+\usepackage{mathtools}
+\usepackage{xspace}
+
+\newcommand{\R} {\texttt{R}\xspace}
+\newcommand{\OpenMx} {\texttt{OpenMx}\xspace}
+
+\title{Mediational analysis of meditation}
+\shorttitle{Meditation}
+\fourauthors{Joshua N.~Pritikin}{Karen Schmidt}{Steven M.~Boker}{Ramesh Manocha}
+\fouraffiliations{University of Virginia}{University of Virginia}{University of Virginia}{University of Sydney}
+\abstract{Not done yet}
+
+<<echo=FALSE, results='hide', warning=FALSE, cache=FALSE>>=
+library(knitr)
+#knit("asem.Rnw", tangle=TRUE)  # to extract only the R chunks
+opts_knit$set(error=TRUE)
+opts_chunk$set(echo=FALSE, cache=FALSE)
+loadlib <- function () {
+library(ggplot2)
+library(reshape2)
+library(plyr)
+library(grid)
+library(gridExtra)
+library(xtable)
+}
+suppressPackageStartupMessages(loadlib())
+theme_set(theme_bw())
+options("xtable.caption.placement"="top")
+options("xtable.table.placement"="tbp")
+options(digits=2)
+@ 
+
+\begin{document}
+\maketitle
+
+\section{Introduction}
+
+Probably the most thorough and up to date review of meditation research lamented
+that little attention has been paid to effect modifiers \parencite{ospina2007}.
+That is, what specific characteristics of the practitioner or meditation
+practice influence outcomes?
+For example, is mantra recitation the end goal or a supportive practice
+that facilitates the end goal?
+We propose that the active ingredient in contemplative practice is
+the experience of mental silence
+\parencite[an experience little known in the West but familiar
+to Oriental thinkers;][]{ramamurthi1995}.
+This hypothesis has a long history \parencite{manocha2008},
+but has not been investigated systematically.
+
+\begin{figure}
+<<fig.height=10>>=
+w1 <- read.table("prep1.csv", header=TRUE, stringsAsFactors=FALSE)
+w2 <- read.table("prep2.csv", header=TRUE, stringsAsFactors=FALSE)
+w3 <- read.table("prep3.csv", header=TRUE, stringsAsFactors=FALSE)
+
+measures <- colnames(w1)[8:ncol(w1)]
+
+lim <- ddply(melt(rbind(w1,w2,w3)[measures], id.vars=c(), variable.name="measure"), ~measure,
+             function(slice) {
+               range(slice$value, na.rm=TRUE)
+             })
+
+plot.univariate <- function(wave) {
+  pl <- list()
+  df <- melt(wave[measures], id.vars=c(), variable.name="measure")
+  for (m in measures) {
+    df1 <- subset(df, measure==m)
+    xx <- unlist(lim[lim$measure==m,-1])
+    r <- diff(xx)
+    # If ylim is too small then data will be omitted from the chart
+    pl[[1+length(pl)]] <- ggplot(df1, aes(value)) + geom_histogram(binwidth=r/20) +
+      ggtitle(m) + xlim(xx[1] - r*.05, xx[2] + r*.05) + ylim(0,150)
+  }
+  do.call(grid.arrange, pl)
+}
+plot.univariate(w1)
+@
+\caption{Wave 1 univariate distributions.}
+\label{fig:wave1-univariate}
+\end{figure}
+
+\begin{figure}
+<<fig.height=10>>=
+plot.univariate(w2)
+@
+\caption{Wave 2 univariate distributions.}
+\label{fig:wave2-univariate}
+\end{figure}
+
+\begin{figure}
+<<fig.height=10>>=
+plot.univariate(w3)
+@
+\caption{Wave 3 univariate distributions.}
+\label{fig:wave3-univariate}
+\end{figure}
+\printbibliography
+
+\end{document}

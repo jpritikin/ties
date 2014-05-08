@@ -131,3 +131,7 @@ if (0) {
   plot(wave2$training - wave2$barrier, wave2[,c("event")])
   cor(wave2$training - wave2$barrier, wave2[,c("event")], use="pairwise.complete.obs") # .72 for wave2
 }
+
+write.table(wave1, file="prep1.csv", row.names=FALSE)
+write.table(wave2, file="prep2.csv", row.names=FALSE)
+write.table(wave3, file="prep3.csv", row.names=FALSE)

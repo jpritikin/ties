@@ -15,5 +15,8 @@
 *.toc
 *.dn
 *.cache
+*.bcf
+*-concordance.tex
+*.synctex.gz
 /fm
 /archive
