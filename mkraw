@@ -2,29 +2,29 @@
 
 #  germano1.csv
 
-input='web-20120527.csv
-  web-20120606.csv
-  web-20130105.csv
-  web-20130108.csv
-  ppool-20121230.csv
-  short-20130215.csv
-  ppool-20130210.csv
-  ppool-20130213.csv
-  ppool-20130219.csv
-  short-20130219.csv
-  ppool-20130220.csv
-  long-20130221.csv
-  long-20130226.csv
-  grad-20130725.csv
-  short-20130725.csv
+input='earlydata/web-20120527.csv
+  earlydata/web-20120606.csv
+  earlydata/web-20130105.csv
+  earlydata/web-20130108.csv
+  earlydata/ppool-20121230.csv
+  earlydata/short-20130215.csv
+  earlydata/ppool-20130210.csv
+  earlydata/ppool-20130213.csv
+  earlydata/ppool-20130219.csv
+  earlydata/short-20130219.csv
+  earlydata/ppool-20130220.csv
+  earlydata/long-20130221.csv
+  earlydata/long-20130226.csv
+  earlydata/grad-20130725.csv
+  earlydata/short-20130725.csv
   yogaville/201309.csv
-  ppool-20130912.csv
-  short-20130912.csv
-  ppool-20131209.csv
-  short-20131221.csv'
+  earlydata/ppool-20130912.csv
+  earlydata/short-20130912.csv
+  earlydata/ppool-20131209.csv
+  earlydata/short-20131221.csv'
 
 sha1sum -c input.sha1
 
 ./sm2r $input raw.csv
 
-./germano2013 >> raw.csv
+germano2013/import-germano2013 >> raw.csv

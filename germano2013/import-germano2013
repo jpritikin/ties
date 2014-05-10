@@ -2,9 +2,15 @@
 
 use Modern::Perl qw(2012);
 use Text::CSV_XS;
-use Fatal qw(open);
+use Fatal qw(open chdir);
 use IO::File;
 use List::Util qw(sum);
+
+my $dir = $0;
+$dir =~ s,/.+?$,,;
+if (length($dir)) {
+    chdir($dir)
+}
 
 my $csv = Text::CSV_XS->new ({ binary => 1, eol => "\n" }) or
   die "Cannot use CSV: ".Text::CSV_XS->error_diag ();
@@ -12,7 +18,7 @@ my $csv = Text::CSV_XS->new ({ binary => 1, eol => "\n" }) or
 our %Demog = ();
 
 sub load_header {
-    open my $io, '<', 'raw.csv';
+    open my $io, '<', '../raw.csv';
     my $h = $csv->getline($io);
     my %map;
     for (my $c=0; $c < @$h; ++$c) {

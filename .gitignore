@@ -20,3 +20,10 @@
 *.synctex.gz
 /fm
 /archive
+cache
+figure
+*.bak
+onyxProperties
+/raw.csv
+auto
+/recruiting

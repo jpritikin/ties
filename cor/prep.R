@@ -63,7 +63,7 @@ for (n in names(got)) cdat[[n]] <- got[[n]]
 
 cdat <- cbind(cdat, cms.score(prep.cms201312(raw1[258:283])))
 
-cdat$psqi <- score.psqi(raw1[284:(284+19-1)])
+cdat$sleep <- -score.psqi(raw1[284:(284+19-1)])
 
 if (0) {
   germano2014.cms <- cbind(prep.cms201312(raw2[67:92]), uid=raw2$uid)
@@ -73,15 +73,16 @@ if (0) {
 
 if (0) {
   #cat(deparse(colnames(wave2)))
-  pairs(cdat[c(6:12,29:31)], cex=.5)
-  pairs(cdat[c(13:18,29:31)], cex=.5)
-  pairs(cdat[c(19:24,29:31)], cex=.5)
-  pairs(cdat[c(25:28,32,29:31)], cex=.5)
+  pairs(cdat[c(6:12,29:31)], cex=.25)
+  pairs(cdat[c(13:18,29:31)], cex=.25)
+  pairs(cdat[c(19:24,29:31)], cex=.25)
+  pairs(cdat[c(25:28,32,29:31)], cex=.25)
   
   plot(cdat[,c("barrier", "event")])
   plot(cdat[,c("training", "event")])
   plot(cdat$training - cdat$barrier, cdat[,c("event")])
   cor(cdat$training - cdat$barrier, cdat[,c("event")], use="pairwise.complete.obs") # .72 for wave2
+  summary(lm(event ~ training + barrier, cdat))
 }
 
-write.table(cdat, file="prep.csv", row.names=FALSE)
+write.csv(cdat, file="corr.csv", row.names=FALSE)

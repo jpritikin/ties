@@ -348,27 +348,27 @@ sub getHeader {
 
 $csv->print($out, getHeader($outMap));
 
-our %Instrument = ('web-20120527.csv' => '2012-05-22',
-		   'web-20120606.csv' => '2012-05-27',
-		   'web-20130105.csv' => '2012-06-06',
-		   'web-20130108.csv' => '2012-06-06',
-		   'ppool-20121230.csv' => '2012-06-06',
-		   'short-20130215.csv' => '2013-01-09',
-		   'ppool-20130210.csv' => '2013-01-09',
-		   'ppool-20130213.csv' => '2013-02-12',  # added interest page
-		   'ppool-20130219.csv' => '2013-02-13',
-		   'short-20130219.csv' => '2013-02-13',
-		   'ppool-20130220.csv' => '2013-02-19',
-		   'long-20130221.csv' => '2013-02-19',
-		   'long-20130226.csv' => '2013-02-19',
-		   'grad-20130725.csv' => '2013-07-25',
-		   'short-20130725.csv' => '2013-07-25',
+our %Instrument = ('earlydata/web-20120527.csv' => '2012-05-22',
+		   'earlydata/web-20120606.csv' => '2012-05-27',
+		   'earlydata/web-20130105.csv' => '2012-06-06',
+		   'earlydata/web-20130108.csv' => '2012-06-06',
+		   'earlydata/ppool-20121230.csv' => '2012-06-06',
+		   'earlydata/short-20130215.csv' => '2013-01-09',
+		   'earlydata/ppool-20130210.csv' => '2013-01-09',
+		   'earlydata/ppool-20130213.csv' => '2013-02-12',  # added interest page
+		   'earlydata/ppool-20130219.csv' => '2013-02-13',
+		   'earlydata/short-20130219.csv' => '2013-02-13',
+		   'earlydata/ppool-20130220.csv' => '2013-02-19',
+		   'earlydata/long-20130221.csv' => '2013-02-19',
+		   'earlydata/long-20130226.csv' => '2013-02-19',
+		   'earlydata/grad-20130725.csv' => '2013-07-25',
+		   'earlydata/short-20130725.csv' => '2013-07-25',
 		   'yogaville/201309.csv' => '2012-11-01',
-		   'ppool-20130912.csv' => '2013-08-15',
-		   'ppool-20130919.csv' => '2013-09-12',
-		   'short-20130912.csv' => '2013-08-15',
-		   'ppool-20131209.csv' => '2013-09-12',
-		   'short-20131221.csv' => '2013-09-12',
+		   'earlydata/ppool-20130912.csv' => '2013-08-15',
+		   'earlydata/ppool-20130919.csv' => '2013-09-12',
+		   'earlydata/short-20130912.csv' => '2013-08-15',
+		   'earlydata/ppool-20131209.csv' => '2013-09-12',
+		   'earlydata/short-20131221.csv' => '2013-09-12',
 		  );
 our %ID;
 

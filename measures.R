@@ -90,7 +90,7 @@ score.ryff9 <- function(raw) {
     raw[[col]] <- ordered(raw[[col]], levels=lev)
   }
   
-  list(automony    = mean.or.na(raw[,01:09], 7),
+  list(autonomy    = mean.or.na(raw[,01:09], 7),
        envMastery  = mean.or.na(raw[,10:18], 7),
        perGrowth   = mean.or.na(raw[,19:27], 7),
        posRelation = mean.or.na(raw[,28:36], 7),
