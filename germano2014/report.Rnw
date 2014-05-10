@@ -55,6 +55,21 @@ to Oriental thinkers;][]{ramamurthi1995}.
 This hypothesis has a long history \parencite{manocha2008},
 but has not been investigated systematically.
 
+Measurement of mental silence addresses
+a related weakness in current intervention studies of mental silence oriented meditation.
+Even in a carefully designed intervention study,
+a mental silence group will consist of some participants who
+adhere to the intervention wholeheartedly
+and those who adhere somewhat less earnestly.
+Mental silence may not be like taking medicine,
+wherein the influence of doubt on efficacy is small.
+Ingested acetaminophen usually works as an analgesic whether the patient believes it or not.
+In contrast, many Sahaja Yoga Meditation (SYM) teachers contend that
+the ability to sustain mental silence is contingent on a genuine desire
+to experience it.
+Therefore, vigilance about potentially
+low rates of adherence in a mental silence oriented meditation group is warranted.
+
 \begin{figure}
 <<fig.height=10>>=
 w1 <- read.table("prep1.csv", header=TRUE, stringsAsFactors=FALSE)

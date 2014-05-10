@@ -1,3 +1,5 @@
+# turn into Rnw, add all details
+
 library(rpf)
 library(OpenMx)
 source('irtplot.R')

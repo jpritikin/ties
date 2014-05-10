@@ -114,7 +114,7 @@ We will recruit a sample of 1000 participants from
 outside the University of Virginia psychology subject pool.
 In addition to the measures already mentioned,
 we will administer the Mindful Attention Awareness Scale \cite{brown2003},
-the PANAS \cite{watson1988}, the Warwick-Edinburgh Mental Wellbeing Scale \cite{stewart2009},
+the PANAS \cite{watson1988}, the Warwick-Edinburgh Mental Wellbeing Scale \cite{bartram2013,stewart2009},
 a social desirability scale \cite{crowne1960,reynolds1982},
 a measure of emotional intelligence \cite{schutte1998},
 measures of psychological well-being \cite{ryff1989},

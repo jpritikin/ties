@@ -1,9 +1,150 @@
+safe.ordered <- function(df, levels, old.levels=c()) {
+  if (!missing(old.levels)) {
+    if (any(!is.na(match(old.levels, levels)))) stop("levels and old.levels overlap")
+    df[which(!is.na(match(df, old.levels)))] <- ''
+  }
+  levels <- tolower(levels)
+  df <- tolower(df)
+  no.match <- !is.na(df) & is.na(match(df, c('',levels)))
+  if (any(no.match)) {
+    stop(paste("Unknown levels:", paste(unique(df[no.match]), collapse=" ")))
+  }
+  ordered(df, levels=levels)
+}
+
 mean.or.na <- function(mat, n.min) {
   mat <- as.data.frame(lapply(mat, unclass))
   size <- apply(mat, 1, function(r) sum(!is.na(r)))
   score <- apply(mat, 1, function(r) sum(r, na.rm=TRUE))
   score[size < n.min] <- NA
   score / size
+}
+
+score.ipipBig5 <- function(raw) {
+  if (ncol(raw) != 50) stop("Expecting 50 columns")
+  
+  IPIPItem <- c('Very Inaccurate',
+                'Moderately Inaccurate',
+                'Neither Accurate Nor Inaccurate',
+                'Moderately Accurate',
+                'Very Accurate')
+  for (col in 1:50) {
+    lev <- NULL
+    if ((col-1) %% 10 <= 4) {
+      lev <- IPIPItem
+    } else {
+      lev <- rev(IPIPItem)
+    }
+    raw[[col]] <- ordered(raw[[col]], levels=lev)
+  }
+  minItems <- 8
+  list(neurotic= mean.or.na(raw[,01:10], minItems),
+       extravert=mean.or.na(raw[,11:20], minItems),
+       open=     mean.or.na(raw[,21:30], minItems),
+       agreeable=mean.or.na(raw[,31:40], minItems),
+       consc=    mean.or.na(raw[,41:50], minItems))
+}
+
+score.panas <- function(raw) {
+  if (ncol(raw) != 20) stop("Expecting 20 columns")
+  
+  PANASItem <- c("Very Slightly or Not at All",  "A Little",	"Moderately",	"Quite a Bit",	"Extremely")
+  
+  for (col in 1:20) {
+    raw[[col]] <- ordered(raw[[col]], levels=PANASItem)
+  }
+  
+  list(posAffect=mean.or.na(raw[,c(1,3,5,9,10,12,14,16,17,19)], 8),
+       negAffect=mean.or.na(raw[,c(2,4,6,7, 8,11,13,15,18,20)], 8))
+}
+
+score.maas <- function(raw) {
+  if (ncol(raw) != 15) stop("Expecting 15 columns")
+  
+  MAASItem <- c("Almost Always",  "Very Frequently",	"Somewhat Frequently",	"Somewhat Infrequently",
+                "Very Infrequently",	"Almost Never")
+
+  for (col in 1:15) {
+    raw[[col]] <- ordered(raw[[col]], levels=MAASItem)
+  }
+  
+  mean.or.na(raw[,1:15], 13)
+}
+
+score.ryff9 <- function(raw) {
+  if (ncol(raw) != 6 * 9) stop("Expected 54 columns")
+  
+  RyffItem <- c("Strongly Disagree",  "Disagree Somewhat",	"Disagree Slightly",
+                "Agree Slightly",	"Agree Somewhat",	"Strongly Agree")
+  
+  for (col in 1:54) {
+    lev <- RyffItem
+    if (col %in% c(3,5,7,8,
+                   11,12,14,17,
+                   19,20,22,24,26,27,
+                   29,30,32,33,35,
+                   37,38,39,40,41,45,
+                   48,51,52)) {
+      lev <- rev(RyffItem)
+    }
+    raw[[col]] <- ordered(raw[[col]], levels=lev)
+  }
+  
+  list(automony    = mean.or.na(raw[,01:09], 7),
+       envMastery  = mean.or.na(raw[,10:18], 7),
+       perGrowth   = mean.or.na(raw[,19:27], 7),
+       posRelation = mean.or.na(raw[,28:36], 7),
+       lifePurpose = mean.or.na(raw[,37:45], 7),
+       selfAccept  = mean.or.na(raw[,46:54], 7))
+}
+
+# See Reynolds (1982) and Crowne & Marlowe (1960)
+score.mcFormC <- function(raw) {
+  if (ncol(raw) != 13) stop("Expected 13 columns")
+  
+  MCItem <- c("False", "True")
+  for (col in 1:13) {
+    lev <- MCItem
+    if (col %in% c(1,2,3,4,6,8,11,12)) {
+      lev <- rev(MCItem)
+    }
+    raw[[col]] <- ordered(raw[[col]], levels=lev)
+  }
+  
+  mean.or.na(raw[,1:13], 11)
+}
+
+score.wemwbs <- function(raw) {  # Warwick-Edinburgh MWBS
+  if (ncol(raw) != 7) stop("Expected 7 columns")
+
+  WEItem <- c("None of the time",  "Rarely",	"Some of the time",	"Often",	"All of the time")
+  for (col in 1:7) {
+    raw[[col]] <- ordered(raw[[col]], levels=WEItem)
+  }
+  
+  rscore <- do.call('mapply', c(sum, lapply(raw, unclass)))
+
+  # Bartram, Sinclair, & Baldwin (2013, p. 387) Table 3
+  rasch <- c(7, 9.22, 10.87, 12.1, 13.11, 13.96, 14.73, 15.44, 16.12,
+             16.79, 17.45, 18.12, 18.81, 19.5, 20.21, 20.94, 21.68, 22.45,
+             23.26, 24.12, 25.04, 26.01, 27.02, 28.04, 29.07, 30.16,
+             31.39, 32.97, 35)
+  rasch[rscore - 6]
+}
+
+score.ei <- function(raw) {
+  if (ncol(raw) != 33) stop("Expected 33 columns")
+  
+  EIItem <- c("None of the time",  "Rarely",	"Some of the time",	"Often",	"All of the time")
+  for (col in 1:33) {
+    lev <- EIItem
+    if (col %in% c(5,28,33)) {
+      lev <- rev(EIItem)
+    }
+    raw[[col]] <- ordered(raw[[col]], levels=lev)
+  }
+  
+  mean.or.na(raw[,1:33], 30)
 }
 
 score.rrq <- function(raw) {
@@ -37,8 +178,8 @@ rsubstr <- function(str, start, end) {
 in.bed <- function(from, to) {
     if (length(from) != length(to)) stop("length mismatch")
     mapply(function(from1, to1) {
-        if (nchar(from1) == 0) return(NA)
-        if (nchar(to1) == 0) return(NA)
+        if (is.na(from1) || nchar(from1) == 0) return(NA)
+        if (is.na(to1) || nchar(to1) == 0) return(NA)
         side <- toupper(rsubstr(from1, -1, 0))
         if (side != "PM" && side != "AM") stop(side)
         sleep.day <- ifelse(side=="PM", "2014-01-01", "2014-01-02")
@@ -116,10 +257,10 @@ score.dass <- function(raw) {
     dass.d <- raw[base+c(3,5,10,13,16,17,21)-1]  # depression
     dass.a <- raw[base+c(2,4,7,9,15,19,20)-1]    # anxiety
     dass.s <- raw[base+c(1,6,8,11,12,14,18)-1]   # stress
-    list(d=mean.or.na(dass.d, 6),
-         a=mean.or.na(dass.a, 6),
-         s=mean.or.na(dass.s, 6),
-         na=mean.or.na(cbind(dass.d, dass.a, dass.s), 18))
+    list(dass.d=mean.or.na(dass.d, 6),
+         dass.a=mean.or.na(dass.a, 6),
+         dass.s=mean.or.na(dass.s, 6),
+         dass.na=mean.or.na(cbind(dass.d, dass.a, dass.s), 18))
 }
 
 NotionItem = c('This is the first time I have thought about it.',
@@ -147,20 +288,6 @@ maxDurationItem = c('A moment (e.g., a second or shorter)',
                     'Between 10 seconds and 1 minute',
                     'Between 1 minute and 10 minutes',
                     'More than 10 minutes')
-
-safe.ordered <- function(df, levels, old.levels=c()) {
-  if (!missing(old.levels)) {
-    if (any(!is.na(match(old.levels, levels)))) stop("levels and old.levels overlap")
-    df[which(!is.na(match(df, old.levels)))] <- ''
-  }
-  levels <- tolower(levels)
-  df <- tolower(df)
-  no.match <- is.na(match(df, c('',levels)))
-  if (any(no.match)) {
-    stop(paste("In", col, "unknown levels:", paste(unique(df[no.match]), collapse=" ")))
-  }
-  ordered(df, levels=levels)
-}
 
 prep.cms201309 <- function(raw) {
   if (ncol(raw) != 23) stop("Expecting 23 columns")
