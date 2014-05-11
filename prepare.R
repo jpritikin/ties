@@ -229,7 +229,7 @@ prepare.espt <- function(espt, scores) {
   mask <- (espt$instrument == "2013-02-19" |
              espt$instrument == "2013-02-13" |
              espt$instrument == "2013-02-12")
-  if (all(!mask)) stop("Can't find instrument")
+#  if (all(!mask)) stop("Can't find instrument")   # obsolete
   espt$skipInt[mask] <-
     apply(is.na(espt[mask,c('msAfraid', 'msEmo', 'msLife',
                             'msFast', "msDescarte", 'msIdentity')]), 1, all)

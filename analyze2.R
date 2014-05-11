@@ -18,7 +18,7 @@ ver.mask <- difftime(when, revision1) > 0
 espt <- espt[ver.mask,]
 
 manocha2013 <- read.csv("au/2013combined.csv", stringsAsFactors=FALSE)
-if (0) {
+if (1) {
   # exclude later when we have more data TODO
   manocha2013.mask <- (manocha2013$time == 2 | (manocha2013$time == 1 & !(manocha2013$id %in% manocha2013[manocha2013$time == 2, 'id'])))
   manocha2013 <- manocha2013[manocha2013.mask,]
@@ -35,6 +35,9 @@ espt$freqCause <- NULL  # response options changed 2013-12
 
 load("germano2014/germano2014-cms.rda")
 espt <- smartbind(espt, germano2014.cms)
+
+load("cor/cor-ppool-cms.rda")
+espt <- smartbind(espt, cor.ppool.cms)
 
 if (length(unique(espt$uid[!is.na(espt$uid)])) != sum(!is.na(espt$uid))) stop("mismatch")
 next.uid <- 1+max(espt$uid, na.rm=TRUE)

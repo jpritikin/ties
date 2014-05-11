@@ -66,9 +66,11 @@ cdat <- cbind(cdat, cms.score(prep.cms201312(raw1[258:283])))
 cdat$sleep <- -score.psqi(raw1[284:(284+19-1)])
 
 if (0) {
-  germano2014.cms <- cbind(prep.cms201312(raw2[67:92]), uid=raw2$uid)
-  germano2014.cms$wave <- "germano2014"
-  save(germano2014.cms, file="germano2014-cms.rda")
+  cor.ppool.cms <- prep.cms201312(raw1[258:283])
+  cor.ppool.cms$wave <- "cor-ppool"
+  cor.ppool.cms$start <- raw1$StartDate
+  cor.ppool.cms$end <- raw1$EndDate
+  save(cor.ppool.cms, file="cor-ppool-cms.rda")
 }
 
 if (0) {

@@ -1,11 +1,14 @@
 \documentclass[12pt]{article}
 \usepackage[margin=.5in]{geometry}
+\usepackage{pdfpages}
+\setlength{\parindent}{0cm}
+\setlength{\parskip}{1ex}
 
 <<echo=FALSE, results='hide', warning=FALSE, cache=FALSE>>=
 library(knitr)
 #knit("asem.Rnw", tangle=TRUE)  # to extract only the R chunks
 opts_knit$set(error=TRUE)
-opts_chunk$set(echo=FALSE, cache=TRUE)
+opts_chunk$set(echo=FALSE, cache=FALSE)
 loadlib <- function () {
 library(rpf)
 library(OpenMx)
@@ -22,7 +25,7 @@ plot.width=3
 
 assertColumnExist <- function(col) {
   missing <- col[is.na(match(col, colnames(espt)))]
-  if (length(missing)) stop(paste("Columns missing:", missing))
+  if (length(missing)) stop(paste("Columns missing:", omxQuotes(missing)))
 }
 
 itemMapText <- geom_text(size=4, position=position_jitter(h=.25))
@@ -52,16 +55,13 @@ if (any(src$types != 1)) {
   stop("There should be no more than 1 instrument version per wave.")
 }
 
-src <- ddply(espt, ~wave, function(slice) c(type=unique(slice$instrument), count=nrow(slice),
+src <- ddply(espt, ~wave, function(slice) c(instrument=unique(slice$instrument), count=nrow(slice),
                                             start=min(slice$start), end=max(slice$end)))
-src <- src[order(src$type, src$end, src$start),]
+src <- src[order(src$instrument, src$end, src$start),]
 print(xtable(src), include.rownames=FALSE)
 @
 
-<<>>=
-# not specific enough: "msAny", "msEvery"
-
-@
+A large proportion of data is missing, but the maximum N=\Sexpr{sum(as.numeric(src$count))}.
 
 \section{Barrier}
 
@@ -123,6 +123,8 @@ ba.grp <- list(spec=ba.est$expectation$ItemSpec,
             data=espt[,colnames(ba.est$ItemParam)], minItems=1L)
 @ 
 
+A high probability of local dependence was observed unless
+the items were condensed into 2 testlets.
 A 2 testlet model was fit with -2LL=\Sexpr{ba.est$output$fit} and
 condition number \Sexpr{ba.est$output$conditionNumber}.
 
@@ -143,6 +145,7 @@ pl <- lapply(colnames(ba.grp$param), function(item) {
 for (px in 1:length(pl)) {
   print(pl[[px]])
 }
+print(plot.info(ba.grp, width=4, show.total=FALSE))
 @
 
 \section{Training}
@@ -174,7 +177,7 @@ fitTraining <- function(training.items, minItems) {
   ip.mat <- set.nominal.rank(spec, ip.mat, 'msCause', .51, 1)
   ip.mat <- set.nominal.rank(spec, ip.mat, 'allowCause', .27, .27)
   ip.mat <- set.nominal.rank(spec, ip.mat, 'trainSkill', .2, .2)
-  ip.mat <- set.nominal.rank(spec, ip.mat, 'trainNum', .1, .1)
+  ip.mat <- set.nominal.rank(spec, ip.mat, 'trainNum', .1, .15)
   
   tr.data <- espt[,training.items]
   
@@ -199,6 +202,7 @@ fitTraining <- function(training.items, minItems) {
   mxRun(train, silent=TRUE)
 }
 
+# not specific enough: "msAny", "msEvery"
 tr.est <- fitTraining(c("yearnEnv", "allowCause", "trainSkill", "trainNum"), 2L)
 tr.grp <- list(spec=tr.est$expectation$ItemSpec,
             param=tr.est$ItemParam@values,
@@ -208,7 +212,8 @@ tr.grp <- list(spec=tr.est$expectation$ItemSpec,
             data=espt[,colnames(tr.est$ItemParam)], minItems=2L)
 @
 
-One possible model obtains -2LL=\Sexpr{tr.est$output$fit}
+Calibration of the training factor is hindered by the late addition
+of the trainNum item. A possible model obtains -2LL=\Sexpr{tr.est$output$fit}
 with condition number \Sexpr{tr.est$output$conditionNumber}.
 
 <<results='asis'>>=
@@ -228,6 +233,7 @@ pl <- lapply(colnames(tr.grp$param), function(item) {
 for (px in 1:length(pl)) {
   print(pl[[px]])
 }
+print(plot.info(tr.grp, width=4, show.total=FALSE))
 @
 
 \section{Event}
@@ -284,7 +290,8 @@ ev.grp <- list(spec=ev.est$expectation$ItemSpec,
             data=espt[,colnames(ev.est$ItemParam)], minItems=2L)
 @ 
 
-One model has -2LL=\Sexpr{ev.est$output$fit} and condition number \Sexpr{ev.est$output$conditionNumber}.
+A possible model has -2LL=\Sexpr{ev.est$output$fit} and
+condition number \Sexpr{ev.est$output$conditionNumber}.
 
 <<results='asis'>>=
 got <- chen.thissen.1997(ev.grp)
@@ -303,6 +310,7 @@ pl <- lapply(colnames(ev.grp$param), function(item) {
 for (px in 1:length(pl)) {
   print(pl[[px]])
 }
+print(plot.info(ev.grp, width=4, show.total=FALSE))
 @ 
 
 <<>>=
@@ -333,5 +341,60 @@ if (0) {
   }
 }
 @
+
+\section{Cross-sectional Relationship}
+
+<<results='asis'>>=
+source("cms-score.R")
+cms <- cms.score(espt)
+miss <- apply(cms, 2, function(c) sum(is.na(c))) / nrow(cms)
+miss <- t(100 * miss)
+rownames(miss) <- "% missing"
+print(xtable(miss, "Percentage of scores missing."))
+@ 
+
+<<results='asis'>>=
+fl <- rbind(apply(cms, 2, function(c) sum(c==min(c, na.rm=TRUE), na.rm=TRUE)),
+            apply(cms, 2, function(c) sum(c==max(c, na.rm=TRUE), na.rm=TRUE)))
+fl <- fl * 100 / nrow(cms)
+rownames(fl) <- c("floor", "ceiling")
+print(xtable(fl, "Percentage of scores at floor and ceiling."))
+@ 
+
+<<results='asis'>>=
+ctbl <- cor(cms, use="pairwise.complete.obs")
+ctbl[upper.tri(ctbl, diag=TRUE)] <- NA
+print(xtable(ctbl, "Correlation matrix of factor scores."))
+@ 
+
+<<fig.height=3>>=
+mask1 <- !is.na(cms[,'barrier']) & !is.na(cms[,'event'])
+mask2 <- !is.na(cms[,'training']) & !is.na(cms[,'event'])
+grid.arrange(qplot(cms[mask1,'barrier'],  cms[mask1,'event']) + coord_fixed() +
+                     labs(x="barrier", y="event") + geom_abline(slope=-1, color="red"),
+                   qplot(cms[mask2,'training'], cms[mask2,'event']) + coord_fixed() +
+                     labs(x="training", y="event") + geom_abline(slope=1, color="red"), ncol=2)
+
+fit1 <- lm(event ~ ., data=as.data.frame(cms))
+#  plot(fit1)
+
+co <- round(coef(fit1),2)
+mask3 <- apply(cms, 1, function (r) all(!is.na(r)))
+print(qplot(co[1] + co[2] * cms[mask3,'barrier'] + co[3] * cms[mask3,'training'],
+            cms[mask3,'event']) + coord_fixed() + geom_abline(slope=1, color="red") +
+        labs(x=paste(co[1],"+", co[2],"barrier","+",co[3], "training"), y="event"))
+
+if (0) {
+  table(espt$wave[is.na(cms[,'barrier'])])
+  mask <- espt$wave == "earlydata/ppool-20130219" #& is.na(cms[,'barrier'])
+  
+  espt[mask, c("wantLearn", "msAfraid", "msIdentity", "msFast", "msEffort", "msLife")]
+}
+@
+
+A simple linear model to predict event from barrier and training
+obtains $R^2 = \Sexpr{summary(fit1)[["r.squared"]]}$.
+
+\includepdf[pages={3-}]{archive/short-20140116.pdf}
 
 \end{document}
