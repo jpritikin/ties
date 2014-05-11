@@ -5,15 +5,15 @@ library(gridExtra)
 item.map <- function(grp, factor=1) {
   item.mask <- grp$param[factor,] > 0
   result <- NULL
-  for (ix in which(item.mask)) {
+  for (ix in rev(colnames(grp$param)[item.mask])) {
     lev <- levels(grp$data[,ix])
     for (ox in 1:length(lev)) {
       mask <- grp$data[,ix]==lev[ox]
       mask <- !is.na(mask) & mask
       if (all(!mask)) next
-      result <- rbind(result, data.frame(item=ix, item.name=colnames(grp$param)[ix],
+      result <- rbind(result, data.frame(item=ix,
                                          outcome=ox, outcome.name=lev[ox],
-                                         score=mean(grp$score[mask, factor])))
+                                         score=mean(grp$score[mask, factor], na.rm=TRUE)))
     }
   }
   result
@@ -22,7 +22,7 @@ item.map <- function(grp, factor=1) {
 # new version of data vs model plot
 rpf.plot <- function(grp, item.name, width=3, data.bins=11, basis=c(1), factor=1) {
   ix <- match(item.name, colnames(grp$param))
-  if (length(ix) != 1 || is.na(ix)) stop(paste("Can't find"), item.name)
+  if (length(ix) != 1 || is.na(ix)) stop(paste("Can't find", item.name))
   
   labels <- levels(grp$data[[item.name]])
   spec1 <- grp$spec[[ix]]

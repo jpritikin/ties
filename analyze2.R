@@ -18,17 +18,38 @@ ver.mask <- difftime(when, revision1) > 0
 espt <- espt[ver.mask,]
 
 manocha2013 <- read.csv("au/2013combined.csv", stringsAsFactors=FALSE)
-manocha2013$wave <- 'manocha2013'
+if (0) {
+  # exclude later when we have more data TODO
+  manocha2013.mask <- (manocha2013$time == 2 | (manocha2013$time == 1 & !(manocha2013$id %in% manocha2013[manocha2013$time == 2, 'id'])))
+  manocha2013 <- manocha2013[manocha2013.mask,]
+  if (any(table(manocha2013$id) != 1)) stop("More than 1 measurement from a single participant")
+}
 manocha2013.cms <- cbind(prep.cms201309(manocha2013[,79:101]), uid=manocha2013$uid)
+manocha2013.cms$start <- '12/15/2013';
+manocha2013.cms$end <- '12/15/2013';
+manocha2013.cms$wave <- 'manocha2013'
 espt <- smartbind(espt, manocha2013.cms)
 
 espt$freqCause <- NULL  # response options changed 2013-12
+# ----------------------------------- add new data after here ---------------
+
 load("germano2014/germano2014-cms.rda")
 espt <- smartbind(espt, germano2014.cms)
 
 if (length(unique(espt$uid[!is.na(espt$uid)])) != sum(!is.na(espt$uid))) stop("mismatch")
 next.uid <- 1+max(espt$uid, na.rm=TRUE)
 espt$uid[is.na(espt$uid)] <- seq(next.uid, next.uid+sum(is.na(espt$uid)) - 1)
+
+# regularize to easily sortable format
+century <- rep(TRUE, length(espt$start))
+century[grep("\\d{4}", espt[["start"]], perl=TRUE, invert=TRUE)] <- FALSE
+for (col in c("start", "end")) {
+  tmp1 <- strptime(espt[[col]][century], "%m/%d/%Y")
+  tmp2 <- strptime(espt[[col]][!century], "%m/%d/%y")
+  espt[[col]][century] <- strftime(tmp1, "%Y/%m/%d")
+  espt[[col]][!century] <- strftime(tmp2, "%Y/%m/%d")
+}
+
 save(espt, file="espt.rda")
 
 #source('irtplot.R')

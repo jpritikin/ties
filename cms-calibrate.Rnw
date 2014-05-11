@@ -1,0 +1,337 @@
+\documentclass[12pt]{article}
+\usepackage[margin=.5in]{geometry}
+
+<<echo=FALSE, results='hide', warning=FALSE, cache=FALSE>>=
+library(knitr)
+#knit("asem.Rnw", tangle=TRUE)  # to extract only the R chunks
+opts_knit$set(error=TRUE)
+opts_chunk$set(echo=FALSE, cache=TRUE)
+loadlib <- function () {
+library(rpf)
+library(OpenMx)
+library(ggplot2)
+library(reshape2)
+library(plyr)
+library(grid)
+library(gridExtra)
+library(xtable)
+}
+suppressPackageStartupMessages(loadlib())
+options(digits=2, scipen=1)
+plot.width=3
+
+assertColumnExist <- function(col) {
+  missing <- col[is.na(match(col, colnames(espt)))]
+  if (length(missing)) stop(paste("Columns missing:", missing))
+}
+
+itemMapText <- geom_text(size=4, position=position_jitter(h=.25))
+@
+
+\title{Calibration of item models for the Complete Mental Silence Disposition Scale}
+\date{\today}
+\author{Joshua N.~Pritikin\\ University of Virginia}
+
+\begin{document}
+\maketitle
+
+\section{Data Sources}
+
+The CMS calibration sample is composed of a number of different datasets.
+
+<<results='asis'>>=
+source('irtplot.R')
+source("cms-score-lib.R")
+
+load("espt.rda")
+espt <- cms.testlets(espt)
+
+src <- ddply(espt, ~wave, function(slice) c(types=length(unique(slice$instrument))))
+
+if (any(src$types != 1)) {
+  stop("There should be no more than 1 instrument version per wave.")
+}
+
+src <- ddply(espt, ~wave, function(slice) c(type=unique(slice$instrument), count=nrow(slice),
+                                            start=min(slice$start), end=max(slice$end)))
+src <- src[order(src$type, src$end, src$start),]
+print(xtable(src), include.rownames=FALSE)
+@
+
+<<>>=
+# not specific enough: "msAny", "msEvery"
+
+@
+
+\section{Barrier}
+
+The \emph{barrier} factor is intended to non-judgmentally assess the participant's
+self-reported inability to experience complete mental silence.
+The items must make sense on a short time horizon and
+should also be amenable to long-term barriers.
+Examination of local dependence between items suggest that
+there are emotional and non-emotional subfactors.
+
+<<>>=
+fitBarrer <- function(barrier.items) {
+  assertColumnExist(barrier.items)
+  spec <- mkspec(espt, barrier.items)
+  numItems <- length(barrier.items)
+  maxParam <- max(sapply(spec, rpf.numParam))
+  
+  ip.mat <- mxMatrix(name="ItemParam", nrow=maxParam, ncol=numItems, free=FALSE)
+  colnames(ip.mat) <- barrier.items
+  
+  ip.mat <- set.nominal.rank(spec, ip.mat, 'msIdAfraid', .27, .5)
+  ip.mat <- set.nominal.rank(spec, ip.mat, 'msIdAfraidLearn', .27, .5)
+  ip.mat <- set.nominal.rank(spec, ip.mat, 'msFastEffort', .27, .5)
+  ip.mat <- set.nominal.rank(spec, ip.mat, 'msFastEffortLife', .27, .5)
+  for (item in c('wantLearn', "msAfraid", "msIdentity",
+                 "msFast", "msEffort", "msLife", "msDescarte", "msEmo")) {
+    ip.mat <- set.nominal.rank(spec, ip.mat, item, .5, 1)
+  }
+  
+  m.mat <- mxMatrix(name="mean", nrow=1, ncol=1, values=0)
+  rownames(m.mat) <- "barrier"
+  cov.mat <- mxMatrix("Symm", name="cov", nrow=1, ncol=1, values=diag(1),
+                      dimnames=list("barrier", "barrier"))
+  
+  ba.data <- espt[,barrier.items]
+  
+  ba <- mxModel(model="barrier",
+                m.mat, cov.mat, ip.mat,
+                mxData(observed=ba.data, type="raw"),
+                mxExpectationBA81(mean="mean", cov="cov",
+                                  ItemSpec=spec, ItemParam="ItemParam", scores="full", naAction="pass"),
+                mxFitFunctionML(),
+                mxComputeSequence(steps=list(
+                  mxComputeEM('expectation', 'scores', mxComputeNewtonRaphson()),
+                  mxComputeOnce('fitfunction', 'information', "meat"),
+                  mxComputeStandardError(),
+                  mxComputeHessianQuality())
+                ))
+  mxRun(ba, silent=TRUE)
+}
+
+ba.est <- fitBarrer(c('msIdAfraidLearn', 'msFastEffortLife'))
+
+ba.grp <- list(spec=ba.est$expectation$ItemSpec,
+            param=ba.est$ItemParam@values,
+            mean=ba.est$mean@values,
+            cov=ba.est$cov@values,
+            scores=ba.est@expectation@output$scores,
+            data=espt[,colnames(ba.est$ItemParam)], minItems=1L)
+@ 
+
+A 2 testlet model was fit with -2LL=\Sexpr{ba.est$output$fit} and
+condition number \Sexpr{ba.est$output$conditionNumber}.
+
+<<results='asis'>>=
+got <- chen.thissen.1997(ba.grp)
+print(xtable(got$pval, "Log p-value of local dependence between item pairs."))
+@
+
+<<fig.height=2>>=
+map1 <- item.map(ba.grp, 1)
+ggplot(map1, aes(x=score, y=item, label=outcome)) + itemMapText
+@
+
+<<fig.height=3>>=
+pl <- lapply(colnames(ba.grp$param), function(item) {
+  rpf.plot(ba.grp, item, width=plot.width, data.bins=12, basis=c(1), factor=1)
+})
+for (px in 1:length(pl)) {
+  print(pl[[px]])
+}
+@
+
+\section{Training}
+
+The \emph{training} factor is intended to assess the self-reported degree
+of preparation and expertise a participant has with complete mental silence.
+The items probe ability to cause oneself to experience mental silence
+and ability to work with others.
+To assess experience with others,
+items probe both belief in oneself to work with others and
+quantitatively how much one has worked with others.
+
+<<>>=
+fitTraining <- function(training.items, minItems) {
+  assertColumnExist(training.items)
+  
+  spec <- mkspec(espt, training.items)
+  numItems <- length(training.items)
+  maxParam <- max(sapply(spec, rpf.numParam))
+  
+  ip.mat <- mxMatrix(name="ItemParam", nrow=maxParam, ncol=numItems, free=FALSE)
+  colnames(ip.mat) <- training.items
+  
+  ip.mat <- set.nominal.rank(spec, ip.mat, 'msNotion', .51, 1)
+  ip.mat <- set.nominal.rank(spec, ip.mat, 'msYearn', .51, 1)
+  ip.mat <- set.nominal.rank(spec, ip.mat, 'msEnv', .51, 1)
+  ip.mat <- set.nominal.rank(spec, ip.mat, 'yearnEnv', .27, .27)
+  ip.mat <- set.nominal.rank(spec, ip.mat, 'msAllow', .51, 1)
+  ip.mat <- set.nominal.rank(spec, ip.mat, 'msCause', .51, 1)
+  ip.mat <- set.nominal.rank(spec, ip.mat, 'allowCause', .27, .27)
+  ip.mat <- set.nominal.rank(spec, ip.mat, 'trainSkill', .2, .2)
+  ip.mat <- set.nominal.rank(spec, ip.mat, 'trainNum', .1, .1)
+  
+  tr.data <- espt[,training.items]
+  
+  m.mat <- mxMatrix(name="mean", nrow=1, ncol=1, values=0)
+  rownames(m.mat) <- "training"
+  cov.mat <- mxMatrix("Symm", name="cov", nrow=1, ncol=1, values=diag(1),
+                      dimnames=list("training", "training"))
+  
+  train <- mxModel(model="training",
+                   m.mat, cov.mat, ip.mat,
+                   mxData(observed=tr.data, type="raw"),
+                   mxExpectationBA81(mean="mean", cov="cov",
+                                     ItemSpec=spec, ItemParam="ItemParam", scores="full",
+                                     naAction="pass", minItemsPerScore=minItems),
+                   mxFitFunctionML(),
+                   mxComputeSequence(steps=list(
+                     mxComputeEM('expectation', 'scores', mxComputeNewtonRaphson()),
+                     mxComputeOnce('fitfunction', 'information', "meat"),
+                     mxComputeStandardError(),
+                     mxComputeHessianQuality())
+                   ))
+  mxRun(train, silent=TRUE)
+}
+
+tr.est <- fitTraining(c("yearnEnv", "allowCause", "trainSkill", "trainNum"), 2L)
+tr.grp <- list(spec=tr.est$expectation$ItemSpec,
+            param=tr.est$ItemParam@values,
+            mean=tr.est$mean@values,
+            cov=tr.est$cov@values,
+            scores=tr.est@expectation@output$scores,
+            data=espt[,colnames(tr.est$ItemParam)], minItems=2L)
+@
+
+One possible model obtains -2LL=\Sexpr{tr.est$output$fit}
+with condition number \Sexpr{tr.est$output$conditionNumber}.
+
+<<results='asis'>>=
+got <- chen.thissen.1997(tr.grp)
+print(xtable(got$pval, "Log p-value of local dependence between item pairs."))
+@ 
+
+<<fig.height=2>>=
+map1 <- item.map(tr.grp, 1)
+ggplot(map1, aes(x=score, y=item, label=outcome)) + itemMapText
+@
+
+<<fig.height=3>>=
+pl <- lapply(colnames(tr.grp$param), function(item) {
+  rpf.plot(tr.grp, item, width=plot.width, data.bins=12, basis=c(1), factor=1)
+})
+for (px in 1:length(pl)) {
+  print(pl[[px]])
+}
+@
+
+\section{Event}
+
+The \emph{event} factor is intended to assess the self-reported
+intensity of experiencing complete mental silence.
+
+<<>>=
+fitEvent <- function(event.items, minItems) {
+  assertColumnExist(event.items)
+  
+  spec <- mkspec(espt, event.items)
+  numItems <- length(event.items)
+  maxParam <- max(sapply(spec, rpf.numParam))
+  
+  ip.mat <- mxMatrix(name="ItemParam", nrow=maxParam, ncol=numItems, free=FALSE)
+  colnames(ip.mat) <- event.items
+  
+  ip.mat <- set.nominal.rank(spec, ip.mat, 'msAny', .51, 1)
+  ip.mat <- set.nominal.rank(spec, ip.mat, 'msEvery', .51, 1)
+  ip.mat <- set.nominal.rank(spec, ip.mat, 'freqCause', .51, 1)
+  ip.mat <- set.nominal.rank(spec, ip.mat, 'successCat', .35, .5)
+  ip.mat <- set.nominal.rank(spec, ip.mat, 'maxDuration', .51, 1)
+  
+  m.mat <- mxMatrix(name="mean", nrow=1, ncol=1, values=0)
+  rownames(m.mat) <- "event"
+  cov.mat <- mxMatrix("Symm", name="cov", nrow=1, ncol=1, values=diag(1),
+                      dimnames=list("event", "event"))
+
+  ev.data <- espt[,event.items]
+  
+  ev <- mxModel(model="event",
+                m.mat, cov.mat, ip.mat,
+                mxData(observed=ev.data, type="raw"),
+                mxExpectationBA81(mean="mean", cov="cov", naAction="pass", minItemsPerScore=minItems,
+                                  ItemSpec=spec, ItemParam="ItemParam", scores="full"),
+                mxFitFunctionML(),
+                mxComputeSequence(steps=list(
+                  mxComputeEM('expectation', 'scores', mxComputeNewtonRaphson()),
+                  mxComputeOnce('fitfunction', 'information', "meat"),
+                  mxComputeStandardError(),
+                  mxComputeHessianQuality())
+                ))
+  mxRun(ev, silent=TRUE)
+}
+
+ev.est <- fitEvent(c("freqCause", "successCat", "maxDuration"), 2L)
+
+ev.grp <- list(spec=ev.est$expectation$ItemSpec,
+            param=ev.est$ItemParam@values,
+            mean=ev.est$mean@values,
+            cov=ev.est$cov@values,
+            scores=ev.est@expectation@output$scores,
+            data=espt[,colnames(ev.est$ItemParam)], minItems=2L)
+@ 
+
+One model has -2LL=\Sexpr{ev.est$output$fit} and condition number \Sexpr{ev.est$output$conditionNumber}.
+
+<<results='asis'>>=
+got <- chen.thissen.1997(ev.grp)
+print(xtable(got$pval, "Log p-value of local dependence between item pairs."))
+@ 
+
+<<fig.height=2>>=
+map1 <- item.map(ev.grp, 1)
+ggplot(map1, aes(x=score, y=item, label=outcome)) + itemMapText
+@
+
+<<fig.height=3>>=
+pl <- lapply(colnames(ev.grp$param), function(item) {
+  rpf.plot(ev.grp, item, width=plot.width, data.bins=12, basis=c(1), factor=1)
+})
+for (px in 1:length(pl)) {
+  print(pl[[px]])
+}
+@ 
+
+<<>>=
+save(ba.grp, tr.grp, ev.grp, file="cms-fit.rda")
+
+if (0) {
+  library(ggplot2)
+  library(stringr)
+  scores <- m2.est@expectation@scores.out
+  espt$interest <- scores[,1]
+  espt$experience <- scores[,2]
+  ggplot(subset(espt, !is.na(str_match(espt$wave, "^germano"))),
+         aes(interest, experience, color=wave, group=email)) +
+    geom_point(size=1) + geom_line(size=.1) + coord_fixed()
+}
+
+#items <- t(m2$ItemParam@values)
+#rownames(items) <- item.names
+#espt[mask, "score"] <- m2@expectation@scores.out[,1]
+#espt[mask, "se"] <- m2@expectation@scores.out[,2]
+
+if (0) {
+  sc <- m2.est@expectation@scores.out
+  for (l in 1:3) {
+    mask <- espt$durationCharacter==levels(espt$durationCharacter)[l]
+    mask <- !is.na(mask) & mask
+    print(paste(l, mean(sc[mask,1]), mean(sc[mask,2])))
+  }
+}
+@
+
+\end{document}

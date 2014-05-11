@@ -68,26 +68,19 @@ wave2$psqi <- score.psqi(raw2[27:(27+19-1)])
 wave3$psqi <- score.psqi(raw3[27:(27+19-1)])
 
 got <- score.dass(raw1[49:(49+21-1)])
-wave1$dass.d <- got$d
-wave1$dass.a <- got$a
-wave1$dass.s <- got$s
-wave1$dass.na <- got$na
+for (k in names(got)) { wave1[[k]] <- got[[k]] }
 
 got <- score.dass(raw2[46:(46+21-1)])
-wave2$dass.d <- got$d
-wave2$dass.a <- got$a
-wave2$dass.s <- got$s
-wave2$dass.na <- got$na
+for (k in names(got)) { wave2[[k]] <- got[[k]] }
 
 got <- score.dass(raw3[46:(46+21-1)])
-wave3$dass.d <- got$d
-wave3$dass.a <- got$a
-wave3$dass.s <- got$s
-wave3$dass.na <- got$na
+for (k in names(got)) { wave3[[k]] <- got[[k]] }
 
 if (0) {
   germano2014.cms <- cbind(prep.cms201312(raw2[67:92]), uid=raw2$uid)
   germano2014.cms$wave <- "germano2014"
+  germano2014.cms$start <- raw2$StartDate
+  germano2014.cms$end <- raw2$EndDate
   save(germano2014.cms, file="germano2014-cms.rda")
 }
 
@@ -101,7 +94,7 @@ if (0) {
 verify.col <- c("reflection", "rumination", "psqi", "dass.d", "dass.a", "dass.s",  "dass.na")
 if (0) {
   for (c in verify.col) {
-    print(digest(wave3[,c]))
+    print(digest(wave1[,c]))
   }
 }
 verifyDigest1 <- c("5c048a9bde4fe7d45a2feea10894cdb4", "8e01999b6cedb96e28c7141e2237610e",
