@@ -79,7 +79,7 @@ rpf.plot <- function(grp, item.name, width=3, data.bins=11, basis=c(1), factor=1
 plot.info <- function(grp, width=3, show.total=TRUE) {
   spec <- grp$spec
   param <- grp$param
-  i.name <- names(spec)
+  i.name <- colnames(grp$param)
   grid <- seq(-width,width,.1)
   df <- list(score=grid)
   total <- numeric(length(grid))

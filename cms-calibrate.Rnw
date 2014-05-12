@@ -75,21 +75,36 @@ there are emotional and non-emotional subfactors.
 <<>>=
 fitBarrer <- function(barrier.items) {
   assertColumnExist(barrier.items)
-  spec <- mkspec(espt, barrier.items)
+
   numItems <- length(barrier.items)
-  maxParam <- max(sapply(spec, rpf.numParam))
-  
-  ip.mat <- mxMatrix(name="ItemParam", nrow=maxParam, ncol=numItems, free=FALSE)
-  colnames(ip.mat) <- barrier.items
-  
-  ip.mat <- set.nominal.rank(spec, ip.mat, 'msIdAfraid', .27, .5)
-  ip.mat <- set.nominal.rank(spec, ip.mat, 'msIdAfraidLearn', .27, .5)
-  ip.mat <- set.nominal.rank(spec, ip.mat, 'msFastEffort', .27, .5)
-  ip.mat <- set.nominal.rank(spec, ip.mat, 'msFastEffortLife', .27, .5)
-  for (item in c('wantLearn', "msAfraid", "msIdentity",
-                 "msFast", "msEffort", "msLife", "msDescarte", "msEmo")) {
-    ip.mat <- set.nominal.rank(spec, ip.mat, item, .5, 1)
+  if (numItems == 2) {
+    spec <- list()
+    for (ix in 1:numItems) {
+      spec[[ix]] <- rpf.grm(outcomes=length(levels(espt[1,barrier.items[ix]])))
+    }
+    maxParam <- max(sapply(spec, rpf.numParam))
+    ip.mat <- mxMatrix(name="ItemParam", nrow=maxParam, ncol=numItems, free=TRUE)
+    colnames(ip.mat) <- barrier.items
+    ip.mat$labels[1,] <- 'a1'
+    ip.mat$values[,] <- sapply(spec, rpf.rparam) # get valid starting parameters
+    ip.mat$values[1,] <- 1
+  } else {
+    spec <- mkspec(espt, barrier.items)
+    maxParam <- max(sapply(spec, rpf.numParam))
+    
+    ip.mat <- mxMatrix(name="ItemParam", nrow=maxParam, ncol=numItems, free=FALSE)
+    colnames(ip.mat) <- barrier.items
+    
+    ip.mat <- set.nominal.rank(spec, ip.mat, 'msIdAfraid', .27, .5)
+    ip.mat <- set.nominal.rank(spec, ip.mat, 'msIdAfraidLearn', .27, .5)
+    ip.mat <- set.nominal.rank(spec, ip.mat, 'msFastEffort', .27, .5)
+    ip.mat <- set.nominal.rank(spec, ip.mat, 'msFastEffortLife', .27, .5)
+    for (item in c('wantLearn', "msAfraid", "msIdentity",
+                   "msFast", "msEffort", "msLife", "msDescarte", "msEmo")) {
+      ip.mat <- set.nominal.rank(spec, ip.mat, item, .5, 1)
+    }
   }
+  
   
   m.mat <- mxMatrix(name="mean", nrow=1, ncol=1, values=0)
   rownames(m.mat) <- "barrier"
