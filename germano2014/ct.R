@@ -1,4 +1,4 @@
-source("CT_SEM.R")
+library(ctsem)
 
 w1 <- read.table("prep1.csv", header=TRUE, stringsAsFactors=FALSE)
 w2 <- read.table("prep2.csv", header=TRUE, stringsAsFactors=FALSE)
@@ -26,28 +26,30 @@ rownames(ctdat) <- w1$id
 colnames(ctdat) <- c(paste(manifests, 1, sep=""), paste(manifests, 2, sep=""), paste(manifests, 3, sep=""),
                      paste("t", 2:3, sep=""))
 
+if (0) {
+  # a simple-minded approach
+  summary(lm(event2 ~ barrier1 + training1 + event1, ctdat))
+  summary(lm(event3 ~ barrier2 + training2 + event2, ctdat))
+}
+
 n.latent <- length(manifests)
 n.manifest <- length(manifests)
 
-PHI1 <- cov(w1[,manifests,drop=FALSE], use="pairwise.complete.obs")
+model <- ctModel(basemodel=NA, n.manifest, n.latent, Tpoints=3,
+               LAMBDA=diag(3), #manifest to latent loading
+               PHIT1="auto",
+               latentM1="auto",
+               manifestM="auto",
+               THETA="auto",
+               DRIFT="auto",
+               PRITRAIT=NULL)
 
-latentM1  <- matrix(apply(w1[,manifests, drop=FALSE],2,mean, na.rm=TRUE), nrow=n.latent, ncol=1)
+mxOption(NULL, "Default optimizer", "NPSOL")
+mxOption(NULL, "Calculate Hessian", "No")
+fits <- ctFit(ctdat, model, D=0, reasonable=T, initialconstraints=T)
+fit = fits[[1]]
 
-manifestM <- matrix(0, nrow=n.manifest, ncol=1)
-
-G    	<- matrix(.1, n.latent, n.latent)
-G[upper.tri(G)] <- 0
-
-drift <- .1 - diag(n.latent)
-
-THETA    <- matrix(0									# var/cov matrix of measurement error
-                   ,nrow=n.manifest, ncol=n.manifest)
-
-fit <- continuous_time(ctdat, Tpoints=3, n.latent, n.manifest,
-                       LAMBDA=diag(3), #manifest to latent loading
-                       DRIFT=drift,
-                       CINT=manifestM,
-                       G=G, D=5,
-                       PHI1,
-                       THETA=THETA, latentM1, manifestM=manifestM)
-
+if (0) {
+  plot(fits)
+  compareResiduals(fit, 3,3, oldomx=FALSE, nopause=F)
+}
