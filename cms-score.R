@@ -7,8 +7,9 @@ load("cms-fit.rda")
 ifa.score <- function(grp, df) {
   ip.mat <- mxMatrix(name="ItemParam", values=grp$param)
   m.mat <- mxMatrix(name="mean", nrow=1, ncol=length(grp$mean), values=grp$mean)
-  rownames(m.mat) <- 'f'
-  cov.mat <- mxMatrix("Symm", name="cov", values=grp$cov, dimnames=list('f','f'))
+  rownames(m.mat) <- rownames(ip.mat)[1]
+  cov.mat <- mxMatrix("Symm", name="cov", values=grp$cov, dimnames=list(rownames(ip.mat)[1],
+                                                                        rownames(ip.mat)[1]))
   
   items <- colnames(grp$param)
   ba.data <- df[,items]

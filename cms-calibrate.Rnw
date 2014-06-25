@@ -6,7 +6,7 @@
 
 <<echo=FALSE, results='hide', warning=FALSE, cache=FALSE>>=
 library(knitr)
-#knit("asem.Rnw", tangle=TRUE)  # to extract only the R chunks
+#knit("cms-calibrate.Rnw", tangle=TRUE)  # to extract only the R chunks
 opts_knit$set(error=TRUE)
 opts_chunk$set(echo=FALSE, cache=FALSE)
 loadlib <- function () {
@@ -83,8 +83,8 @@ fitBarrer <- function(barrier.items) {
       spec[[ix]] <- rpf.grm(outcomes=length(levels(espt[1,barrier.items[ix]])))
     }
     maxParam <- max(sapply(spec, rpf.numParam))
-    ip.mat <- mxMatrix(name="ItemParam", nrow=maxParam, ncol=numItems, free=TRUE)
-    colnames(ip.mat) <- barrier.items
+    ip.mat <- mxMatrix(name="ItemParam", nrow=maxParam, ncol=numItems, free=TRUE,
+                       dimnames=list(c('barrier', paste('b', 2:maxParam, sep="")), barrier.items))
     ip.mat$labels[1,] <- 'a1'
     ip.mat$values[,] <- sapply(spec, rpf.rparam) # get valid starting parameters
     ip.mat$values[1,] <- 1
@@ -92,8 +92,8 @@ fitBarrer <- function(barrier.items) {
     spec <- mkspec(espt, barrier.items)
     maxParam <- max(sapply(spec, rpf.numParam))
     
-    ip.mat <- mxMatrix(name="ItemParam", nrow=maxParam, ncol=numItems, free=FALSE)
-    colnames(ip.mat) <- barrier.items
+    ip.mat <- mxMatrix(name="ItemParam", nrow=maxParam, ncol=numItems, free=FALSE,
+                       dimnames=list(c('barrier', paste('b', 2:maxParam, sep="")), barrier.items))
     
     ip.mat <- set.nominal.rank(spec, ip.mat, 'msIdAfraid', .27, .5)
     ip.mat <- set.nominal.rank(spec, ip.mat, 'msIdAfraidLearn', .27, .5)
@@ -160,7 +160,7 @@ pl <- lapply(colnames(ba.grp$param), function(item) {
 for (px in 1:length(pl)) {
   print(pl[[px]])
 }
-print(plot.info(ba.grp, width=4, show.total=FALSE))
+print(plot.info(ba.grp, width=5, show.total=FALSE))
 @
 
 \section{Training}
@@ -181,8 +181,8 @@ fitTraining <- function(training.items, minItems) {
   numItems <- length(training.items)
   maxParam <- max(sapply(spec, rpf.numParam))
   
-  ip.mat <- mxMatrix(name="ItemParam", nrow=maxParam, ncol=numItems, free=FALSE)
-  colnames(ip.mat) <- training.items
+  ip.mat <- mxMatrix(name="ItemParam", nrow=maxParam, ncol=numItems, free=FALSE,
+                     dimnames=list(c('training', paste('p',2:maxParam,sep="")), training.items))
   
   ip.mat <- set.nominal.rank(spec, ip.mat, 'msNotion', .51, 1)
   ip.mat <- set.nominal.rank(spec, ip.mat, 'msYearn', .51, 1)
@@ -264,8 +264,8 @@ fitEvent <- function(event.items, minItems) {
   numItems <- length(event.items)
   maxParam <- max(sapply(spec, rpf.numParam))
   
-  ip.mat <- mxMatrix(name="ItemParam", nrow=maxParam, ncol=numItems, free=FALSE)
-  colnames(ip.mat) <- event.items
+  ip.mat <- mxMatrix(name="ItemParam", nrow=maxParam, ncol=numItems, free=FALSE,
+                     dimnames=list(c("event", paste("p",2:maxParam,sep="")), event.items))
   
   ip.mat <- set.nominal.rank(spec, ip.mat, 'msAny', .51, 1)
   ip.mat <- set.nominal.rank(spec, ip.mat, 'msEvery', .51, 1)
