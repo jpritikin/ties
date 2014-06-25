@@ -2,6 +2,30 @@ library(ggplot2)
 library(reshape2)
 library(gridExtra)
 
+SSplot <- function(sout, itemName, showSampleSize=TRUE) {
+    s1 <- sout[[itemName]]
+    obs <- s1$orig.observed
+    ex <- s1$orig.expected
+    rowTotal <- apply(obs, 1, sum)
+    mask <- rowTotal > 0
+    obs <- (obs / rowTotal)[mask,]
+    ex <- (ex / rowTotal)[mask,]
+    ss <- data.frame(sscore=as.numeric(names(rowTotal)), n=rowTotal)
+    both <- rbind(cbind(type="expected", melt(ex)),
+                  cbind(type="observed", melt(obs)))
+    both$outcome <- factor(both$outcome, colnames(obs))
+    plot <- ggplot(both, aes(x=sumScore, y=value)) + facet_wrap(~type) + ylim(0,1) +
+        labs(y="probability", title=itemName)
+    guide.style <- guide_legend(keywidth=.1, keyheight=.5, direction = "horizontal", title.position = "top",
+                                label.position="bottom", label.hjust = 0.5, label.vjust = .5,
+                                label.theme = element_text(angle = 90, size=8))
+    plot <- plot + geom_line(aes(color=outcome)) + guides(color = guide.style)
+    if (showSampleSize) {
+        plot <- plot + geom_text(data=ss, aes(label=n, x=sscore), y = 1, size=2, angle=90)
+    }
+    plot
+}
+
 item.map <- function(grp, factor=1) {
   item.mask <- grp$param[factor,] > 0
   result <- NULL
@@ -76,17 +100,18 @@ rpf.plot <- function(grp, item.name, width=3, data.bins=11, basis=c(1), factor=1
   plot + labs(title = paste0(ix,": ",item.name))
 }
 
-plot.info <- function(grp, width=3, show.total=TRUE) {
+plot.info <- function(grp, width=3, show.total=TRUE, basis=c(1)) {
   spec <- grp$spec
   param <- grp$param
   i.name <- colnames(grp$param)
-  grid <- seq(-width,width,.1)
-  df <- list(score=grid)
-  total <- numeric(length(grid))
+  loc <- seq(-width, width, .1)
+  grid <- basis %*% t(loc)
+  df <- list(score=loc)
+  total <- numeric(length(loc))
   for (ix in 1:length(spec)) {
     id <- i.name[ix]
     s <- spec[[ix]]
-    df[[id]] <- rpf.info(s, param[1:rpf.numParam(s),ix], t(grid))
+    df[[id]] <- rpf.info(s, param[1:rpf.numParam(s),ix], grid, basis)
     total <- total + df[[id]]
   }
   if (show.total) df$total <- total

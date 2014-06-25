@@ -6,10 +6,8 @@ load("cms-fit.rda")
 
 ifa.score <- function(grp, df) {
   ip.mat <- mxMatrix(name="ItemParam", values=grp$param)
-  m.mat <- mxMatrix(name="mean", nrow=1, ncol=length(grp$mean), values=grp$mean)
-  rownames(m.mat) <- rownames(ip.mat)[1]
-  cov.mat <- mxMatrix("Symm", name="cov", values=grp$cov, dimnames=list(rownames(ip.mat)[1],
-                                                                        rownames(ip.mat)[1]))
+  m.mat <- mxMatrix(name="mean", values=grp$mean)
+  cov.mat <- mxMatrix("Symm", name="cov", values=grp$cov)
   
   items <- colnames(grp$param)
   ba.data <- df[,items]
@@ -22,14 +20,14 @@ ifa.score <- function(grp, df) {
                 mxComputeOnce('expectation'))
   ba.est <- mxRun(ba, silent=TRUE)
 
-  ba.est@expectation@output$scores
+  ba.est@expectation@output$scores[,1]
 }
 
 cms.score <- function(df) {
   df <- cms.testlets(df)
-  cms <- cbind(barrier=-ifa.score(ba.grp, df)[,1],
-               training=ifa.score(tr.grp, df)[,1],
-               event=ifa.score(ev.grp, df)[,1])
+  cms <- cbind(barrier=-ifa.score(ba.grp, df),
+               training=ifa.score(tr.grp, df),
+               event=ifa.score(ev.grp, df))
 
   barrier.names <- c("wantLearn", "msEffort", "msEmo", "msDescarte", "msAfraid",
                      "msFast", "msLife",  "msIdentity")
@@ -39,7 +37,7 @@ cms.score <- function(df) {
     lim[1,c] <- lev[length(lev)]
   }
   lim <- cms.testlets(lim)
-  cms[df$skipInt==TRUE,'barrier'] <- -ifa.score(ba.grp, lim)[,1]
+  cms[df$skipInt==TRUE,'barrier'] <- -ifa.score(ba.grp, lim)
   
   training.names <- c("msYearn", "msEnv", "msAllow", "msCause",
                       "msMet", "msMetNum", "msShared", "msSharedNum",
@@ -50,7 +48,7 @@ cms.score <- function(df) {
     else lim[1,c] <- 0
   }
   lim <- cms.testlets(lim)
-  cms[df$skipExp==TRUE,'training'] <- ifa.score(tr.grp, lim)[,1]
+  cms[df$skipExp==TRUE,'training'] <- ifa.score(tr.grp, lim)
   
   eventNames <- c('freqCause', 'successCat', 'maxDuration')
   lim <- df[1,eventNames]
@@ -64,7 +62,7 @@ cms.score <- function(df) {
     all(row[!is.na(row)] == lim[!is.na(row)])
   })
   # df[which(lowest), eventNames]
-  cms[lowest, 'event'] <- ifa.score(ev.grp, lim)[,1]
+  cms[lowest, 'event'] <- ifa.score(ev.grp, lim)
   cms
 }
 
@@ -74,10 +72,10 @@ if (0) {
   apply(cms, 2, function(c) sum(is.na(c))) / nrow(cms)
   
   cor(cms, use="pairwise.complete.obs")
-#             barrier   training      event
-#   barrier   1.0000000 -0.2704082 -0.4168304
-#   training -0.2704082  1.0000000  0.4755085
-#   event    -0.4168304  0.4755085  1.0000000
+#   barrier training event
+#   barrier     1.00    -0.27 -0.38
+#   training   -0.27     1.00  0.70
+#   event      -0.38     0.70  1.00
   if (0) {
     require(ggplot2)
     qplot(cms[,'barrier'], cms[,'event'])

@@ -5,6 +5,7 @@
 \setlength{\parskip}{1ex}
 
 <<echo=FALSE, results='hide', warning=FALSE, cache=FALSE>>=
+#options(error = browser)
 library(knitr)
 #knit("cms-calibrate.Rnw", tangle=TRUE)  # to extract only the R chunks
 opts_knit$set(error=TRUE)
@@ -69,54 +70,38 @@ The \emph{barrier} factor is intended to non-judgmentally assess the participant
 self-reported inability to experience complete mental silence.
 The items must make sense on a short time horizon and
 should also be amenable to long-term barriers.
-Examination of local dependence between items suggest that
-there are emotional and non-emotional subfactors.
 
 <<>>=
 fitBarrer <- function(barrier.items) {
   assertColumnExist(barrier.items)
-
-  numItems <- length(barrier.items)
-  if (numItems == 2) {
-    spec <- list()
-    for (ix in 1:numItems) {
-      spec[[ix]] <- rpf.grm(outcomes=length(levels(espt[1,barrier.items[ix]])))
-    }
-    maxParam <- max(sapply(spec, rpf.numParam))
-    ip.mat <- mxMatrix(name="ItemParam", nrow=maxParam, ncol=numItems, free=TRUE,
-                       dimnames=list(c('barrier', paste('b', 2:maxParam, sep="")), barrier.items))
-    ip.mat$labels[1,] <- 'a1'
-    ip.mat$values[,] <- sapply(spec, rpf.rparam) # get valid starting parameters
-    ip.mat$values[1,] <- 1
-  } else {
-    spec <- mkspec(espt, barrier.items)
-    maxParam <- max(sapply(spec, rpf.numParam))
-    
-    ip.mat <- mxMatrix(name="ItemParam", nrow=maxParam, ncol=numItems, free=FALSE,
-                       dimnames=list(c('barrier', paste('b', 2:maxParam, sep="")), barrier.items))
-    
-    ip.mat <- set.nominal.rank(spec, ip.mat, 'msIdAfraid', .27, .5)
-    ip.mat <- set.nominal.rank(spec, ip.mat, 'msIdAfraidLearn', .27, .5)
-    ip.mat <- set.nominal.rank(spec, ip.mat, 'msFastEffort', .27, .5)
-    ip.mat <- set.nominal.rank(spec, ip.mat, 'msFastEffortLife', .27, .5)
-    for (item in c('wantLearn', "msAfraid", "msIdentity",
-                   "msFast", "msEffort", "msLife", "msDescarte", "msEmo")) {
-      ip.mat <- set.nominal.rank(spec, ip.mat, item, .5, 1)
-    }
-  }
-  
-  
-  m.mat <- mxMatrix(name="mean", nrow=1, ncol=1, values=0)
-  rownames(m.mat) <- "barrier"
-  cov.mat <- mxMatrix("Symm", name="cov", nrow=1, ncol=1, values=diag(1),
-                      dimnames=list("barrier", "barrier"))
   
   ba.data <- espt[,barrier.items]
+  
+  spec <- lapply(barrier.items, function(nm) {
+    lev <- length(levels(ba.data[[ nm ]]))
+    rpf.grm(outcomes=lev, factors=3)
+  })
+  
+  maxParam <- max(sapply(spec, rpf.numParam))
+  factors <- c('barrier', 'emo', 'struct')
+  ip.mat <- mxMatrix(name="ItemParam", nrow=maxParam, ncol=length(spec), free=FALSE,
+                     dimnames=list(c(factors,
+                                     paste('b', 4:maxParam, sep="")), barrier.items))
+  ip.mat$values['barrier',] <- 1
+  ip.mat$values['emo',intersect(c('wantLearn', "msAfraid", "msIdentity","msEmo"),barrier.items)] <- 1
+  ip.mat$values['struct',intersect(c("msFast", "msFast1", "msEffort", "msLife"), barrier.items)] <- 1
+  ip.mat$values[4:7,] <- mxSimplify2Array(lapply(spec, function(s) seq(1,.1,length.out = s$outcomes-1)))
+  ip.mat$free[,] <- !is.na(ip.mat$values[,]) & ip.mat$values[,] != 0
+  
+  m.mat <- mxMatrix(name="mean", nrow=length(factors), ncol=1, values=0)
+  rownames(m.mat) <- factors
+  cov.mat <- mxMatrix("Symm", name="cov", nrow=3, ncol=3, values=diag(3),
+                      dimnames=list(factors, factors))
   
   ba <- mxModel(model="barrier",
                 m.mat, cov.mat, ip.mat,
                 mxData(observed=ba.data, type="raw"),
-                mxExpectationBA81(mean="mean", cov="cov",
+                mxExpectationBA81(mean="mean", cov="cov", qwidth=5, qpoints=39,
                                   ItemSpec=spec, ItemParam="ItemParam", scores="full", naAction="pass"),
                 mxFitFunctionML(),
                 mxComputeSequence(steps=list(
@@ -125,27 +110,71 @@ fitBarrer <- function(barrier.items) {
                   mxComputeStandardError(),
                   mxComputeHessianQuality())
                 ))
-  mxRun(ba, silent=TRUE)
+  got <- mxRun(ba, silent=TRUE)
+  got
 }
 
-ba.est <- fitBarrer(c('msIdAfraidLearn', 'msFastEffortLife'))
+# "msDescarte" == worst S fit
+# "wantLearn" poor discrimination, locally dependent with msEffort (duh) & msEmo
+ba.est <- fitBarrer(c("msAfraid", "msIdentity", "msFast1", "msEffort", "msLife", "msEmo"))
 
+interactive <- FALSE
+if (interactive) {
+  ba.est$output$conditionNumber
+}
 ba.grp <- list(spec=ba.est$expectation$ItemSpec,
-            param=ba.est$ItemParam@values,
-            mean=ba.est$mean@values,
-            cov=ba.est$cov@values,
-            scores=ba.est@expectation@output$scores,
-            data=espt[,colnames(ba.est$ItemParam)], minItems=1L)
+              param=ba.est$ItemParam@values,
+              mean=ba.est$mean@values,
+              cov=ba.est$cov@values,
+              scores=ba.est@expectation@output$scores,
+              data=espt[,colnames(ba.est$ItemParam)], minItems=1L, free=ba.est$ItemParam$free)
+
+mnf <- multinomialFit(ba.grp)
+if (interactive) {
+  ba.grp$param
+  mnf
+}
+
+if (0) {
+  mcReps <- 250
+  stat <- rep(NA, mcReps)
+  for (rx in 1:mcReps) {
+    t1 <- ba.grp
+    t1$data <- rpf.sample(grp=ba.grp)
+    got <- multinomialFit(t1)
+    stat[rx] <- got$statistic
+  }
+  log(sum(stat > mnf$statistic) / mcReps)
+}
 @ 
 
-A high probability of local dependence was observed unless
-the items were condensed into 2 testlets.
-A 2 testlet model was fit with -2LL=\Sexpr{ba.est$output$fit} and
+For a single factor model, the items were highly locally dependent.
+Two subfactors were hypothesized: an emotional subfactor for
+\Sexpr{names(which(ba.grp$param['emo',] !=0))}; and a structural subfactor for
+\Sexpr{names(which(ba.grp$param['struct',] !=0))}.
+A candidate bi-factor model was fit with -2LL=\Sexpr{ba.est$output$fit} and
 condition number \Sexpr{ba.est$output$conditionNumber}.
+The full-information multinomial fit test was conducted,
+$G^2(\Sexpr{mnf$df})=\Sexpr{mnf$statistic}$.
+Since the $\chi^2$ distribution is a poor approximation
+for such a large table, a $p$-value of about .05
+was obtained via Monte-Carlo simulation.
 
 <<results='asis'>>=
-got <- chen.thissen.1997(ba.grp)
-print(xtable(got$pval, "Log p-value of local dependence between item pairs."))
+got <- ChenThissen1997(ba.grp)
+print(xtable(got$pval, paste("Log p-value of local dependence between item pairs.",
+                             "Although statistically significant, all values are",
+                             "negative, meaning that there is less observed correlation",
+                             "among the residuals than expected.")))
+@
+
+<<results='asis'>>=
+sfit <- SitemFit(ba.grp, omit = 1, qpoints=15, qwidth=5)
+tbl <- t(sapply(sfit, function(r) c(n=r$n, df=r$df, stat=r$statistic, pval=r$pval)))
+print(xtable(tbl, paste("Sum-score item-wise fit, omitting 1 item.",
+                        "For msFast, \\emph{disagree somewhat} was collapsed",
+                        "to \\emph{not sure} to improve fit.",
+                        "There may be more room for improvement here.")))
 @
 
 <<fig.height=2>>=
@@ -155,12 +184,12 @@ ggplot(map1, aes(x=score, y=item, label=outcome)) + itemMapText
 
 <<fig.height=3>>=
 pl <- lapply(colnames(ba.grp$param), function(item) {
-  rpf.plot(ba.grp, item, width=plot.width, data.bins=12, basis=c(1), factor=1)
+  SSplot(sfit, item)
 })
 for (px in 1:length(pl)) {
   print(pl[[px]])
 }
-print(plot.info(ba.grp, width=5, show.total=FALSE))
+print(plot.info(ba.grp, width=5, show.total=FALSE, basis=c(1,0,0)))
 @
 
 \section{Training}

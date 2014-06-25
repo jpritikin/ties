@@ -49,6 +49,13 @@ num2cat <- function(num) {
 # msEmo -- like a combination of msLife, msId
 
 cms.testlets <- function(df) {
+  if (!is.null(df$msFast)) {
+    df$msFast1 <- df$msFast
+    df$msFast1[df$msFast1 == "disagree somewhat"] <- "not sure"
+    df$msFast1 <- mxFactor(df$msFast1, levels(df$msFast1)[-4])
+    #table(df$msFast1)
+  }
+  
   if (!is.null(df$wantLearn)) {
     df$msIdAfraid <- ordered(unclass(df$msAfraid) + unclass(df$msIdentity) - 10, levels=seq(-8,0,1))
     df$msIdAfraidLearn <- ordered(unclass(df$wantLearn) + unclass(df$msAfraid) + unclass(df$msIdentity) - 10,
