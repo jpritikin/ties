@@ -5,22 +5,8 @@ source("cms-score-lib.R")
 load("cms-fit.rda")
 
 ifa.score <- function(grp, df) {
-  ip.mat <- mxMatrix(name="ItemParam", values=grp$param)
-  m.mat <- mxMatrix(name="mean", values=grp$mean)
-  cov.mat <- mxMatrix("Symm", name="cov", values=grp$cov)
-  
-  items <- colnames(grp$param)
-  ba.data <- df[,items]
-  
-  ba <- mxModel(model="score",
-                m.mat, cov.mat, ip.mat,
-                mxData(observed=ba.data, type="raw"),
-                mxExpectationBA81(mean="mean", cov="cov", minItemsPerScore=grp$minItems,
-                                  ItemSpec=grp$spec, ItemParam="ItemParam", scores="full", naAction="pass"),
-                mxComputeOnce('expectation'))
-  ba.est <- mxRun(ba, silent=TRUE)
-
-  ba.est@expectation@output$scores[,1]
+  grp$data <- df
+  EAPscores(grp, naAction = 'pass')[,1]
 }
 
 cms.score <- function(df) {

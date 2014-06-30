@@ -84,7 +84,7 @@ fitBarrer <- function(barrier.items) {
   
   maxParam <- max(sapply(spec, rpf.numParam))
   factors <- c('barrier', 'emo', 'struct')
-  ip.mat <- mxMatrix(name="ItemParam", nrow=maxParam, ncol=length(spec), free=FALSE,
+  ip.mat <- mxMatrix(name="item", nrow=maxParam, ncol=length(spec), free=FALSE,
                      dimnames=list(c(factors,
                                      paste('b', 4:maxParam, sep="")), barrier.items))
   ip.mat$values['barrier',] <- 1
@@ -93,16 +93,9 @@ fitBarrer <- function(barrier.items) {
   ip.mat$values[4:7,] <- mxSimplify2Array(lapply(spec, function(s) seq(1,.1,length.out = s$outcomes-1)))
   ip.mat$free[,] <- !is.na(ip.mat$values[,]) & ip.mat$values[,] != 0
   
-  m.mat <- mxMatrix(name="mean", nrow=length(factors), ncol=1, values=0)
-  rownames(m.mat) <- factors
-  cov.mat <- mxMatrix("Symm", name="cov", nrow=3, ncol=3, values=diag(3),
-                      dimnames=list(factors, factors))
-  
-  ba <- mxModel(model="barrier",
-                m.mat, cov.mat, ip.mat,
+  ba <- mxModel(model="barrier", ip.mat,
                 mxData(observed=ba.data, type="raw"),
-                mxExpectationBA81(mean="mean", cov="cov", qwidth=5, qpoints=39,
-                                  ItemSpec=spec, ItemParam="ItemParam", scores="full", naAction="pass"),
+                mxExpectationBA81(spec, qwidth=5, qpoints=39, naAction="pass"),
                 mxFitFunctionML(),
                 mxComputeSequence(steps=list(
                   mxComputeEM('expectation', 'scores', mxComputeNewtonRaphson()),
@@ -123,11 +116,11 @@ if (interactive) {
   ba.est$output$conditionNumber
 }
 ba.grp <- list(spec=ba.est$expectation$ItemSpec,
-              param=ba.est$ItemParam@values,
-              mean=ba.est$mean@values,
-              cov=ba.est$cov@values,
+              param=ba.est$item@values,
               scores=ba.est@expectation@output$scores,
-              data=espt[,colnames(ba.est$ItemParam)], minItems=1L, free=ba.est$ItemParam$free)
+              data=espt[,colnames(ba.est$item)],
+              free=ba.est$item$free)
+ba.grp$score <- EAPscores(ba.grp, naAction="pass")
 
 mnf <- multinomialFit(ba.grp)
 if (interactive) {
@@ -160,6 +153,21 @@ Since the $\chi^2$ distribution is a poor approximation
 for such a large table, a $p$-value of about .05
 was obtained via Monte-Carlo simulation.
 
+<<fig.height=2>>=
+got <- sumScoreEAP(ba.grp)
+df <- data.frame(score=as.numeric(rownames(got$tbl)),
+            expected=got$tbl[,'p'] * got$n, observed=got$observed)
+df <- melt(df, id="score", variable.name="source", value.name="n")
+ggplot(df, aes(x=score, y=n, color=source)) + geom_line()
+
+if (0) {
+  ss <- observedSumScore(ba.grp, summary=FALSE)
+  mask <- !is.na(ss) & ss==12
+  ss12 <- ba.grp$data[mask,]
+  sum(apply(ss12 == "not sure", 1, all))
+}
+@
+
 <<results='asis'>>=
 got <- ChenThissen1997(ba.grp)
 print(xtable(got$pval, paste("Log p-value of local dependence between item pairs.",
@@ -169,7 +177,7 @@ print(xtable(got$pval, paste("Log p-value of local dependence between item pairs
 @
 
 <<results='asis'>>=
-sfit <- SitemFit(ba.grp, omit = 1, qpoints=15, qwidth=5)
+sfit <- SitemFit(ba.grp, omit = 1, qpoints=31, qwidth=5)
 tbl <- t(sapply(sfit, function(r) c(n=r$n, df=r$df, stat=r$statistic, pval=r$pval)))
 print(xtable(tbl, paste("Sum-score item-wise fit, omitting 1 item.",
                         "For msFast, \\emph{disagree somewhat} was collapsed",
@@ -210,7 +218,7 @@ fitTraining <- function(training.items, minItems) {
   numItems <- length(training.items)
   maxParam <- max(sapply(spec, rpf.numParam))
   
-  ip.mat <- mxMatrix(name="ItemParam", nrow=maxParam, ncol=numItems, free=FALSE,
+  ip.mat <- mxMatrix(name="item", nrow=maxParam, ncol=numItems, free=FALSE,
                      dimnames=list(c('training', paste('p',2:maxParam,sep="")), training.items))
   
   ip.mat <- set.nominal.rank(spec, ip.mat, 'msNotion', .51, 1)
@@ -225,17 +233,9 @@ fitTraining <- function(training.items, minItems) {
   
   tr.data <- espt[,training.items]
   
-  m.mat <- mxMatrix(name="mean", nrow=1, ncol=1, values=0)
-  rownames(m.mat) <- "training"
-  cov.mat <- mxMatrix("Symm", name="cov", nrow=1, ncol=1, values=diag(1),
-                      dimnames=list("training", "training"))
-  
-  train <- mxModel(model="training",
-                   m.mat, cov.mat, ip.mat,
+  train <- mxModel(model="training", ip.mat,
                    mxData(observed=tr.data, type="raw"),
-                   mxExpectationBA81(mean="mean", cov="cov",
-                                     ItemSpec=spec, ItemParam="ItemParam", scores="full",
-                                     naAction="pass", minItemsPerScore=minItems),
+                   mxExpectationBA81(spec, naAction="pass", minItemsPerScore=minItems),
                    mxFitFunctionML(),
                    mxComputeSequence(steps=list(
                      mxComputeEM('expectation', 'scores', mxComputeNewtonRaphson()),
@@ -247,13 +247,14 @@ fitTraining <- function(training.items, minItems) {
 }
 
 # not specific enough: "msAny", "msEvery"
-tr.est <- fitTraining(c("yearnEnv", "allowCause", "trainSkill", "trainNum"), 2L)
+minItems <- 2L
+tr.est <- fitTraining(c("yearnEnv", "allowCause", "trainSkill", "trainNum"), minItems)
 tr.grp <- list(spec=tr.est$expectation$ItemSpec,
-            param=tr.est$ItemParam@values,
-            mean=tr.est$mean@values,
-            cov=tr.est$cov@values,
-            scores=tr.est@expectation@output$scores,
-            data=espt[,colnames(tr.est$ItemParam)], minItems=2L)
+            param=tr.est$item@values,
+            data=espt[,colnames(tr.est$item)],
+            minItemsPerScore=minItems)
+
+tr.grp$scores <- EAPscores(tr.grp, naAction='pass')
 @
 
 Calibration of the training factor is hindered by the late addition
@@ -261,7 +262,7 @@ of the trainNum item. A possible model obtains -2LL=\Sexpr{tr.est$output$fit}
 with condition number \Sexpr{tr.est$output$conditionNumber}.
 
 <<results='asis'>>=
-got <- chen.thissen.1997(tr.grp)
+got <- ChenThissen1997(tr.grp)
 print(xtable(got$pval, "Log p-value of local dependence between item pairs."))
 @ 
 
@@ -293,7 +294,7 @@ fitEvent <- function(event.items, minItems) {
   numItems <- length(event.items)
   maxParam <- max(sapply(spec, rpf.numParam))
   
-  ip.mat <- mxMatrix(name="ItemParam", nrow=maxParam, ncol=numItems, free=FALSE,
+  ip.mat <- mxMatrix(name="item", nrow=maxParam, ncol=numItems, free=FALSE,
                      dimnames=list(c("event", paste("p",2:maxParam,sep="")), event.items))
   
   ip.mat <- set.nominal.rank(spec, ip.mat, 'msAny', .51, 1)
@@ -302,18 +303,11 @@ fitEvent <- function(event.items, minItems) {
   ip.mat <- set.nominal.rank(spec, ip.mat, 'successCat', .35, .5)
   ip.mat <- set.nominal.rank(spec, ip.mat, 'maxDuration', .51, 1)
   
-  m.mat <- mxMatrix(name="mean", nrow=1, ncol=1, values=0)
-  rownames(m.mat) <- "event"
-  cov.mat <- mxMatrix("Symm", name="cov", nrow=1, ncol=1, values=diag(1),
-                      dimnames=list("event", "event"))
-
   ev.data <- espt[,event.items]
   
-  ev <- mxModel(model="event",
-                m.mat, cov.mat, ip.mat,
+  ev <- mxModel(model="event", ip.mat,
                 mxData(observed=ev.data, type="raw"),
-                mxExpectationBA81(mean="mean", cov="cov", naAction="pass", minItemsPerScore=minItems,
-                                  ItemSpec=spec, ItemParam="ItemParam", scores="full"),
+                mxExpectationBA81(spec, naAction="pass", minItemsPerScore=minItems),
                 mxFitFunctionML(),
                 mxComputeSequence(steps=list(
                   mxComputeEM('expectation', 'scores', mxComputeNewtonRaphson()),
@@ -324,21 +318,21 @@ fitEvent <- function(event.items, minItems) {
   mxRun(ev, silent=TRUE)
 }
 
-ev.est <- fitEvent(c("freqCause", "successCat", "maxDuration"), 2L)
+minItems <- 2L
+ev.est <- fitEvent(c("freqCause", "successCat", "maxDuration"), minItems)
 
 ev.grp <- list(spec=ev.est$expectation$ItemSpec,
-            param=ev.est$ItemParam@values,
-            mean=ev.est$mean@values,
-            cov=ev.est$cov@values,
-            scores=ev.est@expectation@output$scores,
-            data=espt[,colnames(ev.est$ItemParam)], minItems=2L)
+            param=ev.est$item@values,
+            data=espt[,colnames(ev.est$item)],
+            minItemsPerScore=minItems)
+ev.grp$scores <- EAPscores(ev.grp, naAction = 'pass')
 @ 
 
 A possible model has -2LL=\Sexpr{ev.est$output$fit} and
 condition number \Sexpr{ev.est$output$conditionNumber}.
 
 <<results='asis'>>=
-got <- chen.thissen.1997(ev.grp)
+got <- ChenThissen1997(ev.grp)
 print(xtable(got$pval, "Log p-value of local dependence between item pairs."))
 @ 
 
@@ -358,18 +352,10 @@ print(plot.info(ev.grp, width=4, show.total=FALSE))
 @ 
 
 <<>>=
+ba.grp$data <- NULL
+tr.grp$data <- NULL
+# ev.grp$data <- NULL
 save(ba.grp, tr.grp, ev.grp, file="cms-fit.rda")
-
-if (0) {
-  library(ggplot2)
-  library(stringr)
-  scores <- m2.est@expectation@scores.out
-  espt$interest <- scores[,1]
-  espt$experience <- scores[,2]
-  ggplot(subset(espt, !is.na(str_match(espt$wave, "^germano"))),
-         aes(interest, experience, color=wave, group=email)) +
-    geom_point(size=1) + geom_line(size=.1) + coord_fixed()
-}
 
 #items <- t(m2$ItemParam@values)
 #rownames(items) <- item.names
