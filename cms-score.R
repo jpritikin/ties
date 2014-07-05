@@ -6,7 +6,7 @@ load("cms-fit.rda")
 
 ifa.score <- function(grp, df) {
   grp$data <- df
-  EAPscores(grp, naAction = 'pass')[,1]
+  EAPscores(grp)[,1]
 }
 
 cms.score <- function(df) {
@@ -25,7 +25,7 @@ cms.score <- function(df) {
   lim <- cms.testlets(lim)
   cms[df$skipInt==TRUE,'barrier'] <- -ifa.score(ba.grp, lim)
   
-  training.names <- c("msYearn", "msEnv", "msAllow", "msCause",
+  training.names <- c("msNotion", "msYearn", "msEnv", "msAllow", "msCause",
                       "msMet", "msMetNum", "msShared", "msSharedNum",
                       "msTeach", "msTeachNum", "msTrainTeach", "msTrainTeachNum")
   lim <- df[1,training.names]

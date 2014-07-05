@@ -2,14 +2,14 @@ library(rpf)
 library(OpenMx)
 source("measures.R")
 
-mkspec <- function(espt, items) {
+mkspec <- function(espt, items, factors=1) {
   spec <- list()
   for (n in 1:length(items)) {
     lev <- length(levels(espt[[ items[n] ]]))
     if (lev == 2) {
-      spec[n] <- rpf.grm(outcomes=2, factors=1)
+      spec[n] <- rpf.grm(outcomes=2, factors)
     } else {
-      spec[n] <- rpf.nrm(lev, factors=1)
+      spec[n] <- rpf.nrm(lev, factors)
     }
   }
   names(spec) <- items
@@ -23,14 +23,19 @@ set.nominal.rank <- function(spec, ip.mat, name, a, c) {
   }
   thresh <- spec1@outcomes-1
   free <- rep(FALSE, spec1@factors + 2 * thresh)
+  free[1] <- TRUE
   base <- spec1@factors+1
-  free[base:(base + thresh * a - 1)] <- TRUE
+  if (thresh * a >= 1) {
+    free[(1+base):(base + thresh * a - 1)] <- TRUE
+  }
   base <- base + thresh
-  free[base:(base + thresh * c - 1)] <- TRUE
+  if (thresh * c >= 1) {
+    free[base:(base + thresh * c - 1)] <- TRUE
+  }
   ip.mat@free[1:length(free),name] <- free
-  sv <- c(1, rep(1, thresh), rep(0, thresh))
+  sv <- c(rep(1,spec1@factors), rep(1, thresh), rep(0, thresh))
   ip.mat@values[1:length(free),name] <- free * sv
-  ip.mat@values[1,name] <- 1
+  ip.mat@values[c(1,spec1@factors+1),name] <- 1
   ip.mat
 }
 

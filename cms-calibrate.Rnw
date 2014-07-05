@@ -72,7 +72,7 @@ The items must make sense on a short time horizon and
 should also be amenable to long-term barriers.
 
 <<>>=
-fitBarrer <- function(barrier.items) {
+fitBarrer <- function(barrier.items, minItems) {
   assertColumnExist(barrier.items)
   
   ba.data <- espt[,barrier.items]
@@ -95,7 +95,7 @@ fitBarrer <- function(barrier.items) {
   
   ba <- mxModel(model="barrier", ip.mat,
                 mxData(observed=ba.data, type="raw"),
-                mxExpectationBA81(spec, qwidth=5, qpoints=39, naAction="pass"),
+                mxExpectationBA81(spec, qwidth=5, qpoints=39, minItemsPerScore=minItems),
                 mxFitFunctionML(),
                 mxComputeSequence(steps=list(
                   mxComputeEM('expectation', 'scores', mxComputeNewtonRaphson()),
@@ -109,7 +109,8 @@ fitBarrer <- function(barrier.items) {
 
 # "msDescarte" == worst S fit
 # "wantLearn" poor discrimination, locally dependent with msEffort (duh) & msEmo
-ba.est <- fitBarrer(c("msAfraid", "msIdentity", "msFast1", "msEffort", "msLife", "msEmo"))
+minItems <- 3
+ba.est <- fitBarrer(c("msAfraid", "msIdentity", "msFast1", "msEffort", "msLife", "msEmo"), minItems)
 
 interactive <- FALSE
 if (interactive) {
@@ -119,8 +120,9 @@ ba.grp <- list(spec=ba.est$expectation$ItemSpec,
               param=ba.est$item@values,
               scores=ba.est@expectation@output$scores,
               data=espt[,colnames(ba.est$item)],
-              free=ba.est$item$free)
-ba.grp$score <- EAPscores(ba.grp, naAction="pass")
+              free=ba.est$item$free,
+               minItemsPerScore=minItems)
+ba.grp$score <- EAPscores(ba.grp)
 
 mnf <- multinomialFit(ba.grp)
 if (interactive) {
@@ -148,7 +150,7 @@ Two subfactors were hypothesized: an emotional subfactor for
 A candidate bi-factor model was fit with -2LL=\Sexpr{ba.est$output$fit} and
 condition number \Sexpr{ba.est$output$conditionNumber}.
 The full-information multinomial fit test was conducted,
-$G^2(\Sexpr{mnf$df})=\Sexpr{mnf$statistic}$.
+$n=\Sexpr{mnf$n}$, $G^2(\Sexpr{mnf$df})=\Sexpr{mnf$statistic}$.
 Since the $\chi^2$ distribution is a poor approximation
 for such a large table, a $p$-value of about .05
 was obtained via Monte-Carlo simulation.
@@ -170,10 +172,7 @@ if (0) {
 
 <<results='asis'>>=
 got <- ChenThissen1997(ba.grp)
-print(xtable(got$pval, paste("Log p-value of local dependence between item pairs.",
-                             "Although statistically significant, all values are",
-                             "negative, meaning that there is less observed correlation",
-                             "among the residuals than expected.")))
+print(xtable(got$pval, paste("Log p-value of local dependence between item pairs.")))
 @
 
 <<results='asis'>>=
@@ -210,32 +209,55 @@ To assess experience with others,
 items probe both belief in oneself to work with others and
 quantitatively how much one has worked with others.
 
+<<results='asis'>>=
+print(xtable(table(espt[,c("msAllow","msCause")]),
+             paste("The msAllow and msCause items seem to measure practically",
+                   "the same thing. Participants are slighly more willing to",
+                   "endorse higher outcomes in msAllow compared to msCause.",
+                   "I prefer to use msAllow, but msAllow has too much missing",
+                   "data at this time.")))
+@ 
+
 <<>>=
 fitTraining <- function(training.items, minItems) {
   assertColumnExist(training.items)
   
-  spec <- mkspec(espt, training.items)
+  tr.data <- espt[,training.items]
+  
+  nfactors <- 3
+  spec <- lapply(training.items, function(nm) {
+    lev <- length(levels(tr.data[[ nm ]]))
+    rpf.grm(outcomes=lev, factors=nfactors)
+  })
+  names(spec) <- training.items
+  
+  for (item in c('trainSkill', 'trainNum')) {
+    spec[item] <- mkspec(espt, item, nfactors)
+  }
   numItems <- length(training.items)
   maxParam <- max(sapply(spec, rpf.numParam))
   
-  ip.mat <- mxMatrix(name="item", nrow=maxParam, ncol=numItems, free=FALSE,
-                     dimnames=list(c('training', paste('p',2:maxParam,sep="")), training.items))
+  imat <- mxMatrix(name="item", nrow=maxParam, ncol=numItems, free=FALSE,
+                     dimnames=list(c('training', 'other', 'self',
+                                     paste('p',4:maxParam,sep="")), training.items))
+  imat$values[,] <- mxSimplify2Array(lapply(spec, rpf.rparam))
+  imat$values[c('other', 'self'),] <- 0
+  imat$free[,] <- !is.na(imat$values) & imat$values[,] != 0
+  imat$values['training',] <- 1
+
+  imat <- set.nominal.rank(spec, imat, 'trainSkill', 0, .3)
+  imat <- set.nominal.rank(spec, imat, 'trainNum', 0, .15)
+
+  selfGroup <- intersect(training.items, c("msYearn", "msEnv", "msAllow"))
+  otherGroup <- intersect(training.items, c("trainSkill", "trainNum"))
+  imat$values['self',selfGroup] <- 1
+  imat$free['self',selfGroup] <- TRUE
+  imat$values['other',otherGroup] <- 1
+  imat$free['other',otherGroup] <- TRUE
   
-  ip.mat <- set.nominal.rank(spec, ip.mat, 'msNotion', .51, 1)
-  ip.mat <- set.nominal.rank(spec, ip.mat, 'msYearn', .51, 1)
-  ip.mat <- set.nominal.rank(spec, ip.mat, 'msEnv', .51, 1)
-  ip.mat <- set.nominal.rank(spec, ip.mat, 'yearnEnv', .27, .27)
-  ip.mat <- set.nominal.rank(spec, ip.mat, 'msAllow', .51, 1)
-  ip.mat <- set.nominal.rank(spec, ip.mat, 'msCause', .51, 1)
-  ip.mat <- set.nominal.rank(spec, ip.mat, 'allowCause', .27, .27)
-  ip.mat <- set.nominal.rank(spec, ip.mat, 'trainSkill', .2, .2)
-  ip.mat <- set.nominal.rank(spec, ip.mat, 'trainNum', .1, .15)
-  
-  tr.data <- espt[,training.items]
-  
-  train <- mxModel(model="training", ip.mat,
+  train <- mxModel(model="training", imat,
                    mxData(observed=tr.data, type="raw"),
-                   mxExpectationBA81(spec, naAction="pass", minItemsPerScore=minItems),
+                   mxExpectationBA81(spec, minItemsPerScore=minItems, qpoints=27, qwidth=5),
                    mxFitFunctionML(),
                    mxComputeSequence(steps=list(
                      mxComputeEM('expectation', 'scores', mxComputeNewtonRaphson()),
@@ -243,28 +265,72 @@ fitTraining <- function(training.items, minItems) {
                      mxComputeStandardError(),
                      mxComputeHessianQuality())
                    ))
-  mxRun(train, silent=TRUE)
+  got <- mxRun(train, silent=TRUE)
+  got
 }
 
 # not specific enough: "msAny", "msEvery"
-minItems <- 2L
-tr.est <- fitTraining(c("yearnEnv", "allowCause", "trainSkill", "trainNum"), minItems)
+# c("yearnEnv", "allowCause", "trainSkill", "trainNum")
+minItems <- 3L
+tr.est <- fitTraining(c("msYearn", "msEnv", "msCause", "trainSkill", "trainNum"), minItems)
 tr.grp <- list(spec=tr.est$expectation$ItemSpec,
-            param=tr.est$item@values,
+            param=tr.est$item$values,
             data=espt[,colnames(tr.est$item)],
-            minItemsPerScore=minItems)
+            minItemsPerScore=minItems,
+            free=tr.est$item$free,
+            qpoints=31, qwidth=5)
 
-tr.grp$scores <- EAPscores(tr.grp, naAction='pass')
+tr.grp$scores <- EAPscores(tr.grp)
+
+mnf <- multinomialFit(tr.grp, omit=1)
+
+if (0) {
+  mcReps <- 100
+  stat <- rep(NA, mcReps)
+  for (rx in 1:mcReps) {
+    t1 <- tr.grp
+    t1$data <- rpf.sample(grp=tr.grp)
+    got <- multinomialFit(t1, omit=1)
+    stat[rx] <- got$statistic
+  }
+  log(sum(stat > mnf$statistic) / mcReps)
+}
+
 @
 
 Calibration of the training factor is hindered by the late addition
-of the trainNum item. A possible model obtains -2LL=\Sexpr{tr.est$output$fit}
+of the trainNum item.
+For a single factor model, the items were highly locally dependent.
+Two subfactors were hypothesized: a self subfactor for
+\Sexpr{names(which(tr.grp$param['self',] !=0))}; and an other subfactor for
+\Sexpr{names(which(tr.grp$param['other',] !=0))}.
+A candidate model obtains $-2LL=\Sexpr{tr.est$output$fit}$
 with condition number \Sexpr{tr.est$output$conditionNumber}.
+The full-information multinomial fit test was conducted,
+$n=\Sexpr{mnf$n}$, $G^2(\Sexpr{mnf$df})=\Sexpr{mnf$statistic}$.
+Since the $\chi^2$ distribution is a poor approximation
+for such a large table, a $p$-value of about 1
+was obtained via Monte-Carlo simulation.
+
+<<fig.height=2>>=
+got <- sumScoreEAP(tr.grp, omit=1)
+df <- data.frame(score=as.numeric(rownames(got$testTbl)),
+            expected=got$testTbl[,'p'] * got$n, observed=got$observed)
+df <- melt(df, id="score", variable.name="source", value.name="n")
+ggplot(df, aes(x=score, y=n, color=source)) + geom_line()
+@
+
 
 <<results='asis'>>=
 got <- ChenThissen1997(tr.grp)
 print(xtable(got$pval, "Log p-value of local dependence between item pairs."))
 @ 
+
+<<results='asis'>>=
+sfit <- SitemFit(tr.grp, omit = 1)
+tbl <- t(sapply(sfit, function(r) c(n=r$n, df=r$df, stat=r$statistic, pval=r$pval)))
+print(xtable(tbl, paste("Sum-score item-wise fit, omitting 1 item.")))
+@
 
 <<fig.height=2>>=
 map1 <- item.map(tr.grp, 1)
@@ -273,12 +339,12 @@ ggplot(map1, aes(x=score, y=item, label=outcome)) + itemMapText
 
 <<fig.height=3>>=
 pl <- lapply(colnames(tr.grp$param), function(item) {
-  rpf.plot(tr.grp, item, width=plot.width, data.bins=12, basis=c(1), factor=1)
+  SSplot(sfit, item)
 })
 for (px in 1:length(pl)) {
   print(pl[[px]])
 }
-print(plot.info(tr.grp, width=4, show.total=FALSE))
+print(plot.info(tr.grp, width=5, show.total=FALSE, basis=c(1,0,0)))
 @
 
 \section{Event}
@@ -307,7 +373,7 @@ fitEvent <- function(event.items, minItems) {
   
   ev <- mxModel(model="event", ip.mat,
                 mxData(observed=ev.data, type="raw"),
-                mxExpectationBA81(spec, naAction="pass", minItemsPerScore=minItems),
+                mxExpectationBA81(spec, minItemsPerScore=minItems),
                 mxFitFunctionML(),
                 mxComputeSequence(steps=list(
                   mxComputeEM('expectation', 'scores', mxComputeNewtonRaphson()),
@@ -322,14 +388,33 @@ minItems <- 2L
 ev.est <- fitEvent(c("freqCause", "successCat", "maxDuration"), minItems)
 
 ev.grp <- list(spec=ev.est$expectation$ItemSpec,
-            param=ev.est$item@values,
+            param=ev.est$item$values,
             data=espt[,colnames(ev.est$item)],
-            minItemsPerScore=minItems)
-ev.grp$scores <- EAPscores(ev.grp, naAction = 'pass')
+            minItemsPerScore=minItems,
+            free=ev.est$item$free)
+ev.grp$scores <- EAPscores(ev.grp)
+
+mnf <- multinomialFit(ev.grp)
+
+if (0) {
+  mcReps <- 100
+  stat <- rep(NA, mcReps)
+  for (rx in 1:mcReps) {
+    t1 <- ev.grp
+    t1$data <- rpf.sample(grp=ev.grp)
+    got <- multinomialFit(t1, omit=1)
+    stat[rx] <- got$statistic
+  }
+  log(sum(stat > mnf$statistic) / mcReps)
+}
 @ 
 
-A possible model has -2LL=\Sexpr{ev.est$output$fit} and
+A possible model had -2LL=\Sexpr{ev.est$output$fit} and
 condition number \Sexpr{ev.est$output$conditionNumber}.
+The full-information multinomial fit test was conducted,
+$n=\Sexpr{mnf$n}$, $G^2(\Sexpr{mnf$df})=\Sexpr{mnf$statistic}$, $\log(p)=\Sexpr{mnf$pval}$.
+To double-check the $p$-value, a Monte-Carlo simulation
+was conducted, $\log(p) = -.92$.
 
 <<results='asis'>>=
 got <- ChenThissen1997(ev.grp)
