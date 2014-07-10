@@ -72,10 +72,10 @@ The items must make sense on a short time horizon and
 should also be amenable to long-term barriers.
 
 <<>>=
-fitBarrer <- function(barrier.items, minItems) {
-  assertColumnExist(barrier.items)
+fitBarrer <- function(ba.data, minItems) {
+  barrier.items <- colnames(ba.data)
   
-  ba.data <- espt[,barrier.items]
+  assertColumnExist(barrier.items)
   
   spec <- lapply(barrier.items, function(nm) {
     lev <- length(levels(ba.data[[ nm ]]))
@@ -107,10 +107,15 @@ fitBarrer <- function(barrier.items, minItems) {
   got
 }
 
+bitem <- c("msAfraid", "msIdentity", "msFast", "msEffort", "msLife", "msEmo")
+notSure <- apply(espt[,bitem] == "not sure", 1, all)
+notSure <- !is.na(notSure) & notSure
+ba.data <- espt[!notSure, c("msAfraid", "msIdentity", "msFast1", "msEffort", "msLife", "msEmo")]
+
 # "msDescarte" == worst S fit
 # "wantLearn" poor discrimination, locally dependent with msEffort (duh) & msEmo
 minItems <- 3
-ba.est <- fitBarrer(c("msAfraid", "msIdentity", "msFast1", "msEffort", "msLife", "msEmo"), minItems)
+ba.est <- fitBarrer(ba.data, minItems)
 
 interactive <- FALSE
 if (interactive) {
@@ -119,7 +124,7 @@ if (interactive) {
 ba.grp <- list(spec=ba.est$expectation$ItemSpec,
               param=ba.est$item@values,
               scores=ba.est@expectation@output$scores,
-              data=espt[,colnames(ba.est$item)],
+              data=ba.data,
               free=ba.est$item$free,
                minItemsPerScore=minItems)
 ba.grp$score <- EAPscores(ba.grp)
@@ -131,7 +136,7 @@ if (interactive) {
 }
 
 if (0) {
-  mcReps <- 250
+  mcReps <- 100
   stat <- rep(NA, mcReps)
   for (rx in 1:mcReps) {
     t1 <- ba.grp
@@ -166,7 +171,7 @@ if (0) {
   ss <- observedSumScore(ba.grp, summary=FALSE)
   mask <- !is.na(ss) & ss==12
   ss12 <- ba.grp$data[mask,]
-  sum(apply(ss12 == "not sure", 1, all))
+  which(apply(ss12, 1, function(r) all(r == "not sure")))  # huh?
 }
 @
 
