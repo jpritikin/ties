@@ -9,17 +9,9 @@ mean.or.na <- function(mat, n.min) {
 
 lax.ordered <- function(df, col, levels, old.levels=c()) {
   if (is.null(df[[col]])) return(NULL)
-    if (!missing(old.levels)) {
-        if (any(!is.na(match(old.levels, levels)))) stop("levels and old.levels overlap")
-        df[[col]][which(!is.na(match(df[[col]], old.levels)))] <- ''
-    }
-  levels <- tolower(levels)
   df[[col]] <- tolower(df[[col]])
-  no.match <- is.na(match(df[[col]], c('',levels)))
-  if (any(no.match)) {
-    stop(paste("In", col, "unknown levels:", paste(unique(df[[col]][no.match]), collapse=" ")))
-  }
-  df[[col]] <- mxFactor(df[[col]], levels=levels)
+  df[[col]] <- mxFactor(df[[col]], levels=tolower(levels),
+                        exclude = c('',tolower(old.levels)))
 }
 
 cause.teach.testlet <- function(df) {
@@ -165,15 +157,15 @@ prepare.espt <- function(espt, scores) {
     for (col in c(paste(context,'ms.pf',sep='.'),
                   paste(context,'b.pf',sep='.'))) {
       if (is.null(espt[[col]])) next
-      espt[[col]] <- mxFactor(espt[[col]], levels=freq.levels)
+      espt[[col]] <- mxFactor(espt[[col]], levels=freq.levels, exclude = '')
     }
     col <- paste(context,'subjTime',sep='.')
     if (is.null(espt[[col]])) next
-    espt[[col]] <- mxFactor(espt[[col]], levels=subj.time.levels)
+    espt[[col]] <- mxFactor(espt[[col]], levels=subj.time.levels, exclude = '')
     for (col in c(paste(context,'ms.gi',sep='.'),
                   paste(context,'b.gi',sep='.'))) {
       if (is.null(espt[[col]])) next
-      espt[[col]] <- mxFactor(espt[[col]], levels=importance.levels)
+      espt[[col]] <- mxFactor(espt[[col]], levels=importance.levels, exclude = '')
     }
   }
 
@@ -181,14 +173,14 @@ prepare.espt <- function(espt, scores) {
     thinking.levels <- c('None', 'A little thinking',
                          'Some moderate thinking',
                          'Rigorous, intensive thinking')
-    espt$flow.think <- mxFactor(espt$flow.think, levels=thinking.levels)
+    espt$flow.think <- mxFactor(espt$flow.think, levels=thinking.levels, exclude = '')
   }
 
   prepare.levels <- c('Yes', 'Yes, somewhat', 'Not sure / maybe',
                       'Probably not', 'No')
   for (col in c('ms.flow', 'flow.ms')) {
     if (is.null(espt[[col]])) next
-    espt[[col]] <- mxFactor(espt[[col]], levels=prepare.levels)
+    espt[[col]] <- mxFactor(espt[[col]], levels=prepare.levels, exclude = '')
   }
 
   for (col in c('m.training', 'm.regular', 'ip.continent',
@@ -218,7 +210,7 @@ prepare.espt <- function(espt, scores) {
     ethical.levels <- apply(expand.grid(levels(espt$msPay), levels(espt$msPaySure)), 1, paste, collapse="+")
     espt$ethical[ethical.mask] <- apply(as.matrix(espt[ethical.mask, c("msPay", "msPaySure")]),
                                         1, paste, collapse="+")
-    espt$ethical <- mxFactor(espt$ethical, levels=ethical.levels)
+    espt$ethical <- mxFactor(espt$ethical, levels=ethical.levels, exclude = '')
   }
   
   espt$causeTeach <- cause.teach.testlet(espt)

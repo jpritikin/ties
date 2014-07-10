@@ -6,6 +6,7 @@ library(plyr)
 library(gtools)
 source("measures.R")
 
+#options(error=browser)
 # collect the calibration sample
 
 source("prepare.R")
