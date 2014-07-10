@@ -21,9 +21,6 @@ wave1$uid <- uidStart:(uidStart + nrow(wave1) - 1)
 discardCols <- c("Email.Address", "CollectorID", "RespondentID", "IP.Address", "First.Name",
                  "LastName", "Custom.Data",
                  "Do.you.have.any.comments.about.this.survey..If.you.have.questions.for.which.you.wish..to.receive.a.prompt.answer..send.me.email.jpritikin.virginia.edu....Open.Ended.Response")
-for (c in discardCols) {
-  wave1[,c] <- NULL
-}
 
 if (0) {
   # comments
@@ -42,7 +39,11 @@ wave2$time <- 2
 wave3 <- subset(wave23, CollectorID == "52504406")
 wave3$time <- 3
 
+wave2 <- wave2[match(wave1$id, wave2$id),]
+wave3 <- wave3[match(wave1$id, wave3$id),]
+
 for (c in discardCols) {
+  wave1[,c] <- NULL
   wave2[,c] <- NULL
   wave3[,c] <- NULL
 }

@@ -84,9 +84,13 @@ if (0) {
   save(germano2014.cms, file="germano2014-cms.rda")
 }
 
-wave1 <- cbind(wave1, cms.score(prep.cms201312(raw1[70:95])))
-wave2 <- cbind(wave2, cms.score(prep.cms201312(raw2[67:92])))
-wave3 <- cbind(wave3, cms.score(prep.cms201312(raw3[67:92])))
+cms1 <- prep.cms201312(raw1[70:95])
+cms2 <- prep.cms201312(raw2[67:92])
+cms3 <- prep.cms201312(raw3[67:92])
+
+wave1 <- cbind(wave1, cms.score(cms1))
+wave2 <- cbind(wave2, cms.score(cms2))
+wave3 <- cbind(wave3, cms.score(cms3))
 if (0) {
   apply(wave3, 2, function (c) sum(is.na(c)))
 }
@@ -101,14 +105,14 @@ verifyDigest1 <- c("5c048a9bde4fe7d45a2feea10894cdb4", "8e01999b6cedb96e28c7141e
                    "40200e2e00b9ffbf1bf00a00afa92d9e", "c762151cc430e67eecd463e32088aa13",
                    "031af9ac8379ef50e25b583f8b3097bf", "5fca0690cad3c7c67ee36780703e227f",
                    "40ceca7f66dbb3dfbafa18db5e6c25fe")
-verifyDigest2 <- c("366287a482c1b4ea838c47229482c5fd", "b878525361621e136b83cc56dbe62c69",
-                   "0aeb6964dab5d24cb5032862ecbae217", "5b33c257d3d33c0c9d26edea7cae85e3",
-                   "14e40f383a39f6babd8762aec1de608d", "f5e1c5574465d095a7ae3b9d183d6a86",
-                   "83f51b1728bf893f216e124c7f9fede1")
-verifyDigest3 <- c("edff78b1027dc6c4ce9bf921c7a08f30", "be4e353dedd0af5b2be45455686dd72c",
-                   "414cc102ba76ce0837700857dc204f12", "9c24a0f393ed7066d8c6922b94aa552c",
-                   "733fbb1b20681fdfbddc6fa9f930633e", "e2eeef65dd5008fb8e3816d6f7b78c83",
-                   "16bb5d12a37642c36820f158afd635c0")
+verifyDigest2 <- c("bd7f2c37039e0a56b7b882e798d01558", "dd8ea8d635334f15d1b914452dbf9c52",
+                   "c4951099654ee0b200504d2ddea036bb", "08edbbc65af5e2773898ca5187c3a315",
+                   "7004c4c6f840a31cd681c8b06ba76221", "c3a3294297e6b7a14f5dcdf13ff74687",
+                   "7400d78035f5a08db98af30ad9754dfe")
+verifyDigest3 <- c("4c2d04afc4f8a03f09886d48c33a5fea", "a72053073791beef15a418b29f1b7774",
+                   "3bef1ba6fa58f1d86dca71c3274ca3f1", "6a9738b15a4b871b5e09c2e9c2cd861b",
+                   "1c2ef03ccdf9cce9c10494ec354c0b98", "d3b7faa04cf71ccba4f3d5016dc6cc15",
+                   "d71026cd07eaf6b74f0486f914f9dac9")
 for (c in 1:length(verify.col)) {
   expect_equal(digest(wave1[[verify.col[[c]]]]), verifyDigest1[[c]], info=verify.col[[c]])
   expect_equal(digest(wave2[[verify.col[[c]]]]), verifyDigest2[[c]], info=verify.col[[c]])
@@ -123,6 +127,26 @@ if (0) {
   plot(wave2[,c("training", "event")])
   plot(wave2$training - wave2$barrier, wave2[,c("event")])
   cor(wave2$training - wave2$barrier, wave2[,c("event")], use="pairwise.complete.obs") # .72 for wave2
+  
+  df <- rbind(cbind(t=1, wave1[,c('id','event')]),
+              cbind(t=2, wave2[,c('id','event')]),
+              cbind(t=3, wave3[,c('id','event')]))
+  ggplot(df, aes(x=t, y=event, group=id)) + geom_line()
+  
+  etraj <- cbind(wave1[,c('id','event')], wave2[,c('event')], wave3[,c('event')])
+  colnames(etraj) <- c('id',paste('t',1:3,sep=""))
+  emin <- min(etraj$t1, na.rm = TRUE)
+  mask <- etraj$t1 > emin  & etraj$t2 == emin & etraj$t3 > emin
+  mask <- !is.na(mask) & mask
+  mask <- etraj$t1 == emin  & etraj$t2 > emin & etraj$t3 == emin
+  mask <- !is.na(mask) & mask
+  mask <- etraj$t2 > emin & etraj$t3 == emin
+  mask <- !is.na(mask) & mask
+  
+  df <- rbind(cbind(t=1, wave1[,c('id','training')]),
+              cbind(t=2, wave2[,c('id','training')]),
+              cbind(t=3, wave3[,c('id','training')]))
+  ggplot(df, aes(x=t, y=training, group=id)) + geom_line()
 }
 
 write.table(wave1, file="prep1.csv", row.names=FALSE)
