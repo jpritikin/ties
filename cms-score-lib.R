@@ -75,8 +75,15 @@ cms.testlets <- function(df) {
     df$allowCause <- ordered(mean.or.na(df[,c('msAllow','msCause'),drop=FALSE], 1), levels=seq(1,5,.5))
     df$yearnEnv <- ordered(mean.or.na(df[,c("msYearn", "msEnv"),drop=FALSE], 1), levels=seq(1,5,.5))
     
-    df$trainNum <- ordered(num2cat(df$msMetNum) + num2cat(df$msSharedNum) +
-                             num2cat(df$msTeachNum) + num2cat(df$msTrainTeachNum), levels=0:(4*4))
+    if (!is.null(df$msMetNum)) {
+        df$trainNum <- ordered(num2cat(df$msMetNum) + num2cat(df$msSharedNum) +
+                               num2cat(df$msTeachNum) + num2cat(df$msTrainTeachNum), levels=0:(4*4))
+    } else {
+        df$trainNum <- ordered(NA, levels=0:(4*4))
+    }
+  }
+  if (is.null(df$freqCause)) {
+      df$freqCause <- ordered(NA, levels=0:4)   # data from old version
   }
   if (!is.null(df$pctSuccess)) {
     df$pctSuccess[nchar(df$pctSuccess)==0] <- NA

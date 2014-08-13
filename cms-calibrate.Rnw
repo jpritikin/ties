@@ -95,7 +95,7 @@ fitBarrer <- function(ba.data, minItems) {
   
   ba <- mxModel(model="barrier", ip.mat,
                 mxData(observed=ba.data, type="raw"),
-                mxExpectationBA81(spec, qwidth=5, qpoints=39, minItemsPerScore=minItems),
+                mxExpectationBA81(spec, qwidth=5, qpoints=39),
                 mxFitFunctionML(),
                 mxComputeSequence(steps=list(
                   mxComputeEM('expectation', 'scores', mxComputeNewtonRaphson()),
@@ -121,12 +121,8 @@ interactive <- FALSE
 if (interactive) {
   ba.est$output$conditionNumber
 }
-ba.grp <- list(spec=ba.est$expectation$ItemSpec,
-              param=ba.est$item@values,
-              scores=ba.est@expectation@output$scores,
-              data=ba.data,
-              free=ba.est$item$free,
-               minItemsPerScore=minItems)
+ba.grp <- as.IFAgroup(ba.est)
+ba.grp$minItemsPerScore = minItems
 ba.grp$score <- EAPscores(ba.grp)
 
 mnf <- multinomialFit(ba.grp)
@@ -161,9 +157,10 @@ for such a large table, a $p$-value of about .05
 was obtained via Monte-Carlo simulation.
 
 <<fig.height=2>>=
-got <- sumScoreEAP(ba.grp)
-df <- data.frame(score=as.numeric(rownames(got$tbl)),
-            expected=got$tbl[,'p'] * got$n, observed=got$observed)
+tbl <- sumScoreEAP(ba.grp)
+got <- sumScoreEAPTest(ba.grp)
+df <- data.frame(score=as.numeric(rownames(tbl)),
+            expected=tbl[,'p'] * got$n, observed=got$observed)
 df <- melt(df, id="score", variable.name="source", value.name="n")
 ggplot(df, aes(x=score, y=n, color=source)) + geom_line()
 
@@ -224,7 +221,7 @@ print(xtable(table(espt[,c("msAllow","msCause")]),
 @ 
 
 <<>>=
-fitTraining <- function(training.items, minItems) {
+fitTraining <- function(training.items) {
   assertColumnExist(training.items)
   
   tr.data <- espt[,training.items]
@@ -262,7 +259,7 @@ fitTraining <- function(training.items, minItems) {
   
   train <- mxModel(model="training", imat,
                    mxData(observed=tr.data, type="raw"),
-                   mxExpectationBA81(spec, minItemsPerScore=minItems, qpoints=27, qwidth=5),
+                   mxExpectationBA81(spec, qpoints=27, qwidth=5),
                    mxFitFunctionML(),
                    mxComputeSequence(steps=list(
                      mxComputeEM('expectation', 'scores', mxComputeNewtonRaphson()),
@@ -276,18 +273,13 @@ fitTraining <- function(training.items, minItems) {
 
 # not specific enough: "msAny", "msEvery"
 # c("yearnEnv", "allowCause", "trainSkill", "trainNum")
-minItems <- 3L
-tr.est <- fitTraining(c("msYearn", "msEnv", "msCause", "trainSkill", "trainNum"), minItems)
-tr.grp <- list(spec=tr.est$expectation$ItemSpec,
-            param=tr.est$item$values,
-            data=espt[,colnames(tr.est$item)],
-            minItemsPerScore=minItems,
-            free=tr.est$item$free,
-            qpoints=31, qwidth=5)
+tr.est <- fitTraining(c("msYearn", "msEnv", "msCause", "trainSkill", "trainNum"))
+tr.grp <- as.IFAgroup(tr.est)
+tr.grp$minItemsPerScore = 1L
 
 tr.grp$scores <- EAPscores(tr.grp)
 
-mnf <- multinomialFit(tr.grp, omit=1)
+mnf <- multinomialFit(omitMostMissing(tr.grp, 1))
 
 if (0) {
   mcReps <- 100
@@ -318,9 +310,11 @@ for such a large table, a $p$-value of about 1
 was obtained via Monte-Carlo simulation.
 
 <<fig.height=2>>=
-got <- sumScoreEAP(tr.grp, omit=1)
-df <- data.frame(score=as.numeric(rownames(got$testTbl)),
-            expected=got$testTbl[,'p'] * got$n, observed=got$observed)
+tr.grp1 <- omitMostMissing(tr.grp, 1)
+tbl <- sumScoreEAP(tr.grp1)
+got <- sumScoreEAPTest(tr.grp1)
+df <- data.frame(score=as.numeric(rownames(tbl)),
+            expected=tbl[,'p'] * got$n, observed=got$observed)
 df <- melt(df, id="score", variable.name="source", value.name="n")
 ggplot(df, aes(x=score, y=n, color=source)) + geom_line()
 @
@@ -378,7 +372,7 @@ fitEvent <- function(event.items, minItems) {
   
   ev <- mxModel(model="event", ip.mat,
                 mxData(observed=ev.data, type="raw"),
-                mxExpectationBA81(spec, minItemsPerScore=minItems),
+                mxExpectationBA81(spec),
                 mxFitFunctionML(),
                 mxComputeSequence(steps=list(
                   mxComputeEM('expectation', 'scores', mxComputeNewtonRaphson()),

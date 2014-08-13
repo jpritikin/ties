@@ -28,13 +28,19 @@ cms.score <- function(df) {
   training.names <- c("msNotion", "msYearn", "msEnv", "msAllow", "msCause",
                       "msMet", "msMetNum", "msShared", "msSharedNum",
                       "msTeach", "msTeachNum", "msTrainTeach", "msTrainTeachNum")
-  lim <- df[1,training.names]
-  for (c in 1:ncol(lim)) {
-    if (is.factor(lim[1,c])) lim[1,c] <- levels(lim[1,c])[1]
-    else lim[1,c] <- 0
+  if (0) {
+    # It is not clear whether participants can follow direction consistently
+    # enough to enable this assumption. Some of the longitudinal participants
+    # skipped the training items for the middle measurement leading to strange
+    # trajectories.
+    lim <- df[1,training.names]
+    for (c in 1:ncol(lim)) {
+      if (is.factor(lim[1,c])) lim[1,c] <- levels(lim[1,c])[1]
+      else lim[1,c] <- 0
+    }
+    lim <- cms.testlets(lim)
+    cms[df$skipExp==TRUE,'training'] <- ifa.score(tr.grp, lim)
   }
-  lim <- cms.testlets(lim)
-  cms[df$skipExp==TRUE,'training'] <- ifa.score(tr.grp, lim)
   
   eventNames <- c('freqCause', 'successCat', 'maxDuration')
   lim <- df[1,eventNames]
@@ -44,11 +50,19 @@ cms.score <- function(df) {
   }
   lim <- cms.testlets(lim)
   lowest <- apply(df[,eventNames], 1, function(row) {
-    if (all(is.na(row))) return(TRUE)
+    # It would be nice if we could assume that all missing meant the lowest
+    # event score but longitudinal trajectories look strange if the assumption
+    # is made.
+    if (all(is.na(row))) return(FALSE)
     all(row[!is.na(row)] == lim[!is.na(row)])
   })
   # df[which(lowest), eventNames]
   cms[lowest, 'event'] <- ifa.score(ev.grp, lim)
+  
+  notSure.names <- c("msEffort", "msEmo", "msAfraid", "msFast", "msLife",  "msIdentity")
+  mask <- apply(df, 1, function(r) all(r == "not sure"))
+  mask <- !is.na(mask) & mask
+  cms[mask,] <- NA
   cms
 }
 

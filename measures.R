@@ -1,4 +1,4 @@
-safe.ordered <- function(df, levels, old.levels=c()) {
+safe.ordered <- function(df, levels, old.levels=c()) { # replace with mxFactor TODO
   if (!missing(old.levels)) {
     if (any(!is.na(match(old.levels, levels)))) stop("levels and old.levels overlap")
     df[which(!is.na(match(df, old.levels)))] <- ''
@@ -263,6 +263,33 @@ score.dass <- function(raw) {
          dass.na=mean.or.na(cbind(dass.d, dass.a, dass.s), 18))
 }
 
+score.5fMindfulness <- function(raw) {
+    if (ncol(raw) != 39) stop("Expecting 39 columns")
+
+    FFItem = c('never or very rarely true',
+                'rarely true',
+                'sometimes true',
+                'often true',
+                'very often or always true')
+    
+    for (col in 1:39) {
+        raw[[col]] <- mxFactor(raw[[col]], levels=FFItem, exclude='')
+    }
+
+    # See Table 3 of Baer et al (2006)
+    
+    nonreact <- raw[c(4,9,19,21,24,29,33)]  # factor 1
+    observe <- raw[c(1,6,11,15,20,26,31,36)]   # factor 2
+    actAware <- raw[c(5,8,13,18,23,28,34,38)]  # factor 3
+    describe <- raw[c(2,7,12,16,22,27,32,37)]  # factor 4
+    nonjudge <- raw[c(3,10,14,17,25,30,35,39)]  # factor 5
+    list(nonreact=mean.or.na(nonreact, 6),
+         observe=mean.or.na(observe, 7),
+         actAware=mean.or.na(actAware, 7),
+         describe=mean.or.na(describe, 7),
+         nonjudge=mean.or.na(nonjudge, 7))
+}
+
 NotionItem = c('This is the first time I have thought about it.',
                "The notion has crossed my mind, but I'm not sure what it means to me.",
                'I have discussed it with friends.',
@@ -306,6 +333,7 @@ prep.cms201309 <- function(raw) {
     df[,item1[x1]] <- safe.ordered(raw[[5+x1]], MSAgreementItem)
   }
   df$skipInt <- apply(df[,item1], 1, function(t) all(is.na(t)))
+  df$msNotSure <- apply(df[,item1], 1, function(t) all(!is.na(t) & t == "not sure"))
   
   # freqCause response options changed raw[[13]]
   df$pctSuccess <- raw[[14]]
@@ -346,7 +374,8 @@ prep.cms201312 <- function(raw) {
     df[,item1[x1]] <- safe.ordered(raw[[4+x1]], MSAgreementItem)
   }
   df$skipInt <- apply(df[,item1], 1, function(t) all(is.na(t)))
-
+  df$msNotSure <- apply(df[,item1], 1, function(t) all(!is.na(t) & t == "not sure"))
+  
   item2 <- c("msYearn", "msEnv", "msAllow", "msCause")
   for (x2 in 1:4) {
     df[,item2[x2]] <- safe.ordered(raw[[11+x2]], rev(MSAgreementItem), "I don't understand this question.")
