@@ -1,0 +1,216 @@
+#!/usr/bin/perl
+
+use Modern::Perl '2012';
+use Text::CSV_XS;
+use Fatal qw(open);
+use IO::File;
+use Scalar::Util 'looks_like_number';
+use List::Util qw(sum);
+use Carp;
+
+my $csv = Text::CSV_XS->new ({ binary => 1, eol => "\n" }) or
+  die "Cannot use CSV: ".Text::CSV_XS->error_diag ();
+open my $io, '<', "battery.csv";
+my $h1 = $csv->getline($io); #header
+
+if (0) {
+warn $h1->[5];
+warn $h1->[24 + 5 + 1];
+exit;
+}
+
+my $out = IO::Handle->new();
+$out->fdopen(fileno(STDOUT),"w");
+
+our @SexItem = ("Male","Female");
+
+our @EduItem = ("Less than high school degree",
+	       "High school degree or equivalent",
+	       "Some college but no degree",
+	       "Associate degree",
+	       "Bachelor degree",
+	       "Graduate degree");
+
+our @RelaItem = ('Single',
+		 'In a long-term relationship (i.e. together more than a year)',
+		 'Other');
+
+our @RRQItem = ('Strongly disagree',
+                 'Disagree',
+                 'Neutral',
+                 'Agree',
+	     'Strongly Agree');
+
+our @SleepItem = ('Not during the past month',
+		  'Less than once a week',
+		  'Once or twice a week',
+		  'Three or more times a week');
+
+our @SleepQualityItem = ('Very good',
+			 'Fairly good',
+			 'Fairly bad',
+			 'Very bad');
+
+our @SleepEnthItem = ('No problem at all',
+		      'Only a very slight problem',
+		      'Somewhat of a problem',
+		      'A very big problem');
+
+sub uncode {
+    my ($which, $choice, $offset) = @_;
+    $offset = -1 if !defined $offset;
+    if (!length $which) { '' }
+    else {
+	$which += $offset;
+	if ($which < 0 or $which >= @$choice) { confess "$which out of range" }
+	$choice->[$which]
+    }
+}
+
+sub numeric_mean {
+    my ($f) = @_;
+    my @got = split /[^\d.]/, $f;
+    @got = grep { looks_like_number($_) } @got;
+    if (@got == 0) {
+	$f = '';
+    } else {
+	my $m = sum(@got)/@got;
+	#warn "$f -> $m";
+	$f = $m;
+    }
+    $f
+}
+
+sub decode_time {
+    my ($tm) = @_;
+    return '' if !length $tm;
+    my $half;
+    if ($tm =~ s/\s*a\.?m//i) {
+	$half = 'AM';
+    } elsif ($tm =~ s/\s*p\.?m//i) {
+	$half = 'PM'
+    }
+    die $tm if !defined $half;
+    my @parts = split(/[:.]/, $tm);
+    if (@parts == 1) { push @parts, '00' }
+    $tm = join(':', @parts)." $half";
+    $tm;
+}
+
+our @FFItem = ('never or very rarely true',
+                'rarely true',
+                'sometimes true',
+                'often true',
+	    'very often or always true');
+
+our @MSAgreementItem = ('Agree','Agree somewhat','Not sure','Disagree somewhat','Disagree');
+
+our @maxDurationItem = ('A moment (e.g., a second or shorter)',
+                    'Longer than a moment but shorter than 10 seconds',
+                    'Between 10 seconds and 1 minute',
+                    'Between 1 minute and 10 minutes',
+                    'More than 10 minutes');
+
+our @LearnItem = ('No', 'Not Sure',
+              'Yes, if it was easy to learn',
+              'Yes, I am moderately curious',
+		   'Yes, I am keenly curious', '');
+
+our @NotionItem = ('This is the first time I have thought about it.',
+               "The notion has crossed my mind, but I'm not sure what it means to me.",
+               'I have discussed it with friends.',
+               'I have read something about it.',
+		   'I study the topic with interest.');
+
+our @DASSItem = ('Did not apply to me at all',
+        'Applied to me to some degree, or some of the time',
+        'Applied to me to a considerable degree, or a good part of time',
+		 'Applied to me very much, or most of the time');
+
+sub uncode_psqi {
+    my ($row, $base, $debug) = @_;
+    $row->[$base+0] = decode_time($row->[$base + 0]);
+    $row->[$base+1] = numeric_mean($row->[$base + 1]);
+    $row->[$base+2] = decode_time($row->[$base + 2]);
+    $row->[$base+3] = numeric_mean($row->[$base+3]);
+    if (length($row->[$base+3]) and $row->[$base+3] > 12) {
+	$row->[$base+3] = '';
+    }
+    for (my $x=$base+4; $x < $base+13; ++$x) {
+	$row->[$x] = uncode($row->[$x], \@SleepItem);
+    }
+    $row->[$base+14] = uncode($row->[$base + 14], \@SleepItem);
+    $row->[$base+15] = uncode($row->[$base + 15], \@SleepQualityItem);
+    $row->[$base+16] = uncode($row->[$base + 16], \@SleepItem);
+    $row->[$base+17] = uncode($row->[$base + 17], \@SleepItem);
+    $row->[$base+18] = uncode($row->[$base + 18], \@SleepEnthItem);
+}
+
+sub uncode_cms {
+    my ($row, $base, $debug) = @_;
+
+    $row->[0+$base] = uncode($row->[0+$base], \@NotionItem);
+    $row->[1+$base] = ''; # old item
+    for my $x ((2+$base)..(3+$base)) {
+	$row->[$x] = uncode($row->[$x], \@MSAgreementItem);
+    }
+    $row->[4+$base] = uncode($row->[4+$base], \@LearnItem);
+    for my $x ((5+$base)..(11+$base)) {
+	$row->[$x] = uncode($row->[$x], \@MSAgreementItem);
+    }
+    $row->[12+$base] = '';   # old item
+    $row->[13+$base] = numeric_mean($row->[13+$base]);  # mental silence pct success
+    if ($row->[13+$base] > 100) { $row->[13+$base] = ''; }
+    warn $h1->[14+$base];
+    $row->[14+$base] = uncode($row->[14+$base], \@maxDurationItem);
+    for my $x ((15+$base)..(22+$base)) {
+	$row->[$x] = uncode($row->[$x], \@MSAgreementItem);
+    }
+}
+
+while (my $row = $csv->getline($io)) {
+    for my $f (@$row) { $f = '' if ($f eq '999' || $f eq '998') }
+    my $group = shift @$row;
+
+    $row->[2] = uncode($row->[2], \@EduItem);
+    $row->[3] = uncode($row->[3], \@SexItem, 0);
+    $row->[4] = uncode($row->[4], \@RelaItem);
+
+    for my $x (5..28) { # RRQ
+	$row->[$x] = uncode($row->[$x], \@RRQItem);
+    }
+    # PSQI 29 .. 49
+    uncode_psqi($row, 29);
+
+    # DASS
+    for my $x (48..68) {
+	warn $h1->[$x];
+	$row->[$x] = uncode($row->[$x], \@DASSItem, 0)
+    }
+
+    # mental silence
+    uncode_cms($row, 69);
+
+    # 5F
+    for my $x (92..130) {
+	$row->[$x] = uncode($row->[$x], \@FFItem);
+    }
+
+    for my $x (131..154) { # RRQ
+	$row->[$x] = uncode($row->[$x], \@RRQItem);
+    }
+    uncode_psqi($row, 155, 1);
+
+    for my $x (174..194) {
+	$row->[$x] = uncode($row->[$x], \@DASSItem, 0)
+    }
+
+    uncode_cms($row, 195);
+
+    for my $x (218..256) {
+	$row->[$x] = uncode($row->[$x], \@FFItem);
+    }
+
+    unshift @$row, $group;
+    $csv->print($out, $row);
+}
