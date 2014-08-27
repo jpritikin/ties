@@ -509,6 +509,6 @@ if (0) {
 A simple linear model to predict event from barrier and training
 obtains $R^2 = \Sexpr{summary(fit1)[["r.squared"]]}$.
 
-\includepdf[pages={3-}]{archive/short-20140116.pdf}
+\includepdf[pages={3-}]{archive/short-201408.pdf}
 
 \end{document}

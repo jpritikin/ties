@@ -26,6 +26,8 @@ input='
   earlydata/ppool-20131209.csv
   earlydata/short-20131221.csv'
 
+# Don't add any more data to this file. See analyze2.R
+
 sha1sum -c input.sha1
 
 ./sm2r $input raw.csv

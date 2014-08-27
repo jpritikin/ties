@@ -62,10 +62,33 @@ cause.teach.testlet <- function(df) {
   mxFactor(col, levels=lev.order)
 }
 
+EduItem = c('Less than high school degree',
+                'High school degree or equivalent (e.g., ged)',
+                'Some college but no degree',
+                'Associate degree',
+                'Bachelor degree',
+                'Graduate degree')
+
+RelaItem = c('Single',
+                 'In a long-term relationship (i.e. together more than a year)',
+                 'Other')
+
+prepDemographics <- function(sm) {
+  if (ncol(sm) != 16) stop("Expecting 16 columns")
+  data.frame(id=sm[[1]],
+        start=sm[[3]], end=sm[[4]], ip=sm[[5]],
+        city=sm[[10]], country=sm[[11]], born=sm[[12]],
+        edu=mxFactor(tolower(sm[[13]]), levels=tolower(EduItem), exclude=c('')),
+        work=sm[[14]],
+        sex=mxFactor(tolower(sm[[15]]), levels=c('male', 'female'), exclude=c('')),
+        rel=mxFactor(tolower(sm[[16]]), levels=tolower(RelaItem), exclude=c('')),
+        stringsAsFactors=FALSE)
+}
+
 prepare.espt <- function(espt, scores) {
-  for (col in c('edu','sex','rel')) {
-    espt[[col]] <- factor(tolower(espt[[col]]))
-  }
+  espt$edu <- mxFactor(tolower(espt$edu), levels=tolower(EduItem), exclude=c(''))
+  espt$sex <- mxFactor(tolower(espt$sex), levels=c('male', 'female'), exclude=c(''))
+  espt$rel <- mxFactor(tolower(espt$rel), levels=tolower(RelaItem), exclude=c(''))
 
   agreement.levels <- c('Agree','Agree somewhat','Not sure','Disagree somewhat','Disagree')
   notion.levels <- c('This is the first time I have thought about it.',
@@ -186,7 +209,7 @@ prepare.espt <- function(espt, scores) {
   for (col in c('m.training', 'm.regular', 'ip.continent',
                 'ip.country', 'ip.region', 'ip.city')) {
     if (is.null(espt[[col]])) next
-    espt[[col]] <- factor(espt[[col]])
+    espt[[col]] <- factor(espt[[col]], exclude=c(''))
   }
 #  espt$ppool <- factor(espt$wave == "ppool-20121230",
 #                       levels=c(TRUE,FALSE), labels=c("Subjects Pool","Web Surfers"))

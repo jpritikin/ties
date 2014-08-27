@@ -369,6 +369,7 @@ our %Instrument = ('earlydata/web-20120527.csv' => '2012-05-22',
 		   'earlydata/short-20130912.csv' => '2013-08-15',
 		   'earlydata/ppool-20131209.csv' => '2013-09-12',
 		   'earlydata/short-20131221.csv' => '2013-09-12',
+		   'earlydata/short-20140827.csv' => '2013-12-16',
 		  );
 our %ID;
 

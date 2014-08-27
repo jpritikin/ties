@@ -40,6 +40,12 @@ espt <- smartbind(espt, germano2014.cms)
 load("cor/cor-ppool-cms.rda")
 espt <- smartbind(espt, cor.ppool.cms)
 
+web201408 <- read.csv("earlydata/short-20140827.csv", stringsAsFactors=FALSE)
+web201408Prep <- cbind(prepDemographics(web201408[1:16]),
+                       prep.cms201312(web201408[17:(17+26-1)]))
+web201408Prep$wave <- "earlydata/short-20140827"
+espt <- smartbind(espt, web201408Prep)
+
 if (length(unique(espt$uid[!is.na(espt$uid)])) != sum(!is.na(espt$uid))) stop("mismatch")
 next.uid <- 1+max(espt$uid, na.rm=TRUE)
 espt$uid[is.na(espt$uid)] <- seq(next.uid, next.uid+sum(is.na(espt$uid)) - 1)
