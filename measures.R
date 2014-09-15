@@ -296,12 +296,12 @@ NotionItem = c('This is the first time I have thought about it.',
                'I have read something about it.',
                'I study the topic with interest.')
 
-MSAgreementItem = c('Agree','Agree somewhat','Not sure','Disagree somewhat','Disagree')
+MSAgreementItem = tolower(c('Agree','Agree somewhat','Not sure','Disagree somewhat','Disagree'))
 
-LearnItem = c('No', 'Not Sure',
+LearnItem = tolower(c('No', 'Not Sure',
               'Yes, if it was easy to learn',
               'Yes, I am moderately curious',
-              'Yes, I am keenly curious')
+              'Yes, I am keenly curious'))
 
 MSFrequencyItem <- c("more than 2 times a day",
                      "1-2 times a day",
@@ -396,6 +396,102 @@ prep.cms201312 <- function(raw) {
 
   df$instrument <- "2013-12-16"  # also works for 2014-01
 
+  mask <- df$skipInt & df$skipExp
+  df$skipExp[mask] <- NA
+  df$skipInt[mask] <- NA
+  df$skipInt <- mxFactor(df$skipInt, levels=c(FALSE, TRUE))
+  df$skipExp <- mxFactor(df$skipExp, levels=c(TRUE, FALSE))
+  
+  df
+}
+
+MSNotionItem <- tolower(c("This is the first time I have thought about it.",
+                  "The notion has crossed my mind, but I'm not sure what it means to me.",
+                  "I have discussed it with friends.",
+                  "I have read something about it.",
+                  "I have an interest in this topic."))
+
+MSFrequencyItem2 <- tolower(c("more than 2 times a day",
+                     "1-2 times a day",
+                     "4-6 times a week",
+                     "1-3 times a week",
+                     "1-3 times a month",
+                     "I don't specifically allocate my time for complete mental silence"))
+
+MSTimeAlloc <- tolower(c("Less than 10 minutes",
+                         "10-20 minutes",
+                         "21-30 minutes",
+                         "31-45 minutes",
+                         "46-60 minutes",
+                         "More than 1 hour"))
+
+MSMaxDurationItem2 = tolower(c(
+  "I didn't experience complete mental silence.",
+  'A moment (e.g., a second or shorter)',
+  'Longer than a moment but shorter than 10 seconds',
+  'Between 10 seconds and 1 minute',
+  'Between 1 minute and 10 minutes',
+  'Between 10 minutes and 2 hours',
+  'More than 2 hours'))
+
+prep.cms201409 <- function(raw, hack=FALSE) {
+  if (ncol(raw) != 29) stop("Expecting 29 columns")
+  
+  # Only affects wave earlydata/short-20140915
+  raw[[1]][raw[[1]] == "It is a topic of interest."] <- "I have an interest in this topic."
+  
+  df <- data.frame(
+    msNotion=mxFactor(tolower(raw[[1]]), MSNotionItem, exclude=""),
+    msAny=mxFactor(tolower(raw[[2]]), MSAgreementItem, exclude=""),
+    msChildhood=mxFactor(tolower(raw[[3]]), MSAgreementItem, exclude=""),
+    msEvery=mxFactor(tolower(raw[[4]]), MSAgreementItem, exclude=""),
+    wantLearn=mxFactor(tolower(raw[[5]]), LearnItem,
+                       exclude=tolower(c('',"I have experienced complete mental silence.")))
+  )
+  
+  item1 <- c("msEffort", "msEmo", "msAfraid", "msFast", "msLife", "msIdentity", "msPreoccu")
+  for (x1 in 1:7) {
+    df[,item1[x1]] <- mxFactor(tolower(raw[[5+x1]]), MSAgreementItem, exclude="")
+  }
+  df$skipInt <- apply(df[,item1], 1, function(t) all(is.na(t)))
+  df$msNotSure <- apply(df[,item1], 1, function(t) all(!is.na(t) & t == "not sure"))
+  
+  item2 <- c("msYearn", "msEnv", "msAllow", "msCause")
+  for (x2 in 1:4) {
+    df[,item2[x2]] <- mxFactor(tolower(raw[[12+x2]]), rev(MSAgreementItem),
+                               exclude=c('',"I don't understand this question."))
+  }
+
+  evItems <- c('freqCause', 'msTimeAlloc', 'pctSuccess', 'maxDuration', "maxDurationOut")
+  df$freqCause <- mxFactor(tolower(raw[[17]]), rev(MSFrequencyItem2), exclude="")
+  df$msTimeAlloc <- mxFactor(tolower(raw[[18]]), MSTimeAlloc,
+                             exclude=tolower(c("","I don't plan any particular amount of time")))
+  df$pctSuccess <- raw[[19]]
+  # table(df$pctSuccess[df$freqCause == "i don't specifically allocate my time for complete mental silence"])   #crazy?
+  df$maxDuration <- mxFactor(tolower(raw[[20]]), MSMaxDurationItem2,
+                             exclude=tolower(c("", "I have no idea of how much time elapsed.")))
+  df$maxDurationOut <- mxFactor(tolower(raw[[21]]), MSMaxDurationItem2,
+                             exclude=tolower(c("", "I have no idea of how much time elapsed.")))
+
+  if (hack) {
+    # Only affects wave earlydata/short-20140915
+    mask <- unclass(df$maxDuration) == unclass(df$maxDurationOut)
+    mask <- !is.na(mask) & mask
+    df$maxDurationOut[mask] <- MSMaxDurationItem2[1]
+    df$maxDurationOut[!mask] <- NA
+  }
+
+  item3 <- c('msMet', 'msShared', 'msTeach', 'msTrainTeach')
+  for (x3 in 1:4) {
+    df[, item3[x3]] <- mxFactor(tolower(raw[[20+x3*2]]), rev(MSAgreementItem),
+                                exclude="")
+    df[, paste(item3[x3], "Num", sep="")] <- raw[[21+x3*2]]
+  }
+  
+  df$skipExp <- apply(df[,c(item2, evItems)], 1, function(t) all(is.na(t)))
+  
+  df$instrument <- "2014-09-15"
+  
   mask <- df$skipInt & df$skipExp
   df$skipExp[mask] <- NA
   df$skipInt[mask] <- NA

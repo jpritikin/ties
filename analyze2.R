@@ -46,6 +46,13 @@ web201408Prep <- cbind(prepDemographics(web201408[1:16]),
 web201408Prep$wave <- "earlydata/short-20140827"
 espt <- smartbind(espt, web201408Prep)
 
+web201409 <- read.csv("earlydata/short-20140915.csv", stringsAsFactors=FALSE)
+web201409Prep <- cbind(prepDemographics(web201409[1:16]),
+                       prep.cms201409(web201409[17:(17+29-1)]))
+web201409Prep$wave <- "earlydata/short-20140915"
+espt <- smartbind(espt, web201409Prep)
+# TODO: Set NAs where versions are incompatible
+
 if (length(unique(espt$uid[!is.na(espt$uid)])) != sum(!is.na(espt$uid))) stop("mismatch")
 next.uid <- 1+max(espt$uid, na.rm=TRUE)
 espt$uid[is.na(espt$uid)] <- seq(next.uid, next.uid+sum(is.na(espt$uid)) - 1)
