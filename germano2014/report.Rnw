@@ -128,44 +128,55 @@ print(xtable(ctbl[1:24, 25:27],
 
 <<results='asis'>>=
 mask <- cdat$event > min(cdat$event, na.rm=TRUE)
+mask <- mask & !is.na(mask)
 ctbl <- cor(cdat[mask, c(32,6:31)], use="pairwise.complete.obs")
 print(xtable(ctbl[1:24, 25:27],
              paste("Correlation with plausibly related self-report ",
                    "measures for participants above floor for ",
-                   "experience with mental silence ($N=", sum(mask, na.rm=TRUE), "$).", sep=""), "tab:cor"))
+                   "experience with mental silence ($N=", sum(mask, na.rm=TRUE), "$).", sep=""), "tab:cor-above"))
 @
 
-\begin{figure}
-<<fig.height=10>>=
-  pairs(cdat[c(6:12,29:31)], cex=.25)
+<<results='asis'>>=
+mask <- cdat$event >= 0
+mask <- mask & !is.na(mask)
+ctbl <- cor(cdat[mask, c(32,6:31)], use="pairwise.complete.obs")
+print(xtable(ctbl[1:24, 25:27],
+             paste("Correlation with plausibly related self-report ",
+                   "measures for participants above average for ",
+                   "experience with mental silence ($N=", sum(mask, na.rm=TRUE), "$).", sep=""), "tab:cor-avg"))
 @
-\caption{Correlational study, scatterplot matrix.}
-\label{fig:cor1}
-\end{figure}
 
-\begin{figure}
-<<fig.height=10>>=
-  pairs(cdat[c(13:18,29:31)], cex=.25)
-@
-\caption{Correlational study, scatterplot matrix.}
-\label{fig:cor1}
-\end{figure}
+%% \begin{figure}
+%% <<fig.height=10>>=
+%%   pairs(cdat[c(6:12,29:31)], cex=.25)
+%% @
+%% \caption{Correlational study, scatterplot matrix.}
+%% \label{fig:cor1}
+%% \end{figure}
 
-\begin{figure}
-<<fig.height=10>>=
-  pairs(cdat[c(19:24,29:31)], cex=.25)
-@
-\caption{Correlational study, scatterplot matrix.}
-\label{fig:cor1}
-\end{figure}
+%% \begin{figure}
+%% <<fig.height=10>>=
+%%   pairs(cdat[c(13:18,29:31)], cex=.25)
+%% @
+%% \caption{Correlational study, scatterplot matrix.}
+%% \label{fig:cor1}
+%% \end{figure}
 
-\begin{figure}
-<<fig.height=10>>=
-  pairs(cdat[c(25:28,32,29:31)], cex=.25)
-@
-\caption{Correlational study, scatterplot matrix.}
-\label{fig:cor1}
-\end{figure}
+%% \begin{figure}
+%% <<fig.height=10>>=
+%%   pairs(cdat[c(19:24,29:31)], cex=.25)
+%% @
+%% \caption{Correlational study, scatterplot matrix.}
+%% \label{fig:cor1}
+%% \end{figure}
+
+%% \begin{figure}
+%% <<fig.height=10>>=
+%%   pairs(cdat[c(25:28,32,29:31)], cex=.25)
+%% @
+%% \caption{Correlational study, scatterplot matrix.}
+%% \label{fig:cor1}
+%% \end{figure}
 
 \break
 

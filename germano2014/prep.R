@@ -146,6 +146,7 @@ if (0) {
   df <- rbind(cbind(t=1, wave1[,c('id','training')]),
               cbind(t=2, wave2[,c('id','training')]),
               cbind(t=3, wave3[,c('id','training')]))
+  df[df$t==1 & is.na(df$training), 'training'] <- min(df$training, na.rm=TRUE)
   ggplot(df, aes(x=t, y=training, group=id)) + geom_line()
 }
 
