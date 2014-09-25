@@ -19,6 +19,8 @@ library(plyr)
 library(grid)
 library(gridExtra)
 library(xtable)
+library(psych)
+library(GPArotation)
 }
 suppressPackageStartupMessages(loadlib())
 options(digits=2, scipen=1)
@@ -63,6 +65,36 @@ print(xtable(src), include.rownames=FALSE)
 @
 
 A large proportion of data is missing, but the maximum N=\Sexpr{sum(as.numeric(src$count))}.
+
+<<fig.height=4>>=
+# 
+rawTrain <- c('msMet', 'msShared', 'msTeach', 'msTrainTeach')
+rawCols <- c(#"msNotion", "msAny", "msChildhood", "msEvery", "wantLearn",
+             "msEffort", "msEmo", "msAfraid", "msFast", "msLife", "msIdentity", "msPreoccu",
+             "msYearn", "msEnv", "msAllow", "msCause",
+             'freqCause', 'msTimeAlloc', 'pctSuccess', 'maxDuration', "maxDurationOut",
+             rawTrain, paste0(rawTrain, "Num"))
+rawCols <- intersect(rawCols, colnames(espt))
+rawData <- as.data.frame(lapply(espt[,rawCols], function(col) {
+  if (is.factor(col)) {
+      as.numeric(unclass(col))
+    } else {
+      as.numeric(col)
+    }
+}))
+rawDataCor <- cor(rawData, use="pairwise.complete.obs")
+estSampleSize <- sum(!is.na(rawData)) / ncol(rawData)
+capture.output( fa.parallel(rawDataCor, n.obs=estSampleSize, main=NULL, fa="fa"), file='NUL')
+@
+
+<<results='asis'>>=
+f3 <- fa(rawDataCor, 3)
+loadDims <- dimnames(f3$loadings)
+rawLoad <- matrix(f3$loadings, sapply(loadDims, length), dimnames=loadDims)
+minLoading <- .2
+rawLoad[abs(rawLoad) < minLoading] <- NA
+print(xtable(rawLoad, paste0("Factor loadings with minimum loading set to ", minLoading, ".")))
+@
 
 \section{Barrier}
 
