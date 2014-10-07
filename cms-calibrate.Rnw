@@ -68,13 +68,13 @@ A large proportion of data is missing, but the maximum N=\Sexpr{sum(as.numeric(s
 
 <<fig.height=4>>=
 # 
+# add back in the first page TODO
 rawTrain <- c('msMet', 'msShared', 'msTeach', 'msTrainTeach')
 rawCols <- c(#"msNotion", "msAny", "msChildhood", "msEvery", "wantLearn",
              "msEffort", "msEmo", "msAfraid", "msFast", "msLife", "msIdentity", "msPreoccu",
-             "msYearn", "msEnv", "msAllow", "msCause",
+             "msYearn", "msEnv", "msAllow",
              'freqCause', 'msTimeAlloc', 'pctSuccess', 'maxDuration', "maxDurationOut",
              rawTrain, paste0(rawTrain, "Num"))
-rawCols <- intersect(rawCols, colnames(espt))
 rawData <- as.data.frame(lapply(espt[,rawCols], function(col) {
   if (is.factor(col)) {
       as.numeric(unclass(col))
@@ -104,10 +104,8 @@ The items must make sense on a short time horizon and
 should also be amenable to long-term barriers.
 
 <<>>=
-fitBarrer <- function(ba.data, minItems) {
+fitBarrer <- function(ba.data) {
   barrier.items <- colnames(ba.data)
-  
-  assertColumnExist(barrier.items)
   
   spec <- lapply(barrier.items, function(nm) {
     lev <- length(levels(ba.data[[ nm ]]))
@@ -120,7 +118,7 @@ fitBarrer <- function(ba.data, minItems) {
                      dimnames=list(c(factors,
                                      paste('b', 4:maxParam, sep="")), barrier.items))
   ip.mat$values['barrier',] <- 1
-  ip.mat$values['emo',intersect(c('wantLearn', "msAfraid", "msIdentity","msEmo"),barrier.items)] <- 1
+  ip.mat$values['emo',intersect(c('wantLearn', "msAfraid", "msIdentity","msEmo","msPreoccu"),barrier.items)] <- 1
   ip.mat$values['struct',intersect(c("msFast", "msFast1", "msEffort", "msLife"), barrier.items)] <- 1
   ip.mat$values[4:7,] <- mxSimplify2Array(lapply(spec, function(s) seq(1,.1,length.out = s$outcomes-1)))
   ip.mat$free[,] <- !is.na(ip.mat$values[,]) & ip.mat$values[,] != 0
@@ -130,7 +128,8 @@ fitBarrer <- function(ba.data, minItems) {
                 mxExpectationBA81(spec, qwidth=5, qpoints=39),
                 mxFitFunctionML(),
                 mxComputeSequence(steps=list(
-                  mxComputeEM('expectation', 'scores', mxComputeNewtonRaphson()),
+                  mxComputeEM('expectation', 'scores', mxComputeNewtonRaphson(verbose=0L),
+                              verbose=0L),
                   mxComputeOnce('fitfunction', 'information', "meat"),
                   mxComputeStandardError(),
                   mxComputeHessianQuality())
@@ -139,22 +138,23 @@ fitBarrer <- function(ba.data, minItems) {
   got
 }
 
-bitem <- c("msAfraid", "msIdentity", "msFast", "msEffort", "msLife", "msEmo")
-notSure <- apply(espt[,bitem] == "not sure", 1, all)
-notSure <- !is.na(notSure) & notSure
-ba.data <- espt[!notSure, c("msAfraid", "msIdentity", "msFast1", "msEffort", "msLife", "msEmo")]
+# bitem <- c("msAfraid", "msIdentity", "msFast", "msEffort", "msLife", "msEmo")
+# notSure <- apply(espt[,bitem] == "not sure", 1, all)
+# notSure <- !is.na(notSure) & notSure
+ba.data <- espt[, c("msAfraid", "msIdentity", "msFast", "msEffort", "msLife", "msEmo", "msPreoccu")]
+#lev <- levels(ba.data[[1]])[c(3,1,2,4,5)]
+#ba.data <- mxFactor(ba.data, lev)
 
 # "msDescarte" == worst S fit
 # "wantLearn" poor discrimination, locally dependent with msEffort (duh) & msEmo
-minItems <- 3
-ba.est <- fitBarrer(ba.data, minItems)
+ba.est <- fitBarrer(ba.data)
 
 interactive <- FALSE
 if (interactive) {
   ba.est$output$conditionNumber
 }
 ba.grp <- as.IFAgroup(ba.est)
-ba.grp$minItemsPerScore = minItems
+ba.grp$minItemsPerScore = 3L
 ba.grp$score <- EAPscores(ba.grp)
 
 mnf <- multinomialFit(ba.grp)
@@ -184,23 +184,22 @@ A candidate bi-factor model was fit with -2LL=\Sexpr{ba.est$output$fit} and
 condition number \Sexpr{ba.est$output$conditionNumber}.
 The full-information multinomial fit test was conducted,
 $n=\Sexpr{mnf$n}$, $G^2(\Sexpr{mnf$df})=\Sexpr{mnf$statistic}$.
-Since the $\chi^2$ distribution is a poor approximation
-for such a large table, a $p$-value of about .05
-was obtained via Monte-Carlo simulation.
 
 <<fig.height=2>>=
-tbl <- sumScoreEAP(ba.grp)
-got <- sumScoreEAPTest(ba.grp)
+baGrp1 <- omitMostMissing(ba.grp, 1)  # TODO, remove
+tbl <- sumScoreEAP(baGrp1)
+got <- sumScoreEAPTest(baGrp1)
+
 df <- data.frame(score=as.numeric(rownames(tbl)),
             expected=tbl[,'p'] * got$n, observed=got$observed)
 df <- melt(df, id="score", variable.name="source", value.name="n")
 ggplot(df, aes(x=score, y=n, color=source)) + geom_line()
 
 if (0) {
-  ss <- observedSumScore(ba.grp, summary=FALSE)
+  ss <- observedSumScore(baGrp1, summary=FALSE)
   mask <- !is.na(ss) & ss==12
-  ss12 <- ba.grp$data[mask,]
-  which(apply(ss12, 1, function(r) all(r == "not sure")))  # huh?
+  ss12 <- baGrp1$data[mask,]
+  table(apply(ss12, 1, function(r) all(r == "not sure")))  # huh?
 }
 @
 
@@ -210,12 +209,10 @@ print(xtable(got$pval, paste("Log p-value of local dependence between item pairs
 @
 
 <<results='asis'>>=
-sfit <- SitemFit(ba.grp, omit = 1, qpoints=31, qwidth=5)
+toOmit <- 1
+sfit <- SitemFit(ba.grp, omit = toOmit, qpoints=31, qwidth=5)
 tbl <- t(sapply(sfit, function(r) c(n=r$n, df=r$df, stat=r$statistic, pval=r$pval)))
-print(xtable(tbl, paste("Sum-score item-wise fit, omitting 1 item.",
-                        "For msFast, \\emph{disagree somewhat} was collapsed",
-                        "to \\emph{not sure} to improve fit.",
-                        "There may be more room for improvement here.")))
+print(xtable(tbl, paste0("Sum-score item-wise fit, omitting ",toOmit," item.")))
 @
 
 <<fig.height=2>>=
@@ -243,55 +240,48 @@ To assess experience with others,
 items probe both belief in oneself to work with others and
 quantitatively how much one has worked with others.
 
-<<results='asis'>>=
-print(xtable(table(espt[,c("msAllow","msCause")]),
-             paste("The msAllow and msCause items seem to measure practically",
-                   "the same thing. Participants are slighly more willing to",
-                   "endorse higher outcomes in msAllow compared to msCause.",
-                   "I prefer to use msAllow, but msAllow has too much missing",
-                   "data at this time.")))
-@ 
-
 <<>>=
 fitTraining <- function(training.items) {
   assertColumnExist(training.items)
   
   tr.data <- espt[,training.items]
   
-  nfactors <- 3
+  nfactors <- 1
   spec <- lapply(training.items, function(nm) {
     lev <- length(levels(tr.data[[ nm ]]))
     rpf.grm(outcomes=lev, factors=nfactors)
   })
   names(spec) <- training.items
   
-  for (item in c('trainSkill', 'trainNum')) {
+  for (item in intersect(c('trainSkill', 'trainNum'), names(spec))) {
     spec[item] <- mkspec(espt, item, nfactors)
   }
   numItems <- length(training.items)
   maxParam <- max(sapply(spec, rpf.numParam))
   
   imat <- mxMatrix(name="item", nrow=maxParam, ncol=numItems, free=FALSE,
-                     dimnames=list(c('training', 'other', 'self',
-                                     paste('p',4:maxParam,sep="")), training.items))
+                     dimnames=list(c('training', #'other', 'self',
+                                     paste('p',2:maxParam,sep="")), training.items))
   imat$values[,] <- mxSimplify2Array(lapply(spec, rpf.rparam))
-  imat$values[c('other', 'self'),] <- 0
+#  imat$values[c('other', 'self'),] <- 0
   imat$free[,] <- !is.na(imat$values) & imat$values[,] != 0
   imat$values['training',] <- 1
 
   imat <- set.nominal.rank(spec, imat, 'trainSkill', 0, .3)
   imat <- set.nominal.rank(spec, imat, 'trainNum', 0, .15)
 
+if (0) {
   selfGroup <- intersect(training.items, c("msYearn", "msEnv", "msAllow"))
   otherGroup <- intersect(training.items, c("trainSkill", "trainNum"))
   imat$values['self',selfGroup] <- 1
   imat$free['self',selfGroup] <- TRUE
   imat$values['other',otherGroup] <- 1
   imat$free['other',otherGroup] <- TRUE
+}
   
   train <- mxModel(model="training", imat,
                    mxData(observed=tr.data, type="raw"),
-                   mxExpectationBA81(spec, qpoints=27, qwidth=5),
+                   mxExpectationBA81(spec),
                    mxFitFunctionML(),
                    mxComputeSequence(steps=list(
                      mxComputeEM('expectation', 'scores', mxComputeNewtonRaphson()),
@@ -305,9 +295,12 @@ fitTraining <- function(training.items) {
 
 # not specific enough: "msAny", "msEvery"
 # c("yearnEnv", "allowCause", "trainSkill", "trainNum")
-tr.est <- fitTraining(c("msYearn", "msEnv", "msCause", "trainSkill", "trainNum"))
+tr.items <- c('msMet', 'msShared', 'msTeach', 'msTrainTeach')
+tr.items <- c(tr.items, paste0(tr.items, 'Num'))
+
+tr.est <- fitTraining(tr.items)
 tr.grp <- as.IFAgroup(tr.est)
-tr.grp$minItemsPerScore = 1L
+tr.grp$minItemsPerScore = 2L
 
 tr.grp$scores <- EAPscores(tr.grp)
 
@@ -330,16 +323,13 @@ if (0) {
 Calibration of the training factor is hindered by the late addition
 of the trainNum item.
 For a single factor model, the items were highly locally dependent.
-Two subfactors were hypothesized: a self subfactor for
-\Sexpr{names(which(tr.grp$param['self',] !=0))}; and an other subfactor for
-\Sexpr{names(which(tr.grp$param['other',] !=0))}.
+%Two subfactors were hypothesized: a self subfactor for
+%\Sexpr{names(which(tr.grp$param['self',] !=0))}; and an other subfactor for
+%\Sexpr{names(which(tr.grp$param['other',] !=0))}.
 A candidate model obtains $-2LL=\Sexpr{tr.est$output$fit}$
 with condition number \Sexpr{tr.est$output$conditionNumber}.
 The full-information multinomial fit test was conducted,
 $n=\Sexpr{mnf$n}$, $G^2(\Sexpr{mnf$df})=\Sexpr{mnf$statistic}$.
-Since the $\chi^2$ distribution is a poor approximation
-for such a large table, a $p$-value of about 1
-was obtained via Monte-Carlo simulation.
 
 <<fig.height=2>>=
 tr.grp1 <- omitMostMissing(tr.grp, 1)
@@ -375,7 +365,7 @@ pl <- lapply(colnames(tr.grp$param), function(item) {
 for (px in 1:length(pl)) {
   print(pl[[px]])
 }
-print(plot.info(tr.grp, width=5, show.total=FALSE, basis=c(1,0,0)))
+print(plot.info(tr.grp, width=5, show.total=FALSE, basis=c(1)))
 @
 
 \section{Event}
@@ -384,25 +374,31 @@ The \emph{event} factor is intended to assess the self-reported
 intensity of experiencing complete mental silence.
 
 <<>>=
-fitEvent <- function(event.items, minItems) {
+fitEvent <- function(event.items) {
   assertColumnExist(event.items)
   
   spec <- mkspec(espt, event.items)
   numItems <- length(event.items)
   maxParam <- max(sapply(spec, rpf.numParam))
   
-  ip.mat <- mxMatrix(name="item", nrow=maxParam, ncol=numItems, free=FALSE,
-                     dimnames=list(c("event", paste("p",2:maxParam,sep="")), event.items))
+  imat <- mxMatrix(name="item", nrow=maxParam, ncol=numItems,
+                   dimnames=list(c("event", paste("p",2:maxParam,sep="")), event.items))
+  imat$values <- NA
   
-  ip.mat <- set.nominal.rank(spec, ip.mat, 'msAny', .51, 1)
-  ip.mat <- set.nominal.rank(spec, ip.mat, 'msEvery', .51, 1)
-  ip.mat <- set.nominal.rank(spec, ip.mat, 'freqCause', .51, 1)
-  ip.mat <- set.nominal.rank(spec, ip.mat, 'successCat', .35, .5)
-  ip.mat <- set.nominal.rank(spec, ip.mat, 'maxDuration', .51, 1)
+  imat <- set.nominal.rank(spec, imat, 'msAny', .51, 1)
+  imat <- set.nominal.rank(spec, imat, 'msEvery', .51, 1)
+  imat <- set.nominal.rank(spec, imat, 'freqCause', 0, 1)
+  imat <- set.nominal.rank(spec, imat, 'successCat', .35, 1)
+  imat <- set.nominal.rank(spec, imat, 'maxDuration', .25, .75)
+  imat <- set.nominal.rank(spec, imat, 'maxDurationOut', 0, .5)
+  imat <- set.nominal.rank(spec, imat, 'msYearn', 0, 1)
+  imat <- set.nominal.rank(spec, imat, 'msEnv', 0, 1)
+  imat <- set.nominal.rank(spec, imat, 'msAllow', 0, 1)
+  imat <- set.nominal.rank(spec, imat, 'msTimeAlloc', 0, .5)
   
   ev.data <- espt[,event.items]
   
-  ev <- mxModel(model="event", ip.mat,
+  ev <- mxModel(model="event", imat,
                 mxData(observed=ev.data, type="raw"),
                 mxExpectationBA81(spec),
                 mxFitFunctionML(),
@@ -415,14 +411,12 @@ fitEvent <- function(event.items, minItems) {
   mxRun(ev, silent=TRUE)
 }
 
-minItems <- 2L
-ev.est <- fitEvent(c("freqCause", "successCat", "maxDuration"), minItems)
+evItems <- c("msYearn", "msEnv", "msAllow",
+             'freqCause', 'msTimeAlloc', 'successCat', 'maxDuration', "maxDurationOut")
+ev.est <- fitEvent(evItems)
 
-ev.grp <- list(spec=ev.est$expectation$ItemSpec,
-            param=ev.est$item$values,
-            data=espt[,colnames(ev.est$item)],
-            minItemsPerScore=minItems,
-            free=ev.est$item$free)
+ev.grp <- as.IFAgroup(ev.est)
+ev.grp$minItemsPerScore = 2L
 ev.grp$scores <- EAPscores(ev.grp)
 
 mnf <- multinomialFit(ev.grp)
@@ -443,29 +437,44 @@ if (0) {
 A possible model had -2LL=\Sexpr{ev.est$output$fit} and
 condition number \Sexpr{ev.est$output$conditionNumber}.
 The full-information multinomial fit test was conducted,
-$n=\Sexpr{mnf$n}$, $G^2(\Sexpr{mnf$df})=\Sexpr{mnf$statistic}$, $\log(p)=\Sexpr{mnf$pval}$.
-To double-check the $p$-value, a Monte-Carlo simulation
-was conducted, $\log(p) = -.92$.
+$n=\Sexpr{mnf$n}$, $G^2(\Sexpr{mnf$df})=\Sexpr{mnf$statistic}$.
 
-<<results='asis'>>=
-got <- ChenThissen1997(ev.grp)
-print(xtable(got$pval, "Log p-value of local dependence between item pairs."))
-@ 
+<<fig.height=2>>=
+ev.grp1 <- omitMostMissing(ev.grp, 2)
+tbl <- sumScoreEAP(ev.grp1)
+got <- sumScoreEAPTest(ev.grp1)
+df <- data.frame(score=as.numeric(rownames(tbl)),
+            expected=tbl[,'p'] * got$n, observed=got$observed)
+df <- melt(df, id="score", variable.name="source", value.name="n")
+ggplot(df, aes(x=score, y=n, color=source)) + geom_line()
+@
 
 <<fig.height=2>>=
 map1 <- item.map(ev.grp, 1)
 ggplot(map1, aes(x=score, y=item, label=outcome)) + itemMapText
 @
 
+<<results='asis'>>=
+got <- ChenThissen1997(ev.grp)
+print(xtable(got$pval, "Log p-value of local dependence between item pairs."))
+@ 
+
+<<results='asis'>>=
+toOmit <- 2
+sfit <- SitemFit(ev.grp, omit = toOmit)
+tbl <- t(sapply(sfit, function(r) c(n=r$n, df=r$df, stat=r$statistic, pval=r$pval)))
+print(xtable(tbl, paste("Sum-score item-wise fit, omitting", toOmit, "item.")))
+@
+
 <<fig.height=3>>=
 pl <- lapply(colnames(ev.grp$param), function(item) {
-  rpf.plot(ev.grp, item, width=plot.width, data.bins=12, basis=c(1), factor=1)
+  SSplot(sfit, item)
 })
 for (px in 1:length(pl)) {
   print(pl[[px]])
 }
-print(plot.info(ev.grp, width=4, show.total=FALSE))
-@ 
+print(plot.info(ev.grp, width=5, show.total=FALSE, basis=c(1)))
+@
 
 <<>>=
 ba.grp$data <- NULL
@@ -538,9 +547,15 @@ if (0) {
 }
 @
 
-A simple linear model to predict event from barrier and training
-obtains $R^2 = \Sexpr{summary(fit1)[["r.squared"]]}$.
+\break
+<<>>=
+summary(fit1)
+@
 
-\includepdf[pages={3-}]{archive/short-201408.pdf}
+
+% A simple linear model to predict event from barrier and training
+% obtains $R^2 = \Sexpr{summary(fit1)[["r.squared"]]}$.
+
+\includepdf[pages={3-}]{archive/short-201409.pdf}
 
 \end{document}

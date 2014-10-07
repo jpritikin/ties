@@ -1,0 +1,141 @@
+\documentclass[doc,12pt]{apa6}
+\usepackage[american]{babel}
+\usepackage{csquotes}
+\usepackage[style=apa,sortcites=true,sorting=nyt,backend=biber]{biblatex}
+\DeclareLanguageMapping{american}{american-apa}
+\addbibresource{jpritikin.bib}
+\usepackage[hidelinks=true]{hyperref}
+\usepackage{mathtools}
+\usepackage{xspace}
+
+\newcommand{\R} {\texttt{R}\xspace}
+\newcommand{\OpenMx} {\texttt{OpenMx}\xspace}
+
+\title{Cross sectional mental silence study, updated \today}
+\shorttitle{Meditation}
+\fourauthors{Joshua N.~Pritikin}{Karen Schmidt}{Ramesh Manocha}{Steven M.~Boker}
+\fouraffiliations{University of Virginia}{University of Virginia}{University of Sydney}{University of Virginia}
+\abstract{Not done yet}
+
+<<echo=FALSE, results='hide', warning=FALSE, cache=FALSE>>=
+library(knitr)
+#knit("asem.Rnw", tangle=TRUE)  # to extract only the R chunks
+opts_knit$set(error=TRUE)
+opts_chunk$set(echo=FALSE, cache=FALSE)
+loadlib <- function () {
+library(ggplot2)
+library(reshape2)
+library(plyr)
+library(grid)
+library(gridExtra)
+library(xtable)
+}
+suppressPackageStartupMessages(loadlib())
+theme_set(theme_bw())
+options("xtable.caption.placement"="top")
+options("xtable.table.placement"="tbp")
+options(digits=2)
+@ 
+
+\begin{document}
+\maketitle
+
+\section{Introduction}
+
+Factors \emph{neurotic}, \emph{extravert}, \emph{open},
+\emph{agreeable}, \emph{consc} (conscientiousness) assess the big 5
+personality factors using the IPIP item set \parencite{goldberg1999}.
+Factors \emph{posAffect} and \emph{negAffect} were measured using the PANAS \parencite{watson1988}.
+Factors \emph{nonreact}, \emph{observe}, \emph{describe}, \emph{nonjudge}, and \emph{actAware}
+were measured with the Five-Factor Mindfulness Questionnaire \parencite{baer2006}.
+Note that factor \emph{actAware} was originally measured (182 participants)
+with the Mindful Attention Awareness Scale \parencite{brown2003}.
+These data were merged with the same factor on the Five-Factor Mindfulness Questionnaire.
+Factors \emph{autonomy}, \emph{envMastery} (environmental mastery),
+\emph{perGrowth} (personal growth), \emph{posRelation}, \emph{lifePurpose}, and \emph{selfAccept}
+were measured using \textcite{ryff1989}.
+Factor \emph{sleep} is the composite score from
+the Pittsburgh Sleep Quality Index \parencite{buysse1989}.
+Factor \emph{socialDesirable} is a MMPI derived measure \parencite{crowne1960,reynolds1982}.
+Factor \emph{dass.d} (depression), \emph{dass.a} (anxiety), \emph{dass.s} (stress),
+and \emph{dass.na} (negative affect, the total mean of all factors)
+were measured with the DASS-21 \parencite{lovibond1996}.
+Factor \emph{mwb} is a 7-item measure of overall mental wellbeing \parencite{bartram2013,stewart2009}.
+Factor \emph{ei} is a measure of emotional intelligence \parencite{schutte1998}.
+Factors \emph{rumination} and \emph{reflection} were measured with
+Reflection/Rumination scale \parencite{trapnell1999}.
+
+<<results='asis'>>=
+cdat <- read.csv("corr.csv", stringsAsFactors=FALSE)
+
+ctbl <- cor(cdat[c(6:ncol(cdat))], use="pairwise.complete.obs")
+dt <- ctbl[1:(nrow(ctbl)-3), 29:31]
+dt[abs(dt) < .1] <- NA
+print(xtable(dt,
+             paste("Correlation with plausibly related self-report ",
+                   "measures ($N=", nrow(cdat), "$).", sep=""), "tab:cor"))
+@
+
+<<results='asis'>>=
+mask <- cdat$event > min(cdat$event, na.rm=TRUE)
+mask <- mask & !is.na(mask)
+cdat <- cdat[mask,]
+ctbl <- cor(cdat[c(6:ncol(cdat))], use="pairwise.complete.obs")
+dt <- ctbl[1:(nrow(ctbl)-3), 29:31]
+dt[abs(dt) < .1] <- NA
+print(xtable(dt,
+             paste("Correlation with plausibly related self-report ",
+                   "measures for participants above floor for ",
+                   "experience with mental silence ($N=", sum(mask, na.rm=TRUE), "$).", sep=""), "tab:cor-above"))
+@
+
+<<results='asis'>>=
+mask <- cdat$event >= 0
+mask <- mask & !is.na(mask)
+cdat <- cdat[mask,]
+ctbl <- cor(cdat[c(6:ncol(cdat))], use="pairwise.complete.obs")
+dt <- ctbl[1:(nrow(ctbl)-3), 29:31]
+dt[abs(dt) < .1] <- NA
+print(xtable(dt,
+             paste("Correlation with plausibly related self-report ",
+                   "measures for participants above average for ",
+                   "experience with mental silence ($N=", sum(mask, na.rm=TRUE), "$).", sep=""), "tab:cor-avg"))
+@
+
+%% \begin{figure}
+%% <<fig.height=10>>=
+%%   pairs(cdat[c(6:12,29:31)], cex=.25)
+%% @
+%% \caption{Correlational study, scatterplot matrix.}
+%% \label{fig:cor1}
+%% \end{figure}
+
+%% \begin{figure}
+%% <<fig.height=10>>=
+%%   pairs(cdat[c(13:18,29:31)], cex=.25)
+%% @
+%% \caption{Correlational study, scatterplot matrix.}
+%% \label{fig:cor1}
+%% \end{figure}
+
+%% \begin{figure}
+%% <<fig.height=10>>=
+%%   pairs(cdat[c(19:24,29:31)], cex=.25)
+%% @
+%% \caption{Correlational study, scatterplot matrix.}
+%% \label{fig:cor1}
+%% \end{figure}
+
+%% \begin{figure}
+%% <<fig.height=10>>=
+%%   pairs(cdat[c(25:28,32,29:31)], cex=.25)
+%% @
+%% \caption{Correlational study, scatterplot matrix.}
+%% \label{fig:cor1}
+%% \end{figure}
+
+\break
+
+\printbibliography
+
+\end{document}

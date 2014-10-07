@@ -17,6 +17,8 @@ when <- strptime(espt[['instrument']], "%Y-%m-%d")
 revision1 <- strptime("2013-02-11", "%Y-%m-%d")
 ver.mask <- difftime(when, revision1) > 0
 espt <- espt[ver.mask,]
+espt <- espt[,apply(espt, 2, function(c) !all(is.na(c) | c==''))]
+espt <- cms.fixOldData(espt)
 
 manocha2013 <- read.csv("au/2013combined.csv", stringsAsFactors=FALSE)
 if (1) {
@@ -34,6 +36,7 @@ espt <- smartbind(espt, manocha2013.cms)
 espt$freqCause <- NULL  # response options changed 2013-12
 # ----------------------------------- add new data after here ---------------
 
+# Need to refresh these files if necessary TODO
 load("germano2014/germano2014-cms.rda")
 espt <- smartbind(espt, germano2014.cms)
 
@@ -51,7 +54,13 @@ web201409Prep <- cbind(prepDemographics(web201409[1:16]),
                        prep.cms201409(web201409[17:(17+29-1)]))
 web201409Prep$wave <- "earlydata/short-20140915"
 espt <- smartbind(espt, web201409Prep)
-# TODO: Set NAs where versions are incompatible
+
+web201410 <- read.csv("earlydata/short-20141006.csv", stringsAsFactors=FALSE)
+web201410[[33]] <- NULL  # new item, no data
+web201410Prep <- cbind(prepDemographics(web201410[1:16]),
+                       prep.cms201409(web201410[17:(17+29-1)]))
+web201410Prep$wave <- "earlydata/short-20141006"
+espt <- smartbind(espt, web201410Prep)
 
 if (length(unique(espt$uid[!is.na(espt$uid)])) != sum(!is.na(espt$uid))) stop("mismatch")
 next.uid <- 1+max(espt$uid, na.rm=TRUE)

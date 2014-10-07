@@ -41,7 +41,7 @@ set.nominal.rank <- function(spec, ip.mat, name, a, c) {
 
 num2cat <- function(num) {
   zero <- num <= 0
-  high <- num >= 1001
+  high <- num >= 1000
   level.coef <- 1  # try 2 once we have more data
   kat <- round(level.coef * log10(num)) + 1
   kat[zero] <- 0
@@ -69,6 +69,17 @@ cms.testlets <- function(df) {
     df$msFastEffortLife <- ordered(unclass(df$msFast) + unclass(df$msEffort) + unclass(df$msLife) - 15,
                                    levels=seq(-12,0,1))
   }
+
+  for (col in c('msMet', 'msShared', 'msTeach', 'msTrainTeach')) {
+    ncol <- paste0(col, "Num")
+    if (is.null(df[[ncol]])) {
+        df[[ncol]] <- ordered(NA)
+        next
+    }
+    if (is.factor(df[[ncol]])) next
+    df[[ncol]] <- mxFactor(num2cat(df[[ncol]]), levels=0:4)
+  }
+  
   if (!is.null(df$msCause)) {
     df$trainSkill <- ordered(unclass(df$msMet) + unclass(df$msShared) +
                                unclass(df$msTeach) + unclass(df$msTrainTeach) - 4, levels=0:16)
@@ -76,8 +87,8 @@ cms.testlets <- function(df) {
     df$yearnEnv <- ordered(mean.or.na(df[,c("msYearn", "msEnv"),drop=FALSE], 1), levels=seq(1,5,.5))
     
     if (!is.null(df$msMetNum)) {
-        df$trainNum <- ordered(num2cat(df$msMetNum) + num2cat(df$msSharedNum) +
-                               num2cat(df$msTeachNum) + num2cat(df$msTrainTeachNum), levels=0:(4*4))
+        df$trainNum <- ordered(unclass(df$msMetNum) + unclass(df$msSharedNum) +
+                                 unclass(df$msTeachNum) + unclass(df$msTrainTeachNum) - 4, levels=0:(4*4))
     } else {
         df$trainNum <- ordered(NA, levels=0:(4*4))
     }
@@ -90,6 +101,9 @@ cms.testlets <- function(df) {
     # TODO try 10 categories when we have more data
     df$successCat <- cut(as.numeric(df$pctSuccess),
                          breaks=seq(0,100,length.out=8), ordered_result=TRUE)
+  }
+  for (col in c('msPreoccu', 'msTimeAlloc', 'maxDurationOut')) {
+    if (is.null(df[[col]])) df[[col]] <- factor(NA)
   }
   df
 }

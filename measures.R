@@ -35,7 +35,7 @@ score.ipipBig5 <- function(raw) {
     } else {
       lev <- rev(IPIPItem)
     }
-    raw[[col]] <- ordered(raw[[col]], levels=lev)
+    raw[[col]] <- mxFactor(raw[[col]], levels=lev, exclude='')
   }
   minItems <- 8
   list(neurotic= mean.or.na(raw[,01:10], minItems),
@@ -50,9 +50,7 @@ score.panas <- function(raw) {
   
   PANASItem <- c("Very Slightly or Not at All",  "A Little",	"Moderately",	"Quite a Bit",	"Extremely")
   
-  for (col in 1:20) {
-    raw[[col]] <- ordered(raw[[col]], levels=PANASItem)
-  }
+  raw <- mxFactor(raw, levels=PANASItem, exclude='')
   
   list(posAffect=mean.or.na(raw[,c(1,3,5,9,10,12,14,16,17,19)], 8),
        negAffect=mean.or.na(raw[,c(2,4,6,7, 8,11,13,15,18,20)], 8))
@@ -87,7 +85,7 @@ score.ryff9 <- function(raw) {
                    48,51,52)) {
       lev <- rev(RyffItem)
     }
-    raw[[col]] <- ordered(raw[[col]], levels=lev)
+    raw[[col]] <- mxFactor(raw[[col]], levels=lev, exclude='')
   }
   
   list(autonomy    = mean.or.na(raw[,01:09], 7),
@@ -108,7 +106,7 @@ score.mcFormC <- function(raw) {
     if (col %in% c(1,2,3,4,6,8,11,12)) {
       lev <- rev(MCItem)
     }
-    raw[[col]] <- ordered(raw[[col]], levels=lev)
+    raw[[col]] <- mxFactor(raw[[col]], levels=lev, exclude='')
   }
   
   mean.or.na(raw[,1:13], 11)
@@ -273,7 +271,9 @@ score.5fMindfulness <- function(raw) {
                 'very often or always true')
     
     for (col in 1:39) {
-        raw[[col]] <- mxFactor(raw[[col]], levels=FFItem, exclude='')
+        lev <- FFItem
+        if (any(col == c(12, 16, 22))) lev <- rev(lev)
+        raw[[col]] <- mxFactor(raw[[col]], levels=lev, exclude='')
     }
 
     # See Table 3 of Baer et al (2006)
@@ -283,6 +283,38 @@ score.5fMindfulness <- function(raw) {
     actAware <- raw[c(5,8,13,18,23,28,34,38)]  # factor 3
     describe <- raw[c(2,7,12,16,22,27,32,37)]  # factor 4
     nonjudge <- raw[c(3,10,14,17,25,30,35,39)]  # factor 5
+    list(nonreact=mean.or.na(nonreact, 6),
+         observe=mean.or.na(observe, 7),
+         actAware=mean.or.na(actAware, 7),
+         describe=mean.or.na(describe, 7),
+         nonjudge=mean.or.na(nonjudge, 7))
+}
+
+code.5fMindfulness2 <- function(raw) {
+    if (ncol(raw) != 39) stop("Expecting 39 columns")
+
+    FFItem = c('never or very rarely true',
+                'rarely true',
+                'sometimes true',
+                'often true',
+                'very often or always true')
+    
+    for (col in 1:39) {
+        lev <- FFItem
+        if (any(col == c(16:23, 26:28, 32:39))) lev <- rev(lev)
+        raw[[col]] <- mxFactor(raw[[col]], levels=lev, exclude='')
+    }
+    raw
+}
+
+score.5fMindfulness2 <- function(raw) {
+    # See Table 3 of Baer et al (2006)
+    
+    nonreact <- raw[1:7]  # factor 1
+    observe <- raw[8:15]   # factor 2
+    actAware <- raw[16:23]  # factor 3
+    describe <- raw[24:31]  # factor 4, *has reverse scored items*
+    nonjudge <- raw[32:39]  # factor 5
     list(nonreact=mean.or.na(nonreact, 6),
          observe=mean.or.na(observe, 7),
          actAware=mean.or.na(actAware, 7),
@@ -315,6 +347,49 @@ maxDurationItem = c('A moment (e.g., a second or shorter)',
                     'Between 10 seconds and 1 minute',
                     'Between 1 minute and 10 minutes',
                     'More than 10 minutes')
+
+
+MSNotionItem <- tolower(c("This is the first time I have thought about it.",
+                          "The notion has crossed my mind, but I'm not sure what it means to me.",
+                          "I have discussed it with friends.",
+                          "I have read something about it.",
+                          "I have an interest in this topic."))
+
+MSFrequencyItem2 <- tolower(c("more than 2 times a day",
+                              "1-2 times a day",
+                              "4-6 times a week",
+                              "1-3 times a week",
+                              "1-3 times a month"))
+
+MSTimeAlloc <- tolower(c("Less than 10 minutes",
+                         "10-20 minutes",
+                         "21-30 minutes",
+                         "31-45 minutes",
+                         "46-60 minutes",
+                         "More than 1 hour"))
+
+MSMaxDurationItem2 = tolower(c(
+  "I didn't experience complete mental silence.",
+  'A moment (e.g., a second or shorter)',
+  'Longer than a moment but shorter than 10 seconds',
+  'Between 10 seconds and 1 minute',
+  'Between 1 minute and 10 minutes',
+  'Between 10 minutes and 2 hours',
+  'More than 2 hours'))
+
+cms.fixOldData <- function(raw) {
+  raw$maxDuration[raw$maxDuration == "more than 10 minutes"] <- NA
+  raw$maxDuration <- mxFactor(raw$maxDuration, levels=tolower(MSMaxDurationItem2))
+  levels(raw$msNotion)[5] <- tolower(MSNotionItem)[5]
+  if (!is.null(raw$freqCause)) {
+      raw$freqCause[!is.na(raw$freqCause) &
+                    raw$freqCause == "i don't try to cause myself to experience complete mental silence"] <- NA
+      raw$freqCause <- mxFactor(as.character(raw$freqCause), levels = rev(tolower(MSFrequencyItem2)),
+                                exclude=tolower(c('infrequently','weekly','daily',
+                                          "I don't specifically allocate my time for complete mental silence.")))
+  }
+  raw
+}
 
 prep.cms201309 <- function(raw) {
   if (ncol(raw) != 23) stop("Expecting 23 columns")
@@ -355,7 +430,7 @@ prep.cms201309 <- function(raw) {
   df$skipInt <- mxFactor(df$skipInt, levels=c(FALSE, TRUE))
   df$skipExp <- mxFactor(df$skipExp, levels=c(TRUE, FALSE))
   
-  df
+  cms.fixOldData(df)
 }
 
 prep.cms201312 <- function(raw) {
@@ -402,37 +477,8 @@ prep.cms201312 <- function(raw) {
   df$skipInt <- mxFactor(df$skipInt, levels=c(FALSE, TRUE))
   df$skipExp <- mxFactor(df$skipExp, levels=c(TRUE, FALSE))
   
-  df
+  cms.fixOldData(df)
 }
-
-MSNotionItem <- tolower(c("This is the first time I have thought about it.",
-                  "The notion has crossed my mind, but I'm not sure what it means to me.",
-                  "I have discussed it with friends.",
-                  "I have read something about it.",
-                  "I have an interest in this topic."))
-
-MSFrequencyItem2 <- tolower(c("more than 2 times a day",
-                     "1-2 times a day",
-                     "4-6 times a week",
-                     "1-3 times a week",
-                     "1-3 times a month",
-                     "I don't specifically allocate my time for complete mental silence"))
-
-MSTimeAlloc <- tolower(c("Less than 10 minutes",
-                         "10-20 minutes",
-                         "21-30 minutes",
-                         "31-45 minutes",
-                         "46-60 minutes",
-                         "More than 1 hour"))
-
-MSMaxDurationItem2 = tolower(c(
-  "I didn't experience complete mental silence.",
-  'A moment (e.g., a second or shorter)',
-  'Longer than a moment but shorter than 10 seconds',
-  'Between 10 seconds and 1 minute',
-  'Between 1 minute and 10 minutes',
-  'Between 10 minutes and 2 hours',
-  'More than 2 hours'))
 
 prep.cms201409 <- function(raw, hack=FALSE) {
   if (ncol(raw) != 29) stop("Expecting 29 columns")
@@ -454,16 +500,22 @@ prep.cms201409 <- function(raw, hack=FALSE) {
     df[,item1[x1]] <- mxFactor(tolower(raw[[5+x1]]), MSAgreementItem, exclude="")
   }
   df$skipInt <- apply(df[,item1], 1, function(t) all(is.na(t)))
-  df$msNotSure <- apply(df[,item1], 1, function(t) all(!is.na(t) & t == "not sure"))
+  df$skipInt <- mxFactor(df$skipInt, levels=c(FALSE, TRUE))
   
   item2 <- c("msYearn", "msEnv", "msAllow", "msCause")
   for (x2 in 1:4) {
     df[,item2[x2]] <- mxFactor(tolower(raw[[12+x2]]), rev(MSAgreementItem),
-                               exclude=c('',"I don't understand this question."))
+                               exclude=tolower(c('',"I don't understand this question.")))
   }
 
   evItems <- c('freqCause', 'msTimeAlloc', 'pctSuccess', 'maxDuration', "maxDurationOut")
-  df$freqCause <- mxFactor(tolower(raw[[17]]), rev(MSFrequencyItem2), exclude="")
+
+  # add trailing period (oops)
+  raw[[17]][ raw[[17]] == "I don't specifically allocate my time for complete mental silence" ] <-
+      "I don't specifically allocate my time for complete mental silence."
+  
+  df$freqCause <- mxFactor(tolower(raw[[17]]), rev(MSFrequencyItem2),
+                           exclude=tolower(c('',"I don't specifically allocate my time for complete mental silence.")))
   df$msTimeAlloc <- mxFactor(tolower(raw[[18]]), MSTimeAlloc,
                              exclude=tolower(c("","I don't plan any particular amount of time")))
   df$pctSuccess <- raw[[19]]
@@ -488,15 +540,7 @@ prep.cms201409 <- function(raw, hack=FALSE) {
     df[, paste(item3[x3], "Num", sep="")] <- raw[[21+x3*2]]
   }
   
-  df$skipExp <- apply(df[,c(item2, evItems)], 1, function(t) all(is.na(t)))
-  
   df$instrument <- "2014-09-15"
-  
-  mask <- df$skipInt & df$skipExp
-  df$skipExp[mask] <- NA
-  df$skipInt[mask] <- NA
-  df$skipInt <- mxFactor(df$skipInt, levels=c(FALSE, TRUE))
-  df$skipExp <- mxFactor(df$skipExp, levels=c(TRUE, FALSE))
   
   df
 }
