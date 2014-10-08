@@ -1,7 +1,6 @@
 library(testthat)
 library(digest)
 library(ggplot2)
-library(digest)
 {
   wd <- setwd("..")
   source("measures.R")
@@ -75,14 +74,6 @@ for (k in names(got)) { wave2[[k]] <- got[[k]] }
 
 got <- score.dass(raw3[46:(46+21-1)])
 for (k in names(got)) { wave3[[k]] <- got[[k]] }
-
-if (0) {
-  germano2014.cms <- cbind(prep.cms201312(raw2[67:92]), uid=raw2$uid)
-  germano2014.cms$wave <- "germano2014"
-  germano2014.cms$start <- raw2$StartDate
-  germano2014.cms$end <- raw2$EndDate
-  save(germano2014.cms, file="germano2014-cms.rda")
-}
 
 cms1 <- prep.cms201312(raw1[70:95])
 cms2 <- prep.cms201312(raw2[67:92])

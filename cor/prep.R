@@ -1,7 +1,6 @@
 library(testthat)
 library(digest)
 library(ggplot2)
-library(digest)
 library(gtools)
 {
   wd <- setwd("..")
@@ -111,21 +110,6 @@ cdat2$sleep <- -score.psqi(raw2[311:(311+19-1)])
 
 cdat <- smartbind(cdat1, cdat2)
 cdat <- cdat[,c(1:13,33:36,32,14:31)] # move ffmq together and CMS to the end
-
-if (0) {
-  w1 <- prep.cms201312(raw1[258:283])
-  w1$wave <- "cor-ppool1"
-  w1$start <- raw1$StartDate
-  w1$end <- raw1$EndDate
-  
-  w2 <- prep.cms201409(raw2[282:(282+29-1)])
-  w2$wave <- "cor-ppool2"
-  w2$start <- raw2$StartDate
-  w2$end <- raw2$EndDate
-  
-  cor.ppool.cms <- smartbind(w1, w2)
-  save(cor.ppool.cms, file="cor-ppool-cms.rda")
-}
 
 if (0) {
   #cat(deparse(colnames(wave2)))

@@ -36,12 +36,19 @@ espt <- smartbind(espt, manocha2013.cms)
 espt$freqCause <- NULL  # response options changed 2013-12
 # ----------------------------------- add new data after here ---------------
 
-# Need to refresh these files if necessary TODO
-load("germano2014/germano2014-cms.rda")
-espt <- smartbind(espt, germano2014.cms)
+espt <- smartbind(espt, local({
+  wd <- setwd("germano2014")
+  source("getCalibrationData.R")
+  setwd(wd)
+  germano2014.cms
+}))
 
-load("cor/cor-ppool-cms.rda")
-espt <- smartbind(espt, cor.ppool.cms)
+espt <- smartbind(espt, local({
+  wd <- setwd("cor")
+  source("getCalibrationData.R")
+  setwd(wd)
+  cor.ppool.cms
+}))
 
 web201408 <- read.csv("earlydata/short-20140827.csv", stringsAsFactors=FALSE)
 web201408Prep <- cbind(prepDemographics(web201408[1:16]),
