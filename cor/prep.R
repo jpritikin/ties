@@ -61,7 +61,7 @@ cdat1$ei <- score.ei(raw1[201:233])
 got <- score.rrq(raw1[234:(234+24-1)])
 for (n in names(got)) cdat1[[n]] <- got[[n]]
 
-cdat1 <- cbind(cdat1, cms.score(prep.cms201312(raw1[258:283])))
+cdat1 <- cbind(cdat1, cms.score('uva', prep.cms201312(raw1[258:283])))
 
 cdat1$sleep <- -score.psqi(raw1[284:(284+19-1)])
 
@@ -102,7 +102,7 @@ cdat2$ei <- score.ei(raw2[225:(225+33-1)])
 got <- score.rrq(raw2[258:(258+24-1)])
 for (n in names(got)) cdat2[[n]] <- got[[n]]
 
-cdat2 <- cbind(cdat2, cms.score(prep.cms201409(raw2[282:(282+29-1)])))
+cdat2 <- cbind(cdat2, cms.score('uva', prep.cms201409(raw2[282:(282+29-1)])))
 
 cdat2$sleep <- -score.psqi(raw2[311:(311+19-1)])
 

@@ -19,3 +19,4 @@ w2$start <- raw2$StartDate
 w2$end <- raw2$EndDate
 
 cor.ppool.cms <- smartbind(w1, w2)
+cor.ppool.cms$population <- 'uva'

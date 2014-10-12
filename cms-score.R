@@ -9,11 +9,11 @@ ifa.score <- function(grp, df) {
   EAPscores(grp)[,1]
 }
 
-cms.score <- function(df) {
+cms.score <- function(population, df) {
   df <- cms.testlets(df)
-  cms <- cbind(barrier=-ifa.score(ba.grp, df),
-               training=ifa.score(tr.grp, df),
-               event=ifa.score(ev.grp, df))
+  cms <- cbind(barrier=-ifa.score(pop[[population]]$barrier, df),
+               training=ifa.score(pop[[population]]$training, df),
+               event=ifa.score(pop[[population]]$event, df))
 
   if (0) {
     barrier.names <- c("wantLearn", "msEffort", "msEmo", "msDescarte", "msAfraid",

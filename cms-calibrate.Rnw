@@ -32,6 +32,7 @@ assertColumnExist <- function(col) {
 }
 
 itemMapText <- geom_text(size=4, position=position_jitter(h=.25))
+popSplit <- TRUE
 @
 
 \title{Calibration of item models for the Complete Mental Silence Disposition Scale}
@@ -104,36 +105,105 @@ The items must make sense on a short time horizon and
 should also be amenable to long-term barriers.
 
 <<>>=
-fitBarrer <- function(ba.data) {
-  barrier.items <- colnames(ba.data)
+ifaSplitBy <- function(tmpl, fullData, mMat, covMat, ...,
+                       splitCol="population", refGroup="general", split=TRUE) {
+  dataCol <- setdiff(colnames(fullData), splitCol)
+  itemMatName <- tmpl$expectation$item
+  ivalues <- tmpl[[itemMatName]]$values
+  newLabels <- tmpl[[itemMatName]]$labels
   
+  for (r in 1:nrow(newLabels)) {
+    for (c in 1:ncol(newLabels)) {
+      if (!is.na(newLabels[r,c]) || is.na(ivalues[r,c])) next
+      newLabels[r,c] <- paste(itemMatName,"_r", r, "c", c, sep = "")
+    }
+  }
+  
+  tmpl[[itemMatName]]$labels <- newLabels
+  
+  refData <- subset(fullData, !split | population==refGroup, dataCol)
+  refModel <- mxModel(model=tmpl, name=refGroup,
+                      mxData(observed=refData, type="raw"))
+
+  extraGroups <- setdiff(unique(fullData[[splitCol]]), refGroup)
+  container <- mxModel(model="container", refModel)
+  if (!split) {
+    extraGroups <- NULL
+  } else {
+    container <- mxModel(container,
+                         mxModel(model="latentFit",
+                                 mxFitFunctionMultigroup(paste0(extraGroups, "Latent"))))
+  }
+
+  for (grp in extraGroups) {
+    gmodel <- mxModel(model=tmpl, name=grp, mMat, covMat,
+                      mxData(observed=subset(fullData, population==grp, dataCol), type="raw"))
+    lmodel <- mxModel(model=paste0(grp,"Latent"),
+                      mxDataDynamic(type='cov', expectation=paste(grp,'expectation',sep='.')),
+                      mxExpectationNormal(covariance=paste(grp,'cov',sep='.'),
+                                          means=paste(grp,'mean',sep='.')),
+                      mxFitFunctionML())
+    container <- mxModel(model=container, gmodel, lmodel)
+  }
+  
+  enames <- c(refGroup, extraGroups)
+  mstep <- list(mxComputeNewtonRaphson(freeSet=paste(enames,'item',sep='.')))
+  if (split) {
+    lset <- apply(expand.grid(extraGroups, c("mean","cov")), 1, paste, collapse='.')
+    mstep <- c(mstep,
+               mxComputeGradientDescent(fitfunction='latentFit.fitfunction',
+                                        freeSet=lset))
+  }
+  container <- mxModel(container,
+                       mxFitFunctionMultigroup(enames),
+                       mxComputeEM(paste(enames, 'expectation', sep="."), 'scores',
+                                   mxComputeSequence(mstep)))
+  container
+}
+
+fitBarrer <- function(ba.data) {
+  barrier.items <- setdiff(colnames(ba.data), "population")
+  
+  factors <- c('barrier')
+#  factors <- c('barrier', 'emo', 'struct')
   spec <- lapply(barrier.items, function(nm) {
     lev <- length(levels(ba.data[[ nm ]]))
-    rpf.grm(outcomes=lev, factors=3)
+    rpf.grm(outcomes=lev, factors=length(factors))
   })
   
   maxParam <- max(sapply(spec, rpf.numParam))
-  factors <- c('barrier', 'emo', 'struct')
-  ip.mat <- mxMatrix(name="item", nrow=maxParam, ncol=length(spec), free=FALSE,
-                     dimnames=list(c(factors,
-                                     paste('b', 4:maxParam, sep="")), barrier.items))
-  ip.mat$values['barrier',] <- 1
-  ip.mat$values['emo',intersect(c('wantLearn', "msAfraid", "msIdentity","msEmo","msPreoccu"),barrier.items)] <- 1
-  ip.mat$values['struct',intersect(c("msFast", "msFast1", "msEffort", "msLife"), barrier.items)] <- 1
-  ip.mat$values[4:7,] <- mxSimplify2Array(lapply(spec, function(s) seq(1,.1,length.out = s$outcomes-1)))
-  ip.mat$free[,] <- !is.na(ip.mat$values[,]) & ip.mat$values[,] != 0
+  imat <- mxMatrix(name="item", nrow=maxParam, ncol=length(spec), free=FALSE,
+                     dimnames=list(c(factors, paste('b', (1+length(factors)):maxParam, sep="")),
+                                   barrier.items))
+  imat$values['barrier',] <- 1
+#  imat$labels['barrier',] <- 'slope'
+if(length(factors)==3) {
+  imat$values['emo',intersect(c('wantLearn', "msAfraid", "msIdentity","msEmo","msPreoccu"),barrier.items)] <- 1
+  imat$values['struct',intersect(c("msFast", "msFast1", "msEffort", "msLife"), barrier.items)] <- 1
+}
+  imat$values[(1+length(factors)):nrow(imat),] <-
+    mxSimplify2Array(lapply(spec, function(s) seq(1,.1,length.out = s$outcomes-1)))
+  imat$free[,] <- !is.na(imat$values[,]) & imat$values[,] != 0
+
+  tmpl <- mxModel(model="barrier", imat,
+                  mxExpectationBA81(spec),
+                  mxFitFunctionML())
   
-  ba <- mxModel(model="barrier", ip.mat,
-                mxData(observed=ba.data, type="raw"),
-                mxExpectationBA81(spec, qwidth=5, qpoints=39),
-                mxFitFunctionML(),
-                mxComputeSequence(steps=list(
-                  mxComputeEM('expectation', 'scores', mxComputeNewtonRaphson(verbose=0L),
-                              verbose=0L),
-                  mxComputeOnce('fitfunction', 'information', "meat"),
-                  mxComputeStandardError(),
-                  mxComputeHessianQuality())
-                ))
+  mMat <- mxMatrix(name='mean', nrow=length(factors), ncol=1, values=0, free=TRUE)
+  rownames(mMat) <- factors
+  covMat <- mxMatrix(name='cov', values=diag(length(factors)))
+  diag(covMat$free) <- TRUE
+  dimnames(covMat) <- list(factors, factors)
+
+  ba <- ifaSplitBy(tmpl, ba.data, mMat, covMat, split=popSplit)
+  em <- ba$compute
+  ba <- mxModel(ba, mxComputeSequence(steps=list(
+    em,
+    mxComputeOnce('fitfunction', 'information', "meat"),
+    mxComputeStandardError(),
+    mxComputeHessianQuality())
+  ))
+  
   got <- mxRun(ba, silent=TRUE)
   got
 }
@@ -141,7 +211,9 @@ fitBarrer <- function(ba.data) {
 # bitem <- c("msAfraid", "msIdentity", "msFast", "msEffort", "msLife", "msEmo")
 # notSure <- apply(espt[,bitem] == "not sure", 1, all)
 # notSure <- !is.na(notSure) & notSure
-ba.data <- espt[, c("msAfraid", "msIdentity", "msFast", "msEffort", "msLife", "msEmo", "msPreoccu")]
+ba.data <- espt[, c('population', "msAfraid", "msIdentity", "msEmo", "msPreoccu",
+                    "msFast", "msEffort", "msLife")]
+barrier.items <- setdiff(colnames(ba.data), "population")
 #lev <- levels(ba.data[[1]])[c(3,1,2,4,5)]
 #ba.data <- mxFactor(ba.data, lev)
 
@@ -153,11 +225,20 @@ interactive <- FALSE
 if (interactive) {
   ba.est$output$conditionNumber
 }
-ba.grp <- as.IFAgroup(ba.est)
-ba.grp$minItemsPerScore = 3L
-ba.grp$score <- EAPscores(ba.grp)
+pop <- list()
+pops <- sapply(strsplit(ba.est$compute$steps[[1]]$expectation, ".", fixed=TRUE),
+               function(x) x[[1]])
 
-mnf <- multinomialFit(ba.grp)
+for (p1 in pops) {
+  pop[[p1]][['barrier']] <- as.IFAgroup(ba.est[[p1]], minItemsPerScore = 3L)
+  if (FALSE && !is.null(pop[[p1]]$barrier$mean)) {
+    print(pop[[p1]]$barrier$mean)
+    print(pop[[p1]]$barrier$cov)
+  }
+}
+
+#multinomialFit(pop$uva$barrier)
+#mnf <- multinomialFit(ba.grp)
 if (interactive) {
   ba.grp$param
   mnf
@@ -177,21 +258,20 @@ if (0) {
 @ 
 
 For a single factor model, the items were highly locally dependent.
-Two subfactors were hypothesized: an emotional subfactor for
-\Sexpr{names(which(ba.grp$param['emo',] !=0))}; and a structural subfactor for
-\Sexpr{names(which(ba.grp$param['struct',] !=0))}.
+% Two subfactors were hypothesized: an emotional subfactor for
+% \Sexpr{names(which(ba.grp$param['emo',] !=0))}; and a structural subfactor for
+% \Sexpr{names(which(ba.grp$param['struct',] !=0))}.
 A candidate bi-factor model was fit with -2LL=\Sexpr{ba.est$output$fit} and
 condition number \Sexpr{ba.est$output$conditionNumber}.
-The full-information multinomial fit test was conducted,
-$n=\Sexpr{mnf$n}$, $G^2(\Sexpr{mnf$df})=\Sexpr{mnf$statistic}$.
+% The full-information multinomial fit test was conducted,
+% $n=\Sexpr{mnf$n}$, $G^2(\Sexpr{mnf$df})=\Sexpr{mnf$statistic}$.
 
 <<fig.height=2>>=
-baGrp1 <- omitMostMissing(ba.grp, 1)  # TODO, remove
-tbl <- sumScoreEAP(baGrp1)
-got <- sumScoreEAPTest(baGrp1)
+baGrp <- lapply(pop, function (x) sumScoreEAPTest(omitMostMissing(x$barrier, 1)))
+got <- Reduce('+', baGrp)
 
-df <- data.frame(score=as.numeric(rownames(tbl)),
-            expected=tbl[,'p'] * got$n, observed=got$observed)
+df <- data.frame(score=as.numeric(names(got$observed)),
+            expected=got$expected, observed=got$observed)
 df <- melt(df, id="score", variable.name="source", value.name="n")
 ggplot(df, aes(x=score, y=n, color=source)) + geom_line()
 
@@ -204,30 +284,32 @@ if (0) {
 @
 
 <<results='asis'>>=
-got <- ChenThissen1997(ba.grp)
-print(xtable(got$pval, paste("Log p-value of local dependence between item pairs.")))
+got <- Reduce('+', lapply(pop, function (x) ChenThissen1997(x$barrier)))
+print(xtable(got$pval, paste("Log p-value of local dependence between item pairs.")),
+      size="\\footnotesize")
 @
 
 <<results='asis'>>=
-toOmit <- 1
-sfit <- SitemFit(ba.grp, omit = toOmit, qpoints=31, qwidth=5)
+numToOmit <- 1
+toOmit <- lapply(barrier.items, function(x) bestToOmit(pop$general$barrier, numToOmit, x))
+sfit <- Reduce('+', lapply(pop, function (x) SitemFit(x$barrier, omit = toOmit)))
 tbl <- t(sapply(sfit, function(r) c(n=r$n, df=r$df, stat=r$statistic, pval=r$pval)))
-print(xtable(tbl, paste0("Sum-score item-wise fit, omitting ",toOmit," item.")))
+print(xtable(tbl, paste0("Sum-score item-wise fit, omitting ",numToOmit," item.")))
 @
 
 <<fig.height=2>>=
-map1 <- item.map(ba.grp, 1)
+map1 <- item.map(pop$general$barrier, 1)
 ggplot(map1, aes(x=score, y=item, label=outcome)) + itemMapText
 @
 
 <<fig.height=3>>=
-pl <- lapply(colnames(ba.grp$param), function(item) {
+pl <- lapply(names(sfit), function(item) {
   SSplot(sfit, item)
 })
 for (px in 1:length(pl)) {
   print(pl[[px]])
 }
-print(plot.info(ba.grp, width=5, show.total=FALSE, basis=c(1,0,0)))
+print(plot.info(pop$general$barrier, width=5, show.total=FALSE, basis=c(1)))
 @
 
 \section{Training}
@@ -241,26 +323,24 @@ items probe both belief in oneself to work with others and
 quantitatively how much one has worked with others.
 
 <<>>=
-fitTraining <- function(training.items) {
-  assertColumnExist(training.items)
+fitTraining <- function(tr.data) {
+  training.items <- setdiff(colnames(tr.data), "population")
   
-  tr.data <- espt[,training.items]
-  
-  nfactors <- 1
+  factors <- 'training'
   spec <- lapply(training.items, function(nm) {
     lev <- length(levels(tr.data[[ nm ]]))
-    rpf.grm(outcomes=lev, factors=nfactors)
+    rpf.grm(outcomes=lev, factors=length(factors))
   })
   names(spec) <- training.items
   
   for (item in intersect(c('trainSkill', 'trainNum'), names(spec))) {
-    spec[item] <- mkspec(espt, item, nfactors)
+    spec[item] <- mkspec(espt, item, length(factors))
   }
   numItems <- length(training.items)
   maxParam <- max(sapply(spec, rpf.numParam))
   
   imat <- mxMatrix(name="item", nrow=maxParam, ncol=numItems, free=FALSE,
-                     dimnames=list(c('training', #'other', 'self',
+                     dimnames=list(c(factors,
                                      paste('p',2:maxParam,sep="")), training.items))
   imat$values[,] <- mxSimplify2Array(lapply(spec, rpf.rparam))
 #  imat$values[c('other', 'self'),] <- 0
@@ -280,16 +360,24 @@ if (0) {
 }
   
   train <- mxModel(model="training", imat,
-                   mxData(observed=tr.data, type="raw"),
                    mxExpectationBA81(spec),
-                   mxFitFunctionML(),
-                   mxComputeSequence(steps=list(
-                     mxComputeEM('expectation', 'scores', mxComputeNewtonRaphson()),
-                     mxComputeOnce('fitfunction', 'information', "meat"),
-                     mxComputeStandardError(),
-                     mxComputeHessianQuality())
-                   ))
-  got <- mxRun(train, silent=TRUE)
+                   mxFitFunctionML())
+
+  mMat <- mxMatrix(name='mean', nrow=length(factors), ncol=1, values=0, free=TRUE)
+  rownames(mMat) <- factors
+  covMat <- mxMatrix(name='cov', values=diag(length(factors)))
+  diag(covMat$free) <- TRUE
+  dimnames(covMat) <- list(factors, factors)
+
+  trM <- ifaSplitBy(train, tr.data, mMat, covMat, split=popSplit)
+  em <- trM$compute
+  trM <- mxModel(trM, mxComputeSequence(steps=list(
+    em,
+    mxComputeOnce('fitfunction', 'information', "meat"),
+    mxComputeStandardError(),
+    mxComputeHessianQuality())
+  ))
+  got <- mxRun(trM, silent=TRUE)
   got
 }
 
@@ -298,13 +386,20 @@ if (0) {
 tr.items <- c('msMet', 'msShared', 'msTeach', 'msTrainTeach')
 tr.items <- c(tr.items, paste0(tr.items, 'Num'))
 
-tr.est <- fitTraining(tr.items)
-tr.grp <- as.IFAgroup(tr.est)
-tr.grp$minItemsPerScore = 2L
+tr.est <- fitTraining(espt[, c('population', tr.items)])
 
-tr.grp$scores <- EAPscores(tr.grp)
+pops <- sapply(strsplit(tr.est$compute$steps[[1]]$expectation, ".", fixed=TRUE),
+               function(x) x[[1]])
 
-mnf <- multinomialFit(omitMostMissing(tr.grp, 1))
+for (p1 in pops) {
+  pop[[p1]][['training']] <- as.IFAgroup(tr.est[[p1]], minItemsPerScore = 2L)
+  if (FALSE && !is.null(pop[[p1]]$training$mean)) {
+    print(pop[[p1]]$training$mean)
+    print(pop[[p1]]$training$cov)
+  }
+}
+
+#mnf <- multinomialFit(omitMostMissing(tr.grp, 1))
 
 if (0) {
   mcReps <- 100
@@ -328,44 +423,46 @@ For a single factor model, the items were highly locally dependent.
 %\Sexpr{names(which(tr.grp$param['other',] !=0))}.
 A candidate model obtains $-2LL=\Sexpr{tr.est$output$fit}$
 with condition number \Sexpr{tr.est$output$conditionNumber}.
-The full-information multinomial fit test was conducted,
-$n=\Sexpr{mnf$n}$, $G^2(\Sexpr{mnf$df})=\Sexpr{mnf$statistic}$.
+% The full-information multinomial fit test was conducted,
+% $n=\Sexpr{mnf$n}$, $G^2(\Sexpr{mnf$df})=\Sexpr{mnf$statistic}$.
 
 <<fig.height=2>>=
-tr.grp1 <- omitMostMissing(tr.grp, 1)
-tbl <- sumScoreEAP(tr.grp1)
-got <- sumScoreEAPTest(tr.grp1)
-df <- data.frame(score=as.numeric(rownames(tbl)),
-            expected=tbl[,'p'] * got$n, observed=got$observed)
+toOmit <- bestToOmit(pop$general$training, 0)
+got <- Reduce('+',lapply(pop, function (x) sumScoreEAPTest(omitItems(x$training, toOmit))))
+
+df <- data.frame(score=as.numeric(names(got$observed)),
+            expected=got$expected, observed=got$observed)
 df <- melt(df, id="score", variable.name="source", value.name="n")
 ggplot(df, aes(x=score, y=n, color=source)) + geom_line()
 @
 
-
 <<results='asis'>>=
-got <- ChenThissen1997(tr.grp)
-print(xtable(got$pval, "Log p-value of local dependence between item pairs."))
+got <- Reduce('+', lapply(pop, function (x) ChenThissen1997(x$training)))
+print(xtable(got$pval, paste("Log p-value of local dependence between item pairs.")),
+      size="\\footnotesize")
 @ 
 
 <<results='asis'>>=
-sfit <- SitemFit(tr.grp, omit = 1)
+numToOmit <- 0
+toOmit <- lapply(tr.items, function(x) bestToOmit(pop$general$training, numToOmit, x))
+sfit <- Reduce('+', lapply(pop, function (x) SitemFit(x$training, omit = toOmit)))
 tbl <- t(sapply(sfit, function(r) c(n=r$n, df=r$df, stat=r$statistic, pval=r$pval)))
-print(xtable(tbl, paste("Sum-score item-wise fit, omitting 1 item.")))
+print(xtable(tbl, paste0("Sum-score item-wise fit, omitting ",numToOmit," item.")))
 @
 
 <<fig.height=2>>=
-map1 <- item.map(tr.grp, 1)
+map1 <- item.map(pop$general$training, 1)
 ggplot(map1, aes(x=score, y=item, label=outcome)) + itemMapText
 @
 
 <<fig.height=3>>=
-pl <- lapply(colnames(tr.grp$param), function(item) {
+pl <- lapply(names(sfit), function(item) {
   SSplot(sfit, item)
 })
 for (px in 1:length(pl)) {
   print(pl[[px]])
 }
-print(plot.info(tr.grp, width=5, show.total=FALSE, basis=c(1)))
+print(plot.info(pop$general$training, width=5, show.total=FALSE, basis=c(1)))
 @
 
 \section{Event}
@@ -374,15 +471,16 @@ The \emph{event} factor is intended to assess the self-reported
 intensity of experiencing complete mental silence.
 
 <<>>=
-fitEvent <- function(event.items) {
-  assertColumnExist(event.items)
-  
+fitEvent <- function(ev.data) {
+  event.items <- setdiff(colnames(ev.data), "population")
+
   spec <- mkspec(espt, event.items)
   numItems <- length(event.items)
   maxParam <- max(sapply(spec, rpf.numParam))
-  
+  factors <- c('event')
+
   imat <- mxMatrix(name="item", nrow=maxParam, ncol=numItems,
-                   dimnames=list(c("event", paste("p",2:maxParam,sep="")), event.items))
+                   dimnames=list(c(factors, paste("p",2:maxParam,sep="")), event.items))
   imat$values <- NA
   
   imat <- set.nominal.rank(spec, imat, 'msAny', .51, 1)
@@ -396,30 +494,44 @@ fitEvent <- function(event.items) {
   imat <- set.nominal.rank(spec, imat, 'msAllow', 0, 1)
   imat <- set.nominal.rank(spec, imat, 'msTimeAlloc', 0, .5)
   
-  ev.data <- espt[,event.items]
-  
-  ev <- mxModel(model="event", imat,
-                mxData(observed=ev.data, type="raw"),
+  eTmpl <- mxModel(model="event", imat,
                 mxExpectationBA81(spec),
-                mxFitFunctionML(),
-                mxComputeSequence(steps=list(
-                  mxComputeEM('expectation', 'scores', mxComputeNewtonRaphson()),
-                  mxComputeOnce('fitfunction', 'information', "meat"),
-                  mxComputeStandardError(),
-                  mxComputeHessianQuality())
-                ))
-  mxRun(ev, silent=TRUE)
+                mxFitFunctionML())
+  
+  mMat <- mxMatrix(name='mean', nrow=length(factors), ncol=1, values=0, free=TRUE)
+  rownames(mMat) <- factors
+  covMat <- mxMatrix(name='cov', values=diag(length(factors)))
+  diag(covMat$free) <- TRUE
+  dimnames(covMat) <- list(factors, factors)
+
+  ev <- ifaSplitBy(eTmpl, ev.data, mMat, covMat, split=popSplit)
+  em <- ev$compute
+  ev <- mxModel(ev, mxComputeSequence(steps=list(
+    em,
+    mxComputeOnce('fitfunction', 'information', "meat"),
+    mxComputeStandardError(),
+    mxComputeHessianQuality())
+  ))
+
+  ev <- mxRun(ev, silent=TRUE)
+  ev
 }
 
 evItems <- c("msYearn", "msEnv", "msAllow",
              'freqCause', 'msTimeAlloc', 'successCat', 'maxDuration', "maxDurationOut")
-ev.est <- fitEvent(evItems)
+ev.est <- fitEvent(espt[,c(evItems, "population")])
 
-ev.grp <- as.IFAgroup(ev.est)
-ev.grp$minItemsPerScore = 2L
-ev.grp$scores <- EAPscores(ev.grp)
+pops <- sapply(strsplit(ev.est$compute$steps[[1]]$expectation, ".", fixed=TRUE),
+               function(x) x[[1]])
+for (p1 in pops) {
+  pop[[p1]][['event']] <- as.IFAgroup(ev.est[[p1]], minItemsPerScore = 2L)
+  if (FALSE && !is.null(pop[[p1]]$event$mean)) {
+    print(pop[[p1]]$event$mean)
+    print(pop[[p1]]$event$cov)
+  }
+}
 
-mnf <- multinomialFit(ev.grp)
+#mnf <- multinomialFit(ev.grp)
 
 if (0) {
   mcReps <- 100
@@ -436,51 +548,55 @@ if (0) {
 
 A possible model had -2LL=\Sexpr{ev.est$output$fit} and
 condition number \Sexpr{ev.est$output$conditionNumber}.
-The full-information multinomial fit test was conducted,
-$n=\Sexpr{mnf$n}$, $G^2(\Sexpr{mnf$df})=\Sexpr{mnf$statistic}$.
+% The full-information multinomial fit test was conducted,
+% $n=\Sexpr{mnf$n}$, $G^2(\Sexpr{mnf$df})=\Sexpr{mnf$statistic}$.
 
 <<fig.height=2>>=
-ev.grp1 <- omitMostMissing(ev.grp, 2)
-tbl <- sumScoreEAP(ev.grp1)
-got <- sumScoreEAPTest(ev.grp1)
-df <- data.frame(score=as.numeric(rownames(tbl)),
-            expected=tbl[,'p'] * got$n, observed=got$observed)
+toOmit <- bestToOmit(pop$general$event, 2)
+got <- Reduce('+',lapply(pop, function (x) sumScoreEAPTest(omitItems(x$event, toOmit))))
+
+df <- data.frame(score=as.numeric(names(got$observed)),
+            expected=got$expected, observed=got$observed)
 df <- melt(df, id="score", variable.name="source", value.name="n")
 ggplot(df, aes(x=score, y=n, color=source)) + geom_line()
 @
 
 <<fig.height=2>>=
-map1 <- item.map(ev.grp, 1)
+map1 <- item.map(pop$general$event, 1)
 ggplot(map1, aes(x=score, y=item, label=outcome)) + itemMapText
 @
 
 <<results='asis'>>=
-got <- ChenThissen1997(ev.grp)
-print(xtable(got$pval, "Log p-value of local dependence between item pairs."))
+got <- Reduce('+', lapply(pop, function (x) ChenThissen1997(x$event)))
+print(xtable(got$pval, paste("Log p-value of local dependence between item pairs.")),
+      size="\\footnotesize")
 @ 
 
 <<results='asis'>>=
-toOmit <- 2
-sfit <- SitemFit(ev.grp, omit = toOmit)
+numToOmit <- 3
+toOmit <- lapply(evItems, function(x) bestToOmit(pop$general$event, numToOmit, x))
+sfit <- Reduce('+', lapply(pop, function (x) SitemFit(x$event, omit = toOmit)))
 tbl <- t(sapply(sfit, function(r) c(n=r$n, df=r$df, stat=r$statistic, pval=r$pval)))
-print(xtable(tbl, paste("Sum-score item-wise fit, omitting", toOmit, "item.")))
+print(xtable(tbl, paste0("Sum-score item-wise fit, omitting ",numToOmit," item.")))
 @
 
 <<fig.height=3>>=
-pl <- lapply(colnames(ev.grp$param), function(item) {
+pl <- lapply(names(sfit), function(item) {
   SSplot(sfit, item)
 })
 for (px in 1:length(pl)) {
   print(pl[[px]])
 }
-print(plot.info(ev.grp, width=5, show.total=FALSE, basis=c(1)))
+print(plot.info(pop$general$event, width=5, show.total=FALSE, basis=c(1)))
 @
 
 <<>>=
-ba.grp$data <- NULL
-tr.grp$data <- NULL
-# ev.grp$data <- NULL
-save(ba.grp, tr.grp, ev.grp, file="cms-fit.rda")
+for (p1 in names(pop)) {
+  pop[[p1]][["barrier"]]$data <- NULL
+  pop[[p1]][["training"]]$data <- NULL
+  pop[[p1]][["event"]]$data <- NULL
+}
+save(pop, file="cms-fit.rda")
 
 #items <- t(m2$ItemParam@values)
 #rownames(items) <- item.names
@@ -501,7 +617,14 @@ if (0) {
 
 <<results='asis'>>=
 source("cms-score.R")
-cms <- cms.score(espt)
+cms <- NULL
+if (!popSplit) {
+  cms <- cms.score('general', espt)
+} else {
+  for (p1 in pops) {
+    cms <- rbind(cms, cms.score(p1, subset(espt, population == p1)))
+  }
+}
 miss <- apply(cms, 2, function(c) sum(is.na(c))) / nrow(cms)
 miss <- t(100 * miss)
 rownames(miss) <- "% missing"

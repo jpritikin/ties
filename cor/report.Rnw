@@ -90,7 +90,9 @@ print(xtable(dt,
 @
 
 <<results='asis'>>=
-mask <- cdat$event >= 0
+load("../cms-fit.rda")
+
+mask <- cdat$event >= pop$uva$event$mean[1]
 mask <- mask & !is.na(mask)
 cdat <- cdat[mask,]
 ctbl <- cor(cdat[c(6:ncol(cdat))], use="pairwise.complete.obs")

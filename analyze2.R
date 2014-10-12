@@ -20,6 +20,9 @@ espt <- espt[ver.mask,]
 espt <- espt[,apply(espt, 2, function(c) !all(is.na(c) | c==''))]
 espt <- cms.fixOldData(espt)
 
+espt$population[grepl("ppool",espt$wave)] <- 'uva'
+espt$population[grepl("grad",espt$wave)] <- 'uva'
+
 manocha2013 <- read.csv("au/2013combined.csv", stringsAsFactors=FALSE)
 if (1) {
   # exclude later when we have more data TODO
@@ -31,6 +34,7 @@ manocha2013.cms <- cbind(prep.cms201309(manocha2013[,79:101]), uid=manocha2013$u
 manocha2013.cms$start <- '12/15/2013';
 manocha2013.cms$end <- '12/15/2013';
 manocha2013.cms$wave <- 'manocha2013'
+manocha2013.cms$population <- 'general'
 espt <- smartbind(espt, manocha2013.cms)
 
 espt$freqCause <- NULL  # response options changed 2013-12
@@ -68,6 +72,8 @@ web201410Prep <- cbind(prepDemographics(web201410[1:16]),
                        prep.cms201409(web201410[17:(17+29-1)]))
 web201410Prep$wave <- "earlydata/short-20141006"
 espt <- smartbind(espt, web201410Prep)
+
+espt$population[is.na(espt$population)] <- 'general'
 
 if (length(unique(espt$uid[!is.na(espt$uid)])) != sum(!is.na(espt$uid))) stop("mismatch")
 next.uid <- 1+max(espt$uid, na.rm=TRUE)

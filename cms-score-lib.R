@@ -100,7 +100,7 @@ cms.testlets <- function(df) {
     df$pctSuccess[nchar(df$pctSuccess)==0] <- NA
     # TODO try 10 categories when we have more data
     df$successCat <- cut(as.numeric(df$pctSuccess),
-                         breaks=seq(0,100,length.out=8), ordered_result=TRUE)
+                         breaks=seq(0,100,length.out=6), ordered_result=TRUE)
   }
   for (col in c('msPreoccu', 'msTimeAlloc', 'maxDurationOut')) {
     if (is.null(df[[col]])) df[[col]] <- factor(NA)
