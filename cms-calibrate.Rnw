@@ -21,15 +21,10 @@ library(gridExtra)
 library(xtable)
 library(psych)
 library(GPArotation)
+library(ifaTools)
 }
 suppressPackageStartupMessages(loadlib())
 options(digits=2, scipen=1)
-plot.width=3
-
-assertColumnExist <- function(col) {
-  missing <- col[is.na(match(col, colnames(espt)))]
-  if (length(missing)) stop(paste("Columns missing:", omxQuotes(missing)))
-}
 
 itemMapText <- geom_text(size=4, position=position_jitter(h=.25))
 popSplit <- TRUE
@@ -47,7 +42,6 @@ popSplit <- TRUE
 The CMS calibration sample is composed of a number of different datasets.
 
 <<results='asis'>>=
-source('irtplot.R')
 source("cms-score-lib.R")
 
 load("espt.rda")
@@ -105,62 +99,6 @@ The items must make sense on a short time horizon and
 should also be amenable to long-term barriers.
 
 <<>>=
-ifaSplitBy <- function(tmpl, fullData, mMat, covMat, ...,
-                       splitCol="population", refGroup="general", split=TRUE) {
-  dataCol <- setdiff(colnames(fullData), splitCol)
-  itemMatName <- tmpl$expectation$item
-  ivalues <- tmpl[[itemMatName]]$values
-  newLabels <- tmpl[[itemMatName]]$labels
-  
-  for (r in 1:nrow(newLabels)) {
-    for (c in 1:ncol(newLabels)) {
-      if (!is.na(newLabels[r,c]) || is.na(ivalues[r,c])) next
-      newLabels[r,c] <- paste(itemMatName,"_r", r, "c", c, sep = "")
-    }
-  }
-  
-  tmpl[[itemMatName]]$labels <- newLabels
-  
-  refData <- subset(fullData, !split | population==refGroup, dataCol)
-  refModel <- mxModel(model=tmpl, name=refGroup,
-                      mxData(observed=refData, type="raw"))
-
-  extraGroups <- setdiff(unique(fullData[[splitCol]]), refGroup)
-  container <- mxModel(model="container", refModel)
-  if (!split) {
-    extraGroups <- NULL
-  } else {
-    container <- mxModel(container,
-                         mxModel(model="latentFit",
-                                 mxFitFunctionMultigroup(paste0(extraGroups, "Latent"))))
-  }
-
-  for (grp in extraGroups) {
-    gmodel <- mxModel(model=tmpl, name=grp, mMat, covMat,
-                      mxData(observed=subset(fullData, population==grp, dataCol), type="raw"))
-    lmodel <- mxModel(model=paste0(grp,"Latent"),
-                      mxDataDynamic(type='cov', expectation=paste(grp,'expectation',sep='.')),
-                      mxExpectationNormal(covariance=paste(grp,'cov',sep='.'),
-                                          means=paste(grp,'mean',sep='.')),
-                      mxFitFunctionML())
-    container <- mxModel(model=container, gmodel, lmodel)
-  }
-  
-  enames <- c(refGroup, extraGroups)
-  mstep <- list(mxComputeNewtonRaphson(freeSet=paste(enames,'item',sep='.')))
-  if (split) {
-    lset <- apply(expand.grid(extraGroups, c("mean","cov")), 1, paste, collapse='.')
-    mstep <- c(mstep,
-               mxComputeGradientDescent(fitfunction='latentFit.fitfunction',
-                                        freeSet=lset))
-  }
-  container <- mxModel(container,
-                       mxFitFunctionMultigroup(enames),
-                       mxComputeEM(paste(enames, 'expectation', sep="."), 'scores',
-                                   mxComputeSequence(mstep)))
-  container
-}
-
 fitBarrer <- function(ba.data) {
   barrier.items <- setdiff(colnames(ba.data), "population")
   
@@ -195,7 +133,7 @@ if(length(factors)==3) {
   diag(covMat$free) <- TRUE
   dimnames(covMat) <- list(factors, factors)
 
-  ba <- ifaSplitBy(tmpl, ba.data, mMat, covMat, split=popSplit)
+  ba <- replicateModelBy(tmpl, ba.data, mMat, covMat, split=popSplit)
   em <- ba$compute
   ba <- mxModel(ba, mxComputeSequence(steps=list(
     em,
@@ -298,18 +236,18 @@ print(xtable(tbl, paste0("Sum-score item-wise fit, omitting ",numToOmit," item."
 @
 
 <<fig.height=2>>=
-map1 <- item.map(pop$general$barrier, 1)
+map1 <- itemResponseMap(pop$general$barrier, factor=1)
 ggplot(map1, aes(x=score, y=item, label=outcome)) + itemMapText
 @
 
 <<fig.height=3>>=
 pl <- lapply(names(sfit), function(item) {
-  SSplot(sfit, item)
+  SitemPlot(sfit, item)
 })
 for (px in 1:length(pl)) {
   print(pl[[px]])
 }
-print(plot.info(pop$general$barrier, width=5, show.total=FALSE, basis=c(1)))
+print(plotInformation(pop$general$barrier, width=5, basis=c(1)))
 @
 
 \section{Training}
@@ -369,7 +307,7 @@ if (0) {
   diag(covMat$free) <- TRUE
   dimnames(covMat) <- list(factors, factors)
 
-  trM <- ifaSplitBy(train, tr.data, mMat, covMat, split=popSplit)
+  trM <- replicateModelBy(train, tr.data, mMat, covMat, split=popSplit)
   em <- trM$compute
   trM <- mxModel(trM, mxComputeSequence(steps=list(
     em,
@@ -451,18 +389,18 @@ print(xtable(tbl, paste0("Sum-score item-wise fit, omitting ",numToOmit," item."
 @
 
 <<fig.height=2>>=
-map1 <- item.map(pop$general$training, 1)
+map1 <- itemResponseMap(pop$general$training, factor=1)
 ggplot(map1, aes(x=score, y=item, label=outcome)) + itemMapText
 @
 
 <<fig.height=3>>=
 pl <- lapply(names(sfit), function(item) {
-  SSplot(sfit, item)
+  SitemPlot(sfit, item)
 })
 for (px in 1:length(pl)) {
   print(pl[[px]])
 }
-print(plot.info(pop$general$training, width=5, show.total=FALSE, basis=c(1)))
+print(plotInformation(pop$general$training, width=5, basis=c(1)))
 @
 
 \section{Event}
@@ -504,7 +442,7 @@ fitEvent <- function(ev.data) {
   diag(covMat$free) <- TRUE
   dimnames(covMat) <- list(factors, factors)
 
-  ev <- ifaSplitBy(eTmpl, ev.data, mMat, covMat, split=popSplit)
+  ev <- replicateModelBy(eTmpl, ev.data, mMat, covMat, split=popSplit)
   em <- ev$compute
   ev <- mxModel(ev, mxComputeSequence(steps=list(
     em,
@@ -562,7 +500,7 @@ ggplot(df, aes(x=score, y=n, color=source)) + geom_line()
 @
 
 <<fig.height=2>>=
-map1 <- item.map(pop$general$event, 1)
+map1 <- itemResponseMap(pop$general$event, factor=1)
 ggplot(map1, aes(x=score, y=item, label=outcome)) + itemMapText
 @
 
@@ -582,19 +520,19 @@ print(xtable(tbl, paste0("Sum-score item-wise fit, omitting ",numToOmit," item."
 
 <<fig.height=3>>=
 pl <- lapply(names(sfit), function(item) {
-  SSplot(sfit, item)
+  SitemPlot(sfit, item)
 })
 for (px in 1:length(pl)) {
   print(pl[[px]])
 }
-print(plot.info(pop$general$event, width=5, show.total=FALSE, basis=c(1)))
+print(plotInformation(pop$general$event, width=5, basis=c(1)))
 @
 
 <<>>=
 for (p1 in names(pop)) {
-  pop[[p1]][["barrier"]]$data <- NULL
-  pop[[p1]][["training"]]$data <- NULL
-  pop[[p1]][["event"]]$data <- NULL
+  for (f1 in names(pop[[p1]])) {
+    pop[[p1]][[f1]] <- stripData(pop[[p1]][[f1]])
+  }
 }
 save(pop, file="cms-fit.rda")
 

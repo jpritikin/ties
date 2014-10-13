@@ -1,3 +1,5 @@
+# This file is deprecated. These functions are mostly moved to ifaTools
+
 library(ggplot2)
 library(reshape2)
 library(gridExtra)
