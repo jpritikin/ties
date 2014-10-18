@@ -1,4 +1,5 @@
 \documentclass[12pt]{article}
+\usepackage{fixltx2e}
 \usepackage[margin=.5in]{geometry}
 \usepackage{pdfpages}
 \setlength{\parindent}{0cm}
@@ -271,7 +272,7 @@ fitTraining <- function(tr.data) {
   })
   names(spec) <- training.items
   
-  for (item in intersect(c('trainSkill', 'trainNum'), names(spec))) {
+  for (item in intersect(c('trainSkill', 'trainNum', 'msTimeAlloc', 'freqCause'), names(spec))) {
     spec[item] <- mkspec(espt, item, length(factors))
   }
   numItems <- length(training.items)
@@ -287,6 +288,8 @@ fitTraining <- function(tr.data) {
 
   imat <- set.nominal.rank(spec, imat, 'trainSkill', 0, .3)
   imat <- set.nominal.rank(spec, imat, 'trainNum', 0, .15)
+  imat <- set.nominal.rank(spec, imat, 'freqCause', 0, 1)
+  imat <- set.nominal.rank(spec, imat, 'msTimeAlloc', 0, .5)
 
 if (0) {
   selfGroup <- intersect(training.items, c("msYearn", "msEnv", "msAllow"))
@@ -323,6 +326,7 @@ if (0) {
 # c("yearnEnv", "allowCause", "trainSkill", "trainNum")
 tr.items <- c('msMet', 'msShared', 'msTeach', 'msTrainTeach')
 tr.items <- c(tr.items, paste0(tr.items, 'Num'))
+tr.items <- c(tr.items, 'freqCause', 'msTimeAlloc')
 
 tr.est <- fitTraining(espt[, c('population', tr.items)])
 
@@ -365,7 +369,7 @@ with condition number \Sexpr{tr.est$output$conditionNumber}.
 % $n=\Sexpr{mnf$n}$, $G^2(\Sexpr{mnf$df})=\Sexpr{mnf$statistic}$.
 
 <<fig.height=2>>=
-toOmit <- bestToOmit(pop$general$training, 0)
+toOmit <- bestToOmit(pop$general$training, 1)
 got <- Reduce('+',lapply(pop, function (x) sumScoreEAPTest(omitItems(x$training, toOmit))))
 
 df <- data.frame(score=as.numeric(names(got$observed)),
@@ -381,7 +385,7 @@ print(xtable(got$pval, paste("Log p-value of local dependence between item pairs
 @ 
 
 <<results='asis'>>=
-numToOmit <- 0
+numToOmit <- 1
 toOmit <- lapply(tr.items, function(x) bestToOmit(pop$general$training, numToOmit, x))
 sfit <- Reduce('+', lapply(pop, function (x) SitemFit(x$training, omit = toOmit)))
 tbl <- t(sapply(sfit, function(r) c(n=r$n, df=r$df, stat=r$statistic, pval=r$pval)))
@@ -456,7 +460,7 @@ fitEvent <- function(ev.data) {
 }
 
 evItems <- c("msYearn", "msEnv", "msAllow",
-             'freqCause', 'msTimeAlloc', 'successCat', 'maxDuration', "maxDurationOut")
+             'successCat', 'maxDuration', "maxDurationOut")
 ev.est <- fitEvent(espt[,c(evItems, "population")])
 
 pops <- sapply(strsplit(ev.est$compute$steps[[1]]$expectation, ".", fixed=TRUE),
@@ -511,7 +515,7 @@ print(xtable(got$pval, paste("Log p-value of local dependence between item pairs
 @ 
 
 <<results='asis'>>=
-numToOmit <- 3
+numToOmit <- 1
 toOmit <- lapply(evItems, function(x) bestToOmit(pop$general$event, numToOmit, x))
 sfit <- Reduce('+', lapply(pop, function (x) SitemFit(x$event, omit = toOmit)))
 tbl <- t(sapply(sfit, function(r) c(n=r$n, df=r$df, stat=r$statistic, pval=r$pval)))
