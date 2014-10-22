@@ -106,9 +106,51 @@ cdat2 <- cbind(cdat2, cms.score('uva', prep.cms201409(raw2[282:(282+29-1)])))
 
 cdat2$sleep <- -score.psqi(raw2[311:(311+19-1)])
 
+# ------------------------------------------------------------------
+raw3 <- read.csv("data-201411.csv", stringsAsFactors=FALSE)
+
+cdat3 <- data.frame(
+  start=raw3$StartDate,
+  end=raw3$EndDate,
+  born=raw3[[3]],
+  sex=factor(raw3[[4]], levels=SexItem, labels=tolower(SexItem)),
+  rel=factor(raw3[[5]], levels=RelaItem, labels=tolower(RelaItemShort)))
+
+# SF12 (ignore for now) 6:17
+
+got <- score.ipipBig5(raw3[18:67])
+for (n in names(got)) cdat3[[n]] <- got[[n]]
+
+got <- score.panas(raw3[68:87])
+for (n in names(got)) cdat3[[n]] <- got[[n]]
+
+got <- score.5fMindfulness2(code.5fMindfulness2(raw3[88:126]))
+for (n in names(got)) cdat3[[n]] <- got[[n]]
+
+got <- score.ryff9(raw3[127:180])
+for (n in names(got)) cdat3[[n]] <- got[[n]]
+
+got <- score.mcFormC(raw3[184:196])
+cdat3$socialDesirable <- got - mean(got, na.rm=TRUE)
+
+got <- score.dass(raw3[197:(197+21-1)])
+for (n in names(got)) cdat3[[n]] <- got[[n]]
+
+cdat3$mwb <- score.wemwbs(raw3[218:(218+7-1)])
+
+cdat3$ei <- score.ei(raw3[225:(225+33-1)])
+
+got <- score.rrq(raw3[258:(258+24-1)])
+for (n in names(got)) cdat3[[n]] <- got[[n]]
+
+cdat3 <- cbind(cdat3, cms.score('uva', prep.cms201410(raw3[282:(282+29-1)])))
+
+cdat3$sleep <- -score.psqi(raw3[311:(311+19-1)])
+
 # --------------------------------------------------------
 
 cdat <- smartbind(cdat1, cdat2)
+cdat <- smartbind(cdat, cdat3)
 cdat <- cdat[,c(1:13,33:36,32,14:31)] # move ffmq together and CMS to the end
 
 if (0) {

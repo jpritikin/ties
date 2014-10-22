@@ -68,7 +68,7 @@ A large proportion of data is missing, but the maximum N=\Sexpr{sum(as.numeric(s
 rawTrain <- c('msMet', 'msShared', 'msTeach', 'msTrainTeach')
 rawCols <- c(#"msNotion", "msAny", "msChildhood", "msEvery", "wantLearn",
              "msEffort", "msEmo", "msAfraid", "msFast", "msLife", "msIdentity", "msPreoccu",
-             "msYearn", "msEnv", "msAllow",
+             "msYearn", "msEnv", "msAllow", #"msTaught",  add later with more data
              'freqCause', 'msTimeAlloc', 'pctSuccess', 'maxDuration', "maxDurationOut",
              rawTrain, paste0(rawTrain, "Num"))
 rawData <- as.data.frame(lapply(espt[,rawCols], function(col) {
@@ -434,6 +434,7 @@ fitEvent <- function(ev.data) {
   imat <- set.nominal.rank(spec, imat, 'msYearn', 0, 1)
   imat <- set.nominal.rank(spec, imat, 'msEnv', 0, 1)
   imat <- set.nominal.rank(spec, imat, 'msAllow', 0, 1)
+  imat <- set.nominal.rank(spec, imat, 'msTaught', 0, .5)
   imat <- set.nominal.rank(spec, imat, 'msTimeAlloc', 0, .5)
   
   eTmpl <- mxModel(model="event", imat,
@@ -459,7 +460,7 @@ fitEvent <- function(ev.data) {
   ev
 }
 
-evItems <- c("msYearn", "msEnv", "msAllow",
+evItems <- c("msYearn", "msEnv", "msAllow", "msTaught",
              'successCat', 'maxDuration', "maxDurationOut")
 ev.est <- fitEvent(espt[,c(evItems, "population")])
 
@@ -494,7 +495,7 @@ condition number \Sexpr{ev.est$output$conditionNumber}.
 % $n=\Sexpr{mnf$n}$, $G^2(\Sexpr{mnf$df})=\Sexpr{mnf$statistic}$.
 
 <<fig.height=2>>=
-toOmit <- bestToOmit(pop$general$event, 2)
+toOmit <- bestToOmit(pop$general$event, 3)
 got <- Reduce('+',lapply(pop, function (x) sumScoreEAPTest(omitItems(x$event, toOmit))))
 
 df <- data.frame(score=as.numeric(names(got$observed)),
@@ -515,7 +516,7 @@ print(xtable(got$pval, paste("Log p-value of local dependence between item pairs
 @ 
 
 <<results='asis'>>=
-numToOmit <- 1
+numToOmit <- 2
 toOmit <- lapply(evItems, function(x) bestToOmit(pop$general$event, numToOmit, x))
 sfit <- Reduce('+', lapply(pop, function (x) SitemFit(x$event, omit = toOmit)))
 tbl <- t(sapply(sfit, function(r) c(n=r$n, df=r$df, stat=r$statistic, pval=r$pval)))
@@ -621,6 +622,6 @@ summary(fit1)
 % A simple linear model to predict event from barrier and training
 % obtains $R^2 = \Sexpr{summary(fit1)[["r.squared"]]}$.
 
-\includepdf[pages={3-}]{archive/short-201409.pdf}
+\includepdf[pages={3-}]{archive/short-201410.pdf}
 
 \end{document}

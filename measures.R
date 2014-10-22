@@ -544,3 +544,51 @@ prep.cms201409 <- function(raw, hack=FALSE) {
   
   df
 }
+
+prep.cms201410 <- function(raw) {
+  if (ncol(raw) != 29) stop("Expecting 29 columns")
+  
+  df <- data.frame(
+    msNotion=mxFactor(tolower(raw[[1]]), MSNotionItem, exclude=""),
+    msAny=mxFactor(tolower(raw[[2]]), MSAgreementItem, exclude=""),
+    msChildhood=mxFactor(tolower(raw[[3]]), MSAgreementItem, exclude=""),
+    msEvery=mxFactor(tolower(raw[[4]]), MSAgreementItem, exclude=""),
+    wantLearn=mxFactor(tolower(raw[[5]]), LearnItem,
+                       exclude=tolower(c('',"I have experienced complete mental silence.")))
+  )
+  
+  item1 <- c("msEffort", "msEmo", "msAfraid", "msFast", "msLife", "msIdentity", "msPreoccu")
+  for (x1 in 1:7) {
+    df[,item1[x1]] <- mxFactor(tolower(raw[[5+x1]]), MSAgreementItem, exclude="")
+  }
+  df$skipInt <- apply(df[,item1], 1, function(t) all(is.na(t)))
+  df$skipInt <- mxFactor(df$skipInt, levels=c(FALSE, TRUE))
+  
+  item2 <- c("msYearn", "msEnv", "msAllow", "msTaught")
+  for (x2 in 1:4) {
+    df[,item2[x2]] <- mxFactor(tolower(raw[[12+x2]]), rev(MSAgreementItem),
+                               exclude=tolower(c('',"I don't understand this question.")))
+  }
+  
+  df$freqCause <- mxFactor(tolower(raw[[17]]), rev(MSFrequencyItem2),
+                           exclude=tolower(c('',"I don't specifically allocate my time for complete mental silence.")))
+  df$msTimeAlloc <- mxFactor(tolower(raw[[18]]), MSTimeAlloc,
+                             exclude=tolower(c("","I don't plan any particular amount of time")))
+  df$pctSuccess <- raw[[19]]
+  # table(df$pctSuccess[df$freqCause == "i don't specifically allocate my time for complete mental silence"])   #crazy?
+  df$maxDuration <- mxFactor(tolower(raw[[20]]), MSMaxDurationItem2,
+                             exclude=tolower(c("", "I have no idea of how much time elapsed.")))
+  df$maxDurationOut <- mxFactor(tolower(raw[[21]]), MSMaxDurationItem2,
+                                exclude=tolower(c("", "I have no idea of how much time elapsed.")))
+  
+  item3 <- c('msMet', 'msShared', 'msTeach', 'msTrainTeach')
+  for (x3 in 1:4) {
+    df[, item3[x3]] <- mxFactor(tolower(raw[[20+x3*2]]), rev(MSAgreementItem),
+                                exclude="")
+    df[, paste(item3[x3], "Num", sep="")] <- raw[[21+x3*2]]
+  }
+  
+  df$instrument <- "2014-10-22"
+  
+  df
+}
