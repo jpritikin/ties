@@ -265,43 +265,39 @@ quantitatively how much one has worked with others.
 fitTraining <- function(tr.data) {
   training.items <- setdiff(colnames(tr.data), "population")
   
-  factors <- 'training'
+  factors <- c('training', 'lifetime')
+#  factors <- c('training')
   spec <- lapply(training.items, function(nm) {
     lev <- length(levels(tr.data[[ nm ]]))
     rpf.grm(outcomes=lev, factors=length(factors))
   })
   names(spec) <- training.items
   
-  for (item in intersect(c('trainSkill', 'trainNum', 'msTimeAlloc', 'freqCause'), names(spec))) {
+  for (item in intersect(c('trainSkill', 'trainNum', 'msTimeAlloc'), names(spec))) {
     spec[item] <- mkspec(espt, item, length(factors))
   }
   numItems <- length(training.items)
   maxParam <- max(sapply(spec, rpf.numParam))
   
-  imat <- mxMatrix(name="item", nrow=maxParam, ncol=numItems, free=FALSE,
+  imat <- mxMatrix(name="item", nrow=maxParam, ncol=numItems,
                      dimnames=list(c(factors,
-                                     paste('p',2:maxParam,sep="")), training.items))
+                                     paste('p',(length(factors)+1):maxParam,sep="")), training.items))
   imat$values[,] <- mxSimplify2Array(lapply(spec, rpf.rparam))
-#  imat$values[c('other', 'self'),] <- 0
-  imat$free[,] <- !is.na(imat$values) & imat$values[,] != 0
   imat$values['training',] <- 1
+  if (any('lifetime' == factors)) {
+    imat$values['lifetime',] <- 0
+    imat$values['lifetime', intersect(c('msMet', 'msShared', 'msTeach', 'msTrainTeach'), training.items)] <- 1
+    imat$values['lifetime', intersect(paste0(c('msMet', 'msShared', 'msTeach', 'msTrainTeach'), "Num"), training.items)] <- 1
+  }
+  imat$free[,] <- !is.na(imat$values) & imat$values[,] != 0
 
   imat <- set.nominal.rank(spec, imat, 'trainSkill', 0, .3)
   imat <- set.nominal.rank(spec, imat, 'trainNum', 0, .15)
-  imat <- set.nominal.rank(spec, imat, 'freqCause', 0, 1)
+#  imat <- set.nominal.rank(spec, imat, 'freqCause', 0, 1)
   imat <- set.nominal.rank(spec, imat, 'msTimeAlloc', 0, .5)
 
-if (0) {
-  selfGroup <- intersect(training.items, c("msYearn", "msEnv", "msAllow"))
-  otherGroup <- intersect(training.items, c("trainSkill", "trainNum"))
-  imat$values['self',selfGroup] <- 1
-  imat$free['self',selfGroup] <- TRUE
-  imat$values['other',otherGroup] <- 1
-  imat$free['other',otherGroup] <- TRUE
-}
-  
   train <- mxModel(model="training", imat,
-                   mxExpectationBA81(spec),
+                   mxExpectationBA81(spec, qwidth=5, qpoints=39),
                    mxFitFunctionML())
 
   mMat <- mxMatrix(name='mean', nrow=length(factors), ncol=1, values=0, free=TRUE)
@@ -328,7 +324,11 @@ tr.items <- c('msMet', 'msShared', 'msTeach', 'msTrainTeach')
 tr.items <- c(tr.items, paste0(tr.items, 'Num'))
 tr.items <- c(tr.items, 'freqCause', 'msTimeAlloc')
 
-tr.est <- fitTraining(espt[, c('population', tr.items)])
+when <- strptime(espt[['instrument']], "%Y-%m-%d")
+revision1 <- strptime("2013-12-15", "%Y-%m-%d")  # slowly increase to 2014-09-15
+ver.mask <- difftime(when, revision1) > 0
+
+tr.est <- fitTraining(espt[ver.mask, c('population', tr.items)])
 
 pops <- sapply(strsplit(tr.est$compute$steps[[1]]$expectation, ".", fixed=TRUE),
                function(x) x[[1]])
@@ -404,7 +404,9 @@ pl <- lapply(names(sfit), function(item) {
 for (px in 1:length(pl)) {
   print(pl[[px]])
 }
-print(plotInformation(pop$general$training, width=5, basis=c(1)))
+basis <- rep(0, pop$general$training$spec[[1]]$factors)
+basis[1] <- 1
+print(plotInformation(pop$general$training, width=5, basis=basis))
 @
 
 \section{Event}
