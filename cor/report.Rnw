@@ -73,7 +73,8 @@ dt <- ctbl[1:(nrow(ctbl)-3), 29:31]
 dt[abs(dt) < .1] <- NA
 print(xtable(dt,
              paste("Correlation with plausibly related self-report ",
-                   "measures ($N=", nrow(cdat), "$).", sep=""), "tab:cor"))
+                   "measures ($N=", nrow(cdat), "$).", sep=""), "tab:cor"),
+      table.placement="p!")
 @
 
 <<results='asis'>>=
@@ -86,7 +87,8 @@ dt[abs(dt) < .1] <- NA
 print(xtable(dt,
              paste("Correlation with plausibly related self-report ",
                    "measures for participants above floor for ",
-                   "experience with mental silence ($N=", sum(mask, na.rm=TRUE), "$).", sep=""), "tab:cor-above"))
+                   "experience with mental silence ($N=", sum(mask, na.rm=TRUE), "$).", sep=""), "tab:cor-above"),
+      table.placement="p!")
 @
 
 <<results='asis'>>=
@@ -101,42 +103,99 @@ dt[abs(dt) < .1] <- NA
 print(xtable(dt,
              paste("Correlation with plausibly related self-report ",
                    "measures for participants above average for ",
-                   "experience with mental silence ($N=", sum(mask, na.rm=TRUE), "$).", sep=""), "tab:cor-avg"))
+                   "experience with mental silence ($N=", sum(mask, na.rm=TRUE), "$).", sep=""), "tab:cor-avg"),
+      table.placement="p!")
 @
 
-%% \begin{figure}
-%% <<fig.height=10>>=
-%%   pairs(cdat[c(6:12,29:31)], cex=.25)
-%% @
-%% \caption{Correlational study, scatterplot matrix.}
-%% \label{fig:cor1}
-%% \end{figure}
+\begin{figure}[p!]
+<<fig.height=8>>=
+cdat <- read.csv("corr.csv", stringsAsFactors=FALSE)
 
-%% \begin{figure}
-%% <<fig.height=10>>=
-%%   pairs(cdat[c(13:18,29:31)], cex=.25)
-%% @
-%% \caption{Correlational study, scatterplot matrix.}
-%% \label{fig:cor1}
-%% \end{figure}
+condCorPlot <- function(vs) {
+  slice <- cdat[,c(vs, 'training', 'event')]
+  minSampleSize <- 30
+  xpoints <- seq(min(slice$event, na.rm=TRUE),
+                 -sort(-slice$event)[minSampleSize],
+                 length.out=60)
+  grid <- expand.grid(x=xpoints,
+                      trait=c('training', 'event'),
+                      upper=0, lower=0)
+  corci <- function(x, c1, c2) {
+    win <- subset(slice, event > x)
+    win <- win[apply(win, 1, function(r) all(!is.na(r))),]
+    #  c(nrow(win),
+    ct <- cor.test(win[[c1]], win[[c2]])
+    c(ct$conf.int, ct$estimate)
+  }
+  ev1 <- sapply(xpoints, corci, vs, 'event')
+  grid[grid$trait=='event', 'lower'] <- ev1[1,]
+  grid[grid$trait=='event', 'upper'] <- ev1[2,]
+  tr1 <- sapply(xpoints, corci, vs, 'training')
+  grid[grid$trait=='training', 'lower'] <- tr1[1,]
+  grid[grid$trait=='training', 'upper'] <- tr1[2,]
+  grid$diff <- ev1[3,] - tr1[3,]
+  pl <- ggplot(grid, aes(x, ymin=lower, ymax=upper, fill=trait)) +
+    geom_ribbon(alpha=.5) +
+    geom_hline(yintercept=0, color="yellow") +
+    geom_line(aes(y=diff), linetype=2) +
+    labs(title=vs, x="minimum event", y="correlation")
+  pl <- pl + theme(legend.position="none") + ylim(-.75, .75)
+  pl
+}
 
-%% \begin{figure}
-%% <<fig.height=10>>=
-%%   pairs(cdat[c(19:24,29:31)], cex=.25)
-%% @
-%% \caption{Correlational study, scatterplot matrix.}
-%% \label{fig:cor1}
-%% \end{figure}
+# nothing
+do.call(grid.arrange,
+        list(condCorPlot('mwb'),
+             condCorPlot('ei'),
+             condCorPlot('extravert'),
+             condCorPlot('nonjudge'),
+             condCorPlot('describe'),
+             condCorPlot('observe'),  #actAware similar
+             ncol=2))
+@
+\caption{Correlation conditional on event score.
+Dash line is event minus training.
+All these measures seem more related to training
+than event (the dash line is mostly at or below 0),
+if they are related at all.}
+\label{fig:nothing}
+\end{figure}
 
-%% \begin{figure}
-%% <<fig.height=10>>=
-%%   pairs(cdat[c(25:28,32,29:31)], cex=.25)
-%% @
-%% \caption{Correlational study, scatterplot matrix.}
-%% \label{fig:cor1}
-%% \end{figure}
+\begin{figure}
+<<fig.height=8>>=
+# not surprising
+do.call(grid.arrange,
+        list(condCorPlot('reflection'),
+             condCorPlot('posAffect'),
+             condCorPlot('perGrowth'),
+             condCorPlot('selfAccept'),
+             ncol=2))
+@
+\caption{Correlation conditional on event score.
+Dash line is event minus training.
+These factor correlations are in the expected direction
+and are more associated with event than training
+(the dashed line is mostly above 0).}
+\label{fig:noSurprise}
+\end{figure}
 
-\break
+\begin{figure}
+<<fig.height=8>>=
+# significant
+do.call(grid.arrange,
+        list(condCorPlot('envMastery'),
+             condCorPlot('autonomy'),
+             condCorPlot('sleep'),
+             ncol=2))
+@
+\caption{Correlation conditional on event score.
+Dash line is event minus training.
+Both envMastery and autonomy are statistically
+significant near the -1 region.
+Sleep exhibits the most dramatic
+discrimination between event and training.}
+\label{fig:sig}
+\end{figure}
 
 \printbibliography
 
