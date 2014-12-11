@@ -21,20 +21,20 @@ set.nominal.rank <- function(spec, ip.mat, name, a, c) {
   if (is.null(spec1)) {
     return(ip.mat)
   }
-  thresh <- spec1@outcomes-1
+  thresh <- spec1$outcomes-1
   free <- rep(FALSE, spec1@factors + 2 * thresh)
   free[1] <- TRUE
-  base <- spec1@factors+1
+  base <- spec1$factors+1
   if (thresh * a >= 1) {
     free[(1+base):(base + thresh * a - 1)] <- TRUE
   }
   base <- base + thresh
   numGamma <- max(thresh * c, 2L)
   free[base:(base + numGamma - 1)] <- TRUE
-  ip.mat@free[1:length(free),name] <- free
+  ip.mat$free[1:length(free),name] <- free
   sv <- c(rep(1,spec1@factors), rep(1, thresh), rep(0, thresh))
-  ip.mat@values[1:length(free),name] <- free * sv
-  ip.mat@values[c(1,spec1@factors+1),name] <- 1
+  ip.mat$values[1:length(free),name] <- free * sv
+  ip.mat$values[c(1,spec1@factors+1),name] <- 1
   ip.mat
 }
 

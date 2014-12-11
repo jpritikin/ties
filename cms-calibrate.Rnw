@@ -102,6 +102,7 @@ should also be amenable to long-term barriers.
 <<>>=
 fitBarrer <- function(ba.data) {
   barrier.items <- setdiff(colnames(ba.data), "population")
+  ba.data <- ba.data[rowSums(!is.na(ba.data[,barrier.items])) > 0,]
   
   factors <- c('barrier')
 #  factors <- c('barrier', 'emo', 'struct')
@@ -115,10 +116,10 @@ fitBarrer <- function(ba.data) {
                      dimnames=list(c(factors, paste('b', (1+length(factors)):maxParam, sep="")),
                                    barrier.items))
   imat$values['barrier',] <- 1
-#  imat$labels['barrier',] <- 'slope'
+  imat$labels['barrier',] <- 'slope'
 if(length(factors)==3) {
-  imat$values['emo',intersect(c('wantLearn', "msAfraid", "msIdentity","msEmo","msPreoccu"),barrier.items)] <- 1
-  imat$values['struct',intersect(c("msFast", "msFast1", "msEffort", "msLife"), barrier.items)] <- 1
+  imat$values['emo',intersect(c('wantLearn', "msAfraid", "msIdentity","msEmo"),barrier.items)] <- 1
+  imat$values['struct',intersect(c("msFast", "msFast1", "msEffort", "msLife", "msPreoccu"), barrier.items)] <- 1
 }
   imat$values[(1+length(factors)):nrow(imat),] <-
     mxSimplify2Array(lapply(spec, function(s) seq(1,.1,length.out = s$outcomes-1)))
@@ -148,11 +149,12 @@ if(length(factors)==3) {
 }
 
 # bitem <- c("msAfraid", "msIdentity", "msFast", "msEffort", "msLife", "msEmo")
-# notSure <- apply(espt[,bitem] == "not sure", 1, all)
-# notSure <- !is.na(notSure) & notSure
-ba.data <- espt[, c('population', "msAfraid", "msIdentity", "msEmo", "msPreoccu",
+ba.data <- espt[, c('population', "msAfraid", "msIdentity", "msPreoccu",
                     "msFast", "msEffort", "msLife")]
 barrier.items <- setdiff(colnames(ba.data), "population")
+notSure <- apply(espt[,barrier.items] == "not sure", 1, all)
+notSure <- !is.na(notSure) & notSure
+ba.data <- ba.data[!notSure,]
 #lev <- levels(ba.data[[1]])[c(3,1,2,4,5)]
 #ba.data <- mxFactor(ba.data, lev)
 
@@ -176,6 +178,11 @@ for (p1 in pops) {
   }
 }
 
+if (0) {
+  rpf.1dim.fit(group=pop$general$barrier, margin=2)
+  rpf.1dim.fit(group=pop$uva$barrier, margin=2)
+}
+
 #multinomialFit(pop$uva$barrier)
 #mnf <- multinomialFit(ba.grp)
 if (interactive) {
@@ -196,11 +203,14 @@ if (0) {
 }
 @ 
 
+Participants who answered ``not sure'' for all items
+were excluded ($n=\Sexpr{sum(notSure)}$).
 For a single factor model, the items were highly locally dependent.
 % Two subfactors were hypothesized: an emotional subfactor for
 % \Sexpr{names(which(ba.grp$param['emo',] !=0))}; and a structural subfactor for
 % \Sexpr{names(which(ba.grp$param['struct',] !=0))}.
-A candidate bi-factor model was fit with -2LL=\Sexpr{ba.est$output$fit} and
+A bi-factor model was not empirically identified.
+A Rasch model was fit with -2LL=\Sexpr{ba.est$output$fit} and
 condition number \Sexpr{ba.est$output$conditionNumber}.
 % The full-information multinomial fit test was conducted,
 % $n=\Sexpr{mnf$n}$, $G^2(\Sexpr{mnf$df})=\Sexpr{mnf$statistic}$.
@@ -264,7 +274,8 @@ quantitatively how much one has worked with others.
 <<>>=
 fitTraining <- function(tr.data) {
   training.items <- setdiff(colnames(tr.data), "population")
-  
+    tr.data <- tr.data[rowSums(!is.na(tr.data[,training.items])) > 0,]
+
   factors <- c('training', 'lifetime')
 #  factors <- c('training')
   spec <- lapply(training.items, function(nm) {
@@ -417,6 +428,7 @@ intensity of experiencing complete mental silence.
 <<>>=
 fitEvent <- function(ev.data) {
   event.items <- setdiff(colnames(ev.data), "population")
+  ev.data <- ev.data[rowSums(!is.na(ev.data[,event.items])) > 0,]
 
   spec <- mkspec(espt, event.items)
   numItems <- length(event.items)

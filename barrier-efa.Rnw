@@ -1,0 +1,194 @@
+\documentclass[12pt]{article}
+\usepackage{fixltx2e}
+\usepackage[margin=.5in]{geometry}
+\usepackage{pdfpages}
+\usepackage{float}
+\setlength{\parindent}{0cm}
+\setlength{\parskip}{1ex}
+
+<<echo=FALSE, results='hide', warning=FALSE, cache=FALSE>>=
+#options(error = browser)
+library(knitr)
+#knit("barrier-efa.Rnw", tangle=TRUE)  # to extract only the R chunks
+opts_knit$set(error=TRUE)
+opts_chunk$set(echo=FALSE, cache=FALSE)
+loadlib <- function () {
+library(rpf)
+library(OpenMx)
+library(ggplot2)
+library(reshape2)
+library(plyr)
+library(grid)
+library(gridExtra)
+library(xtable)
+library(GPArotation)
+library(ifaTools)
+}
+suppressPackageStartupMessages(loadlib())
+options(digits=2, scipen=1)
+
+itemMapText <- geom_text(size=4, position=position_jitter(h=.25))
+popSplit <- TRUE
+@
+
+\title{Barrier subscale, exploratory factor analysis}
+\date{\today}
+\author{Joshua N.~Pritikin\\ University of Virginia}
+
+\begin{document}
+\maketitle
+
+\section{Data Sources}
+
+The CMS calibration sample is composed of a number of different datasets.
+
+<<results='asis'>>=
+source("cms-score-lib.R")
+
+load("espt.rda")
+espt <- cms.testlets(espt)
+
+src <- ddply(espt, ~wave, function(slice) c(types=length(unique(slice$instrument))))
+
+if (any(src$types != 1)) {
+  stop("There should be no more than 1 instrument version per wave.")
+}
+
+src <- ddply(espt, ~wave, function(slice) c(instrument=unique(slice$instrument), count=nrow(slice),
+                                            start=min(slice$start), end=max(slice$end)))
+src <- src[order(src$instrument, src$end, src$start),]
+print(xtable(src), include.rownames=FALSE)
+@
+
+A large proportion of data is missing, but the maximum N=\Sexpr{sum(as.numeric(src$count))}.
+
+<<cache=FALSE>>=
+fitBarrer <- function(ba.data) {
+  barrier.items <- setdiff(colnames(ba.data), "population")
+  ba.data <- ba.data[rowSums(!is.na(ba.data[,barrier.items])) > 0,]
+  
+  factors <- c('barrier')
+#  factors <- c('barrier', 'emo', 'struct')
+  spec <- lapply(barrier.items, function(nm) {
+    lev <- length(levels(ba.data[[ nm ]]))
+    rpf.grm(outcomes=lev, factors=length(factors))
+  })
+  
+  maxParam <- max(sapply(spec, rpf.numParam))
+  imat <- mxMatrix(name="item", nrow=maxParam, ncol=length(spec), free=FALSE,
+                     dimnames=list(c(factors, paste('b', (1+length(factors)):maxParam, sep="")),
+                                   barrier.items))
+  imat$values['barrier',] <- 1
+#  imat$labels['barrier',] <- 'slope'
+if(length(factors)==3) {
+  imat$values['emo',intersect(c('wantLearn', "msAfraid", "msIdentity","msEmo","msPreoccu"),barrier.items)] <- 1
+  imat$values['struct',intersect(c("msFast", "msFast1", "msEffort", "msLife"), barrier.items)] <- 1
+}
+  imat$values[(1+length(factors)):nrow(imat),] <-
+    mxSimplify2Array(lapply(spec, function(s) seq(.9,.1,length.out = s$outcomes-1)))
+  imat$free[,] <- !is.na(imat$values[,]) & imat$values[,] != 0
+
+  tmpl <- mxModel(model="barrier", imat,
+                  mxExpectationBA81(spec),
+                  mxFitFunctionML())
+  
+  mMat <- mxMatrix(name='mean', nrow=length(factors), ncol=1, values=0, free=TRUE)
+  rownames(mMat) <- factors
+  covMat <- mxMatrix(name='cov', values=diag(length(factors)))
+  diag(covMat$free) <- TRUE
+  dimnames(covMat) <- list(factors, factors)
+
+  ba <- replicateModelBy(tmpl, ba.data, mMat, covMat, split=popSplit)
+  em <- ba$compute
+  ba <- mxModel(ba, mxComputeSequence(steps=list(
+    em,
+    mxComputeOnce('fitfunction', 'information', "meat"),
+    mxComputeStandardError(),
+    mxComputeHessianQuality())
+  ))
+  ba
+}
+
+# bitem <- c("msAfraid", "msIdentity", "msFast", "msEffort", "msLife", "msEmo")
+# notSure <- apply(espt[,bitem] == "not sure", 1, all)
+# notSure <- !is.na(notSure) & notSure
+if (0) {
+ba.data <- espt[, c('population', "msAfraid", "msIdentity", "msEmo",
+                    "msPreoccu", "msFast", "msEffort", "msLife")]
+} else {
+ba.data <- espt[, c('population', "msEmo",
+                    "msEffort", "msAfraid", "msLife",
+                    "msIdentity", "msPreoccu","msFast")]
+}
+
+barrier.items <- setdiff(colnames(ba.data), "population")
+#lev <- levels(ba.data[[1]])[c(3,1,2,4,5)]
+#ba.data <- mxFactor(ba.data, lev)
+
+# "wantLearn" poor discrimination, locally dependent with msEffort (duh) & msEmo
+f1 <- fitBarrer(ba.data)
+f2 <- addExploratoryFactors(f1, 1)
+f3 <- addExploratoryFactors(f1, 2)
+
+randomizeStart <- function(m) {
+  p1 <- omxGetParameters(m)
+  mask <- grepl("item", names(p1)) & p1 == 1
+  p1[mask] <- rlnorm(sum(mask))
+  omxSetParameters(m, names(p1), values=p1)
+}
+
+istart <- structure(c(3.64, 0, 6.71, 4.23, 2.98, 0.86, 3.75, 0, 8.18, 5.91,  3.46, 1.17, 2.93, 1.23, 5.82, 3.78, 1.81, -0.02, 3.27, 4.08,  5.83, 2.1, 0.14, -2.49, 1.5, 1.78, 3.02, 0.42, -0.56, -2.26,  1.51, 1.42, 3.62, 1.56, -0.43, -2.21, 2.63, 2.46, 4.64, 2.18,  0.52, -1.61), .Dim = 6:7, .Dimnames = list(c("barrier", "explore1",  "b2", "b3", "b4", "b5"), c("msAfraid", "msIdentity", "msEmo",  "msPreoccu", "msFast", "msEffort", "msLife")))
+f2$general$item$values[,colnames(istart)] <- istart+.01
+f2$uva$item$values[,colnames(istart)] <- istart+.01
+#f3$general$item$values[-3,colnames(istart)] <- istart+.01
+#f3$uva$item$values[-3,colnames(istart)] <- istart+.01
+
+f1 <- mxRun(f1, silent=TRUE)
+f2 <- mxRun(f2, silent=TRUE)
+f3 <- mxRun(f3, silent=TRUE)
+@ 
+
+<<results='asis'>>=
+print(xtable(mxCompare(f3, c(f2,f1))))
+@
+
+The 3 factor solution is sensitive to starting values.
+A 4 factor solution was not empirically identified.
+
+\subsection{Two factor solution}
+
+<<results='asis'>>=
+r2 <- oblimin(toFactorLoading(f2$general$item$values[1:2,]))
+ss <- r2$loadings
+minLoading <- .2
+ss[abs(ss) < minLoading] <- NA
+print(xtable(ss, paste("Loadings for 2 factor solution suppressing",
+                       "loadings less than", minLoading)),
+      table.placement="H")
+@
+
+<<results='asis'>>=
+print(xtable(r2$Phi, "Correlation matrix of oblique rotation."),
+      table.placement="H")
+@
+
+\subsection{Three factor solution}
+
+<<results='asis'>>=
+r3 <- oblimin(toFactorLoading(f3$general$item$values[1:3,]))
+ss <- r3$loadings
+minLoading <- .2
+ss[abs(ss) < minLoading] <- NA
+print(xtable(ss, paste("Loadings for 3 factor solution suppressing",
+                       "loadings less than", minLoading)),
+      table.placement="H")
+@
+
+<<results='asis'>>=
+print(xtable(r3$Phi, "Correlation matrix of oblique rotation."),
+      table.placement="H")
+@
+
+\includepdf[pages={5}]{archive/short-201410.pdf}
+
+\end{document}
