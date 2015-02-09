@@ -1,0 +1,3 @@
+To anonymize,
+
+rm idmap.csv labmap.csv wave1-id.csv waven-id.csv ppool1-id.csv ppooln-id.csv

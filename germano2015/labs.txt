@@ -1,0 +1,142 @@
+15291
+100-LEC
+Regular
+TuTh 11:00AM - 12:15PM
+Nau Hall 101
+Kurtis Schaeffer
+01/12/2015 - 04/28/2015
+Wait List
+select
+Enrl: 240/240
+
+15292
+101-DIS
+Regular
+Fr 11:00AM - 11:50AM
+Slaughter Rec 115B-MP2
+Nicholas Trautz
+01/12/2015 - 04/28/2015
+Wait List
+select
+Enrl: 20/20
+
+15293
+102-DIS
+Regular
+Fr 12:00PM - 12:50PM
+Slaughter Rec 115B-MP2
+Michelle Walsh
+01/12/2015 - 04/28/2015
+Wait List
+select
+Enrl: 20/20
+
+15294
+103-DIS
+Regular
+Fr 1:00PM - 1:50PM
+Slaughter Rec 115B-MP2
+Michelle Walsh
+01/12/2015 - 04/28/2015
+Wait List
+select
+Enrl: 20/20
+
+15295
+104-DIS
+Regular
+Fr 2:00PM - 2:50PM
+Slaughter Rec 115A-MP1
+Michelle Walsh
+01/12/2015 - 04/28/2015
+Wait List
+select
+Enrl: 20/20
+
+15296
+105-DIS
+Regular
+Fr 3:00PM - 3:50PM
+Slaughter Rec 115A-MP1
+Nicholas Trautz
+01/12/2015 - 04/28/2015
+Wait List
+select
+Enrl: 20/20
+
+15297
+106-DIS
+Regular
+Fr 4:00PM - 4:50PM
+Slaughter Rec 115A-MP1
+Nicholas Trautz
+01/12/2015 - 04/28/2015
+Wait List
+select
+Enrl: 20/20
+
+15298
+107-DIS
+Regular
+Fr 2:00PM - 2:50PM
+Slaughter Rec 115B-MP2
+Christopher Hiebert
+01/12/2015 - 04/28/2015
+Wait List
+select
+Enrl: 20/20
+
+15299
+108-DIS
+Regular
+Fr 3:00PM - 3:50PM
+Slaughter Rec 115B-MP2
+Christopher Hiebert
+01/12/2015 - 04/28/2015
+Wait List
+select
+Enrl: 20/20
+
+15300
+109-DIS
+Regular
+Fr 4:00PM - 4:50PM
+Slaughter Rec 115B-MP2
+Christopher Hiebert
+01/12/2015 - 04/28/2015
+Wait List
+select
+Enrl: 20/20
+
+21412
+113-DIS
+Regular
+Th 2:00PM - 2:50PM
+Slaughter Rec 115B-MP2
+Katarina Turpeinen
+01/12/2015 - 04/28/2015
+Wait List
+select
+Enrl: 20/20
+
+21413
+114-DIS
+Regular
+Th 3:00PM - 3:50PM
+Slaughter Rec 115B-MP2
+Katarina Turpeinen
+01/12/2015 - 04/28/2015
+Wait List
+select
+Enrl: 20/20
+
+21414
+115-DIS
+Regular
+Th 4:00PM - 4:50PM
+Slaughter Rec 115B-MP2
+Katarina Turpeinen
+01/12/2015 - 04/28/2015
+Wait List
+select
+Enrl: 20/20

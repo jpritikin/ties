@@ -96,6 +96,23 @@ score.ryff9 <- function(raw) {
        selfAccept  = mean.or.na(raw[,46:54], 7))
 }
 
+score.ryff.envMastery14 <- function(raw) {
+  if (ncol(raw) != 14) stop("Expected 14 columns")
+  
+  RyffItem <- c("Strongly Disagree",  "Disagree Somewhat",	"Disagree Slightly",
+                "Agree Slightly",	"Agree Somewhat",	"Strongly Agree")
+
+  for (col in 1:14) {
+    lev <- RyffItem
+    if (col %in% c(2,3,5,8,11,13)) {
+      lev <- rev(RyffItem)
+    }
+    raw[[col]] <- mxFactor(raw[[col]], levels=lev, exclude='')
+  }
+
+  mean.or.na(raw[,1:14], 12)
+}
+
 # See Reynolds (1982) and Crowne & Marlowe (1960)
 score.mcFormC <- function(raw) {
   if (ncol(raw) != 13) stop("Expected 13 columns")
