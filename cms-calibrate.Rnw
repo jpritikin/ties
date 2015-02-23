@@ -80,7 +80,7 @@ rawData <- as.data.frame(lapply(espt[,rawCols], function(col) {
 }))
 rawDataCor <- cor(rawData, use="pairwise.complete.obs")
 estSampleSize <- sum(!is.na(rawData)) / ncol(rawData)
-capture.output( fa.parallel(rawDataCor, n.obs=estSampleSize, main=NULL, fa="fa"), file='NUL')
+capture.output( fa.parallel(rawDataCor, n.obs=estSampleSize, main=NULL, fa="fa"))
 @
 
 <<results='asis'>>=
@@ -569,6 +569,8 @@ if (0) {
   }
 }
 @
+
+% Consider canonical correlation between training/barrier & event indicators TODO
 
 \section{Cross-sectional Relationship}
 

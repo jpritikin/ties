@@ -193,9 +193,20 @@ Dash line is event minus training.
 Both envMastery and autonomy are statistically
 significant near the -1 region.
 Sleep exhibits the most dramatic
-discrimination between event and training.}
+discrimination between event and training of all the factors.
+Sleep quality is not correlated with event but it has a significant
+negative correlation with training.}
 \label{fig:sig}
 \end{figure}
+
+Figures~\ref{fig:nothing},~\ref{fig:noSurprise},~\ref{fig:sig}
+are a more continuous version of Tables~\ref{tab:cor-above},~\ref{tab:cor-avg}.
+The dotted line is the difference between the correlation point estimates.
+The shaded area shows the 95\% confidence interval of the correlation
+(assuming that factor scores are measured without error).
+Blue is event. Pink is training.
+The CI gets wider as it approaches the right side of the plot
+because the sample size gets smaller and smaller.
 
 \printbibliography
 
