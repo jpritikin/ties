@@ -34,10 +34,13 @@ waven <- read.csv("waven-id.csv", stringsAsFactors=FALSE)
 waven <- rbind(waven, read.csv("ppooln-id.csv", stringsAsFactors=FALSE))
 waven$id <- idmap[match(waven[,'Email.Address'], idmap$email), 'id']
 
-Collector1 <- c("63247047","63990099","64589357")
-Collector2 <- c("64759933", "TBA", "TBA")
+if (0) {
+  table(waven$CollectorID)
+}
+Collector1 <- c("63247047","63990099","64589357","65247444")
+Collector2 <- c("64759933", "64960121", "TBA")
 
-for (wn in 1:3) {
+for (wn in 1:4) {
   wave2 <- subset(waven, CollectorID == Collector1[wn] | CollectorID == Collector2[wn])
   wave2 <- wave2[match(wave1$id, wave2$id),]
   wave2$time <- wn+1

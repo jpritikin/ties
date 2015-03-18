@@ -26,7 +26,7 @@ rownames(labGrid) <- labLabels
 
 labData <- NULL
 
-numWaves <- 4
+numWaves <- 5
 
 wide <- NULL
 for (wave in 1:numWaves) {
@@ -45,7 +45,7 @@ for (wave in 1:numWaves) {
 labData$labTA <- factor(labData$labTA)
 
 mask <- apply(!is.na(wide[,which(colnames(wide) == "id")]), 1, sum)
-wide <- wide[mask >= 3,]
+wide <- wide[mask >= 3,]  # minimum number of measurements per participant
 
 erange <- apply(wide[,which(colnames(wide) == "event")], 1, range)
 wide <- wide[order(erange[1,] - erange[2,]),]
