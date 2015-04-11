@@ -26,7 +26,7 @@ rownames(labGrid) <- labLabels
 
 labData <- NULL
 
-numWaves <- 5
+numWaves <- 6
 
 wide <- NULL
 for (wave in 1:numWaves) {
@@ -46,8 +46,13 @@ labData$labTA <- factor(labData$labTA)
 
 mask <- apply(!is.na(wide[,which(colnames(wide) == "id")]), 1, sum)
 wide <- wide[mask >= 3,]  # minimum number of measurements per participant
+# sum(mask >= 5)
+if (0) {
+  cat(deparse(wide[!is.na(wide$labTA), 'id']))
+}
 
-erange <- apply(wide[,which(colnames(wide) == "event")], 1, range)
+erange <- apply(wide[,which(colnames(wide) == "event")], 1,
+                function(x) range(c(0,x), na.rm=TRUE))
 wide <- wide[order(erange[1,] - erange[2,]),]
 
 measures <- c("barrier", "training", "event", "envMastery")
@@ -86,7 +91,7 @@ for (.id in unique(long$id)) {
     labs(title=paste("ID =", .id, "LabTA =", ifelse(nrow(lab1), lab1$labTA[1], ""))) +
     xlim(tmRange[1],tmRange[2]) + ylim(mRange[1], mRange[2])
   
-  if (nrow(lab1)) {
+  if (FALSE && nrow(lab1)) {
     pl <- pl + geom_vline(data=lab1,
                           aes(xintercept = x), color="yellow")
   }
