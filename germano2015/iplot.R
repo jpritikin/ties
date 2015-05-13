@@ -45,10 +45,11 @@ for (wave in 1:numWaves) {
 labData$labTA <- factor(labData$labTA)
 
 mask <- apply(!is.na(wide[,which(colnames(wide) == "id")]), 1, sum)
-wide <- wide[mask >= 3,]  # minimum number of measurements per participant
+wide <- wide[mask >= 5,]  # minimum number of measurements per participant
 # sum(mask >= 5)
 if (0) {
-  cat(deparse(wide[!is.na(wide$labTA), 'id']))
+  inviteId <- wide[!is.na(wide$labTA), 'id']
+  cat(deparse(inviteId))
 }
 
 erange <- apply(wide[,which(colnames(wide) == "event")], 1,

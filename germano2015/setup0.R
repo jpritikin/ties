@@ -60,12 +60,10 @@ for (wn in 1:5) {
 }
 
 if (0) {
-  m3 <- c(802L, 810L, 815L, 821L, 825L, 833L, 834L, 839L, 840L, 842L,  843L, 844L,
-          849L, 850L, 851L, 852L, 853L, 856L, 857L, 859L, 860L,  861L, 864L, 865L,
-          874L, 877L, 878L, 879L, 881L, 885L, 886L, 889L,  895L, 896L, 898L, 900L,
-          901L, 904L, 905L, 906L, 907L, 908L, 909L,  911L, 912L, 914L, 915L, 917L,
-          918L, 922L, 923L, 924L, 925L, 928L,  929L, 930L, 931L)
+  m3 <- c(802L, 810L, 825L, 833L, 834L, 839L, 840L, 842L, 843L, 851L,  852L, 856L,
+          859L, 860L, 861L, 864L, 865L, 877L, 878L, 885L, 886L,  896L, 898L, 900L,
+          904L, 905L, 906L, 907L, 908L, 909L, 911L, 915L,  918L, 922L, 923L, 924L, 925L, 929L, 930L)
   e3 <- idmap[match(m3, idmap$id), 'email']
-  e3 <- e3[-match("vb4bv@virginia.edu", e3)]  # exclude after March 27
-  write.table(e3, file="e3.csv", quote=FALSE, row.names=FALSE)
+#  e3 <- e3[-match("vb4bv@virginia.edu", e3)]  # exclude after March 27
+  write.table(e3, file="e6.csv", quote=FALSE, row.names=FALSE)
 }
