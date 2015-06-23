@@ -26,7 +26,7 @@ rownames(labGrid) <- labLabels
 
 labData <- NULL
 
-numWaves <- 6
+numWaves <- 9
 
 wide <- NULL
 for (wave in 1:numWaves) {
@@ -49,6 +49,7 @@ wide <- wide[mask >= 5,]  # minimum number of measurements per participant
 # sum(mask >= 5)
 if (0) {
   inviteId <- wide[!is.na(wide$labTA), 'id']
+  length(inviteId)
   cat(deparse(inviteId))
 }
 

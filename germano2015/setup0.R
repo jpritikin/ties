@@ -41,14 +41,15 @@ if (0) {
   df$count <- sapply(df$CollectorID, function(cid) sum(cid == waven$CollectorID))
   df
 }
-Collector1 <- c("63247047","63990099","64589357","65247444","66271723")
-Collector2 <- c("64759933", "64960121", "64960311","64960615")
+Collector1 <- c("63247047","63990099","64589357","65247444","66271723",
+                "68288151", "68788201", "69491717")  #relb
+Collector2 <- c("64759933", "64960121", "64960311","64960615", "64960712") #ppool
 if (0) {
   subset(df, CollectorID %in% Collector1)
   subset(df, CollectorID %in% Collector2)
 }
 
-for (wn in 1:5) {
+for (wn in 1:9) {
   wave2 <- subset(waven, CollectorID == Collector1[wn] | CollectorID == Collector2[wn])
   wave2 <- wave2[match(wave1$id, wave2$id),]
   wave2$time <- wn+1
@@ -66,4 +67,11 @@ if (0) {
   e3 <- idmap[match(m3, idmap$id), 'email']
 #  e3 <- e3[-match("vb4bv@virginia.edu", e3)]  # exclude after March 27
   write.table(e3, file="e6.csv", quote=FALSE, row.names=FALSE)
+}
+if (0) {
+  m9 <- c(810L, 833L, 840L, 842L, 843L, 856L, 859L, 860L, 877L, 885L,  898L, 900L,
+          905L, 906L, 907L, 908L, 909L, 915L, 918L, 924L, 925L,  929L, 930L)
+  e9 <- idmap[match(m9, idmap$id), 'email']
+  e9
+  length(e9)
 }

@@ -22,7 +22,7 @@ rel <- NULL
 labTime <- NULL
 labTA <- NULL
 
-for (wave in 1:6) {
+for (wave in 1:9) {
   raw <- read.csv(sprintf("wave%d-anon.csv", wave), stringsAsFactors=FALSE)
   offset <- 3+ifelse(wave==1, 3, 0)
   if (wave == 1) {
