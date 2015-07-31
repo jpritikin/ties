@@ -73,6 +73,13 @@ web201410Prep <- cbind(prepDemographics(web201410[1:16]),
 web201410Prep$wave <- "earlydata/short-20141006"
 espt <- smartbind(espt, web201410Prep)
 
+espt <- smartbind(espt, local({
+  wd <- setwd("germano2015")
+  source("getCalibrationData.R")
+  setwd(wd)
+  germano2015.cms
+}))
+
 web201410 <- read.csv("earlydata/short-20141022p.csv", stringsAsFactors=FALSE)
 web201410Prep <- cbind(prepDemographics(web201410[1:16]),
                        prep.cms201410(web201410[17:(17+29-1)]))
