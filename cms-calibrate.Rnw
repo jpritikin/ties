@@ -246,8 +246,8 @@ fitTraining <- function(tr.data) {
   training.items <- setdiff(colnames(tr.data), "population")
     tr.data <- tr.data[rowSums(!is.na(tr.data[,training.items])) > 0,]
 
-  factors <- c('training', 'lifetime')
-#  factors <- c('training')
+#  factors <- c('training', 'lifetime')
+  factors <- c('training')
   spec <- lapply(training.items, function(nm) {
     lev <- length(levels(tr.data[[ nm ]]))
     rpf.grm(outcomes=lev, factors=length(factors))
@@ -267,7 +267,7 @@ fitTraining <- function(tr.data) {
   imat$values['training',] <- 1
   if (any('lifetime' == factors)) {
     imat$values['lifetime',] <- 0
-    imat$values['lifetime', intersect(c('msMet', 'msShared', 'msTeach', 'msTrainTeach'), training.items)] <- 1
+#    imat$values['lifetime', intersect(c('msMet', 'msShared', 'msTeach', 'msTrainTeach'), training.items)] <- 1
     imat$values['lifetime', intersect(paste0(c('msMet', 'msShared', 'msTeach', 'msTrainTeach'), "Num"), training.items)] <- 1
   }
   imat$free[,] <- !is.na(imat$values) & imat$values[,] != 0
@@ -301,8 +301,7 @@ fitTraining <- function(tr.data) {
 
 # not specific enough: "msAny", "msEvery"
 # c("yearnEnv", "allowCause", "trainSkill", "trainNum")
-tr.items <- c('msMet', 'msShared', 'msTeach', 'msTrainTeach')
-tr.items <- c(tr.items, paste0(tr.items, 'Num'))
+tr.items <- paste0(c('msShared', 'msMet', 'msTeach', 'msTrainTeach'), 'Num')
 tr.items <- c(tr.items, 'freqCause', 'msTimeAlloc')
 
 when <- strptime(espt[['instrument']], "%Y-%m-%d")
