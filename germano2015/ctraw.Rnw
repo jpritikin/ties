@@ -1,0 +1,116 @@
+\documentclass[12pt]{article}
+\usepackage{fixltx2e}
+\usepackage[margin=1in]{geometry}
+\usepackage{graphicx}
+\usepackage{authblk}
+\setlength{\parindent}{0cm}
+\setlength{\parskip}{1ex}
+
+<<echo=FALSE, results='hide', warning=FALSE, cache=FALSE>>=
+#options(error = browser)
+library(knitr)
+#knit("cms-calibrate.Rnw", tangle=TRUE)  # to extract only the R chunks
+opts_knit$set(error=TRUE)
+opts_chunk$set(echo=FALSE, cache=FALSE)
+loadlib <- function () {
+  library(rpf)
+  library(OpenMx)
+  library(xtable)
+  library(ctsem)
+  source("lab.R")
+}
+suppressPackageStartupMessages(loadlib())
+@
+
+\title{Continuous Time Factor Analysis of the 2015~Meditation Class}
+\date{\today}
+\author[1]{Joshua N.~Pritikin}
+\author[2]{Charles C.~Driver}
+\affil[1]{University of Virginia}
+\affil[2]{Max Planck Institute for Human Development, Berlin}
+
+\begin{document}
+\maketitle
+
+
+<<>>=
+{
+  wd <- setwd("..")
+  source("measures.R")
+  source("cms-score.R")
+  setwd(wd)
+}
+
+SexItem <- c("Male","Female")
+
+RelaItem = c('Single',
+             'In a long-term relationship (i.e. together more than a year)',
+             'Other')
+RelaItemShort = c('Single',
+                  'Together',
+                  'Other')
+numWaves <- 9
+
+# declare global variables
+born <- NULL
+sex <- NULL
+rel <- NULL
+labTime <- NULL
+labTA <- NULL
+lifeExperience <- c('msMet', 'msShared', 'msTeach','msTrainTeach')
+tformat <- "%m/%d/%Y %H:%M:%S"
+reftime <- strptime("01/07/2015 12:00:00", tformat)
+labGrid <- buildLabTable(reftime)
+manifestNames <- NULL
+
+long <- NULL
+
+for (wave in 1:numWaves) {
+  raw <- read.csv(sprintf("wave%d-anon.csv", wave), stringsAsFactors=FALSE)
+  offset <- 3+ifelse(wave==1, 3, 0)
+  if (wave == 1) {
+    born <- raw[[3]]
+    sex <- factor(raw[[4]], levels=SexItem, labels=tolower(SexItem))
+    rel <- factor(raw[[5]], levels=RelaItem, labels=tolower(RelaItemShort))
+    labTime <- raw$labTime
+    labTA <- raw$labTA
+  }
+  envMastery <- score.ryff.envMastery14(raw[offset:(offset + 14 - 1)])
+  offset <- offset + 14 + ifelse(wave==1, 5, 0)
+  cmsCol <- raw[,offset:(offset+24-1)]
+  cmsCol <- cbind(NA,NA,NA,NA,NA,cmsCol)
+  cms <- prep.cms201410(cmsCol)
+  cms[['instrument']] <- NULL
+  cms <- cms.testlets(cms)
+  for (del in c(
+    'msNotion', 'msAny', 'msChildhood', 'msEvery', 'wantLearn', 'skipInt',
+    'pctSuccess', 'msEmo', 'msFast1', 'msIdAfraid', 'msIdAfraidLearn',
+                'msFastEffort','msFastEffortLife', lifeExperience)) {
+    cms[[del]] <- NULL
+  }
+#  if (is.null(itemLev)) itemLev <- unlist(lapply(cms, function(col) length(levels(col))))
+  if (is.null(manifestNames)) manifestNames <- colnames(cms)
+  cms <- sapply(cms, unclass)
+  mask <- apply(cms, 1, function (r) any(!is.na(r)))
+  relweek <- as.numeric((strptime(raw$EndDate, "%m/%d/%Y %H:%M:%S") - reftime))/7
+  long <- rbind(long, data.frame(
+    id=raw$id[mask], time=relweek[mask], cms[mask,], envMastery=envMastery[mask], lab=0
+  ))
+  
+  if (wave == 1) {
+    labRow <- NULL
+    for (row in which(!is.na(labTime))) {
+      labRow <- rbind(labRow, data.frame(
+        id=raw[row, 'id'], time=as.numeric(labGrid[labTime[row],])/7, lab=1))
+    }
+    for (col in c(colnames(cms), 'envMastery')) labRow[[col]] <- NA
+    labRow <- rbind(long, labRow)
+  }
+}
+
+# This doesn't quite work.
+wide <- ctLongToWide(long, id="id", time="time",
+                     manifestNames=manifestNames, TDpredNames=c("lab"))
+@
+
+\end{document}
