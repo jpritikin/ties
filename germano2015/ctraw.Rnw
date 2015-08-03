@@ -102,10 +102,11 @@ for (wave in 1:numWaves) {
     labRow <- NULL
     for (row in which(!is.na(labTime))) {
       labRow <- rbind(labRow, data.frame(
-        id=raw[row, 'id'], time=as.numeric(labGrid[labTime[row],])/7, lab=1))
+        id=raw[row, 'id'], time=as.numeric(labGrid[labTime[row],])/7))
     }
     for (col in colnames(cms)) labRow[[col]] <- NA
-    labRow <- rbind(long, labRow)
+    labRow[['lab']] <- 1
+    long <- rbind(long, labRow)
   }
 }
 
