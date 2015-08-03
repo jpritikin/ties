@@ -123,7 +123,8 @@ long <- toIndividualRelativeTime(long)
 
 wide <- ctLongToWide(long, id="id", time="time",
                      manifestNames=manifestNames, TDpredNames=c("lab"))
-wide <- ctIntervalise(wide, numWaves, length(manifestNames), n.TDpred=1)
+wide <- ctIntervalise(wide, numWaves, length(manifestNames), n.TDpred=n.TDpred,
+                      manifestNames=manifestNames, TDpredNames=c("lab"))
 
 latents <- c("lab", "training", "ties", "envMastery")
 n.TDpred <- 1
