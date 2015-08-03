@@ -125,7 +125,8 @@ wide <- ctLongToWide(long, id="id", time="time",
                      manifestNames=manifestNames, TDpredNames=c("lab"))
 wide <- ctIntervalise(wide, numWaves, length(manifestNames), n.TDpred=1)
 
-latents <- c("training", "ties", "envMastery")
+latents <- c("lab", "training", "ties", "envMastery")
+n.TDpred <- 1
 
 free_path <- function(lambda, from, to) {
   lambda[from, to] <- apply(expand.grid(from, to), 1, paste0, collapse="_to_")
@@ -149,9 +150,24 @@ lambda <- free_path(lambda, c('msTimeAlloc', 'msYearn', 'msEnv', 'msAllow', 'msT
                     c('training', 'ties'))
 
 model <- ctModel(
-  n.manifest=length(manifestNames), n.latent=length(latents), Tpoints=numWaves, n.TDpred=1,
-  LAMBDA=lambda, manifestNames=manifestNames, latentNames=latents, TDpredNames = "lab")
-fit <- ctFit(wide, model, retryattempts=0, plotOptimization=TRUE, verbose=2)
+  n.manifest=length(manifestNames), n.latent=length(latents), Tpoints=numWaves, n.TDpred=n.TDpred,
+  LAMBDA=lambda, manifestNames=manifestNames, latentNames=latents, TDpredNames = "lab",
+  T0TDPREDCOV=matrix(0, nrow=length(latents), ncol=(numWaves-1)*n.TDpred),
+  TRAITTDPREDCOV=matrix(0, nrow=length(latents), ncol=(numWaves-1)*n.TDpred),
+  TRAITVAR = "auto"
+  )
+
+model$TRAITVAR[,match('lab',latents)] <- 0
+model$DIFFUSION[,match('lab',latents)] <- 0
+model$T0VAR[,match('lab',latents)] <- 0
+model$CINT[match('lab',latents),] <- 0
+model$T0MEANS[match('lab',latents),] <- 0
+model$TDPREDEFFECT[match('lab',latents),] <- 0
+model$DRIFT[match('lab',latents),match('lab',latents)] <- 0
+# We know that training does not cause labs
+model$DRIFT[match('lab',latents),match('training',latents)] <- 0
+
+fit <- ctFit(wide, model, retryattempts=0, plotOptimization=TRUE, verbose=2, objective="mxRAM")
 @
 
 \end{document}

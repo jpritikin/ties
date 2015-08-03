@@ -2,7 +2,7 @@ library(rpf)
 library(OpenMx)
 source("cms-score-lib.R")
 
-load("cms-fit.rda")
+try(load("cms-fit.rda"))
 
 ifa.score <- function(grp, df) {
   grp$data <- df
