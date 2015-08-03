@@ -89,12 +89,13 @@ for (wave in 1:numWaves) {
     cms[[del]] <- NULL
   }
 #  if (is.null(itemLev)) itemLev <- unlist(lapply(cms, function(col) length(levels(col))))
-  if (is.null(manifestNames)) manifestNames <- colnames(cms)
   cms <- sapply(cms, unclass)
+  cms <- cbind(cms, envMastery=envMastery)
+  if (is.null(manifestNames)) manifestNames <- colnames(cms)
   mask <- apply(cms, 1, function (r) any(!is.na(r)))
   relweek <- as.numeric((strptime(raw$EndDate, "%m/%d/%Y %H:%M:%S") - reftime))/7
   long <- rbind(long, data.frame(
-    id=raw$id[mask], time=relweek[mask], cms[mask,], envMastery=envMastery[mask], lab=0
+    id=raw$id[mask], time=relweek[mask], cms[mask,], lab=0
   ))
   
   if (wave == 1) {
@@ -103,14 +104,38 @@ for (wave in 1:numWaves) {
       labRow <- rbind(labRow, data.frame(
         id=raw[row, 'id'], time=as.numeric(labGrid[labTime[row],])/7, lab=1))
     }
-    for (col in c(colnames(cms), 'envMastery')) labRow[[col]] <- NA
+    for (col in colnames(cms)) labRow[[col]] <- NA
     labRow <- rbind(long, labRow)
   }
 }
 
-# This doesn't quite work.
+toIndividualRelativeTime <- function(df, id="id", time="time") {
+  idList <- unique(df[[id]])
+  for (ix in idList) {
+    mask <- df[[id]] == ix
+    t0 <- min(df[mask,time])
+    df[mask,time] <- df[mask,time] - t0
+  }
+  df
+}
+
+long <- toIndividualRelativeTime(long)
+
 wide <- ctLongToWide(long, id="id", time="time",
                      manifestNames=manifestNames, TDpredNames=c("lab"))
+wide <- ctIntervalise(wide, numWaves, length(manifestNames), n.TDpred=1)
+
+latents <- c("training", "ties", "envMastery")
+lambda <- matrix(0, nrow=length(manifestNames), ncol=length(latents),
+                 dimnames=list(manifestNames, latents))
+lambda['envMastery', 'envMastery'] <- 1
+lambda[paste0(lifeExperience, "Num"), 'training'] <- 1
+lambda[c('maxDuration','maxDurationOut','successCat'), 'ties'] <- 1
+
+model <- ctModel(
+  n.manifest=length(manifestNames), n.latent=length(latents), Tpoints=numWaves, n.TDpred=1,
+  LAMBDA=lambda, manifestNames=manifestNames, latentNames=latents, TDpredNames = "lab")
+fit <- ctFit(wide, model, verbose=2)
 @
 
 \end{document}
