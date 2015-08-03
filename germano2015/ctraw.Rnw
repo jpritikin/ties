@@ -126,16 +126,32 @@ wide <- ctLongToWide(long, id="id", time="time",
 wide <- ctIntervalise(wide, numWaves, length(manifestNames), n.TDpred=1)
 
 latents <- c("training", "ties", "envMastery")
-lambda <- matrix(0, nrow=length(manifestNames), ncol=length(latents),
+
+free_path <- function(lambda, from, to) {
+  lambda[from, to] <- apply(expand.grid(from, to), 1, paste0, collapse="_to_")
+  lambda
+}
+
+# a plausible factor structure
+lambda <- matrix("0", nrow=length(manifestNames), ncol=length(latents),
                  dimnames=list(manifestNames, latents))
 lambda['envMastery', 'envMastery'] <- 1
-lambda[paste0(lifeExperience, "Num"), 'training'] <- 1
-lambda[c('maxDuration','maxDurationOut','successCat'), 'ties'] <- 1
+
+lambda['freqCause', 'training'] <- 1
+lambda <- free_path(lambda, paste0(lifeExperience, "Num"), 'training')
+lambda <- free_path(lambda, c('msAfraid', 'msIdentity', 'msEffort'), 'training')
+
+lambda['maxDuration', 'ties'] <- 1
+lambda <- free_path(lambda, c('msFast', 'msLife', 'msPreoccu'), 'ties')
+lambda <- free_path(lambda, c('maxDurationOut', 'successCat'), 'ties')
+
+lambda <- free_path(lambda, c('msTimeAlloc', 'msYearn', 'msEnv', 'msAllow', 'msTaught'),
+                    c('training', 'ties'))
 
 model <- ctModel(
   n.manifest=length(manifestNames), n.latent=length(latents), Tpoints=numWaves, n.TDpred=1,
   LAMBDA=lambda, manifestNames=manifestNames, latentNames=latents, TDpredNames = "lab")
-fit <- ctFit(wide, model, verbose=2)
+fit <- ctFit(wide, model, retryattempts=0, plotOptimization=TRUE, verbose=2)
 @
 
 \end{document}
