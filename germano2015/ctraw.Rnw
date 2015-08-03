@@ -123,9 +123,14 @@ long <- toIndividualRelativeTime(long)
 
 wide <- ctLongToWide(long, id="id", time="time",
                      manifestNames=manifestNames, TDpredNames=c("lab"))
-wide <- ctIntervalise(wide, numWaves, length(manifestNames), n.TDpred=1)
+wide <- ctIntervalise(wide, numWaves, length(manifestNames), n.TDpred=1,manifestNames=manifestNames, TDpredNames = 'lab')
 
-latents <- c("lab", "training", "ties", "envMastery")
+#plot means
+for(i in 1:length(manifestNames)){
+plot(0:8,apply(wide[,paste0(manifestNames[i],'_T',0:8)],2,mean,na.rm=T),type='b',main=paste0('mean ', manifestNames[i]))
+}
+
+latents <- c("labeffect", "training", "ties", "envMastery")
 n.TDpred <- 1
 
 free_path <- function(lambda, from, to) {
@@ -153,21 +158,76 @@ model <- ctModel(
   n.manifest=length(manifestNames), n.latent=length(latents), Tpoints=numWaves, n.TDpred=n.TDpred,
   LAMBDA=lambda, manifestNames=manifestNames, latentNames=latents, TDpredNames = "lab",
   T0TDPREDCOV=matrix(0, nrow=length(latents), ncol=(numWaves-1)*n.TDpred),
-  TRAITTDPREDCOV=matrix(0, nrow=length(latents), ncol=(numWaves-1)*n.TDpred),
-  TRAITVAR = "auto"
+  # TRAITTDPREDCOV=matrix(0, nrow=length(latents), ncol=(numWaves-1)*n.TDpred), #I don't think we know this is 0 - unless the lab or control condition was randomly assigned?
+  MANIFESTTRAITVAR = "auto" #to begin, I would use MANIFESTTRAITVAR so that all between person variance is removed (people can be consistently high / low on some manifest variables of a process and not others) - we can work on the between person structure more adequately once we understand the dynamic structure somewhat. 
   )
 
-model$TRAITVAR[,match('lab',latents)] <- 0
-model$DIFFUSION[,match('lab',latents)] <- 0
-model$T0VAR[,match('lab',latents)] <- 0
-model$CINT[match('lab',latents),] <- 0
-model$T0MEANS[match('lab',latents),] <- 0
-model$TDPREDEFFECT[match('lab',latents),] <- 0
-model$DRIFT[match('lab',latents),match('lab',latents)] <- 0
-# We know that training does not cause labs
-model$DRIFT[match('lab',latents),match('training',latents)] <- 0
+# model$TRAITVAR[,match('lab',latents)] <- 0
+model$DIFFUSION[,match('labeffect',latents)] <- 0
+model$T0VAR[,match('labeffect',latents)] <- 0
+# model$CINT[match('labeffect',latents),] <- 0
+model$T0MEANS[match('labeffect',latents),] <- 0
+# model$TDPREDEFFECT[match('lab',latents),] <- 0 #this is the wrong way around
+model$TDPREDEFFECT[-which(latents %in% 'labeffect'),] <- 0
+model$DRIFT[match('labeffect',latents),match('labeffect',latents)] <- 0
+# We know that changes in latent processes do not cause labs
+model$DRIFT[match('labeffect',latents),] <- 0
 
-fit <- ctFit(wide, model, retryattempts=0, plotOptimization=TRUE, verbose=2, objective="mxRAM")
+
+fit <- ctFit(wide, model, retryattempts=10, verbose=2, meanIntervals=T)
+
+
+
+
+
+
+
+
+####Without lab influence but modelling trend instead
+wide <- ctLongToWide(long, id="id", time="time",
+                     manifestNames=manifestNames)
+wide <- ctIntervalise(wide, numWaves, length(manifestNames), n.TDpred=0,manifestNames=manifestNames)
+latents <- c("trend", "training", "ties", "envMastery")
+n.TDpred <- 0
+
+free_path <- function(lambda, from, to) {
+  lambda[from, to] <- apply(expand.grid(from, to), 1, paste0, collapse="_to_")
+  lambda
+}
+
+# a plausible factor structure
+lambda <- matrix("0", nrow=length(manifestNames), ncol=length(latents),
+                 dimnames=list(manifestNames, latents))
+lambda['envMastery', 'envMastery'] <- 1
+
+lambda['freqCause', 'training'] <- 1
+lambda <- free_path(lambda, paste0(lifeExperience, "Num"), 'training')
+lambda <- free_path(lambda, c('msAfraid', 'msIdentity', 'msEffort'), 'training')
+
+lambda['maxDuration', 'ties'] <- 1
+lambda <- free_path(lambda, c('msFast', 'msLife', 'msPreoccu'), 'ties')
+lambda <- free_path(lambda, c('maxDurationOut', 'successCat'), 'ties')
+
+lambda <- free_path(lambda, c('msTimeAlloc', 'msYearn', 'msEnv', 'msAllow', 'msTaught'),
+                    c('training', 'ties'))
+
+model <- ctModel(
+  n.manifest=length(manifestNames), n.latent=length(latents), Tpoints=numWaves, n.TDpred=n.TDpred,
+  LAMBDA=lambda, manifestNames=manifestNames, latentNames=latents, 
+  MANIFESTTRAITVAR = "auto" #to begin, I would use MANIFESTTRAITVAR so that all between person variance is removed (people can be consistently high / low on some manifest variables of a process and not others) - we can work on the between person structure more adequately once we understand the dynamic structure somewhat. 
+  )
+
+# model$TRAITVAR[,match('lab',latents)] <- 0
+model$DIFFUSION[,match('trend',latents)] <- 0
+model$T0VAR[,match('trend',latents)] <- 0
+model$CINT[match('trend',latents),] <- 1
+model$T0MEANS[match('trend',latents),] <- 0
+model$DRIFT[match('trend',latents),match('trend',latents)] <- 0
+# We think that changes in latent processes do not cause trends
+model$DRIFT[match('trend',latents),] <- 0
+
+
+fit <- ctFit(wide, model, retryattempts=10, verbose=2, stationary=c('T0MEANS', 'T0VAR'),meanIntervals=T)
 @
 
 \end{document}
