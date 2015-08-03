@@ -120,15 +120,33 @@ toIndividualRelativeTime <- function(df, id="id", time="time") {
   df
 }
 
-long <- toIndividualRelativeTime(long)
+TDpredNames<-'lab'
 
+# long <- toIndividualRelativeTime(long) #unnecessary and problematic
+
+#generate group vector based on observations
+long<-long[order(long[,'id'],long[,'time']),]
+id<-long[,'id']
+numObsUnique<- unlist(lapply(1:length(unique(id)), function(x){
+  length(id[id==unique(id)[x]])
+  }))
+numObs<-c()
+for(i in 1:length(id)){
+numObs[i]<-numObsUnique[id[i]==unique(id)]
+}
+
+long<-cbind(long,numObs)
+  
 wide <- ctLongToWide(long, id="id", time="time",
-                     manifestNames=manifestNames, TDpredNames=c("lab"))
-wide <- ctIntervalise(wide, numWaves, length(manifestNames), n.TDpred=1,manifestNames=manifestNames, TDpredNames = 'lab')
+                     manifestNames=manifestNames, TDpredNames=c(TDpredNames))
+numWaves<-23
+wide <- ctIntervalise(wide, numWaves, length(manifestNames), n.TDpred=1,manifestNames=manifestNames, TDpredNames = TDpredNames)
+
+wide[,paste0(TDpredNames,'_T',0:(numWaves-2))][is.na(wide[,paste0(TDpredNames,'_T',0:(numWaves-2))])] <- 0
 
 #plot means
 for(i in 1:length(manifestNames)){
-plot(0:8,apply(wide[,paste0(manifestNames[i],'_T',0:8)],2,mean,na.rm=T),type='b',main=paste0('mean ', manifestNames[i]))
+plot(0:(numWaves-1),apply(wide[,paste0(manifestNames[i],'_T',0:(numWaves-1))],2,mean,na.rm=T),type='b',main=paste0('mean ', manifestNames[i]))
 }
 
 latents <- c("labeffect", "training", "ties", "envMastery")
@@ -175,9 +193,7 @@ model$DRIFT[match('labeffect',latents),match('labeffect',latents)] <- 0
 model$DRIFT[match('labeffect',latents),] <- 0
 
 
-fit <- ctFit(wide, model, retryattempts=10, verbose=2, meanIntervals=T)
-
-
+fit <- ctFit(wide, model, retryattempts=10, verbose=2,meanIntervals=T)
 
 
 
