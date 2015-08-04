@@ -193,11 +193,12 @@ for (px in levels(partition)) {
   model$MANIFESTMEANS <- matrix(paste0('mean_',manifestNames),ncol=1)
   model$T0MEANS[,] <- 0
   model$TDPREDEFFECT[-which(latents %in% 'labeffect'),] <- 0
-  model$DRIFT[match('labeffect',latents),match('labeffect',latents)] <- 0
-  # We know that changes in latent processes do not cause labs
-  model$DRIFT[match('labeffect',latents),] <- 0
+  model$TDPREDEFFECT[which(latents %in% 'labeffect'),] <- 1
+  model$DRIFT[match('labeffect',latents),] <- 0  # set persistent labeffect, and we know that changes in latent processes do not cause labs
   model$TDPREDVAR <- diag(0.1,max(Tpoints)-1)
- model$DRIFT[!diag(length(latents))] <- 0
+  driftindex<-!diag(length(latents))
+  driftindex[,which(latents %in% 'labeffect')] <- FALSE
+ model$DRIFT[driftindex] <- 0
   
   m1 <- ctFit(wide, model, nofit=TRUE, meanIntervals=T,stationary=c('T0VAR','T0MEANS'))
   m1 <- mxRename(m1, sprintf("group%02d_%02d", min(Tpoints), max(Tpoints)))
