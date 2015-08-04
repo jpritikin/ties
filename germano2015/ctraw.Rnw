@@ -154,7 +154,6 @@ for (Tpoints in sort(unique(numUniqueObs))) {
     long1 <- rbind(long1, subset(long, id %in% longUniqueIds[which(numUniqueObs == 1)]))
     long1 <- rbind(long1, subset(long, id %in% longUniqueIds[which(numUniqueObs == 2)]))
   }
-  print(c(Tpoints,nrow(long1)))
   wide <- ctLongToWide(long1, id="id", time="time",
                        manifestNames=manifestNames, TDpredNames=TDpredNames)
   wide <- ctIntervalise(wide, Tpoints, n.manifest=length(manifestNames), n.TDpred=n.TDpred,
@@ -172,7 +171,6 @@ for (Tpoints in sort(unique(numUniqueObs))) {
     LAMBDA=lambda, manifestNames=manifestNames, latentNames=latents, TDpredNames=TDpredNames,
     T0TDPREDCOV=matrix(0, nrow=length(latents), ncol=(Tpoints-1)*n.TDpred),
     #  TRAITTDPREDCOV=matrix(0, nrow=length(latents), ncol=(Tpoints-1)*n.TDpred), #I don't think we know this is 0 - unless the lab or control condition was randomly assigned?
-    TDPREDMEANS=matrix(apply(wide[,paste0(TDpredNames,'_T',0:(Tpoints-2)), drop=FALSE],2,mean,na.rm=T),ncol=1),
     MANIFESTTRAITVAR = "auto" #to begin, I would use MANIFESTTRAITVAR so that all between person variance is removed (people can be consistently high / low on some manifest variables of a process and not others) - we can work on the between person structure more adequately once we understand the dynamic structure somewhat. 
   )
   
@@ -188,7 +186,7 @@ for (Tpoints in sort(unique(numUniqueObs))) {
   model$DRIFT[match('labeffect',latents),] <- 0
   
   m1 <- ctFit(wide, model, nofit=TRUE, stationary=c('T0VAR','T0MEANS'))
-  m1 <- mxRename(m1, paste0("group", Tpoints))
+  m1 <- mxRename(m1, sprintf("group%02d", Tpoints))
   container <- mxModel(container, m1)
 }
 
