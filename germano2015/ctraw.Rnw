@@ -146,17 +146,14 @@ longUniqueIds <- unique(long[,'id'])
 numUniqueObs <- sapply(1:length(longUniqueIds),
                        function(x) sum(long[,'id'] == longUniqueIds[x]))
 container <- mxModel(model="ctraw")
-for (Tpoints in sort(unique(numUniqueObs))) {
-  if (Tpoints < 3) next
-  long1 <- subset(long, id %in% longUniqueIds[which(numUniqueObs == Tpoints)])
-  if (Tpoints == 3) {
-    # combine 1,2,3 because ctsem can't handle Tpoints=c(1,2) right now
-    long1 <- rbind(long1, subset(long, id %in% longUniqueIds[which(numUniqueObs == 1)]))
-    long1 <- rbind(long1, subset(long, id %in% longUniqueIds[which(numUniqueObs == 2)]))
-  }
+uniqueTpoints <- sort(unique(numUniqueObs))
+partition <- cut(uniqueTpoints, 4)
+for (px in levels(partition)) {
+  Tpoints <- uniqueTpoints[partition == px]
+  long1 <- subset(long, id %in% longUniqueIds[which(numUniqueObs %in% Tpoints)])
   wide <- ctLongToWide(long1, id="id", time="time",
                        manifestNames=manifestNames, TDpredNames=TDpredNames)
-  wide <- ctIntervalise(wide, Tpoints, n.manifest=length(manifestNames), n.TDpred=n.TDpred,
+  wide <- ctIntervalise(wide, max(Tpoints), n.manifest=length(manifestNames), n.TDpred=n.TDpred,
                         manifestNames=manifestNames, TDpredNames = TDpredNames)
 
   if (FALSE) {
@@ -167,14 +164,14 @@ for (Tpoints in sort(unique(numUniqueObs))) {
   }
   
   model <- ctModel(
-    n.manifest=length(manifestNames), n.latent=length(latents), Tpoints=Tpoints, n.TDpred=n.TDpred,
+    n.manifest=length(manifestNames), n.latent=length(latents),
+    Tpoints=max(Tpoints), n.TDpred=n.TDpred,
     LAMBDA=lambda, manifestNames=manifestNames, latentNames=latents, TDpredNames=TDpredNames,
-    T0TDPREDCOV=matrix(0, nrow=length(latents), ncol=(Tpoints-1)*n.TDpred),
-    #  TRAITTDPREDCOV=matrix(0, nrow=length(latents), ncol=(Tpoints-1)*n.TDpred), #I don't think we know this is 0 - unless the lab or control condition was randomly assigned?
+    T0TDPREDCOV=matrix(0, nrow=length(latents), ncol=(max(Tpoints)-1)*n.TDpred),
+    #  TRAITTDPREDCOV=matrix(0, nrow=length(latents), ncol=(max(Tpoints)-1)*n.TDpred), #I don't think we know this is 0 - unless the lab or control condition was randomly assigned?
     MANIFESTTRAITVAR = "auto" #to begin, I would use MANIFESTTRAITVAR so that all between person variance is removed (people can be consistently high / low on some manifest variables of a process and not others) - we can work on the between person structure more adequately once we understand the dynamic structure somewhat. 
   )
   
-  # model$TRAITVAR[,match('lab',latents)] <- 0
   model$DIFFUSION[,match('labeffect',latents)] <- 0
   model$T0VAR[,match('labeffect',latents)] <- 0
   model$CINT[,] <- 0
@@ -186,7 +183,7 @@ for (Tpoints in sort(unique(numUniqueObs))) {
   model$DRIFT[match('labeffect',latents),] <- 0
   
   m1 <- ctFit(wide, model, nofit=TRUE, stationary=c('T0VAR','T0MEANS'))
-  m1 <- mxRename(m1, sprintf("group%02d", Tpoints))
+  m1 <- mxRename(m1, sprintf("group%02d_%02d", min(Tpoints), max(Tpoints)))
   container <- mxModel(container, m1)
 }
 
