@@ -103,6 +103,9 @@ for (wave in 1:numWaves) {
   ))
 }
 
+long<-long[!is.na(long[,'time']),] #remove rows with no time observation
+
+
 if (FALSE) {  # add labs as separate rows at the correct time
   labRow <- NULL
   for (row in which(!is.na(labTime))) {
@@ -180,7 +183,7 @@ for (px in levels(partition)) {
     Tpoints=max(Tpoints), n.TDpred=n.TDpred,
     LAMBDA=lambda, manifestNames=manifestNames, latentNames=latents, TDpredNames=TDpredNames,
     T0TDPREDCOV=matrix(0, nrow=length(latents), ncol=(max(Tpoints)-1)*n.TDpred),
-    #  TRAITTDPREDCOV=matrix(0, nrow=length(latents), ncol=(max(Tpoints)-1)*n.TDpred), #I don't think we know this is 0 - unless the lab or control condition was randomly assigned?
+     TRAITTDPREDCOV=matrix(0, nrow=length(latents), ncol=(max(Tpoints)-1)*n.TDpred), #I don't think we know this is 0 - unless the lab or control condition was randomly assigned?
     MANIFESTTRAITVAR = "auto" #to begin, I would use MANIFESTTRAITVAR so that all between person variance is removed (people can be consistently high / low on some manifest variables of a process and not others) - we can work on the between person structure more adequately once we understand the dynamic structure somewhat. 
   )
   
@@ -193,11 +196,11 @@ for (px in levels(partition)) {
   model$DRIFT[match('labeffect',latents),match('labeffect',latents)] <- 0
   # We know that changes in latent processes do not cause labs
   model$DRIFT[match('labeffect',latents),] <- 0
-#  model$DRIFT[!diag(length(latents))] <- 0
+  model$TDPREDVAR <- diag(0.1,max(Tpoints)-1)
+ model$DRIFT[!diag(length(latents))] <- 0
   
-  m1 <- ctFit(wide, model, nofit=TRUE, stationary=c('T0VAR','T0MEANS'))
+  m1 <- ctFit(wide, model, nofit=TRUE, meanIntervals=T,stationary=c('T0VAR','T0MEANS'))
   m1 <- mxRename(m1, sprintf("group%02d_%02d", min(Tpoints), max(Tpoints)))
-  m1$TDPREDVARlogchol$free[ lower.tri(m1$TDPREDVARlogchol$free, diag=TRUE) ] <- TRUE
   container <- mxModel(container, m1)
 }
 
