@@ -103,7 +103,7 @@ for (wave in 1:numWaves) {
   ))
 }
 
-if (TRUE) {  # add labs
+if (FALSE) {  # add labs as separate rows at the correct time
   labRow <- NULL
   for (row in which(!is.na(labTime))) {
     potentialLabs <- data.frame(
@@ -117,6 +117,18 @@ if (TRUE) {  # add labs
   for (col in colnames(cms)) labRow[[col]] <- NA
   labRow[['lab']] <- 1
   long <- rbind(long, labRow)
+}
+if (TRUE) {   # add labs at the wrong time to speed up estimation
+  labRow <- NULL
+  for (row in which(!is.na(labTime))) {
+    potentialLabs <- data.frame(
+      id=UnfilteredID[row], time=as.numeric(labGrid[labTime[row],])/7)
+    tpoints <- long[long$id==UnfilteredID[row],'time']
+    rtp <- range(tpoints)
+    potentialLabs <- potentialLabs[rtp[1] < potentialLabs$time & potentialLabs$time < rtp[2],]
+    active <- findInterval(potentialLabs$time, tpoints)
+    long[which(long$id==UnfilteredID[row])[unique(active)],'lab'] <- 1
+  }
 }
 
 latents <- c("labeffect", "training", "ties", "envMastery")
@@ -147,12 +159,18 @@ numUniqueObs <- sapply(1:length(longUniqueIds),
                        function(x) sum(long[,'id'] == longUniqueIds[x]))
 container <- mxModel(model="ctraw")
 uniqueTpoints <- sort(unique(numUniqueObs))
-partition <- cut(uniqueTpoints, 4)
+partition <- cut(uniqueTpoints, 3)
 for (px in levels(partition)) {
   Tpoints <- uniqueTpoints[partition == px]
   long1 <- subset(long, id %in% longUniqueIds[which(numUniqueObs %in% Tpoints)])
   wide <- ctLongToWide(long1, id="id", time="time",
                        manifestNames=manifestNames, TDpredNames=TDpredNames)
+  # replace NAs in the TDpredNames columns with zeros
+  # This should be unneccesary, I think
+  for (tx in 0:(max(Tpoints)-2)) {
+    col <- paste0(TDpredNames, "_T", tx)
+    wide[is.na(wide[,col]), col] <- 0
+  }
   wide <- ctIntervalise(wide, max(Tpoints), n.manifest=length(manifestNames), n.TDpred=n.TDpred,
                         manifestNames=manifestNames, TDpredNames = TDpredNames)
 
@@ -181,6 +199,7 @@ for (px in levels(partition)) {
   model$DRIFT[match('labeffect',latents),match('labeffect',latents)] <- 0
   # We know that changes in latent processes do not cause labs
   model$DRIFT[match('labeffect',latents),] <- 0
+#  model$DRIFT[!diag(length(latents))] <- 0
   
   m1 <- ctFit(wide, model, nofit=TRUE, stationary=c('T0VAR','T0MEANS'))
   m1 <- mxRename(m1, sprintf("group%02d_%02d", min(Tpoints), max(Tpoints)))
