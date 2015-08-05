@@ -77,12 +77,14 @@ they would be more strongly related to training or TIES
 so we put in both paths and let the data express its
 opinion.
 
-For all items, loadings were expected to be non-negative.
+For most items, loadings were expected to be non-negative.
+That is, the appropriate items were reverse scored
+such that all items were aligned in the same direction.
 
 To speed estimation, off-diagonal drift entries were fixed to zero.
 Hence, the model considered the latent factors as causally independent.
 This helps in estimation because it prevents the drift structure
-from settling at some uninterpretable solutions.
+from settling at some uninterpretable solution.
 The chance of sensible, interpretable estimates are increased.
 The cost of this constraint is that the factor structure is
 affected by the absence in our model of all the variables
@@ -308,6 +310,25 @@ tbl <- container$group01_03$LAMBDA$values[-envMasteryIndex,c('training', 'ties')
 tbl[tbl[,] == 0] <- NA
 print(xtable(tbl, "Loadings for first model of dynamic factor structure.", "tab:dfs1"))
 @ 
+
+The loadings were examined after about 130 major iterations,
+prior to meeting the optimizer convergence criterion (Table~\ref{tab:dfs1}).
+Items \verb\msEnv\, \verb\msAllow\, and \verb\msTaught\ seemed
+more closely associated with ties than training.
+Hence, the loadings from these items to training was fixed to zero.
+Item \verb\msTrainTeachNum\ was also eliminated from the model
+(all loadings set to zero).
+This item was designed for very high ability participants
+and seems unhelpful for this sample.
+Item \verb\msYearn\ appears to load on both factors.
+It seems plausible that this item is not specific enough
+and should be discarded from the measure.
+Item \verb\msTimeAlloc\ shows an unusual pattern.
+The negative loading indicates that participants with
+training spent less time trying to meditate, but
+spending more time did increase their experience of ties.
+This is surprising, but no change was made to the
+loadings for this item in the improved model.
 
 <<>>=
 #container <- mxRestore(container, line=10)
