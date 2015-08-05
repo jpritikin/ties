@@ -34,25 +34,29 @@ suppressPackageStartupMessages(loadlib())
 
 Cross sectional factor analysis is prone to find the wrong solution
 for causally related latent structures.
-Causally related indicators will be correlated.
-However, we don't want sunrise and rooster on the same latent factor.
+We expect that causally related indicators are correlated.
+However, it is not helpful for sunrise and rooster to load on the same latent factor.
 Hence, longitudinal factor analysis is necessary to make
-sense of causally related data.
+sense of causally related indicators.
 
 We hypothesized two latent factors underlying the TIES record:
-training and ties.
+training and TIES.
 The quintessential indicator of training is \verb\freqCause\
-because you will most likely not experience ties unless
+(``how often did you allocate time to experience
+(or try to experience) complete mental silence?'')
+because you will most likely not experience TIES unless
 you set aside some time to attempt it.
-In addition, the life experience items load on training (\verb\msMetNum\, \verb\msSharedNum\,
-\verb\msTeachNum\, and possibly \verb\msTrainTeachNum\).
-This is clearly evidenced in the raw data.
+In addition, the life experience items
+(\verb\msMetNum\, \verb\msSharedNum\,
+\verb\msTeachNum\, and possibly \verb\msTrainTeachNum\)
+were set to load on training.
+These items' association with training is clearly evidenced in the raw data.
 There was a striking difference between participants who
 were enrolled in the meditation class and those who were not on these items.
 Items \verb\msEffort\, \verb\msAfraid\, and \verb\msIdentity\
-were also assigned to training (reverse coded) because scores on these
+were also assigned to training because scores on these
 items should move in one direction under the influence
-of training. People experienced with TIES would never
+of training. People experienced with TIES would almost never
 endorse an item like, ``I am afraid of what will
 happen if I stop thinking.''
 
@@ -65,8 +69,8 @@ were also assigned to TIES due to their fairly
 direct and straightforward relationship to the
 latent construct.
 Items \verb\msFast\, \verb\msLife\, and \verb\msPreoccu\
-describe circumstances that can prevent TIES even
-in people with a lot of TIES experience.
+describe circumstances that can preclude TIES even
+for people with a lot of TIES experience.
 Hence, these items were assigned to the TIES latent
 factor (reverse coded).
 
@@ -76,16 +80,16 @@ it was not obvious whether
 they would be more strongly related to training or TIES
 so we put in both paths and let the data express its
 opinion.
-
 For most items, loadings were expected to be non-negative.
 That is, the appropriate items were reverse scored
-such that all items were aligned in the same direction.
+such that all items were expected to be aligned in the same direction.
 
 To speed estimation, off-diagonal drift entries were fixed to zero.
 Hence, the model considered the latent factors as causally independent.
 This helps in estimation because it prevents the drift structure
 from settling at some uninterpretable solution.
-The chance of sensible, interpretable estimates are increased.
+That is,
+the chance of obtaining sensible, interpretable estimates is increased.
 The cost of this constraint is that the factor structure is
 affected by the absence in our model of all the variables
 that are excluded from the model or unmeasured
@@ -95,7 +99,7 @@ this model is not such a bad approximation.
 
 For sensible models, the cross effects after accounting
 for the free diffusion matrix, free manifestvar,
-free manifestrait, will be quite small.
+and free manifestrait will be quite small.
 However, complex models often have multiple minima
 and some of them are nonsensical.
 A stepwise approach is very helpful.
@@ -314,8 +318,8 @@ print(xtable(tbl, "Loadings for first model of dynamic factor structure.", "tab:
 The loadings were examined after about 130 major iterations,
 prior to meeting the optimizer convergence criterion (Table~\ref{tab:dfs1}).
 Items \verb\msEnv\, \verb\msAllow\, and \verb\msTaught\ seemed
-more closely associated with ties than training.
-Hence, the loadings from these items to training was fixed to zero.
+more closely associated with TIES than training.
+Hence, the loadings from these items to training were fixed to zero.
 Item \verb\msTrainTeachNum\ was also eliminated from the model
 (all loadings set to zero).
 This item was designed for very high ability participants
@@ -323,10 +327,12 @@ and seems unhelpful for this sample.
 Item \verb\msYearn\ appears to load on both factors.
 It seems plausible that this item is not specific enough
 and should be discarded from the measure.
+We reserve judgment for now.
 Item \verb\msTimeAlloc\ shows an unusual pattern.
-The negative loading indicates that participants with
+The loadings indicate that participants with
 training spent less time trying to meditate, but
-spending more time did increase their experience of ties.
+when they did spend more time,
+it did increase their experience of TIES.
 This is surprising, but no change was made to the
 loadings for this item in the improved model.
 
