@@ -469,7 +469,8 @@ for (px in levels(partition)) {
   model$TDPREDEFFECT[-which(latents %in% c("labeffect")),] <- 0
   model$TDPREDEFFECT[which(latents %in% c("labeffect")),] <- 1
   driftindex<-!diag(length(latents))
-  driftindex[-which(latents %in% c("labeffect",'trend')),which(latents %in% c("labeffect",'trend'))] <- FALSE
+  driftindex[,which(latents %in% c("labeffect",'trend'))] <- FALSE
+  driftindex[cbind(which(latents %in% c("labeffect",'trend')),which(latents %in% c("labeffect",'trend')))] <- TRUE
   model$DRIFT[driftindex] <- 0
   model$TDPREDVAR <- diag(0.1,max(Tpoints)-1)
 
@@ -478,6 +479,8 @@ for (px in levels(partition)) {
   m1 <- mxRename(m1, sprintf("group%02d_%02d", min(Tpoints), max(Tpoints)))
   container <- mxModel(container, m1)
 }
+
+
 
 container <- mxModel(container,
                      mxFitFunctionMultigroup(names(container$submodels)))
@@ -494,7 +497,9 @@ mxComputeNumericDeriv(),
 mxComputeHessianQuality(),
 mxComputeStandardError()
 )))
+container<-omxSetParameters(container,labels=names(oldparams),values=oldparams,strict=F)
 container<-mxTryHard(container,paste=F,initialTolerance=1e-16,verbose=2)
+oldparams<-omxGetParameters(container)
 ctsummary(object=container$group07_09)
 mxEval(MANIFESTTRAITVAR,container$group07_09,compute=T)
 
