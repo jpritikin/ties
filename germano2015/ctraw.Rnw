@@ -31,7 +31,7 @@ suppressPackageStartupMessages(loadlib())
 
 numWaves <- 9
 tformat <- "%m/%d/%Y %H:%M:%S"
-reftime <- strptime("01/07/2015 12:00:00", tformat)
+reftime <- strptime("01/07/2015 12:00:00", tformat, tz="GMT")
 labGrid <- buildLabTable(reftime)
 
 lifeExperience <- c('msMet', 'msShared', 'msTeach','msTrainTeach')
@@ -202,7 +202,7 @@ loadRawData <- function(approxLabTime) {
     cms <- cbind(cms, envMastery=envMastery)
     if (is.null(manifestNames)) manifestNames <- colnames(cms)
     mask <- apply(cms, 1, function (r) any(!is.na(r)))
-    relweek <- as.numeric((strptime(raw$EndDate, "%m/%d/%Y %H:%M:%S") - reftime))/7
+    relweek <- as.numeric((strptime(raw$EndDate, tformat, tz="GMT") - reftime))/7
     waveData <- data.frame(
       id=raw$id[mask], time=relweek[mask], cms[mask,], lab=0)
     waveSummary[wave, c('nrow', 'timeSum')] <- c(nrow(waveData), sum(waveData$time))
@@ -421,8 +421,9 @@ for (wave in 1:numWaves) {
   for (col in c('start', 'uid', 'born', 'sex', 'rel','labTime','labTA')) raw[[col]] <- NULL
   mask <- apply(raw[,c(manifestNames)], 1, function (r) any(!is.na(r[])))
   raw <- raw[mask,]
-  raw$time <- as.numeric((strptime(raw$end, "%m/%d/%Y %H:%M:%S") - reftime))/7
+  raw$time <- as.numeric((strptime(raw$end, tformat, tz="GMT") - reftime))/7
   raw$lab <- 0
+  raw$wave <- wave
   long <- rbind(long, raw)
 }
 
