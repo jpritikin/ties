@@ -68,8 +68,16 @@ unlink("gen/page-*.pdf")
 dir.create("gen", showWarnings =FALSE)
 
 pdf(file=sprintf("gen/page-%03d.pdf", 0), width=11, height=8.5)
-pl <- ggplot(subset(long, variable=='training'),
-             aes(tm, value, group=id)) + geom_line(alpha=.1, size=5) + facet_wrap(~hasLab) +
+longTraining <- subset(long, variable=='training')
+longTraining$bin <- cut(longTraining$tm, 7)
+meanTraining <- ddply(longTraining, ~hasLab+bin, function (df) {
+  c(value=mean(df$value), tm=mean(df$tm))
+})
+meanTraining <- subset(meanTraining, !is.na(value))
+pl <- ggplot() + geom_line(aes(tm, value, group=id), data=longTraining,
+                           alpha=.1, size=5) +
+  facet_wrap(~hasLab) +
+  geom_line(aes(tm, value), data=meanTraining, alpha=.5, color="red", size=4) +
   labs(title="Training conditional on lab participation")
 print(pl)
 dev.off()
