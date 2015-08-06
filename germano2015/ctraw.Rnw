@@ -430,7 +430,7 @@ for (wave in 1:numWaves) {
 long <- mergeLabData(TRUE, long, labTime, UnfilteredID)
 
 n.TDpred      <- length(TDpredNames)
-latents <- c("labeffect", "training", "ties", "envMastery")
+latents <- c("labeffect", 'trend', "training", "ties", "envMastery")
 
 longUniqueIds <- unique(long[,'id'])
 numUniqueObs <- sapply(1:length(longUniqueIds),
@@ -449,7 +449,7 @@ for (px in levels(partition)) {
 
   lambda <- matrix(0, length(manifestNames), length(latents),
                    dimnames=list(manifestNames, latents))
-  lambda[,-match("labeffect", colnames(lambda))] <- diag(nrow(lambda))
+  lambda[,-match(c("labeffect",'trend'), colnames(lambda))] <- diag(nrow(lambda))
   
   model <- ctModel(
     n.manifest=length(manifestNames), n.latent=length(latents),
@@ -460,20 +460,21 @@ for (px in levels(partition)) {
     MANIFESTTRAITVAR = "auto" #to begin, I would use MANIFESTTRAITVAR so that all between person variance is removed (people can be consistently high / low on some manifest variables of a process and not others) - we can work on the between person structure more adequately once we understand the dynamic structure somewhat. 
   )
   
-  model$DIFFUSION[,match('labeffect',latents)] <- 0
-  model$T0VAR[,match('labeffect',latents)] <- 0
-  model$CINT[,] <- 0
+  model$DIFFUSION[,match(c("labeffect",'trend'),latents)] <- 0
+  model$T0VAR[,match(c("labeffect",'trend'),latents)] <- 0
+  model$CINT[-which(latents %in% c("trend")),] <- 0
+  model$CINT[which(latents %in% c("trend")),] <- 1
   model$MANIFESTMEANS <- matrix(paste0('mean_',manifestNames),ncol=1)
   model$T0MEANS[,] <- 0
-  model$TDPREDEFFECT[-which(latents %in% 'labeffect'),] <- 0
-  model$TDPREDEFFECT[which(latents %in% 'labeffect'),] <- 1
+  model$TDPREDEFFECT[-which(latents %in% c("labeffect")),] <- 0
+  model$TDPREDEFFECT[which(latents %in% c("labeffect")),] <- 1
   driftindex<-!diag(length(latents))
-  driftindex[-which(latents %in% 'labeffect'),which(latents %in% 'labeffect')] <- FALSE
+  driftindex[-which(latents %in% c("labeffect",'trend')),which(latents %in% c("labeffect",'trend'))] <- FALSE
   model$DRIFT[driftindex] <- 0
   model$TDPREDVAR <- diag(0.1,max(Tpoints)-1)
 
   m1 <- suppressMessages(ctFit(
-    wide, model, nofit=TRUE, meanIntervals=T,stationary=c('T0VAR','T0MEANS')))
+    wide, model, nofit=TRUE, meanIntervals=F,stationary=c('T0VAR','T0MEANS')))
   m1 <- mxRename(m1, sprintf("group%02d_%02d", min(Tpoints), max(Tpoints)))
   container <- mxModel(container, m1)
 }
@@ -495,6 +496,7 @@ mxComputeStandardError()
 )))
 container<-mxTryHard(container,paste=F,initialTolerance=1e-16,verbose=2)
 ctsummary(object=container$group07_09)
+mxEval(MANIFESTTRAITVAR,container$group07_09,compute=T)
 
 #refit with full drift matrix
 for(i in names(container$submodels)){
