@@ -559,10 +559,14 @@ if (0) {
 
 @
 
+there's not a clear causal boundary between the same time
+correlations and lagged time regressions
+
 \section{TODO}
 
 \begin{enumerate}
 \item Try to do some kind of sensitivity analysis.
+\item Throw away less variance in the IFA analysis
 \end{enumerate}
 
 \end{document}
