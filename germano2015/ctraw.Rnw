@@ -489,6 +489,7 @@ container <- omxAssignFirstParameters(container)
 container<- OpenMx::mxOption(container, 'Always Checkpoint', 'Yes')
 container<- OpenMx::mxOption(container, 'Checkpoint Units', 'iterations')
 container<- OpenMx::mxOption(container, 'Checkpoint Count', 1)    
+
 container <- mxModel(container,
                      mxComputeGradientDescent(nudgeZeroStarts=FALSE, verbose=2))
 container <- mxModel(container,
@@ -497,7 +498,8 @@ mxComputeNumericDeriv(),
 mxComputeHessianQuality(),
 mxComputeStandardError()
 )))
-container<-omxSetParameters(container,labels=names(oldparams),values=oldparams,strict=F)
+# container<-omxSetParameters(container,labels=names(oldparams),values=oldparams,strict=F)
+
 container<-mxTryHard(container,paste=F,initialTolerance=1e-16,verbose=2)
 oldparams<-omxGetParameters(container)
 ctsummary(object=container$group07_09)
@@ -564,10 +566,14 @@ if (0) {
 
 @
 
+there's not a clear causal boundary between the same time
+correlations and lagged time regressions
+
 \section{TODO}
 
 \begin{enumerate}
 \item Try to do some kind of sensitivity analysis.
+\item Throw away less variance in the IFA analysis
 \end{enumerate}
 
 \end{document}
