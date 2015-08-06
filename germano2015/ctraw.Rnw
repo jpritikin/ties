@@ -486,14 +486,6 @@ container <- omxAssignFirstParameters(container)
 container<- OpenMx::mxOption(container, 'Always Checkpoint', 'Yes')
 container<- OpenMx::mxOption(container, 'Checkpoint Units', 'iterations')
 container<- OpenMx::mxOption(container, 'Checkpoint Count', 1)    
-container <- mxModel(container,
-                     mxComputeGradientDescent(nudgeZeroStarts=FALSE, verbose=2))
-container <- mxModel(container,
-mxComputeSequence(list(
-mxComputeNumericDeriv(),
-mxComputeHessianQuality(),
-mxComputeStandardError()
-)))
 container<-mxTryHard(container,paste=F,initialTolerance=1e-16,verbose=2)
 ctsummary(object=container$group07_09)
 mxEval(MANIFESTTRAITVAR,container$group07_09,compute=T)
