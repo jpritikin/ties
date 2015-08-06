@@ -2,7 +2,7 @@ library(ggplot2)
 {
   wd <- setwd("..")
   source("measures.R")
-  source("cms-score.R")
+  source("ties-score.R")
   setwd(wd)
 }
 
@@ -42,7 +42,7 @@ for (wave in 1:9) {
   cmsCol <- raw[,offset:(offset+24-1)]
   cmsCol <- cbind(NA,NA,NA,NA,NA,cmsCol)
   cms <- prep.cms201410(cmsCol)
-  scored <- cbind(scored, cms.score("uva", cms))
+  scored <- cbind(scored, ties.score("uva", cms))
   write.table(scored, file=sprintf("prep%d.csv", wave), row.names=FALSE)
 }
 

@@ -1,0 +1,416 @@
+\documentclass[12pt]{article}
+\usepackage{fixltx2e}
+\usepackage[margin=.5in]{geometry}
+\usepackage{pdfpages}
+\setlength{\parindent}{0cm}
+\setlength{\parskip}{1ex}
+
+<<echo=FALSE, results='hide', warning=FALSE, cache=FALSE>>=
+#options(error = browser)
+library(knitr)
+#knit("cms-calibrate.Rnw", tangle=TRUE)  # to extract only the R chunks
+opts_knit$set(error=TRUE)
+opts_chunk$set(echo=FALSE, cache=FALSE)
+loadlib <- function () {
+library(rpf)
+library(OpenMx)
+library(ggplot2)
+library(reshape2)
+library(plyr)
+library(grid)
+library(gridExtra)
+library(xtable)
+library(ifaTools)
+}
+suppressPackageStartupMessages(loadlib())
+options(digits=2, scipen=1)
+
+itemMapText <- geom_text(size=4, position=position_jitter(h=.25))
+popSplit <- TRUE
+pop <- list()
+@
+
+\title{Calibration of item models for the TIES Record}
+\date{\today}
+\author{Joshua N.~Pritikin\\ University of Virginia}
+
+\begin{document}
+\maketitle
+
+\section{Data Sources}
+
+The TIES Record calibration sample is composed of a number of different datasets.
+
+<<results='asis'>>=
+source("cms-score-lib.R")
+
+load("espt.rda")
+espt <- cms.testlets(espt)
+
+src <- ddply(espt, ~wave, function(slice) c(types=length(unique(slice$instrument))))
+
+if (any(src$types != 1)) {
+  stop("There should be no more than 1 instrument version per wave.")
+}
+
+src <- ddply(espt, ~wave, function(slice) c(instrument=unique(slice$instrument), count=nrow(slice),
+                                            start=min(slice$start), end=max(slice$end)))
+src <- src[order(src$instrument, src$end, src$start),]
+print(xtable(src), include.rownames=FALSE)
+@
+
+A large proportion of data is missing, but the maximum N=\Sexpr{sum(as.numeric(src$count))}.
+
+\section{Training}
+
+% deal with not sure somehow TODO
+
+The \emph{training} factor is composed of indicators that cause TIES.
+
+<<>>=
+fitTraining <- function(tr.data) {
+  training.items <- setdiff(colnames(tr.data), "population")
+    
+    ns <- c("msEffort",  "msAfraid", "msIdentity")
+    confused <- apply(tr.data[,ns], 1, function(x) all(!is.na(x) &x == 'not sure'))
+    warning(paste(sum(confused), "answered 'not sure' to effort,afraid,identity"))
+    tr.data[confused,ns] <- NA
+
+        tr.data <- tr.data[rowSums(!is.na(tr.data[,training.items])) > 0,]
+
+#  factors <- c('training', 'lifetime')
+  factors <- c('training')
+#  factors <- c('training', 'fear')
+  spec <- lapply(training.items, function(nm) {
+    lev <- length(levels(tr.data[[ nm ]]))
+    rpf.grm(outcomes=lev, factors=length(factors))
+  })
+  names(spec) <- training.items
+  
+  for (item in intersect(c('trainSkill', 'trainNum'), names(spec))) {
+    spec[item] <- mkspec(espt, item, length(factors))
+  }
+  numItems <- length(training.items)
+  maxParam <- max(sapply(spec, rpf.numParam))
+  
+  imat <- mxMatrix(name="item", nrow=maxParam, ncol=numItems,
+                     dimnames=list(c(factors,
+                                     paste('p',(length(factors)+1):maxParam,sep="")), training.items))
+  imat$values[,] <- mxSimplify2Array(lapply(spec, rpf.rparam))
+  imat$values['training',] <- 1
+  imat$labels['training',] <- 'slope'
+  if (any('fear' == factors)) {
+    imat$values['fear',] <- 0
+    imat$values['fear', intersect(c('msAfraid','msIdentity'), training.items)] <- 1
+  }
+  if (any('lifetime' == factors)) {
+    imat$values['lifetime',] <- 0
+#    imat$values['lifetime', intersect(c('msMet', 'msShared', 'msTeach', 'msTrainTeach'), training.items)] <- 1
+    imat$values['lifetime', intersect(paste0(c('msMet', 'msShared', 'msTeach', 'msTrainTeach'), "Num"), training.items)] <- 1
+  }
+  imat$free[,] <- !is.na(imat$values) & imat$values[,] != 0
+
+  imat <- set.nominal.rank(spec, imat, 'trainSkill', 0, .3)
+  imat <- set.nominal.rank(spec, imat, 'trainNum', 0, .15)
+#  imat <- set.nominal.rank(spec, imat, 'freqCause', 0, 1)
+#  imat <- set.nominal.rank(spec, imat, 'msTimeAlloc', 0, .5)
+
+  train <- mxModel(model="training", imat,
+                   mxExpectationBA81(spec, qwidth=5, qpoints=39),
+                   mxFitFunctionML())
+
+  mMat <- mxMatrix(name='mean', nrow=length(factors), ncol=1, values=0, free=TRUE)
+  rownames(mMat) <- factors
+  covMat <- mxMatrix(name='cov', values=diag(length(factors)))
+  diag(covMat$free) <- TRUE
+  dimnames(covMat) <- list(factors, factors)
+
+  trM <- replicateModelBy(train, tr.data, mMat, covMat, split=popSplit)
+  em <- trM$compute
+  trM <- mxModel(trM, mxComputeSequence(steps=list(
+    em,
+    mxComputeOnce('fitfunction', 'information', "meat"),
+    mxComputeStandardError(),
+    mxComputeHessianQuality())
+  ))
+  got <- mxRun(trM, silent=TRUE)
+  got
+}
+
+tr.items <- c('msEffort', 'msAfraid', 'msIdentity', 'freqCause',
+              'msTimeAlloc',  # TODO
+              paste0(c('msShared', 'msMet', 'msTeach'), 'Num'))
+
+when <- strptime(espt[['instrument']], "%Y-%m-%d")
+revision1 <- strptime("2013-12-15", "%Y-%m-%d")  # slowly increase to 2014-09-15
+ver.mask <- difftime(when, revision1) > 0
+
+tr.data <- espt[ver.mask, c('population', tr.items)]
+tr.est <- fitTraining(tr.data)
+
+pops <- sapply(strsplit(tr.est$compute$steps[[1]]$expectation, ".", fixed=TRUE),
+               function(x) x[[1]])
+
+for (p1 in pops) {
+  pop[[p1]][['training']] <- as.IFAgroup(tr.est[[p1]], minItemsPerScore = 2L)
+  if (FALSE && !is.null(pop[[p1]]$training$mean)) {
+    print(pop[[p1]]$training$mean)
+    print(pop[[p1]]$training$cov)
+  }
+}
+
+#mnf <- multinomialFit(omitMostMissing(tr.grp, 1))
+
+if (0) {
+  mcReps <- 100
+  stat <- rep(NA, mcReps)
+  for (rx in 1:mcReps) {
+    t1 <- tr.grp
+    t1$data <- rpf.sample(grp=tr.grp)
+    got <- multinomialFit(t1, omit=1)
+    stat[rx] <- got$statistic
+  }
+  log(sum(stat > mnf$statistic) / mcReps)
+}
+
+@
+
+%Two subfactors were hypothesized: a self subfactor for
+%\Sexpr{names(which(tr.grp$param['self',] !=0))}; and an other subfactor for
+%\Sexpr{names(which(tr.grp$param['other',] !=0))}.
+A candidate model obtains $-2LL=\Sexpr{tr.est$output$fit}$
+with condition number \Sexpr{tr.est$output$conditionNumber}.
+% The full-information multinomial fit test was conducted,
+% $n=\Sexpr{mnf$n}$, $G^2(\Sexpr{mnf$df})=\Sexpr{mnf$statistic}$.
+
+<<fig.height=2>>=
+toOmit <- bestToOmit(pop$general$training, 1)
+got <- Reduce('+',lapply(pop, function (x) sumScoreEAPTest(omitItems(x$training, toOmit))))
+
+df <- data.frame(score=as.numeric(names(got$observed)),
+            expected=got$expected, observed=got$observed)
+df <- melt(df, id="score", variable.name="source", value.name="n")
+ggplot(df, aes(x=score, y=n, color=source)) + geom_line()
+@
+
+\begin{center}
+<<results='asis'>>=
+fl <- toFactorLoading(pop$general$training$param[1:pop$general$training$spec[[1]]$factors,,drop=FALSE])
+print(xtable(fl, paste("Factor loadings.")),
+      size="\\footnotesize", floating=FALSE)
+@ 
+\end{center}
+
+\begin{center}
+<<results='asis'>>=
+got <- Reduce('+', lapply(pop, function (x) ChenThissen1997(x$training)))
+print(xtable(got$pval, paste("Log p-value of local dependence between item pairs.")),
+      size="\\footnotesize", floating=FALSE)
+@ 
+\end{center}
+
+<<results='asis'>>=
+numToOmit <- 1
+toOmit <- lapply(tr.items, function(x) bestToOmit(pop$general$training, numToOmit, x))
+sfit <- Reduce('+', lapply(pop, function (x) SitemFit(x$training, omit = toOmit)))
+tbl <- t(sapply(sfit, function(r) c(n=r$n, df=r$df, stat=r$statistic, pval=r$pval)))
+print(xtable(tbl, paste0("Sum-score item-wise fit, omitting ",numToOmit," item.")))
+@
+
+<<fig.height=2>>=
+map1 <- itemResponseMap(pop$general$training, factor=1)
+ggplot(map1, aes(x=score, y=item, label=outcome)) + itemMapText
+@
+
+<<fig.height=3>>=
+pl <- lapply(names(sfit), function(item) {
+  SitemPlot(sfit, item)
+})
+for (px in 1:length(pl)) {
+  print(pl[[px]])
+}
+basis <- rep(0, pop$general$training$spec[[1]]$factors)
+basis[1] <- 1
+print(plotInformation(pop$general$training, width=5, basis=basis))
+@
+
+\section{TIES}
+
+The \emph{TIES} factor is intended to assess the self-reported
+intensity of experiencing TIES.
+
+<<>>=
+fitties <- function(ev.data) {
+  ties.items <- setdiff(colnames(ev.data), "population")
+
+    ns <- c("msFast", "msLife", "msPreoccu")
+    confused <- apply(ev.data[,ns], 1, function(x) all(!is.na(x) & x == 'not sure'))
+    warning(paste(sum(confused), "answered 'not sure' to fast,life,preoccu"))
+    ev.data[confused,ns] <- NA
+    
+  ev.data <- ev.data[rowSums(!is.na(ev.data[,ties.items])) > 0,]
+
+      factors <- c('ties')
+  spec <- lapply(ties.items, function(nm) {
+    lev <- length(levels(ev.data[[ nm ]]))
+    rpf.grm(outcomes=lev, factors=length(factors))
+  })
+  names(spec) <- ties.items
+#  spec <- mkspec(espt, ties.items)
+  numItems <- length(ties.items)
+  maxParam <- max(sapply(spec, rpf.numParam))
+
+  imat <- mxMatrix(name="item", nrow=maxParam, ncol=numItems,
+                   dimnames=list(c(factors, paste("p",2:maxParam,sep="")), ties.items))
+  imat$values[,] <- mxSimplify2Array(lapply(spec, rpf.rparam))
+  imat$values['ties',] <- 1
+  imat$labels['ties',] <- 'slope'
+  imat$free[,] <- !is.na(imat$values) & imat$values[,] != 0
+
+#   imat <- set.nominal.rank(spec, imat, 'msAny', .51, 1)
+#   imat <- set.nominal.rank(spec, imat, 'msEvery', .51, 1)
+#   imat <- set.nominal.rank(spec, imat, 'freqCause', 0, 1)
+#   imat <- set.nominal.rank(spec, imat, 'successCat', .35, 1)
+#   imat <- set.nominal.rank(spec, imat, 'maxDuration', .25, .75)
+#   imat <- set.nominal.rank(spec, imat, 'maxDurationOut', 0, .5)
+#   imat <- set.nominal.rank(spec, imat, 'msYearn', 0, 1)
+#   imat <- set.nominal.rank(spec, imat, 'msEnv', 0, 1)
+#   imat <- set.nominal.rank(spec, imat, 'msAllow', 0, 1)
+#   imat <- set.nominal.rank(spec, imat, 'msTaught', 0, .5)
+#   imat <- set.nominal.rank(spec, imat, 'msTimeAlloc', 0, .5)
+  
+  eTmpl <- mxModel(model="ties", imat,
+                mxExpectationBA81(spec),
+                mxFitFunctionML())
+  
+  mMat <- mxMatrix(name='mean', nrow=length(factors), ncol=1, values=0, free=TRUE)
+  rownames(mMat) <- factors
+  covMat <- mxMatrix(name='cov', values=diag(length(factors)))
+  diag(covMat$free) <- TRUE
+  dimnames(covMat) <- list(factors, factors)
+
+  ev <- replicateModelBy(eTmpl, ev.data, mMat, covMat, split=popSplit)
+  em <- ev$compute
+  ev <- mxModel(ev, mxComputeSequence(steps=list(
+    em,
+    mxComputeOnce('fitfunction', 'information', "meat"),
+    mxComputeStandardError(),
+    mxComputeHessianQuality())
+  ))
+
+  ev <- mxRun(ev, silent=TRUE)
+  ev
+}
+
+evItems <- c("msFast", "msLife", "msPreoccu",
+             "msEnv", "msAllow", "msTaught",
+             'maxDuration', "maxDurationOut", 'successCat')
+ev.data <- espt[,c(evItems, "population")]
+ev.est <- fitties(ev.data)
+
+pops <- sapply(strsplit(ev.est$compute$steps[[1]]$expectation, ".", fixed=TRUE),
+               function(x) x[[1]])
+for (p1 in pops) {
+  pop[[p1]][['ties']] <- as.IFAgroup(ev.est[[p1]], minItemsPerScore = 2L)
+  if (FALSE && !is.null(pop[[p1]]$ties$mean)) {
+    print(pop[[p1]]$ties$mean)
+    print(pop[[p1]]$ties$cov)
+  }
+}
+
+#mnf <- multinomialFit(ev.grp)
+
+if (0) {
+  mcReps <- 100
+  stat <- rep(NA, mcReps)
+  for (rx in 1:mcReps) {
+    t1 <- ev.grp
+    t1$data <- rpf.sample(grp=ev.grp)
+    got <- multinomialFit(t1, omit=1)
+    stat[rx] <- got$statistic
+  }
+  log(sum(stat > mnf$statistic) / mcReps)
+}
+@ 
+
+A possible model had -2LL=\Sexpr{ev.est$output$fit} and
+condition number \Sexpr{ev.est$output$conditionNumber}.
+% The full-information multinomial fit test was conducted,
+% $n=\Sexpr{mnf$n}$, $G^2(\Sexpr{mnf$df})=\Sexpr{mnf$statistic}$.
+
+<<fig.height=2>>=
+toOmit <- bestToOmit(pop$general$ties, 3)
+got <- Reduce('+',lapply(pop, function (x) sumScoreEAPTest(omitItems(x$ties, toOmit))))
+
+df <- data.frame(score=as.numeric(names(got$observed)),
+            expected=got$expected, observed=got$observed)
+df <- melt(df, id="score", variable.name="source", value.name="n")
+ggplot(df, aes(x=score, y=n, color=source)) + geom_line()
+@
+
+<<fig.height=2>>=
+map1 <- itemResponseMap(pop$general$ties, factor=1)
+ggplot(map1, aes(x=score, y=item, label=outcome)) + itemMapText
+@
+
+\begin{center}
+<<results='asis'>>=
+fl <- toFactorLoading(pop$general$ties$param[1:pop$general$ties$spec[[1]]$factors,,drop=FALSE])
+print(xtable(fl, paste("Factor loadings.")),
+      size="\\footnotesize", floating=FALSE)
+@ 
+\end{center}
+
+\begin{center}
+<<results='asis'>>=
+got <- Reduce('+', lapply(pop, function (x) ChenThissen1997(x$ties)))
+print(xtable(got$pval, paste("Log p-value of local dependence between item pairs.")),
+      size="\\footnotesize", floating=FALSE)
+@ 
+\end{center}
+
+<<results='asis'>>=
+numToOmit <- 2
+toOmit <- lapply(evItems, function(x) bestToOmit(pop$general$ties, numToOmit, x))
+sfit <- Reduce('+', lapply(pop, function (x) SitemFit(x$ties, omit = toOmit)))
+tbl <- t(sapply(sfit, function(r) c(n=r$n, df=r$df, stat=r$statistic, pval=r$pval)))
+print(xtable(tbl, paste0("Sum-score item-wise fit, omitting ",numToOmit," item.")))
+@
+
+<<fig.height=3>>=
+pl <- lapply(names(sfit), function(item) {
+  SitemPlot(sfit, item)
+})
+for (px in 1:length(pl)) {
+  print(pl[[px]])
+}
+print(plotInformation(pop$general$ties, width=5, basis=c(1)))
+@
+
+<<>>=
+for (p1 in names(pop)) {
+  for (f1 in names(pop[[p1]])) {
+    pop[[p1]][[f1]] <- stripData(pop[[p1]][[f1]])
+  }
+}
+tiesPop <- pop
+save(tiesPop, file="ties-fit.rda")
+
+#items <- t(m2$ItemParam@values)
+#rownames(items) <- item.names
+#espt[mask, "score"] <- m2@expectation@scores.out[,1]
+#espt[mask, "se"] <- m2@expectation@scores.out[,2]
+
+if (0) {
+  sc <- m2.est@expectation@scores.out
+  for (l in 1:3) {
+    mask <- espt$durationCharacter==levels(espt$durationCharacter)[l]
+    mask <- !is.na(mask) & mask
+    print(paste(l, mean(sc[mask,1]), mean(sc[mask,2])))
+  }
+}
+@
+
+%\includepdf[pages={3-}]{archive/short-201410.pdf}
+
+\end{document}

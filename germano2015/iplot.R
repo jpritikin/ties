@@ -36,13 +36,15 @@ if (0) {
   cat(deparse(inviteId))
 }
 
-erange <- apply(wide[,which(colnames(wide) == "event")], 1,
+erange <- apply(wide[,which(colnames(wide) == "ties")], 1,
                 function(x) range(c(0,x), na.rm=TRUE))
 wide <- wide[order(erange[1,] - erange[2,]),]
 
-measures <- c("barrier", "training", "event", "envMastery")
+measures <- c("training", "ties", "envMastery")
 perOccasionCol <- c("id", measures)
 cmap <- match(colnames(wide), c("end",perOccasionCol))
+
+labIds <- unique(labData$id)
 
 long <- NULL
 for (wave in 1:numWaves) {
@@ -53,6 +55,7 @@ for (wave in 1:numWaves) {
   }
   colnames(occasion) <- c("tm", perOccasionCol)
   lo <- melt(occasion, id.vars=c("tm", "id"))
+  lo$hasLab <- lo$id %in% labIds
   long <- rbind(long, lo)
 }
 
@@ -63,6 +66,13 @@ mRange <- range(long$value, na.rm=TRUE)
 
 unlink("gen/page-*.pdf")
 dir.create("gen", showWarnings =FALSE)
+
+pdf(file=sprintf("gen/page-%03d.pdf", 0), width=11, height=8.5)
+pl <- ggplot(subset(long, variable=='training'),
+             aes(tm, value, group=id)) + geom_line(alpha=.1, size=5) + facet_wrap(~hasLab) +
+  labs(title="Training conditional on lab participation")
+print(pl)
+dev.off()
 
 spam <- c(881)
 page <- 1

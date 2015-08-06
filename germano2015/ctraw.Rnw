@@ -3,6 +3,7 @@
 \usepackage[margin=1in]{geometry}
 \usepackage{graphicx}
 \usepackage{authblk}
+\usepackage{mathtools}
 \setlength{\parindent}{0cm}
 \setlength{\parskip}{1ex}
 
@@ -20,6 +21,51 @@ loadlib <- function () {
   source("lab.R")
 }
 suppressPackageStartupMessages(loadlib())
+
+{
+  wd <- setwd("..")
+  source("measures.R")
+  source("cms-score.R")
+  setwd(wd)
+}
+
+numWaves <- 9
+tformat <- "%m/%d/%Y %H:%M:%S"
+reftime <- strptime("01/07/2015 12:00:00", tformat)
+labGrid <- buildLabTable(reftime)
+
+lifeExperience <- c('msMet', 'msShared', 'msTeach','msTrainTeach')
+
+mergeLabData <- function(approxLabTime, long, labTime, UnfilteredID) {
+  if (!approxLabTime) {  # add labs as separate rows at the correct time
+    labRow <- NULL
+    for (row in which(!is.na(labTime))) {
+      potentialLabs <- data.frame(
+        id=UnfilteredID[row], time=as.numeric(labGrid[labTime[row],])/7)
+      tpoints <- long[long$id==UnfilteredID[row],'time']
+      if (length(tpoints) < 2) next
+      rtp <- range(tpoints)
+      mask <- rtp[1] < potentialLabs$time & potentialLabs$time < rtp[2]
+      labRow <- rbind(labRow, potentialLabs[mask,])
+    }
+    for (col in colnames(cms)) labRow[[col]] <- NA
+    labRow[['lab']] <- 1
+    long <- rbind(long, labRow)
+  }
+  if (approxLabTime) {   # add labs at nearest time to speed up estimation
+    labRow <- NULL
+    for (row in which(!is.na(labTime))) {
+      potentialLabs <- data.frame(
+        id=UnfilteredID[row], time=as.numeric(labGrid[labTime[row],])/7)
+      tpoints <- long[long$id==UnfilteredID[row],'time']
+      rtp <- range(tpoints)
+      potentialLabs <- potentialLabs[rtp[1] < potentialLabs$time & potentialLabs$time < rtp[2],]
+      active <- findInterval(potentialLabs$time, tpoints)
+      long[which(long$id==UnfilteredID[row])[unique(active)],'lab'] <- 1
+    }
+  }
+  long
+}
 @
 
 \title{Continuous Time Factor Analysis of the 2015~Meditation Class}
@@ -105,16 +151,7 @@ and some of them are nonsensical.
 A stepwise approach is very helpful.
 
 <<results='asis'>>=
-{
-  wd <- setwd("..")
-  source("measures.R")
-  source("cms-score.R")
-  setwd(wd)
-}
-
-lifeExperience <- c('msMet', 'msShared', 'msTeach','msTrainTeach')
-
-loadData <- function(approxLabTime) {
+loadRawData <- function(approxLabTime) {
   SexItem <- c("Male","Female")
   
   RelaItem = c('Single',
@@ -123,8 +160,6 @@ loadData <- function(approxLabTime) {
   RelaItemShort = c('Single',
                     'Together',
                     'Other')
-  numWaves <- 9
-  
   # declare global variables
   born <- NULL
   sex <- NULL
@@ -132,9 +167,6 @@ loadData <- function(approxLabTime) {
   UnfilteredID <- NULL
   labTime <- NULL
   labTA <- NULL
-  tformat <- "%m/%d/%Y %H:%M:%S"
-  reftime <- strptime("01/07/2015 12:00:00", tformat)
-  labGrid <- buildLabTable(reftime)
   manifestNames <- NULL
   
   long <- NULL
@@ -185,37 +217,11 @@ loadData <- function(approxLabTime) {
   
   long<-long[!is.na(long[,'time']),] #remove rows with no time observation
   
-  if (!approxLabTime) {  # add labs as separate rows at the correct time
-    labRow <- NULL
-    for (row in which(!is.na(labTime))) {
-      potentialLabs <- data.frame(
-        id=UnfilteredID[row], time=as.numeric(labGrid[labTime[row],])/7)
-      tpoints <- long[long$id==UnfilteredID[row],'time']
-      if (length(tpoints) < 2) next
-      rtp <- range(tpoints)
-      mask <- rtp[1] < potentialLabs$time & potentialLabs$time < rtp[2]
-      labRow <- rbind(labRow, potentialLabs[mask,])
-    }
-    for (col in colnames(cms)) labRow[[col]] <- NA
-    labRow[['lab']] <- 1
-    long <- rbind(long, labRow)
-  }
-  if (approxLabTime) {   # add labs at nearest time to speed up estimation
-    labRow <- NULL
-    for (row in which(!is.na(labTime))) {
-      potentialLabs <- data.frame(
-        id=UnfilteredID[row], time=as.numeric(labGrid[labTime[row],])/7)
-      tpoints <- long[long$id==UnfilteredID[row],'time']
-      rtp <- range(tpoints)
-      potentialLabs <- potentialLabs[rtp[1] < potentialLabs$time & potentialLabs$time < rtp[2],]
-      active <- findInterval(potentialLabs$time, tpoints)
-      long[which(long$id==UnfilteredID[row])[unique(active)],'lab'] <- 1
-    }
-  }
+  long <- mergeLabData(approxLabTime, long, labTime, UnfilteredID)
   list(long=long, manifestNames=manifestNames, TDpredNames='lab')
 }
 
-loadedData    <- loadData(approxLabTime=TRUE)
+loadedData    <- loadRawData(approxLabTime=TRUE)
 long          <- loadedData[['long']]
 manifestNames <- loadedData[['manifestNames']]
 TDpredNames   <- loadedData[['TDpredNames']]
@@ -309,6 +315,10 @@ par1 <- structure(c(1.4227, 1.1595, 0.2002, 0.6875, -0.1148, -0.3284,  0.0968, -
                   .Names = c("msEffort_to_training", "msAfraid_to_training",  "msIdentity_to_training", "msYearn_to_training", "msEnv_to_training",  "msAllow_to_training", "msTaught_to_training", "msTimeAlloc_to_training",  "msMetNum_to_training", "msSharedNum_to_training", "msTeachNum_to_training",  "msTrainTeachNum_to_training", "msFast_to_ties", "msLife_to_ties",  "msPreoccu_to_ties", "msYearn_to_ties", "msEnv_to_ties", "msAllow_to_ties",  "msTaught_to_ties", "msTimeAlloc_to_ties", "maxDurationOut_to_ties",  "successCat_to_ties", "mean_msEffort", "mean_msAfraid", "mean_msFast",  "mean_msLife", "mean_msIdentity", "mean_msPreoccu", "mean_msYearn",  "mean_msEnv", "mean_msAllow", "mean_msTaught", "mean_freqCause",  "mean_msTimeAlloc", "mean_maxDuration", "mean_maxDurationOut",  "mean_msMetNum", "mean_msSharedNum", "mean_msTeachNum", "mean_msTrainTeachNum",  "mean_successCat", "mean_envMastery", "manifestvar_msEffort_msEffort",  "manifestvar_msAfraid_msAfraid", "manifestvar_msFast_msFast",  "manifestvar_msLife_msLife", "manifestvar_msIdentity_msIdentity",  "manifestvar_msPreoccu_msPreoccu", "manifestvar_msYearn_msYearn",  "manifestvar_msEnv_msEnv", "manifestvar_msAllow_msAllow", "manifestvar_msTaught_msTaught",  "manifestvar_freqCause_freqCause", "manifestvar_msTimeAlloc_msTimeAlloc",  "manifestvar_maxDuration_maxDuration", "manifestvar_maxDurationOut_maxDurationOut",  "manifestvar_msMetNum_msMetNum", "manifestvar_msSharedNum_msSharedNum",  "manifestvar_msTeachNum_msTeachNum", "manifestvar_msTrainTeachNum_msTrainTeachNum",  "manifestvar_successCat_successCat", "manifestvar_envMastery_envMastery",
                              "diffusion_training_training", "diffusion_ties_training", "diffusion_envMastery_training",  "diffusion_ties_ties", "diffusion_envMastery_ties", "diffusion_envMastery_envMastery",  "drift_training_labeffect", "drift_ties_labeffect", "drift_envMastery_labeffect",  "drift_training_training", "drift_ties_ties", "drift_envMastery_envMastery",  "manifesttraitvar_msEffort_msEffort", "manifesttraitvar_msAfraid_msEffort",  "manifesttraitvar_msFast_msEffort", "manifesttraitvar_msLife_msEffort",  "manifesttraitvar_msIdentity_msEffort", "manifesttraitvar_msPreoccu_msEffort",  "manifesttraitvar_msYearn_msEffort", "manifesttraitvar_msEnv_msEffort",  "manifesttraitvar_msAllow_msEffort", "manifesttraitvar_msTaught_msEffort",  "manifesttraitvar_freqCause_msEffort", "manifesttraitvar_msTimeAlloc_msEffort",  "manifesttraitvar_maxDuration_msEffort", "manifesttraitvar_maxDurationOut_msEffort",  "manifesttraitvar_msMetNum_msEffort", "manifesttraitvar_msSharedNum_msEffort",  "manifesttraitvar_msTeachNum_msEffort", "manifesttraitvar_msTrainTeachNum_msEffort",  "manifesttraitvar_successCat_msEffort", "manifesttraitvar_envMastery_msEffort",  "manifesttraitvar_msAfraid_msAfraid", "manifesttraitvar_msFast_msAfraid",  "manifesttraitvar_msLife_msAfraid", "manifesttraitvar_msIdentity_msAfraid",  "manifesttraitvar_msPreoccu_msAfraid", "manifesttraitvar_msYearn_msAfraid",  "manifesttraitvar_msEnv_msAfraid", "manifesttraitvar_msAllow_msAfraid",  "manifesttraitvar_msTaught_msAfraid", "manifesttraitvar_freqCause_msAfraid",  "manifesttraitvar_msTimeAlloc_msAfraid", "manifesttraitvar_maxDuration_msAfraid",  "manifesttraitvar_maxDurationOut_msAfraid", "manifesttraitvar_msMetNum_msAfraid",  "manifesttraitvar_msSharedNum_msAfraid", "manifesttraitvar_msTeachNum_msAfraid",  "manifesttraitvar_msTrainTeachNum_msAfraid", "manifesttraitvar_successCat_msAfraid",  "manifesttraitvar_envMastery_msAfraid", "manifesttraitvar_msFast_msFast",  "manifesttraitvar_msLife_msFast", "manifesttraitvar_msIdentity_msFast",  "manifesttraitvar_msPreoccu_msFast", "manifesttraitvar_msYearn_msFast",  "manifesttraitvar_msEnv_msFast", "manifesttraitvar_msAllow_msFast",  "manifesttraitvar_msTaught_msFast", "manifesttraitvar_freqCause_msFast",  "manifesttraitvar_msTimeAlloc_msFast", "manifesttraitvar_maxDuration_msFast",  "manifesttraitvar_maxDurationOut_msFast", "manifesttraitvar_msMetNum_msFast",  "manifesttraitvar_msSharedNum_msFast", "manifesttraitvar_msTeachNum_msFast",  "manifesttraitvar_msTrainTeachNum_msFast", "manifesttraitvar_successCat_msFast",  "manifesttraitvar_envMastery_msFast", "manifesttraitvar_msLife_msLife",  "manifesttraitvar_msIdentity_msLife", "manifesttraitvar_msPreoccu_msLife",  "manifesttraitvar_msYearn_msLife", "manifesttraitvar_msEnv_msLife",  "manifesttraitvar_msAllow_msLife", "manifesttraitvar_msTaught_msLife",  "manifesttraitvar_freqCause_msLife", "manifesttraitvar_msTimeAlloc_msLife",  "manifesttraitvar_maxDuration_msLife", "manifesttraitvar_maxDurationOut_msLife",  "manifesttraitvar_msMetNum_msLife", "manifesttraitvar_msSharedNum_msLife",  "manifesttraitvar_msTeachNum_msLife", "manifesttraitvar_msTrainTeachNum_msLife",  "manifesttraitvar_successCat_msLife", "manifesttraitvar_envMastery_msLife",  "manifesttraitvar_msIdentity_msIdentity", "manifesttraitvar_msPreoccu_msIdentity",  "manifesttraitvar_msYearn_msIdentity", "manifesttraitvar_msEnv_msIdentity",  "manifesttraitvar_msAllow_msIdentity", "manifesttraitvar_msTaught_msIdentity",  "manifesttraitvar_freqCause_msIdentity", "manifesttraitvar_msTimeAlloc_msIdentity",  "manifesttraitvar_maxDuration_msIdentity", "manifesttraitvar_maxDurationOut_msIdentity",  "manifesttraitvar_msMetNum_msIdentity", "manifesttraitvar_msSharedNum_msIdentity",  "manifesttraitvar_msTeachNum_msIdentity", "manifesttraitvar_msTrainTeachNum_msIdentity",  "manifesttraitvar_successCat_msIdentity", "manifesttraitvar_envMastery_msIdentity",  "manifesttraitvar_msPreoccu_msPreoccu", "manifesttraitvar_msYearn_msPreoccu",  "manifesttraitvar_msEnv_msPreoccu", "manifesttraitvar_msAllow_msPreoccu",  "manifesttraitvar_msTaught_msPreoccu", "manifesttraitvar_freqCause_msPreoccu",  "manifesttraitvar_msTimeAlloc_msPreoccu", "manifesttraitvar_maxDuration_msPreoccu",  "manifesttraitvar_maxDurationOut_msPreoccu", "manifesttraitvar_msMetNum_msPreoccu",  "manifesttraitvar_msSharedNum_msPreoccu", "manifesttraitvar_msTeachNum_msPreoccu",  "manifesttraitvar_msTrainTeachNum_msPreoccu", "manifesttraitvar_successCat_msPreoccu",  "manifesttraitvar_envMastery_msPreoccu", "manifesttraitvar_msYearn_msYearn",  "manifesttraitvar_msEnv_msYearn", "manifesttraitvar_msAllow_msYearn",  "manifesttraitvar_msTaught_msYearn", "manifesttraitvar_freqCause_msYearn",  "manifesttraitvar_msTimeAlloc_msYearn", "manifesttraitvar_maxDuration_msYearn",  "manifesttraitvar_maxDurationOut_msYearn", "manifesttraitvar_msMetNum_msYearn",  "manifesttraitvar_msSharedNum_msYearn", "manifesttraitvar_msTeachNum_msYearn",  "manifesttraitvar_msTrainTeachNum_msYearn", "manifesttraitvar_successCat_msYearn",  "manifesttraitvar_envMastery_msYearn", "manifesttraitvar_msEnv_msEnv",  "manifesttraitvar_msAllow_msEnv", "manifesttraitvar_msTaught_msEnv",  "manifesttraitvar_freqCause_msEnv", "manifesttraitvar_msTimeAlloc_msEnv",  "manifesttraitvar_maxDuration_msEnv", "manifesttraitvar_maxDurationOut_msEnv",  "manifesttraitvar_msMetNum_msEnv", "manifesttraitvar_msSharedNum_msEnv",  "manifesttraitvar_msTeachNum_msEnv", "manifesttraitvar_msTrainTeachNum_msEnv",  "manifesttraitvar_successCat_msEnv", "manifesttraitvar_envMastery_msEnv",  "manifesttraitvar_msAllow_msAllow", "manifesttraitvar_msTaught_msAllow",  "manifesttraitvar_freqCause_msAllow", "manifesttraitvar_msTimeAlloc_msAllow",  "manifesttraitvar_maxDuration_msAllow", "manifesttraitvar_maxDurationOut_msAllow",  "manifesttraitvar_msMetNum_msAllow", "manifesttraitvar_msSharedNum_msAllow",  "manifesttraitvar_msTeachNum_msAllow", "manifesttraitvar_msTrainTeachNum_msAllow",  "manifesttraitvar_successCat_msAllow", "manifesttraitvar_envMastery_msAllow",  "manifesttraitvar_msTaught_msTaught", "manifesttraitvar_freqCause_msTaught",  "manifesttraitvar_msTimeAlloc_msTaught", "manifesttraitvar_maxDuration_msTaught",  "manifesttraitvar_maxDurationOut_msTaught", "manifesttraitvar_msMetNum_msTaught",  "manifesttraitvar_msSharedNum_msTaught", "manifesttraitvar_msTeachNum_msTaught",  "manifesttraitvar_msTrainTeachNum_msTaught", "manifesttraitvar_successCat_msTaught",  "manifesttraitvar_envMastery_msTaught", "manifesttraitvar_freqCause_freqCause",  "manifesttraitvar_msTimeAlloc_freqCause", "manifesttraitvar_maxDuration_freqCause",  "manifesttraitvar_maxDurationOut_freqCause", "manifesttraitvar_msMetNum_freqCause",  "manifesttraitvar_msSharedNum_freqCause", "manifesttraitvar_msTeachNum_freqCause",  "manifesttraitvar_msTrainTeachNum_freqCause", "manifesttraitvar_successCat_freqCause",  "manifesttraitvar_envMastery_freqCause", "manifesttraitvar_msTimeAlloc_msTimeAlloc",  "manifesttraitvar_maxDuration_msTimeAlloc", "manifesttraitvar_maxDurationOut_msTimeAlloc",  "manifesttraitvar_msMetNum_msTimeAlloc", "manifesttraitvar_msSharedNum_msTimeAlloc",  "manifesttraitvar_msTeachNum_msTimeAlloc", "manifesttraitvar_msTrainTeachNum_msTimeAlloc",  "manifesttraitvar_successCat_msTimeAlloc", "manifesttraitvar_envMastery_msTimeAlloc",  "manifesttraitvar_maxDuration_maxDuration", "manifesttraitvar_maxDurationOut_maxDuration",  "manifesttraitvar_msMetNum_maxDuration", "manifesttraitvar_msSharedNum_maxDuration",  "manifesttraitvar_msTeachNum_maxDuration", "manifesttraitvar_msTrainTeachNum_maxDuration",  "manifesttraitvar_successCat_maxDuration", "manifesttraitvar_envMastery_maxDuration",  "manifesttraitvar_maxDurationOut_maxDurationOut", "manifesttraitvar_msMetNum_maxDurationOut",  "manifesttraitvar_msSharedNum_maxDurationOut", "manifesttraitvar_msTeachNum_maxDurationOut",  "manifesttraitvar_msTrainTeachNum_maxDurationOut", "manifesttraitvar_successCat_maxDurationOut",  "manifesttraitvar_envMastery_maxDurationOut", "manifesttraitvar_msMetNum_msMetNum",  "manifesttraitvar_msSharedNum_msMetNum", "manifesttraitvar_msTeachNum_msMetNum",  "manifesttraitvar_msTrainTeachNum_msMetNum", "manifesttraitvar_successCat_msMetNum",  "manifesttraitvar_envMastery_msMetNum", "manifesttraitvar_msSharedNum_msSharedNum",  "manifesttraitvar_msTeachNum_msSharedNum", "manifesttraitvar_msTrainTeachNum_msSharedNum",  "manifesttraitvar_successCat_msSharedNum", "manifesttraitvar_envMastery_msSharedNum",  "manifesttraitvar_msTeachNum_msTeachNum", "manifesttraitvar_msTrainTeachNum_msTeachNum",  "manifesttraitvar_successCat_msTeachNum", "manifesttraitvar_envMastery_msTeachNum",  "manifesttraitvar_msTrainTeachNum_msTrainTeachNum", "manifesttraitvar_successCat_msTrainTeachNum",  "manifesttraitvar_envMastery_msTrainTeachNum", "manifesttraitvar_successCat_successCat",  "manifesttraitvar_envMastery_successCat", "manifesttraitvar_envMastery_envMastery",  "mean_labT0", "mean_labT1", "mean_labT2", "mean_labT3", "mean_labT4",  "mean_labT5", "mean_labT6", "mean_labT7"))
 container <- omxSetParameters(container, names(par1), values=par1)
+
+drift <- mxEval(group01_03.DRIFT, container, compute=TRUE)
+dimnames(drift) <- list(paste0("\\text{",latents,"}"), paste0("\\text{",latents,"}"))
+
 envMasteryIndex <- match('envMastery', rownames(container$group01_03$LAMBDA))
 tbl <- container$group01_03$LAMBDA$values[-envMasteryIndex,c('training', 'ties')]
 tbl[tbl[,] == 0] <- NA
@@ -317,6 +327,14 @@ print(xtable(tbl, "Loadings for first model of dynamic factor structure.", "tab:
 
 The loadings were examined after about 130 major iterations,
 prior to meeting the optimizer convergence criterion (Table~\ref{tab:dfs1}).
+The drift matrix was
+\begin{align}
+<<results="asis">>=
+print(xtable(drift, align=rep('',1+ncol(drift))), floating=FALSE, tabular.environment="bmatrix", 
+  hline.after=NULL, include.rownames=TRUE, include.colnames=TRUE,
+  sanitize.rownames.function=function(x)x, sanitize.colnames.function=function(x)x)
+@
+\end{align}
 Items \verb\msEnv\, \verb\msAllow\, and \verb\msTaught\ seemed
 more closely associated with TIES than training.
 Hence, the loadings from these items to training were fixed to zero.
@@ -336,7 +354,10 @@ it did increase their experience of TIES.
 This is surprising, but no change was made to the
 loadings for this item in the improved model.
 
-<<>>=
+After about 400 major iterations,
+the model was drifting into a non-sensical solution.
+
+<<results='asis'>>=
 #container <- mxRestore(container, line=10)
 LAMBDA <- container$group01_03$LAMBDA
 LAMBDA$values[c('msEnv','msAllow','msTaught'),'training'] <- 0
@@ -349,14 +370,124 @@ for (sm in names(container$submodels)) {
 par2 <- structure(c(1.226, 1.201, 1.261, 1.269, 1.147, 0.683, 1.267,  0.482, 0.914, 1.07, 1.314, 0.885, 0.884, 0.944, 0.275, 0.769,  1.26, 0.9, 0.088, 0.244, 0.292, -0.158, 0.241, -1.637, -1.762,  0.906, 0.342, 0.85, 1.116, -1.389, 0.605, -0.086, 1.085, -1.777,  0.523, 1.398, -0.217, 0.969, -0.345, -0.578, -0.263, -0.302,  -0.696, -0.372, -0.188, -0.374, -0.375, -0.606, -0.501, 0.002,  -0.261, -0.272, -1.054, -1.034, -1.636, -2.318, -0.432, -1.364,  -1.509, 0.677, 0.325, -0.091, 0.57, -0.934, 0.214, 0.223, 0.274,  -0.625, -1.094, -0.185, -0.281, 0.046, 0.13, 0.149, 0.119, 0.287,  0.184, -0.025, 0.002, -0.236, -0.04, -0.034, 0.076, 0.073, -0.02,  0.35, -0.053, -0.222, 0.07, 0.467, -0.197, -0.003, 0.023, 0.396,  0.314, 0.256, -0.108, -0.018, -0.229, -0.076, -0.021, 0.054,  0.108, -0.02, 0.513, -0.139, -0.311, 0.026, 0.787, -0.334, 0.169,  0.066, 0.267, 0.092, -0.015, 0.034, -0.142, -0.02, 0, 0.077,  0.078, -0.001, 0.226, -0.059, -0.161, 0.079, 0.361, -0.321, 0.049,  0.423, 0.215, 0.003, -0.071, -0.185, -0.031, -0.006, -0.008,  0.047, -0.005, 0.347, -0.113, -0.262, 0.04, 0.539, -0.091, 0.304,  0.321, -0.122, -0.041, -0.216, -0.061, -0.001, 0.034, 0.096,  -0.038, 0.513, -0.12, -0.303, 0.023, 0.823, 0.06, 0.304, -0.073,  -0.08, -0.193, -0.035, 0.011, 0.017, 0.07, -0.052, 0.556, -0.114,  -0.344, 0.019, 0.805, 0.181, -0.03, -0.06, -0.164, -0.014, 0.024,  0.03, 0.087, -0.046, 0.564, -0.105, -0.339, -0.032, 0.648, -0.319,  0.152, 0.05, 0.03, 0.039, -0.005, -0.007, 0.007, -0.155, 0.029,  0.093, 0.008, -0.216, -0.344, 0.101, 0.021, -0.015, 0.076, 0.059,  0.055, -0.145, 0.014, 0.086, 0.051, -0.111, -0.196, 0.023, 0.08,  -0.065, -0.046, 0, -0.199, 0.154, 0.265, -0.017, -0.287, -0.153,  0.006, -0.063, -0.019, 0.01, -0.059, 0.046, 0.057, -0.021, -0.121,  -0.085, -0.009, -0.021, -0.04, 0.003, 0.036, 0.054, -0.039, 0.019,  -0.143, 0.265, 0.072, 0.144, -0.042, -0.068, 0.036, 0.125, -0.173,  0.021, 0.171, -0.064, -0.114, 0.033, 0.25, -0.311, 0.148, 0.059,  0.063, 0.012, -0.021, 0.521, -0.137, -0.407, -0.018, 0.853, -0.382,  0.23, 0.009, -0.18, -0.35, 0.013, -0.43, -0.125, 0.022, 1.119,  0.356, 0.124, 0.094, 0.089, 0.194, 1.104, 0, 0.001),
                   .Names = c("msEffort_to_training",  "msAfraid_to_training", "msIdentity_to_training", "msYearn_to_training",  "msTimeAlloc_to_training", "msMetNum_to_training", "msSharedNum_to_training",  "msTeachNum_to_training", "msFast_to_ties", "msLife_to_ties",  "msPreoccu_to_ties", "msYearn_to_ties", "msEnv_to_ties", "msAllow_to_ties",  "msTaught_to_ties", "msTimeAlloc_to_ties", "maxDurationOut_to_ties",  "successCat_to_ties", "mean_msEffort", "mean_msAfraid", "mean_msFast",  "mean_msLife", "mean_msIdentity", "mean_msPreoccu", "mean_msYearn",  "mean_msEnv", "mean_msAllow", "mean_msTaught", "mean_freqCause",  "mean_msTimeAlloc", "mean_maxDuration", "mean_maxDurationOut",  "mean_msMetNum", "mean_msSharedNum", "mean_msTeachNum", "mean_msTrainTeachNum",  "mean_successCat", "mean_envMastery", "manifestvar_msEffort_msEffort",  "manifestvar_msAfraid_msAfraid", "manifestvar_msFast_msFast",  "manifestvar_msLife_msLife", "manifestvar_msIdentity_msIdentity",  "manifestvar_msPreoccu_msPreoccu", "manifestvar_msYearn_msYearn",  "manifestvar_msEnv_msEnv", "manifestvar_msAllow_msAllow", "manifestvar_msTaught_msTaught",  "manifestvar_freqCause_freqCause", "manifestvar_msTimeAlloc_msTimeAlloc",  "manifestvar_maxDuration_maxDuration", "manifestvar_maxDurationOut_maxDurationOut",  "manifestvar_msMetNum_msMetNum", "manifestvar_msSharedNum_msSharedNum",  "manifestvar_msTeachNum_msTeachNum", "manifestvar_msTrainTeachNum_msTrainTeachNum",  "manifestvar_successCat_successCat", "manifestvar_envMastery_envMastery",  "diffusion_training_training", "diffusion_ties_training", "diffusion_envMastery_training",  "diffusion_ties_ties", "diffusion_envMastery_ties", "diffusion_envMastery_envMastery",  "drift_training_labeffect", "drift_ties_labeffect", "drift_envMastery_labeffect",  "drift_training_training", "drift_ties_ties", "drift_envMastery_envMastery",  "manifesttraitvar_msEffort_msEffort", "manifesttraitvar_msAfraid_msEffort",  "manifesttraitvar_msFast_msEffort", "manifesttraitvar_msLife_msEffort",  "manifesttraitvar_msIdentity_msEffort", "manifesttraitvar_msPreoccu_msEffort",  "manifesttraitvar_msYearn_msEffort", "manifesttraitvar_msEnv_msEffort",  "manifesttraitvar_msAllow_msEffort", "manifesttraitvar_msTaught_msEffort",  "manifesttraitvar_freqCause_msEffort", "manifesttraitvar_msTimeAlloc_msEffort",  "manifesttraitvar_maxDuration_msEffort", "manifesttraitvar_maxDurationOut_msEffort",  "manifesttraitvar_msMetNum_msEffort", "manifesttraitvar_msSharedNum_msEffort",  "manifesttraitvar_msTeachNum_msEffort", "manifesttraitvar_msTrainTeachNum_msEffort",  "manifesttraitvar_successCat_msEffort", "manifesttraitvar_envMastery_msEffort",  "manifesttraitvar_msAfraid_msAfraid", "manifesttraitvar_msFast_msAfraid",  "manifesttraitvar_msLife_msAfraid", "manifesttraitvar_msIdentity_msAfraid",  "manifesttraitvar_msPreoccu_msAfraid", "manifesttraitvar_msYearn_msAfraid",  "manifesttraitvar_msEnv_msAfraid", "manifesttraitvar_msAllow_msAfraid",  "manifesttraitvar_msTaught_msAfraid", "manifesttraitvar_freqCause_msAfraid",  "manifesttraitvar_msTimeAlloc_msAfraid", "manifesttraitvar_maxDuration_msAfraid",  "manifesttraitvar_maxDurationOut_msAfraid", "manifesttraitvar_msMetNum_msAfraid",  "manifesttraitvar_msSharedNum_msAfraid", "manifesttraitvar_msTeachNum_msAfraid",  "manifesttraitvar_msTrainTeachNum_msAfraid", "manifesttraitvar_successCat_msAfraid",  "manifesttraitvar_envMastery_msAfraid", "manifesttraitvar_msFast_msFast",  "manifesttraitvar_msLife_msFast", "manifesttraitvar_msIdentity_msFast",  "manifesttraitvar_msPreoccu_msFast", "manifesttraitvar_msYearn_msFast",  "manifesttraitvar_msEnv_msFast", "manifesttraitvar_msAllow_msFast",  "manifesttraitvar_msTaught_msFast", "manifesttraitvar_freqCause_msFast",  "manifesttraitvar_msTimeAlloc_msFast", "manifesttraitvar_maxDuration_msFast",  "manifesttraitvar_maxDurationOut_msFast", "manifesttraitvar_msMetNum_msFast",  "manifesttraitvar_msSharedNum_msFast", "manifesttraitvar_msTeachNum_msFast",  "manifesttraitvar_msTrainTeachNum_msFast", "manifesttraitvar_successCat_msFast",  "manifesttraitvar_envMastery_msFast", "manifesttraitvar_msLife_msLife",  "manifesttraitvar_msIdentity_msLife", "manifesttraitvar_msPreoccu_msLife",  "manifesttraitvar_msYearn_msLife", "manifesttraitvar_msEnv_msLife",  "manifesttraitvar_msAllow_msLife", "manifesttraitvar_msTaught_msLife",  "manifesttraitvar_freqCause_msLife", "manifesttraitvar_msTimeAlloc_msLife",  "manifesttraitvar_maxDuration_msLife", "manifesttraitvar_maxDurationOut_msLife",  "manifesttraitvar_msMetNum_msLife", "manifesttraitvar_msSharedNum_msLife",  "manifesttraitvar_msTeachNum_msLife", "manifesttraitvar_msTrainTeachNum_msLife",  "manifesttraitvar_successCat_msLife", "manifesttraitvar_envMastery_msLife",  "manifesttraitvar_msIdentity_msIdentity", "manifesttraitvar_msPreoccu_msIdentity",  "manifesttraitvar_msYearn_msIdentity", "manifesttraitvar_msEnv_msIdentity",  "manifesttraitvar_msAllow_msIdentity", "manifesttraitvar_msTaught_msIdentity",  "manifesttraitvar_freqCause_msIdentity", "manifesttraitvar_msTimeAlloc_msIdentity",  "manifesttraitvar_maxDuration_msIdentity", "manifesttraitvar_maxDurationOut_msIdentity",  "manifesttraitvar_msMetNum_msIdentity", "manifesttraitvar_msSharedNum_msIdentity",  "manifesttraitvar_msTeachNum_msIdentity", "manifesttraitvar_msTrainTeachNum_msIdentity",  "manifesttraitvar_successCat_msIdentity", "manifesttraitvar_envMastery_msIdentity",  "manifesttraitvar_msPreoccu_msPreoccu", "manifesttraitvar_msYearn_msPreoccu",  "manifesttraitvar_msEnv_msPreoccu", "manifesttraitvar_msAllow_msPreoccu",  "manifesttraitvar_msTaught_msPreoccu", "manifesttraitvar_freqCause_msPreoccu",  "manifesttraitvar_msTimeAlloc_msPreoccu", "manifesttraitvar_maxDuration_msPreoccu",  "manifesttraitvar_maxDurationOut_msPreoccu", "manifesttraitvar_msMetNum_msPreoccu",  "manifesttraitvar_msSharedNum_msPreoccu", "manifesttraitvar_msTeachNum_msPreoccu",  "manifesttraitvar_msTrainTeachNum_msPreoccu", "manifesttraitvar_successCat_msPreoccu",  "manifesttraitvar_envMastery_msPreoccu", "manifesttraitvar_msYearn_msYearn",  "manifesttraitvar_msEnv_msYearn", "manifesttraitvar_msAllow_msYearn",  "manifesttraitvar_msTaught_msYearn", "manifesttraitvar_freqCause_msYearn",  "manifesttraitvar_msTimeAlloc_msYearn", "manifesttraitvar_maxDuration_msYearn",  "manifesttraitvar_maxDurationOut_msYearn", "manifesttraitvar_msMetNum_msYearn",  "manifesttraitvar_msSharedNum_msYearn", "manifesttraitvar_msTeachNum_msYearn",  "manifesttraitvar_msTrainTeachNum_msYearn", "manifesttraitvar_successCat_msYearn",  "manifesttraitvar_envMastery_msYearn", "manifesttraitvar_msEnv_msEnv",  "manifesttraitvar_msAllow_msEnv", "manifesttraitvar_msTaught_msEnv",  "manifesttraitvar_freqCause_msEnv", "manifesttraitvar_msTimeAlloc_msEnv",  "manifesttraitvar_maxDuration_msEnv", "manifesttraitvar_maxDurationOut_msEnv",  "manifesttraitvar_msMetNum_msEnv", "manifesttraitvar_msSharedNum_msEnv",  "manifesttraitvar_msTeachNum_msEnv", "manifesttraitvar_msTrainTeachNum_msEnv",  "manifesttraitvar_successCat_msEnv", "manifesttraitvar_envMastery_msEnv",  "manifesttraitvar_msAllow_msAllow", "manifesttraitvar_msTaught_msAllow",  "manifesttraitvar_freqCause_msAllow", "manifesttraitvar_msTimeAlloc_msAllow",  "manifesttraitvar_maxDuration_msAllow", "manifesttraitvar_maxDurationOut_msAllow",  "manifesttraitvar_msMetNum_msAllow", "manifesttraitvar_msSharedNum_msAllow",  "manifesttraitvar_msTeachNum_msAllow", "manifesttraitvar_msTrainTeachNum_msAllow",  "manifesttraitvar_successCat_msAllow", "manifesttraitvar_envMastery_msAllow",  "manifesttraitvar_msTaught_msTaught", "manifesttraitvar_freqCause_msTaught",  "manifesttraitvar_msTimeAlloc_msTaught", "manifesttraitvar_maxDuration_msTaught",  "manifesttraitvar_maxDurationOut_msTaught", "manifesttraitvar_msMetNum_msTaught",  "manifesttraitvar_msSharedNum_msTaught", "manifesttraitvar_msTeachNum_msTaught",  "manifesttraitvar_msTrainTeachNum_msTaught", "manifesttraitvar_successCat_msTaught",  "manifesttraitvar_envMastery_msTaught", "manifesttraitvar_freqCause_freqCause",  "manifesttraitvar_msTimeAlloc_freqCause", "manifesttraitvar_maxDuration_freqCause",  "manifesttraitvar_maxDurationOut_freqCause", "manifesttraitvar_msMetNum_freqCause",  "manifesttraitvar_msSharedNum_freqCause", "manifesttraitvar_msTeachNum_freqCause",  "manifesttraitvar_msTrainTeachNum_freqCause", "manifesttraitvar_successCat_freqCause",  "manifesttraitvar_envMastery_freqCause", "manifesttraitvar_msTimeAlloc_msTimeAlloc",  "manifesttraitvar_maxDuration_msTimeAlloc", "manifesttraitvar_maxDurationOut_msTimeAlloc",  "manifesttraitvar_msMetNum_msTimeAlloc", "manifesttraitvar_msSharedNum_msTimeAlloc",  "manifesttraitvar_msTeachNum_msTimeAlloc", "manifesttraitvar_msTrainTeachNum_msTimeAlloc",  "manifesttraitvar_successCat_msTimeAlloc", "manifesttraitvar_envMastery_msTimeAlloc",  "manifesttraitvar_maxDuration_maxDuration", "manifesttraitvar_maxDurationOut_maxDuration",  "manifesttraitvar_msMetNum_maxDuration", "manifesttraitvar_msSharedNum_maxDuration",  "manifesttraitvar_msTeachNum_maxDuration", "manifesttraitvar_msTrainTeachNum_maxDuration",  "manifesttraitvar_successCat_maxDuration", "manifesttraitvar_envMastery_maxDuration",  "manifesttraitvar_maxDurationOut_maxDurationOut", "manifesttraitvar_msMetNum_maxDurationOut",  "manifesttraitvar_msSharedNum_maxDurationOut", "manifesttraitvar_msTeachNum_maxDurationOut",  "manifesttraitvar_msTrainTeachNum_maxDurationOut", "manifesttraitvar_successCat_maxDurationOut",  "manifesttraitvar_envMastery_maxDurationOut", "manifesttraitvar_msMetNum_msMetNum",  "manifesttraitvar_msSharedNum_msMetNum", "manifesttraitvar_msTeachNum_msMetNum",  "manifesttraitvar_msTrainTeachNum_msMetNum", "manifesttraitvar_successCat_msMetNum",  "manifesttraitvar_envMastery_msMetNum", "manifesttraitvar_msSharedNum_msSharedNum",  "manifesttraitvar_msTeachNum_msSharedNum", "manifesttraitvar_msTrainTeachNum_msSharedNum",  "manifesttraitvar_successCat_msSharedNum", "manifesttraitvar_envMastery_msSharedNum",  "manifesttraitvar_msTeachNum_msTeachNum", "manifesttraitvar_msTrainTeachNum_msTeachNum",  "manifesttraitvar_successCat_msTeachNum", "manifesttraitvar_envMastery_msTeachNum",  "manifesttraitvar_msTrainTeachNum_msTrainTeachNum", "manifesttraitvar_successCat_msTrainTeachNum",  "manifesttraitvar_envMastery_msTrainTeachNum", "manifesttraitvar_successCat_successCat",  "manifesttraitvar_envMastery_successCat", "manifesttraitvar_envMastery_envMastery",  "mean_labT0", "mean_labT1", "mean_labT2", "mean_labT3", "mean_labT4",  "mean_labT5", "mean_labT6", "mean_labT7"))
 container <- omxSetParameters(container, names(par2), values=par2)
-fit <- mxRun(container)
+if (0) {
+  fit <- mxRun(container)
+} else {
+container <- mxRestore(container)
+#cat(deparse(round(omxGetParameters(container), 4)))
+par3 <- structure(c(5.8094, 5.4145, 1.9366, -0.2195, -5.1106, 14.5648,  21.3312, 4.5074, 0.2744, 0.2683, 0.3508, 0.4958, 1.1404, 1.3599,  0.3528, 0.1299, 0.9555, 0.4605, 3.0171, 4.0037, 2.835, 3.1785,  4.2178, 3.1988, 3.1901, 2.5402, 2.308, 1.3928, 2.0974, 2.0499,  2.2745, 2.1061, 1.7773, 1.8266, 1.1171, 1.0519, 1.2684, 4.2898,  -0.1957, -0.3246, -0.1329, -0.1386, -0.4075, -0.1391, -0.1116,  -0.3841, -0.5317, -0.4281, -0.4519, -0.0642, -0.1992, -0.1858,  -0.8746, -0.911, -1.3638, -2.0427, -0.3722, -1.3426, -10.2211,  0.0553, -5e-04, -0.4768, 0.2968, -2.2938, 0.0678, 0.0825, 0.0054,  1.9467, -0.6026, -3.5622, -13.7649, 0.0197, 0.1206, -0.1699,  -0.0449, 0.0292, 0.04, 0.3384, 0.1775, -0.101, 0.0109, -0.0391,  -0.233, 0.099, 0.0295, 0.1025, -0.0281, -0.0026, 0.6348, 0.2425,  -11.813, -0.0841, -0.0243, 0.5082, 0.0904, 0.1144, 0.3061, -0.1544,  -0.2618, -0.2754, -0.0124, -0.0481, 0.0218, 0.0656, 0.2312, -0.1022,  -0.1211, 0.2444, 0.3573, -1.8915, -0.017, -0.2132, 0.2185, 0.1634,  0.3204, -0.091, -0.14, 0.0533, 0.176, -0.2839, 0.1331, 0.037,  0.1327, 0.0529, 0.0189, 0.6924, 0.1606, -3.1463, -0.1378, 0.4339,  0.0783, 0.4471, 0.234, -0.1137, 0.1589, 0.1393, -0.2467, 0.0419,  0.057, 0.1743, 0.0401, -0.0882, 0.5083, 0.333, -0.9107, 0.0652,  0.1676, 0.2592, -0.08, -0.2498, -0.1831, 0.0029, 0.0404, 0.0156,  0.0089, 0.2399, -0.0939, -0.1703, 0.2001, 0.2939, -0.9476, 0.1047,  0.5056, 0.147, -0.0945, 0.199, 0.1982, -0.1559, 0.0113, 0.0745,  0.1536, -0.0154, -0.0277, 0.468, 0.34, -0.7145, -0.1402, 0.4095,  -0.2809, 0.2699, -0.0338, -0.239, 0.3374, 0.3172, 0.297, 0.1699,  0.0051, 0.1216, -0.1389, -16.1758, 0.2034, -0.2934, 0.2439, 0.0752,  -0.5247, 0.2391, 0.0758, 0.1431, 0.1541, 0.0197, 0.3489, 0.054,  -7.2623, -0.1658, 0.1649, -0.0385, -0.4398, 0.2896, 0.1646, 0.1612,  0.1088, 0.0063, 0.4889, 0.0894, -1.3143, 0.0953, -0.0914, -0.2181,  0.1282, 0.0628, -0.0825, 0.2902, 0.1533, 0.021, -0.1874, -0.3645,  0.162, -0.111, 0.0717, 0.0363, 0.0992, 0.0628, 0.0528, 0.121,  -0.057, -0.5834, -0.2846, 0.2875, 0.0297, -0.008, 0.1381, 0.1557,  0.0305, 0.0448, -9.5668, 0.8287, 0.1759, 0.2944, 0.1703, 0.1638,  0.6056, 0.0153, -0.1713, 0.1448, 0.208, 0.0749, 0.1593, 0.5161,  0.1278, -0.6452, 0.391, 0.2312, 0.1857, 0.1418, 0.2126, -0.1003,  0.3024, 0.2275, -0.0158, 0.025, -1.5525, 0.3452, 0.0632, -0.0164,  -1.1041, 0.0229, -0.0339, -0.138, 0.0329, -0.421, 0.3396, 0.3733,  0.35, 0.325, 0.2963, 0.913, 0, 0), .Names = c("msEffort_to_training",  "msAfraid_to_training", "msIdentity_to_training", "msYearn_to_training",  "msTimeAlloc_to_training", "msMetNum_to_training", "msSharedNum_to_training",  "msTeachNum_to_training", "msFast_to_ties", "msLife_to_ties",  "msPreoccu_to_ties", "msYearn_to_ties", "msEnv_to_ties", "msAllow_to_ties",  "msTaught_to_ties", "msTimeAlloc_to_ties", "maxDurationOut_to_ties",  "successCat_to_ties", "mean_msEffort", "mean_msAfraid", "mean_msFast",  "mean_msLife", "mean_msIdentity", "mean_msPreoccu", "mean_msYearn",  "mean_msEnv", "mean_msAllow", "mean_msTaught", "mean_freqCause",  "mean_msTimeAlloc", "mean_maxDuration", "mean_maxDurationOut",  "mean_msMetNum", "mean_msSharedNum", "mean_msTeachNum", "mean_msTrainTeachNum",  "mean_successCat", "mean_envMastery", "manifestvar_msEffort_msEffort",  "manifestvar_msAfraid_msAfraid", "manifestvar_msFast_msFast",  "manifestvar_msLife_msLife", "manifestvar_msIdentity_msIdentity",  "manifestvar_msPreoccu_msPreoccu", "manifestvar_msYearn_msYearn",  "manifestvar_msEnv_msEnv", "manifestvar_msAllow_msAllow", "manifestvar_msTaught_msTaught",  "manifestvar_freqCause_freqCause", "manifestvar_msTimeAlloc_msTimeAlloc",  "manifestvar_maxDuration_maxDuration", "manifestvar_maxDurationOut_maxDurationOut",  "manifestvar_msMetNum_msMetNum", "manifestvar_msSharedNum_msSharedNum",  "manifestvar_msTeachNum_msTeachNum", "manifestvar_msTrainTeachNum_msTrainTeachNum",  "manifestvar_successCat_successCat", "manifestvar_envMastery_envMastery",  "diffusion_training_training", "diffusion_ties_training", "diffusion_envMastery_training",  "diffusion_ties_ties", "diffusion_envMastery_ties", "diffusion_envMastery_envMastery",  "drift_training_labeffect", "drift_ties_labeffect", "drift_envMastery_labeffect",  "drift_training_training", "drift_ties_ties", "drift_envMastery_envMastery",  "manifesttraitvar_msEffort_msEffort", "manifesttraitvar_msAfraid_msEffort",  "manifesttraitvar_msFast_msEffort", "manifesttraitvar_msLife_msEffort",  "manifesttraitvar_msIdentity_msEffort", "manifesttraitvar_msPreoccu_msEffort",  "manifesttraitvar_msYearn_msEffort", "manifesttraitvar_msEnv_msEffort",  "manifesttraitvar_msAllow_msEffort", "manifesttraitvar_msTaught_msEffort",  "manifesttraitvar_freqCause_msEffort", "manifesttraitvar_msTimeAlloc_msEffort",  "manifesttraitvar_maxDuration_msEffort", "manifesttraitvar_maxDurationOut_msEffort",  "manifesttraitvar_msMetNum_msEffort", "manifesttraitvar_msSharedNum_msEffort",  "manifesttraitvar_msTeachNum_msEffort", "manifesttraitvar_msTrainTeachNum_msEffort",  "manifesttraitvar_successCat_msEffort", "manifesttraitvar_envMastery_msEffort",  "manifesttraitvar_msAfraid_msAfraid", "manifesttraitvar_msFast_msAfraid",  "manifesttraitvar_msLife_msAfraid", "manifesttraitvar_msIdentity_msAfraid",  "manifesttraitvar_msPreoccu_msAfraid", "manifesttraitvar_msYearn_msAfraid",  "manifesttraitvar_msEnv_msAfraid", "manifesttraitvar_msAllow_msAfraid",  "manifesttraitvar_msTaught_msAfraid", "manifesttraitvar_freqCause_msAfraid",  "manifesttraitvar_msTimeAlloc_msAfraid", "manifesttraitvar_maxDuration_msAfraid",  "manifesttraitvar_maxDurationOut_msAfraid", "manifesttraitvar_msMetNum_msAfraid",  "manifesttraitvar_msSharedNum_msAfraid", "manifesttraitvar_msTeachNum_msAfraid",  "manifesttraitvar_msTrainTeachNum_msAfraid", "manifesttraitvar_successCat_msAfraid",  "manifesttraitvar_envMastery_msAfraid", "manifesttraitvar_msFast_msFast",  "manifesttraitvar_msLife_msFast", "manifesttraitvar_msIdentity_msFast",  "manifesttraitvar_msPreoccu_msFast", "manifesttraitvar_msYearn_msFast",  "manifesttraitvar_msEnv_msFast", "manifesttraitvar_msAllow_msFast",  "manifesttraitvar_msTaught_msFast", "manifesttraitvar_freqCause_msFast",  "manifesttraitvar_msTimeAlloc_msFast", "manifesttraitvar_maxDuration_msFast",  "manifesttraitvar_maxDurationOut_msFast", "manifesttraitvar_msMetNum_msFast",  "manifesttraitvar_msSharedNum_msFast", "manifesttraitvar_msTeachNum_msFast",  "manifesttraitvar_msTrainTeachNum_msFast", "manifesttraitvar_successCat_msFast",  "manifesttraitvar_envMastery_msFast", "manifesttraitvar_msLife_msLife",  "manifesttraitvar_msIdentity_msLife", "manifesttraitvar_msPreoccu_msLife",  "manifesttraitvar_msYearn_msLife", "manifesttraitvar_msEnv_msLife",  "manifesttraitvar_msAllow_msLife", "manifesttraitvar_msTaught_msLife",  "manifesttraitvar_freqCause_msLife", "manifesttraitvar_msTimeAlloc_msLife",  "manifesttraitvar_maxDuration_msLife", "manifesttraitvar_maxDurationOut_msLife",  "manifesttraitvar_msMetNum_msLife", "manifesttraitvar_msSharedNum_msLife",  "manifesttraitvar_msTeachNum_msLife", "manifesttraitvar_msTrainTeachNum_msLife",  "manifesttraitvar_successCat_msLife", "manifesttraitvar_envMastery_msLife",  "manifesttraitvar_msIdentity_msIdentity", "manifesttraitvar_msPreoccu_msIdentity",  "manifesttraitvar_msYearn_msIdentity", "manifesttraitvar_msEnv_msIdentity",  "manifesttraitvar_msAllow_msIdentity", "manifesttraitvar_msTaught_msIdentity",  "manifesttraitvar_freqCause_msIdentity", "manifesttraitvar_msTimeAlloc_msIdentity",  "manifesttraitvar_maxDuration_msIdentity", "manifesttraitvar_maxDurationOut_msIdentity",  "manifesttraitvar_msMetNum_msIdentity", "manifesttraitvar_msSharedNum_msIdentity",  "manifesttraitvar_msTeachNum_msIdentity", "manifesttraitvar_msTrainTeachNum_msIdentity",  "manifesttraitvar_successCat_msIdentity", "manifesttraitvar_envMastery_msIdentity",  "manifesttraitvar_msPreoccu_msPreoccu", "manifesttraitvar_msYearn_msPreoccu",  "manifesttraitvar_msEnv_msPreoccu", "manifesttraitvar_msAllow_msPreoccu",  "manifesttraitvar_msTaught_msPreoccu", "manifesttraitvar_freqCause_msPreoccu",  "manifesttraitvar_msTimeAlloc_msPreoccu", "manifesttraitvar_maxDuration_msPreoccu",  "manifesttraitvar_maxDurationOut_msPreoccu", "manifesttraitvar_msMetNum_msPreoccu",  "manifesttraitvar_msSharedNum_msPreoccu", "manifesttraitvar_msTeachNum_msPreoccu",  "manifesttraitvar_msTrainTeachNum_msPreoccu", "manifesttraitvar_successCat_msPreoccu",  "manifesttraitvar_envMastery_msPreoccu", "manifesttraitvar_msYearn_msYearn",  "manifesttraitvar_msEnv_msYearn", "manifesttraitvar_msAllow_msYearn",  "manifesttraitvar_msTaught_msYearn", "manifesttraitvar_freqCause_msYearn",  "manifesttraitvar_msTimeAlloc_msYearn", "manifesttraitvar_maxDuration_msYearn",  "manifesttraitvar_maxDurationOut_msYearn", "manifesttraitvar_msMetNum_msYearn",  "manifesttraitvar_msSharedNum_msYearn", "manifesttraitvar_msTeachNum_msYearn",  "manifesttraitvar_msTrainTeachNum_msYearn", "manifesttraitvar_successCat_msYearn",  "manifesttraitvar_envMastery_msYearn", "manifesttraitvar_msEnv_msEnv",  "manifesttraitvar_msAllow_msEnv", "manifesttraitvar_msTaught_msEnv",  "manifesttraitvar_freqCause_msEnv", "manifesttraitvar_msTimeAlloc_msEnv",  "manifesttraitvar_maxDuration_msEnv", "manifesttraitvar_maxDurationOut_msEnv",  "manifesttraitvar_msMetNum_msEnv", "manifesttraitvar_msSharedNum_msEnv",  "manifesttraitvar_msTeachNum_msEnv", "manifesttraitvar_msTrainTeachNum_msEnv",  "manifesttraitvar_successCat_msEnv", "manifesttraitvar_envMastery_msEnv",  "manifesttraitvar_msAllow_msAllow", "manifesttraitvar_msTaught_msAllow",  "manifesttraitvar_freqCause_msAllow", "manifesttraitvar_msTimeAlloc_msAllow",  "manifesttraitvar_maxDuration_msAllow", "manifesttraitvar_maxDurationOut_msAllow",  "manifesttraitvar_msMetNum_msAllow", "manifesttraitvar_msSharedNum_msAllow",  "manifesttraitvar_msTeachNum_msAllow", "manifesttraitvar_msTrainTeachNum_msAllow",  "manifesttraitvar_successCat_msAllow", "manifesttraitvar_envMastery_msAllow",  "manifesttraitvar_msTaught_msTaught", "manifesttraitvar_freqCause_msTaught",  "manifesttraitvar_msTimeAlloc_msTaught", "manifesttraitvar_maxDuration_msTaught",  "manifesttraitvar_maxDurationOut_msTaught", "manifesttraitvar_msMetNum_msTaught",  "manifesttraitvar_msSharedNum_msTaught", "manifesttraitvar_msTeachNum_msTaught",  "manifesttraitvar_msTrainTeachNum_msTaught", "manifesttraitvar_successCat_msTaught",  "manifesttraitvar_envMastery_msTaught", "manifesttraitvar_freqCause_freqCause",  "manifesttraitvar_msTimeAlloc_freqCause", "manifesttraitvar_maxDuration_freqCause",  "manifesttraitvar_maxDurationOut_freqCause", "manifesttraitvar_msMetNum_freqCause",  "manifesttraitvar_msSharedNum_freqCause", "manifesttraitvar_msTeachNum_freqCause",  "manifesttraitvar_msTrainTeachNum_freqCause", "manifesttraitvar_successCat_freqCause",  "manifesttraitvar_envMastery_freqCause", "manifesttraitvar_msTimeAlloc_msTimeAlloc",  "manifesttraitvar_maxDuration_msTimeAlloc", "manifesttraitvar_maxDurationOut_msTimeAlloc",  "manifesttraitvar_msMetNum_msTimeAlloc", "manifesttraitvar_msSharedNum_msTimeAlloc",  "manifesttraitvar_msTeachNum_msTimeAlloc", "manifesttraitvar_msTrainTeachNum_msTimeAlloc",  "manifesttraitvar_successCat_msTimeAlloc", "manifesttraitvar_envMastery_msTimeAlloc",  "manifesttraitvar_maxDuration_maxDuration", "manifesttraitvar_maxDurationOut_maxDuration",  "manifesttraitvar_msMetNum_maxDuration", "manifesttraitvar_msSharedNum_maxDuration",  "manifesttraitvar_msTeachNum_maxDuration", "manifesttraitvar_msTrainTeachNum_maxDuration",  "manifesttraitvar_successCat_maxDuration", "manifesttraitvar_envMastery_maxDuration",  "manifesttraitvar_maxDurationOut_maxDurationOut", "manifesttraitvar_msMetNum_maxDurationOut",  "manifesttraitvar_msSharedNum_maxDurationOut", "manifesttraitvar_msTeachNum_maxDurationOut",  "manifesttraitvar_msTrainTeachNum_maxDurationOut", "manifesttraitvar_successCat_maxDurationOut",  "manifesttraitvar_envMastery_maxDurationOut", "manifesttraitvar_msMetNum_msMetNum",  "manifesttraitvar_msSharedNum_msMetNum", "manifesttraitvar_msTeachNum_msMetNum",  "manifesttraitvar_msTrainTeachNum_msMetNum", "manifesttraitvar_successCat_msMetNum",  "manifesttraitvar_envMastery_msMetNum", "manifesttraitvar_msSharedNum_msSharedNum",  "manifesttraitvar_msTeachNum_msSharedNum", "manifesttraitvar_msTrainTeachNum_msSharedNum",  "manifesttraitvar_successCat_msSharedNum", "manifesttraitvar_envMastery_msSharedNum",  "manifesttraitvar_msTeachNum_msTeachNum", "manifesttraitvar_msTrainTeachNum_msTeachNum",  "manifesttraitvar_successCat_msTeachNum", "manifesttraitvar_envMastery_msTeachNum",  "manifesttraitvar_msTrainTeachNum_msTrainTeachNum", "manifesttraitvar_successCat_msTrainTeachNum",  "manifesttraitvar_envMastery_msTrainTeachNum", "manifesttraitvar_successCat_successCat",  "manifesttraitvar_envMastery_successCat", "manifesttraitvar_envMastery_envMastery",  "mean_labT0", "mean_labT1", "mean_labT2", "mean_labT3", "mean_labT4",  "mean_labT5", "mean_labT6", "mean_labT7"))
+  
+}
 
 # fit <- ctFit(wide, model, retryattempts=0, verbose=2, meanIntervals=T,
 #              stationary=c('T0VAR','T0MEANS'), plotOptimization=T)
 
+drift <- mxEval(group01_03.DRIFT, container, compute=TRUE)
+dimnames(drift) <- list(paste0("\\text{",latents,"}"), paste0("\\text{",latents,"}"))
+
+tbl <- container$group01_03$LAMBDA$values[-envMasteryIndex,c('training', 'ties')]
+tbl[tbl[,] == 0] <- NA
+print(xtable(tbl, "Loadings for second model of dynamic factor structure.", "tab:dfs2"))
 @ 
 
+The drift matrix was
+\begin{align}
+<<results="asis">>=
+print(xtable(drift, align=rep('',1+ncol(drift))), floating=FALSE, tabular.environment="bmatrix", 
+  hline.after=NULL, include.rownames=TRUE, include.colnames=TRUE,
+  sanitize.rownames.function=function(x)x, sanitize.colnames.function=function(x)x)
+@
+\end{align}
+
 <<>>=
+
+if (!file.exists("prep1.csv")) {
+  source("prep.R")
+}
+
+manifestNames <- c('training', 'ties', 'envMastery')
+TDpredNames <- 'lab'
+
+long <- NULL
+labTime <- NULL
+UnfilteredID <- NULL
+
+for (wave in 1:numWaves) {
+  raw <- read.table(sprintf("prep%d.csv", wave), stringsAsFactors=FALSE, header=TRUE)
+  if (wave == 1) {
+    UnfilteredID <- raw$id
+    labTime <- raw$labTime
+  }
+  for (col in c('start', 'uid', 'born', 'sex', 'rel','labTime','labTA')) raw[[col]] <- NULL
+  mask <- apply(raw[,c(manifestNames)], 1, function (r) any(!is.na(r[])))
+  raw <- raw[mask,]
+  raw$time <- as.numeric((strptime(raw$end, "%m/%d/%Y %H:%M:%S") - reftime))/7
+  raw$lab <- 0
+  long <- rbind(long, raw)
+}
+
+long <- mergeLabData(TRUE, long, labTime, UnfilteredID)
+
+n.TDpred      <- length(TDpredNames)
+latents <- c("labeffect", "training", "ties", "envMastery")
+
+longUniqueIds <- unique(long[,'id'])
+numUniqueObs <- sapply(1:length(longUniqueIds),
+                       function(x) sum(long[,'id'] == longUniqueIds[x]))
+container <- mxModel(model="ctraw")
+uniqueTpoints <- sort(unique(numUniqueObs))
+partition <- cut(uniqueTpoints, 3)
+for (px in levels(partition)) {
+  Tpoints <- uniqueTpoints[partition == px]
+  long1 <- subset(long, id %in% longUniqueIds[which(numUniqueObs %in% Tpoints)])
+  wide <- suppressMessages(ctLongToWide(
+    long1, id="id", time="time", manifestNames=manifestNames, TDpredNames=TDpredNames))
+  wide <- suppressMessages(ctIntervalise(
+    wide, max(Tpoints), n.manifest=length(manifestNames), n.TDpred=n.TDpred,
+    manifestNames=manifestNames, TDpredNames = TDpredNames))
+
+  lambda <- matrix(0, length(manifestNames), length(latents),
+                   dimnames=list(manifestNames, latents))
+  lambda[,-match("labeffect", colnames(lambda))] <- diag(nrow(lambda))
+  
+  model <- ctModel(
+    n.manifest=length(manifestNames), n.latent=length(latents),
+    Tpoints=max(Tpoints), n.TDpred=n.TDpred,
+    LAMBDA=lambda, manifestNames=manifestNames, latentNames=latents, TDpredNames=TDpredNames,
+    T0TDPREDCOV=matrix(0, nrow=length(latents), ncol=(max(Tpoints)-1)*n.TDpred),
+     TRAITTDPREDCOV=matrix(0, nrow=length(latents), ncol=(max(Tpoints)-1)*n.TDpred), #I don't think we know this is 0 - unless the lab or control condition was randomly assigned?
+    MANIFESTTRAITVAR = "auto" #to begin, I would use MANIFESTTRAITVAR so that all between person variance is removed (people can be consistently high / low on some manifest variables of a process and not others) - we can work on the between person structure more adequately once we understand the dynamic structure somewhat. 
+  )
+  
+  model$DIFFUSION[,match('labeffect',latents)] <- 0
+  model$T0VAR[,match('labeffect',latents)] <- 0
+  model$CINT[,] <- 0
+  model$MANIFESTMEANS <- matrix(paste0('mean_',manifestNames),ncol=1)
+  model$T0MEANS[,] <- 0
+  model$TDPREDEFFECT[-which(latents %in% 'labeffect'),] <- 0
+  model$TDPREDEFFECT[which(latents %in% 'labeffect'),] <- 1
+  model$DRIFT[match('labeffect',latents),] <- 0  # set persistent labeffect, and we know that changes in latent processes do not cause labs
+  model$TDPREDVAR <- diag(0.1,max(Tpoints)-1)
+
+  m1 <- suppressMessages(ctFit(
+    wide, model, nofit=TRUE, meanIntervals=T,stationary=c('T0VAR','T0MEANS')))
+  m1 <- mxRename(m1, sprintf("group%02d_%02d", min(Tpoints), max(Tpoints)))
+  container <- mxModel(container, m1)
+}
+
+container <- mxModel(container,
+                     mxFitFunctionMultigroup(names(container$submodels)))
+container <- omxAssignFirstParameters(container)
+
+container<- OpenMx::mxOption(container, 'Always Checkpoint', 'Yes')
+container<- OpenMx::mxOption(container, 'Checkpoint Units', 'iterations')
+container<- OpenMx::mxOption(container, 'Checkpoint Count', 1)    
+container <- mxModel(container,
+                     mxComputeGradientDescent(nudgeZeroStarts=FALSE, verbose=2))
+container <- mxRun(container)
+
+drift <- mxEval(group01_03.DRIFT, container, compute=TRUE)
+dimnames(drift) <- list(paste0("\\text{",latents,"}"), paste0("\\text{",latents,"}"))
 
 if (0) {
   
@@ -408,5 +539,11 @@ if (0) {
 }
 
 @
+
+\section{TODO}
+
+\begin{enumerate}
+\item Try to do some kind of sensitivity analysis.
+\end{enumerate}
 
 \end{document}
