@@ -471,6 +471,8 @@ for (px in levels(partition)) {
   driftindex<-!diag(length(latents))
   driftindex[,which(latents %in% c("labeffect",'trend'))] <- FALSE
   driftindex[cbind(which(latents %in% c("labeffect",'trend')),which(latents %in% c("labeffect",'trend')))] <- TRUE
+  driftindex[which(latents %in% "labeffect"),which(latents %in% 'trend')] <- TRUE
+  driftindex[which(latents %in% "trend"),which(latents %in% 'labeffect')] <- TRUE
   model$DRIFT[driftindex] <- 0
   model$TDPREDVAR <- diag(0.1,max(Tpoints)-1)
 
@@ -498,7 +500,8 @@ mxComputeNumericDeriv(),
 mxComputeHessianQuality(),
 mxComputeStandardError()
 )))
-# container<-omxSetParameters(container,labels=names(oldparams),values=oldparams,strict=F)
+# container<-omxSetParameters(container,labels=names(oldparams)[names(oldparams) %in% names(omxGetParameters(container))],
+# values=oldparams[names(oldparams) %in% names(omxGetParameters(container))],strict=F)
 
 container<-mxTryHard(container,paste=F,initialTolerance=1e-16,verbose=2)
 oldparams<-omxGetParameters(container)
