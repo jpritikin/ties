@@ -58,6 +58,7 @@ mergeLabData <- function(approxLabTime, long, labTime, UnfilteredID) {
       potentialLabs <- data.frame(
         id=UnfilteredID[row], time=as.numeric(labGrid[labTime[row],])/7)
       tpoints <- long[long$id==UnfilteredID[row],'time']
+      if (length(tpoints) == 0) next
       rtp <- range(tpoints)
       potentialLabs <- potentialLabs[rtp[1] < potentialLabs$time & potentialLabs$time < rtp[2],]
       active <- findInterval(potentialLabs$time, tpoints)
@@ -400,7 +401,6 @@ print(xtable(drift, align=rep('',1+ncol(drift))), floating=FALSE, tabular.enviro
 \end{align}
 
 <<>>=
-
 if (!file.exists("prep1.csv")) {
   source("prep.R")
 }
@@ -418,7 +418,7 @@ for (wave in 1:numWaves) {
     UnfilteredID <- raw$id
     labTime <- raw$labTime
   }
-  for (col in c('start', 'uid', 'born', 'sex', 'rel','labTime','labTA')) raw[[col]] <- NULL
+  for (col in c('start', 'uid', 'born', 'sex', 'rel','labTA')) raw[[col]] <- NULL
   mask <- apply(raw[,c(manifestNames)], 1, function (r) any(!is.na(r[])))
   raw <- raw[mask,]
   raw$time <- as.numeric((strptime(raw$end, tformat, tz="GMT") - reftime))/7
@@ -428,19 +428,68 @@ for (wave in 1:numWaves) {
 }
 
 long <- mergeLabData(TRUE, long, labTime, UnfilteredID)
+longRel <- subset(long, !is.na(labTime))
+longPsy <- subset(long, is.na(labTime))
 
 n.TDpred      <- length(TDpredNames)
+container <- mxModel(model="ctraw")
+
+# longPsy = psychology participant pool students ----------------------
+latents <- c("labeffect", "training", "ties", "envMastery")
+
+wide <- suppressMessages(ctLongToWide(
+  longPsy, id="id", time="time", manifestNames=manifestNames, TDpredNames=TDpredNames))
+
+Tpoints <- 6
+wide <- suppressMessages(ctIntervalise(
+  wide, Tpoints, n.manifest=length(manifestNames), n.TDpred=n.TDpred,
+  manifestNames=manifestNames, TDpredNames = TDpredNames))
+
+lambda <- matrix(0, length(manifestNames), length(latents),
+                 dimnames=list(manifestNames, latents))
+lambda[,-match(c("labeffect"), colnames(lambda))] <- diag(nrow(lambda))
+
+model <- ctModel(
+    n.manifest=length(manifestNames), n.latent=length(latents),
+    Tpoints=max(Tpoints), n.TDpred=n.TDpred,
+    LAMBDA=lambda, manifestNames=manifestNames, latentNames=latents, TDpredNames=TDpredNames,
+    T0TDPREDCOV=matrix(0, nrow=length(latents), ncol=(max(Tpoints)-1)*n.TDpred),
+     TRAITTDPREDCOV=matrix(0, nrow=length(latents), ncol=(max(Tpoints)-1)*n.TDpred), #I don't think we know this is 0 - unless the lab or control condition was randomly assigned?
+    MANIFESTTRAITVAR = "auto" #to begin, I would use MANIFESTTRAITVAR so that all between person variance is removed (people can be consistently high / low on some manifest variables of a process and not others) - we can work on the between person structure more adequately once we understand the dynamic structure somewhat. 
+  )
+
+model$DIFFUSION[,match(c("labeffect"),latents)] <- 0
+model$T0VAR[,match(c("labeffect"),latents)] <- 0
+model$CINT[,] <- 0
+model$MANIFESTMEANS <- matrix(paste0('mean_',manifestNames),ncol=1)
+model$T0MEANS[,] <- 0
+model$TDPREDEFFECT[-which(latents %in% c("labeffect")),] <- 0
+model$TDPREDEFFECT[which(latents %in% c("labeffect")),] <- 1
+driftindex<-!diag(length(latents))
+driftindex[,which(latents %in% c("labeffect"))] <- FALSE
+driftindex[cbind(which(latents %in% c("labeffect")),
+                 which(latents %in% c("labeffect")))] <- TRUE
+model$DRIFT[driftindex] <- 0
+model$TDPREDVAR <- diag(0.1,max(Tpoints)-1)
+
+m1 <- suppressMessages(ctFit(
+  wide, model, nofit=TRUE, meanIntervals=F,stationary=c('T0VAR','T0MEANS')))
+m1 <- mxRename(m1, "psypool")
+container <- mxModel(container, m1)
+
+
+# longRel = Religious Study students enrolled in the course ----------------
+
 latents <- c("labeffect", 'trend', "training", "ties", "envMastery")
 
-longUniqueIds <- unique(long[,'id'])
+longUniqueIds <- unique(longRel[,'id'])
 numUniqueObs <- sapply(1:length(longUniqueIds),
-                       function(x) sum(long[,'id'] == longUniqueIds[x]))
-container <- mxModel(model="ctraw")
+                       function(x) sum(longRel[,'id'] == longUniqueIds[x]))
 uniqueTpoints <- sort(unique(numUniqueObs))
 partition <- cut(uniqueTpoints, 3)
 for (px in levels(partition)) {
   Tpoints <- uniqueTpoints[partition == px]
-  long1 <- subset(long, id %in% longUniqueIds[which(numUniqueObs %in% Tpoints)])
+  long1 <- subset(longRel, id %in% longUniqueIds[which(numUniqueObs %in% Tpoints)])
   wide <- suppressMessages(ctLongToWide(
     long1, id="id", time="time", manifestNames=manifestNames, TDpredNames=TDpredNames))
   wide <- suppressMessages(ctIntervalise(
@@ -481,8 +530,6 @@ for (px in levels(partition)) {
   m1 <- mxRename(m1, sprintf("group%02d_%02d", min(Tpoints), max(Tpoints)))
   container <- mxModel(container, m1)
 }
-
-
 
 container <- mxModel(container,
                      mxFitFunctionMultigroup(names(container$submodels)))
