@@ -5,6 +5,7 @@ library(ggplot2)
   source("ties-score.R")
   setwd(wd)
 }
+source("spammer.R")
 
 SexItem <- c("Male","Female")
 
@@ -43,6 +44,9 @@ for (wave in 1:9) {
   cmsCol <- cbind(NA,NA,NA,NA,NA,cmsCol)
   cms <- prep.cms201410(cmsCol)
   scored <- cbind(scored, ties.score("uva", cms))
+  mask <- match(spammer, scored$id)
+  mask <- mask[!is.na(mask)]
+  scored[mask,c('envMastery', 'training', 'ties')] <- NA
   write.table(scored, file=sprintf("prep%d.csv", wave), row.names=FALSE)
 }
 

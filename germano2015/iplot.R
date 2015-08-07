@@ -67,25 +67,30 @@ mRange <- range(long$value, na.rm=TRUE)
 unlink("gen/page-*.pdf")
 dir.create("gen", showWarnings =FALSE)
 
-pdf(file=sprintf("gen/page-%03d.pdf", 0), width=11, height=8.5)
-longTraining <- subset(long, variable=='training')
-longTraining$bin <- cut(longTraining$tm, 7)
-meanTraining <- ddply(longTraining, ~hasLab+bin, function (df) {
-  c(value=mean(df$value), tm=mean(df$tm))
-})
-meanTraining <- subset(meanTraining, !is.na(value))
-pl <- ggplot() + geom_line(aes(tm, value, group=id), data=longTraining,
-                           alpha=.1, size=5) +
-  facet_wrap(~hasLab) +
-  geom_line(aes(tm, value), data=meanTraining, alpha=.5, color="red", size=4) +
-  labs(title="Training conditional on lab participation")
-print(pl)
-dev.off()
-
-spam <- c(881)
 page <- 1
+
+for (vx in levels(long$variable)) {
+  pdf(file=sprintf("gen/page-%03d.pdf", page), width=11, height=8.5)
+  longIndicator <- subset(long, variable==vx)
+  longIndicator$bin <- cut(longIndicator$tm, 7)
+  meanIndicator <- ddply(longIndicator, ~hasLab+bin, function (df) {
+    c(value=mean(df$value, na.rm=TRUE), tm=mean(df$tm, na.rm=TRUE))
+  })
+  meanIndicator <- subset(meanIndicator, !is.na(value))
+  pl <- ggplot() + geom_line(aes(tm, value, group=id),
+                             data=subset(longIndicator, !is.na(value)),
+                             alpha=.1, size=5) +
+    facet_wrap(~hasLab) +
+    geom_line(aes(tm, value), data=meanIndicator, alpha=.5, color="red", size=4) +
+    labs(title=paste(vx,"conditional on lab participation")) +
+    xlim(tmRange[1],tmRange[2]) + ylim(mRange[1], mRange[2])
+  print(pl)
+  dev.off()
+  page <- page + 1L
+}
+
 for (.id in unique(long$id)) {
-  if (is.na(.id) || .id %in% spam) next
+  if (is.na(.id)) next
   lab1 <- subset(labData, id==.id)
   
   pl <- ggplot(subset(long, id==.id & !is.na(value)),

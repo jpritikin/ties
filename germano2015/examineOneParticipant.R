@@ -1,4 +1,14 @@
-targetID <- 930
+args <- commandArgs(trailingOnly = TRUE)
+if (length(args) != 1) stop("Specify one participant ID after --args")
+
+{
+wd <- setwd("..")
+source("measures.R")
+source("cms-score.R")
+setwd(wd)
+}
+
+targetID <- as.integer(args[1])
 
 df <- NULL
 for (wave in 1:4) {

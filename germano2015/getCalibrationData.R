@@ -3,9 +3,11 @@
   source("measures.R")
   setwd(wd)
 }
+source("spammer.R")
 
 wave = 1
 raw <- read.csv(sprintf("wave%d-anon.csv", wave), stringsAsFactors=FALSE)
+raw <- subset(raw, !(id %in% spammer))
 offset <- 3+ifelse(wave==1, 3, 0)
 offset <- offset + 14 + ifelse(wave==1, 5, 0)
 
