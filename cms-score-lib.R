@@ -41,7 +41,7 @@ set.nominal.rank <- function(spec, ip.mat, name, a, c) {
 num2cat <- function(num) {
   zero <- num <= 0
   high <- num >= 1000
-  level.coef <- 1  # try 2 once we have more data
+  level.coef <- 2
   kat <- round(level.coef * log10(num)) + 1
   kat[zero] <- 0
   kat[high] <- round(level.coef * log10(1000))+1
@@ -76,7 +76,7 @@ cms.testlets <- function(df) {
         next
     }
     if (is.factor(df[[ncol]])) next
-    df[[ncol]] <- mxFactor(num2cat(df[[ncol]]), levels=0:4)
+    df[[ncol]] <- mxFactor(num2cat(df[[ncol]]), levels=0:7)
   }
   
   if (!is.null(df$msCause)) {
@@ -97,9 +97,8 @@ cms.testlets <- function(df) {
   }
   if (!is.null(df$pctSuccess)) {
     df$pctSuccess[nchar(df$pctSuccess)==0] <- NA
-    # TODO try 10 categories when we have more data
     df$successCat <- cut(as.numeric(df$pctSuccess),
-                         breaks=seq(0,100,length.out=6), ordered_result=TRUE)
+                         breaks=seq(0,100,length.out=8), ordered_result=TRUE)
   }
   for (col in c('msPreoccu', 'msTimeAlloc', 'maxDurationOut', 'msTaught')) {
     if (is.null(df[[col]])) df[[col]] <- factor(NA)

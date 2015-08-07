@@ -25,7 +25,7 @@ library(ifaTools)
 suppressPackageStartupMessages(loadlib())
 options(digits=2, scipen=1)
 
-itemMapText <- geom_text(size=4, position=position_jitter(h=.25))
+itemMapText <- geom_text(size=4, position=position_jitter(h=.1))
 popSplit <- TRUE
 pop <- list()
 @
@@ -67,19 +67,22 @@ A large proportion of data is missing, but the maximum N=\Sexpr{sum(as.numeric(s
 
 The \emph{training} factor is composed of indicators that cause TIES.
 
-<<>>=
+<<cache=TRUE>>=
 fitTraining <- function(tr.data) {
   training.items <- setdiff(colnames(tr.data), "population")
-    
-    ns <- c("msEffort",  "msAfraid", "msIdentity")
+
+  leItems <- intersect(colnames(tr.data),
+            paste0(c('msMet', 'msShared', 'msTeach', 'msTrainTeach'), "Num"))
+  
+    ns <- intersect(colnames(tr.data), c("msEffort",  "msAfraid", "msIdentity"))
     confused <- apply(tr.data[,ns], 1, function(x) all(!is.na(x) &x == 'not sure'))
     warning(paste(sum(confused), "answered 'not sure' to effort,afraid,identity"))
     tr.data[confused,ns] <- NA
 
         tr.data <- tr.data[rowSums(!is.na(tr.data[,training.items])) > 0,]
 
-#  factors <- c('training', 'lifetime')
-  factors <- c('training')
+  factors <- c('training', 'lifetime')
+#  factors <- c('training')
 #  factors <- c('training', 'fear')
   spec <- lapply(training.items, function(nm) {
     lev <- length(levels(tr.data[[ nm ]]))
@@ -87,8 +90,9 @@ fitTraining <- function(tr.data) {
   })
   names(spec) <- training.items
   
-  for (item in intersect(c('trainSkill', 'trainNum'), names(spec))) {
-    spec[item] <- mkspec(espt, item, length(factors))
+  # remove msTimeAlloc from here once we have enough data TODO
+  for (item in intersect(c(leItems, 'msTimeAlloc'), names(spec))) {
+    spec[item] <- mkspec(tr.data, item, length(factors))
   }
   numItems <- length(training.items)
   maxParam <- max(sapply(spec, rpf.numParam))
@@ -97,25 +101,25 @@ fitTraining <- function(tr.data) {
                      dimnames=list(c(factors,
                                      paste('p',(length(factors)+1):maxParam,sep="")), training.items))
   imat$values[,] <- mxSimplify2Array(lapply(spec, rpf.rparam))
+  imat$values[factors,] <- 0
   imat$values['training',] <- 1
-  imat$labels['training',] <- 'slope'
+  imat$free[,] <- !is.na(imat$values) & imat$values[,] != 0
+
+  for (item in leItems) {
+    imat <- set.nominal.rank(spec, imat, item, 0, 0.25)
+  }
+  imat <- set.nominal.rank(spec, imat, 'msSharedNum', 0, 0.7)
+  imat <- set.nominal.rank(spec, imat, 'msTimeAlloc', 0, 0.25)
+
   if (any('fear' == factors)) {
-    imat$values['fear',] <- 0
     imat$values['fear', intersect(c('msAfraid','msIdentity'), training.items)] <- 1
   }
   if (any('lifetime' == factors)) {
-    imat$values['lifetime',] <- 0
-#    imat$values['lifetime', intersect(c('msMet', 'msShared', 'msTeach', 'msTrainTeach'), training.items)] <- 1
-    imat$values['lifetime', intersect(paste0(c('msMet', 'msShared', 'msTeach', 'msTrainTeach'), "Num"), training.items)] <- 1
+    imat$values['lifetime', intersect(leItems, training.items)] <- 1
+    imat$free['lifetime', intersect(leItems, training.items)] <- TRUE
   }
-  imat$free[,] <- !is.na(imat$values) & imat$values[,] != 0
 
-  imat <- set.nominal.rank(spec, imat, 'trainSkill', 0, .3)
-  imat <- set.nominal.rank(spec, imat, 'trainNum', 0, .15)
-#  imat <- set.nominal.rank(spec, imat, 'freqCause', 0, 1)
-#  imat <- set.nominal.rank(spec, imat, 'msTimeAlloc', 0, .5)
-
-  train <- mxModel(model="training", imat,
+    train <- mxModel(model="training", imat,
                    mxExpectationBA81(spec, qwidth=5, qpoints=39),
                    mxFitFunctionML())
 
@@ -126,19 +130,15 @@ fitTraining <- function(tr.data) {
   dimnames(covMat) <- list(factors, factors)
 
   trM <- replicateModelBy(train, tr.data, mMat, covMat, split=popSplit)
-  em <- trM$compute
-  trM <- mxModel(trM, mxComputeSequence(steps=list(
-    em,
-    mxComputeOnce('fitfunction', 'information', "meat"),
-    mxComputeStandardError(),
-    mxComputeHessianQuality())
-  ))
+  trM$compute$steps[[1]]$maxIter <- 750L  # TODO
+  trM$fitfunction$groups <- c(trM$fitfunction$groups, 'latentFit')
   got <- mxRun(trM, silent=TRUE)
   got
 }
 
-tr.items <- c('msEffort', 'msAfraid', 'msIdentity', 'freqCause',
-              'msTimeAlloc',  # TODO
+#'msAfraid' too similar to msIdentity TODO
+tr.items <- c('msEffort', 'msIdentity', 'freqCause',
+              'msTimeAlloc',
               paste0(c('msShared', 'msMet', 'msTeach'), 'Num'))
 
 when <- strptime(espt[['instrument']], "%Y-%m-%d")
@@ -210,7 +210,7 @@ print(xtable(got$pval, paste("Log p-value of local dependence between item pairs
 \end{center}
 
 <<results='asis'>>=
-numToOmit <- 1
+numToOmit <- 2
 toOmit <- lapply(tr.items, function(x) bestToOmit(pop$general$training, numToOmit, x))
 sfit <- Reduce('+', lapply(pop, function (x) SitemFit(x$training, omit = toOmit)))
 tbl <- t(sapply(sfit, function(r) c(n=r$n, df=r$df, stat=r$statistic, pval=r$pval)))
@@ -240,7 +240,7 @@ The \emph{TIES} factor is intended to assess the self-reported
 intensity of experiencing TIES.
 
 <<>>=
-fitties <- function(ev.data) {
+fitTies <- function(ev.data) {
   ties.items <- setdiff(colnames(ev.data), "population")
 
     ns <- c("msFast", "msLife", "msPreoccu")
@@ -250,35 +250,52 @@ fitties <- function(ev.data) {
     
   ev.data <- ev.data[rowSums(!is.na(ev.data[,ties.items])) > 0,]
 
-      factors <- c('ties')
+#      factors <- c('ties')
+#      factors <- c('ties', "roadbump")
+#      factors <- c('ties', "roadbump", 'spon')
+      factors <- c('ties', "roadbump", 'try')
   spec <- lapply(ties.items, function(nm) {
     lev <- length(levels(ev.data[[ nm ]]))
     rpf.grm(outcomes=lev, factors=length(factors))
   })
   names(spec) <- ties.items
-#  spec <- mkspec(espt, ties.items)
-  numItems <- length(ties.items)
+
+#   for (item in intersect(c(leItems, 'msTimeAlloc'), names(spec))) {
+#     spec[item] <- mkspec(tr.data, item, length(factors))
+#   }
+
+    numItems <- length(ties.items)
   maxParam <- max(sapply(spec, rpf.numParam))
 
   imat <- mxMatrix(name="item", nrow=maxParam, ncol=numItems,
-                   dimnames=list(c(factors, paste("p",2:maxParam,sep="")), ties.items))
+                   dimnames=list(c(factors,
+                                   paste("p",(length(factors)+1):maxParam,sep="")), ties.items))
   imat$values[,] <- mxSimplify2Array(lapply(spec, rpf.rparam))
+  imat$values[factors,] <- 0
   imat$values['ties',] <- 1
-  imat$labels['ties',] <- 'slope'
   imat$free[,] <- !is.na(imat$values) & imat$values[,] != 0
 
-#   imat <- set.nominal.rank(spec, imat, 'msAny', .51, 1)
-#   imat <- set.nominal.rank(spec, imat, 'msEvery', .51, 1)
 #   imat <- set.nominal.rank(spec, imat, 'freqCause', 0, 1)
 #   imat <- set.nominal.rank(spec, imat, 'successCat', .35, 1)
 #   imat <- set.nominal.rank(spec, imat, 'maxDuration', .25, .75)
 #   imat <- set.nominal.rank(spec, imat, 'maxDurationOut', 0, .5)
-#   imat <- set.nominal.rank(spec, imat, 'msYearn', 0, 1)
-#   imat <- set.nominal.rank(spec, imat, 'msEnv', 0, 1)
-#   imat <- set.nominal.rank(spec, imat, 'msAllow', 0, 1)
-#   imat <- set.nominal.rank(spec, imat, 'msTaught', 0, .5)
-#   imat <- set.nominal.rank(spec, imat, 'msTimeAlloc', 0, .5)
-  
+
+  if (any('roadbump' == factors)) {
+    roadbump.items <- intersect(c('msFast', 'msLife', 'msPreoccu'), ties.items)
+    imat$values['roadbump', roadbump.items] <- 1
+    imat$free['roadbump', roadbump.items] <- TRUE
+  }
+  if (any('spon' == factors)) {
+    spon.items <- intersect(c('maxDuration', 'maxDurationOut'), ties.items)
+    imat$values['spon', spon.items] <- 1
+    imat$free['spon', spon.items] <- TRUE
+  }
+  if (any('try' == factors)) {
+    try.items <- intersect(c('msYearn', 'msEnv', 'msAllow'), ties.items)
+    imat$values['try', try.items] <- 1
+    imat$free['try', try.items] <- TRUE
+  }
+
   eTmpl <- mxModel(model="ties", imat,
                 mxExpectationBA81(spec),
                 mxFitFunctionML())
@@ -290,23 +307,16 @@ fitties <- function(ev.data) {
   dimnames(covMat) <- list(factors, factors)
 
   ev <- replicateModelBy(eTmpl, ev.data, mMat, covMat, split=popSplit)
-  em <- ev$compute
-  ev <- mxModel(ev, mxComputeSequence(steps=list(
-    em,
-    mxComputeOnce('fitfunction', 'information', "meat"),
-    mxComputeStandardError(),
-    mxComputeHessianQuality())
-  ))
-
   ev <- mxRun(ev, silent=TRUE)
   ev
 }
 
+# reconsider "maxDurationOut", 'msYearn', TODO
 evItems <- c("msFast", "msLife", "msPreoccu",
              "msEnv", "msAllow", "msTaught",
-             'maxDuration', "maxDurationOut", 'successCat')
+             'maxDuration', 'successCat')
 ev.data <- espt[,c(evItems, "population")]
-ev.est <- fitties(ev.data)
+ev.est <- fitTies(ev.data)
 
 pops <- sapply(strsplit(ev.est$compute$steps[[1]]$expectation, ".", fixed=TRUE),
                function(x) x[[1]])
@@ -370,7 +380,7 @@ print(xtable(got$pval, paste("Log p-value of local dependence between item pairs
 \end{center}
 
 <<results='asis'>>=
-numToOmit <- 2
+numToOmit <- 3
 toOmit <- lapply(evItems, function(x) bestToOmit(pop$general$ties, numToOmit, x))
 sfit <- Reduce('+', lapply(pop, function (x) SitemFit(x$ties, omit = toOmit)))
 tbl <- t(sapply(sfit, function(r) c(n=r$n, df=r$df, stat=r$statistic, pval=r$pval)))
@@ -384,7 +394,9 @@ pl <- lapply(names(sfit), function(item) {
 for (px in 1:length(pl)) {
   print(pl[[px]])
 }
-print(plotInformation(pop$general$ties, width=5, basis=c(1)))
+basis <- rep(0, pop$general$ties$spec[[1]]$factors)
+basis[1] <- 1
+print(plotInformation(pop$general$ties, width=5, basis=basis))
 @
 
 <<>>=
