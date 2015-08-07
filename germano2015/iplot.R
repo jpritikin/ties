@@ -89,9 +89,8 @@ for (vx in levels(long$variable)) {
   page <- page + 1L
 }
 
-spam <- c(881)
 for (.id in unique(long$id)) {
-  if (is.na(.id) || .id %in% spam) next
+  if (is.na(.id)) next
   lab1 <- subset(labData, id==.id)
   
   pl <- ggplot(subset(long, id==.id & !is.na(value)),

@@ -67,7 +67,7 @@ A large proportion of data is missing, but the maximum N=\Sexpr{sum(as.numeric(s
 
 The \emph{training} factor is composed of indicators that cause TIES.
 
-<<cache=TRUE>>=
+<<cache=FALSE>>=
 fitTraining <- function(tr.data) {
   training.items <- setdiff(colnames(tr.data), "population")
 
