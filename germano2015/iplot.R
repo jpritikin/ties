@@ -59,7 +59,9 @@ for (wave in 1:numWaves) {
   long <- rbind(long, lo)
 }
 
-long$value[long$variable=="envMastery"] <- scale(long$value[long$variable=="envMastery"])
+for (ix in c('envMastery', 'training')) {
+  long$value[long$variable==ix] <- scale(long$value[long$variable==ix])
+}
 
 tmRange <- range(long$tm, na.rm=TRUE)
 mRange <- range(long$value, na.rm=TRUE)
