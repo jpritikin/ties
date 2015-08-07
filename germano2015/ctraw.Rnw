@@ -509,13 +509,14 @@ ctsummary(object=container$group07_09)
 mxEval(MANIFESTTRAITVAR,container$group07_09,compute=T)
 
 #refit with full drift matrix
-for(i in names(container$submodels)){
-  container[[i]]$DRIFTlog$free[-which(latents %in% 'labeffect'),]<-TRUE
+container2<-container
+for(i in names(container2$submodels)){
+  container2[[i]]$DRIFTlog$free[-which(latents %in% c('trend', 'labeffect')),]<-TRUE
 }
-container<-mxTryHard(container,paste=F,initialTolerance=1e-16,verbose=2)
+container2<-mxTryHard(container2,paste=F,initialTolerance=1e-16,verbose=2)
+ctsummary(object=container2$group07_09)
 
-
-drift <- mxEval(group01_03.DRIFT, container, compute=TRUE)
+drift <- mxEval(group01_03.DRIFT, container2, compute=TRUE)
 dimnames(drift) <- list(paste0("\\text{",latents,"}"), paste0("\\text{",latents,"}"))
 
 if (0) {
