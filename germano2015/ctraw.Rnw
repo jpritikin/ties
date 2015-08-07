@@ -487,6 +487,7 @@ for (px in c(levels(partition), 'psy')) {
     wide, model, nofit=TRUE, meanIntervals=F,stationary=c('T0VAR','T0MEANS')))
   if (px == 'psy') {
     m1 <- mxRename(m1, "psy")
+    m1$DRIFTlog$labels[3:5,2] <- paste0("PSY", m1$DRIFTlog$labels[3:5,2])
   } else {
     m1 <- mxRename(m1, sprintf("group%02d_%02d", min(Tpoints), max(Tpoints)))
   }
