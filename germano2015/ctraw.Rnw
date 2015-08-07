@@ -508,7 +508,7 @@ ctsummary(object=container$group07_09)
 mxEval(MANIFESTTRAITVAR,container$group07_09,compute=T)
 
 #refit with full drift matrix
-container2<-container
+container2<- mxRename(container, "ctrawFull")
 for(i in names(container2$submodels)){
   container2[[i]]$DRIFTlog$free[-which(latents %in% c('trend', 'labeffect')),]<-TRUE
 }
