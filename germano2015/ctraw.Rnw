@@ -440,7 +440,7 @@ longUniqueIds <- unique(longRel[,'id'])
 numUniqueObs <- sapply(1:length(longUniqueIds),
                        function(x) sum(longRel[,'id'] == longUniqueIds[x]))
 uniqueTpoints <- sort(unique(numUniqueObs))
-partition <- cut(uniqueTpoints, 3)
+partition <- cut(uniqueTpoints, 2)
 for (px in c(levels(partition), 'psy')) {
   if (px == 'psy') {
     Tpoints <- 6
