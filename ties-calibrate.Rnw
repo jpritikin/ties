@@ -67,7 +67,7 @@ A large proportion of data is missing, but the maximum N=\Sexpr{sum(as.numeric(s
 
 The \emph{training} factor is composed of indicators that cause TIES.
 
-<<cache=TRUE>>=
+<<cache=FALSE>>=
 fitTraining <- function(tr.data) {
   training.items <- setdiff(colnames(tr.data), "population")
 
@@ -110,6 +110,7 @@ fitTraining <- function(tr.data) {
   for (item in leItems) {
     imat <- set.nominal.rank(spec, imat, item, 0, 0.25)
   }
+  imat <- set.nominal.rank(spec, imat, 'msMetNum', 0, 0.7)
   imat <- set.nominal.rank(spec, imat, 'msSharedNum', 0, 0.7)
   imat <- set.nominal.rank(spec, imat, 'msTimeAlloc', 0, 0.25)
 
@@ -251,7 +252,7 @@ print(plotInformation(pop$general$training, width=5, basis=basis))
 The \emph{TIES} factor is intended to assess the self-reported
 intensity of experiencing TIES.
 
-<<cache=TRUE>>=
+<<cache=FALSE>>=
 fitTies <- function(ev.data) {
   ties.items <- setdiff(colnames(ev.data), "population")
 
