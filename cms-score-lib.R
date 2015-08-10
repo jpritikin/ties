@@ -9,6 +9,7 @@ mkspec <- function(espt, items, factors=1) {
     if (lev == 2) {
       spec[n] <- rpf.grm(outcomes=2, factors)
     } else {
+        if (lev < 3) stop(paste(items[n], "has only", lev, "levels"))
       spec[n] <- rpf.nrm(lev, factors)
     }
   }
@@ -53,6 +54,12 @@ num2cat <- function(num) {
 # msEmo -- like a combination of msLife, msId
 
 cms.testlets <- function(df) {
+    if (TRUE) {
+        df2 <- sapply(df[,c("msEffort", "msAfraid", "msFast", "msLife", "msIdentity", "msPreoccu")], unclass)
+        mask <- apply(df2, 1, function(x) sum(x==3, na.rm=TRUE)) >= 5
+        df[mask,c("msEffort", "msAfraid", "msFast", "msLife", "msIdentity", "msPreoccu")] <- NA
+    }
+
   if (!is.null(df$msFast)) {
     df$msFast1 <- df$msFast
     df$msFast1[df$msFast1 == "disagree somewhat"] <- "not sure"

@@ -503,6 +503,9 @@ container<- OpenMx::mxOption(container, 'Always Checkpoint', 'Yes')
 container<- OpenMx::mxOption(container, 'Checkpoint Units', 'iterations')
 container<- OpenMx::mxOption(container, 'Checkpoint Count', 1)    
 
+container <- mxRestore(container, strict=TRUE)
+ctsummary(container$group02_05)
+
 container<-mxTryHard(container,paste=F,initialTolerance=1e-16,verbose=2)
 oldparams<-omxGetParameters(container)
 ctsummary(object=container$group07_09)
@@ -577,7 +580,8 @@ correlations and lagged time regressions
 
 \begin{enumerate}
 \item Try to do some kind of sensitivity analysis.
-\item Throw away less variance in the IFA analysis
+\item Examine special 1st wave items
+\item IFA model for envMastery?
 \end{enumerate}
 
 \end{document}

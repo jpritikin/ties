@@ -67,21 +67,23 @@ A large proportion of data is missing, but the maximum N=\Sexpr{sum(as.numeric(s
 
 The \emph{training} factor is composed of indicators that cause TIES.
 
-<<cache=FALSE>>=
+<<cache=TRUE>>=
 fitTraining <- function(tr.data) {
   training.items <- setdiff(colnames(tr.data), "population")
 
   leItems <- intersect(colnames(tr.data),
             paste0(c('msMet', 'msShared', 'msTeach', 'msTrainTeach'), "Num"))
-  
-    ns <- intersect(colnames(tr.data), c("msEffort",  "msAfraid", "msIdentity"))
+
+  if (FALSE) {
+      ns <- intersect(colnames(tr.data), c("msEffort",  "msAfraid", "msIdentity"))
     confused <- apply(tr.data[,ns], 1, function(x) all(!is.na(x) &x == 'not sure'))
     warning(paste(sum(confused), "answered 'not sure' to effort,afraid,identity"))
     tr.data[confused,ns] <- NA
+  }
 
         tr.data <- tr.data[rowSums(!is.na(tr.data[,training.items])) > 0,]
 
-  factors <- c('training', 'lifetime')
+  factors <- c('training', 'lifetime', 'backward')
 #  factors <- c('training')
 #  factors <- c('training', 'fear')
   spec <- lapply(training.items, function(nm) {
@@ -118,6 +120,10 @@ fitTraining <- function(tr.data) {
     imat$values['lifetime', intersect(leItems, training.items)] <- 1
     imat$free['lifetime', intersect(leItems, training.items)] <- TRUE
   }
+  if (any('backward' == factors)) {
+    imat$values['backward', intersect(c('msEffort', 'msIdentity'), training.items)] <- 1
+    imat$free['backward', intersect(c('msEffort', 'msIdentity'), training.items)] <- TRUE
+  }
 
     train <- mxModel(model="training", imat,
                    mxExpectationBA81(spec, qwidth=5, qpoints=39),
@@ -130,6 +136,11 @@ fitTraining <- function(tr.data) {
   dimnames(covMat) <- list(factors, factors)
 
   trM <- replicateModelBy(train, tr.data, mMat, covMat, split=popSplit)
+  if (FALSE) {
+    up <- uniquenessPrior(trM$general, length(factors))
+    trM <- mxModel(trM, up)
+    trM$fitfunction$groups <- c(trM$fitfunction$groups, up$name)
+  }
   trM$compute$steps[[1]]$maxIter <- 750L  # TODO
   trM$fitfunction$groups <- c(trM$fitfunction$groups, 'latentFit')
   got <- mxRun(trM, silent=TRUE)
@@ -137,7 +148,7 @@ fitTraining <- function(tr.data) {
 }
 
 #'msAfraid' too similar to msIdentity TODO
-tr.items <- c('msEffort', 'msIdentity', 'freqCause',
+tr.items <- c('msNotion', 'msEffort', 'msIdentity', 'freqCause',
               'msTimeAlloc',
               paste0(c('msShared', 'msMet', 'msTeach'), 'Num'))
 
@@ -195,7 +206,8 @@ ggplot(df, aes(x=score, y=n, color=source)) + geom_line()
 
 \begin{center}
 <<results='asis'>>=
-fl <- toFactorLoading(pop$general$training$param[1:pop$general$training$spec[[1]]$factors,,drop=FALSE])
+slope <- pop$general$training$param[1:pop$general$training$spec[[1]]$factors,,drop=FALSE]
+fl <- suppressWarnings(toFactorLoading(slope))
 print(xtable(fl, paste("Factor loadings.")),
       size="\\footnotesize", floating=FALSE)
 @ 
@@ -239,14 +251,16 @@ print(plotInformation(pop$general$training, width=5, basis=basis))
 The \emph{TIES} factor is intended to assess the self-reported
 intensity of experiencing TIES.
 
-<<>>=
+<<cache=TRUE>>=
 fitTies <- function(ev.data) {
   ties.items <- setdiff(colnames(ev.data), "population")
 
+  if(FALSE) {
     ns <- c("msFast", "msLife", "msPreoccu")
     confused <- apply(ev.data[,ns], 1, function(x) all(!is.na(x) & x == 'not sure'))
     warning(paste(sum(confused), "answered 'not sure' to fast,life,preoccu"))
     ev.data[confused,ns] <- NA
+  }
     
   ev.data <- ev.data[rowSums(!is.na(ev.data[,ties.items])) > 0,]
 

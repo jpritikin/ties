@@ -39,9 +39,13 @@ for (wave in 1:9) {
     born=born, sex=sex, rel=rel, labTime = labTime, labTA=labTA)
   # deal with lab section TODO
   scored$envMastery <- score.ryff.envMastery14(raw[offset:(offset + 14 - 1)])
-  offset <- offset + 14 + ifelse(wave==1, 5, 0)
-  cmsCol <- raw[,offset:(offset+24-1)]
-  cmsCol <- cbind(NA,NA,NA,NA,NA,cmsCol)
+  offset <- offset + 14
+  if (wave == 1) {
+    cmsCol <- raw[,offset:(offset+29-1)]
+  } else {
+    cmsCol <- raw[,offset:(offset+24-1)]
+    cmsCol <- cbind(NA,NA,NA,NA,NA,cmsCol)
+  }
   cms <- prep.cms201410(cmsCol)
   scored <- cbind(scored, ties.score("uva", cms))
   mask <- match(spammer, scored$id)
