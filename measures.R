@@ -69,9 +69,9 @@ score.maas <- function(raw) {
   mean.or.na(raw[,1:15], 13)
 }
 
-score.ryff9 <- function(raw) {
+prep.ryff9 <- function(raw) {
   if (ncol(raw) != 6 * 9) stop("Expected 54 columns")
-  
+
   RyffItem <- c("Strongly Disagree",  "Disagree Somewhat",	"Disagree Slightly",
                 "Agree Slightly",	"Agree Somewhat",	"Strongly Agree")
   
@@ -87,7 +87,20 @@ score.ryff9 <- function(raw) {
     }
     raw[[col]] <- mxFactor(raw[[col]], levels=lev, exclude='')
   }
-  
+
+  colnames(raw)[01:09] <- paste0("autonomy",  c(2,3,4,5,6, 9,10,11,14))
+  colnames(raw)[10:18] <- paste0("envm",      c(1,2,3,4,5, 7, 9,13,14))
+  colnames(raw)[19:27] <- paste0("pergrowth", c(1,4,5,6,9,10,11,13,14))
+  colnames(raw)[28:36] <- paste0("posrel",    c(1,2,3,4,6, 8, 9,10,12))
+  colnames(raw)[37:45] <- paste0("purpose",   c(2,3,5,6,7, 8, 9,10,11))
+  colnames(raw)[46:54] <- paste0("selfaccept",c(1,2,3,5,6, 7,10,12,13))
+
+  raw
+}
+
+score.ryff9 <- function(raw) {
+    raw <- prep.ryff9(raw)
+
   list(autonomy    = mean.or.na(raw[,01:09], 7),
        envMastery  = mean.or.na(raw[,10:18], 7),
        perGrowth   = mean.or.na(raw[,19:27], 7),
@@ -96,7 +109,7 @@ score.ryff9 <- function(raw) {
        selfAccept  = mean.or.na(raw[,46:54], 7))
 }
 
-score.ryff.envMastery14 <- function(raw) {
+prep.ryff.envMastery14 <- function(raw) {
   if (ncol(raw) != 14) stop("Expected 14 columns")
   
   RyffItem <- c("Strongly Disagree",  "Disagree Somewhat",	"Disagree Slightly",
@@ -110,6 +123,14 @@ score.ryff.envMastery14 <- function(raw) {
     raw[[col]] <- mxFactor(raw[[col]], levels=lev, exclude='')
   }
 
+  colnames(raw)[1:14] <- paste0("envm", 1:14)
+
+  raw
+}
+
+score.ryff.envMastery14 <- function(raw) {
+    raw <- prep.ryff.envMastery14(raw)
+    
   mean.or.na(raw[,1:14], 12)
 }
 

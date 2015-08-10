@@ -1,8 +1,8 @@
-library(ggplot2)
 {
   wd <- setwd("..")
   source("measures.R")
   source("ties-score.R")
+  source("envm-score.R")
   setwd(wd)
 }
 source("spammer.R")
@@ -38,7 +38,14 @@ for (wave in 1:9) {
     start=raw$StartDate, end=raw$EndDate,
     born=born, sex=sex, rel=rel, labTime = labTime, labTA=labTA)
   # deal with lab section TODO
-  scored$envMastery <- score.ryff.envMastery14(raw[offset:(offset + 14 - 1)])
+  if (TRUE) {
+    scored$envMastery <- score.ryff.envMastery14(raw[offset:(offset + 14 - 1)])
+  } else {
+    emdata <- prep.ryff.envMastery14(raw[offset:(offset + 14 - 1)])
+    scored$envMastery <- envm.score(emdata)
+    scored$envMastery2 <- score.ryff.envMastery14(raw[offset:(offset + 14 - 1)])
+    print(cor(scored$envMastery, scored$envMastery2, use = "pairwise.complete.obs"))
+  }
   offset <- offset + 14
   if (wave == 1) {
     cmsCol <- raw[,offset:(offset+29-1)]
