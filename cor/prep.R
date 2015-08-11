@@ -5,7 +5,7 @@ library(gtools)
 {
   wd <- setwd("..")
   source("measures.R")
-  source("cms-score.R")
+  source("ties-score.R")
   setwd(wd)
 }
 
@@ -61,7 +61,7 @@ cdat1$ei <- score.ei(raw1[201:233])
 got <- score.rrq(raw1[234:(234+24-1)])
 for (n in names(got)) cdat1[[n]] <- got[[n]]
 
-cdat1 <- cbind(cdat1, cms.score('uva', prep.cms201312(raw1[258:283])))
+cdat1 <- cbind(cdat1, ties.score('uva', prep.cms201312(raw1[258:283])))
 
 cdat1$sleep <- -score.psqi(raw1[284:(284+19-1)])
 
@@ -102,7 +102,7 @@ cdat2$ei <- score.ei(raw2[225:(225+33-1)])
 got <- score.rrq(raw2[258:(258+24-1)])
 for (n in names(got)) cdat2[[n]] <- got[[n]]
 
-cdat2 <- cbind(cdat2, cms.score('uva', prep.cms201409(raw2[282:(282+29-1)])))
+cdat2 <- cbind(cdat2, ties.score('uva', prep.cms201409(raw2[282:(282+29-1)])))
 
 cdat2$sleep <- -score.psqi(raw2[311:(311+19-1)])
 
@@ -143,7 +143,7 @@ cdat3$ei <- score.ei(raw3[225:(225+33-1)])
 got <- score.rrq(raw3[258:(258+24-1)])
 for (n in names(got)) cdat3[[n]] <- got[[n]]
 
-cdat3 <- cbind(cdat3, cms.score('uva', prep.cms201410(raw3[282:(282+29-1)])))
+cdat3 <- cbind(cdat3, ties.score('uva', prep.cms201410(raw3[282:(282+29-1)])))
 
 cdat3$sleep <- -score.psqi(raw3[311:(311+19-1)])
 
@@ -151,7 +151,12 @@ cdat3$sleep <- -score.psqi(raw3[311:(311+19-1)])
 
 cdat <- smartbind(cdat1, cdat2)
 cdat <- smartbind(cdat, cdat3)
-cdat <- cdat[,c(1:13,33:36,32,14:31)] # move ffmq together and CMS to the end
+mind5f <- c('nonreact', 'observe', 'actAware', 'describe', 'nonjudge')
+perm <- c(setdiff(colnames(cdat), mind5f), mind5f)
+cdat <- cdat[,perm]
+perm <- c(setdiff(colnames(cdat), c('training', 'ties')),
+          c('training', 'ties'))
+cdat <- cdat[,perm]
 
 if (0) {
   #cat(deparse(colnames(wave2)))

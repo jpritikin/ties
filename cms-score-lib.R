@@ -55,9 +55,12 @@ num2cat <- function(num) {
 
 cms.testlets <- function(df) {
     if (TRUE) {
-        df2 <- sapply(df[,c("msEffort", "msAfraid", "msFast", "msLife", "msIdentity", "msPreoccu")], unclass)
-        mask <- apply(df2, 1, function(x) sum(x==3, na.rm=TRUE)) >= 5
-        df[mask,c("msEffort", "msAfraid", "msFast", "msLife", "msIdentity", "msPreoccu")] <- NA
+      nscol <- intersect(colnames(df), c("msEffort", "msAfraid", "msFast",
+                               "msLife", "msIdentity", "msPreoccu", "msDescarte",
+                               "msEmo"))
+        df2 <- sapply(df[,nscol], unclass)
+        mask <- apply(df2, 1, function(x) sum(x==3, na.rm=TRUE)) >= (length(nscol)-1)
+        df[mask,nscol] <- NA
     }
 
   if (!is.null(df$msFast)) {

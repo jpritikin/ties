@@ -11,7 +11,7 @@
 \newcommand{\R} {\texttt{R}\xspace}
 \newcommand{\OpenMx} {\texttt{OpenMx}\xspace}
 
-\title{Cross sectional mental silence study, updated \today}
+\title{Cross sectional mental silence study,\\ updated \today}
 \shorttitle{Meditation}
 \fourauthors{Joshua N.~Pritikin}{Karen Schmidt}{Ramesh Manocha}{Steven M.~Boker}
 \fouraffiliations{University of Virginia}{University of Virginia}{University of Sydney}{University of Virginia}
@@ -69,7 +69,7 @@ Reflection/Rumination scale \parencite{trapnell1999}.
 cdat <- read.csv("corr.csv", stringsAsFactors=FALSE)
 
 ctbl <- cor(cdat[c(6:ncol(cdat))], use="pairwise.complete.obs")
-dt <- ctbl[1:(nrow(ctbl)-3), 29:31]
+dt <- ctbl[1:(nrow(ctbl)-2), c('training', 'ties')]
 dt[abs(dt) < .1] <- NA
 print(xtable(dt,
              paste("Correlation with plausibly related self-report ",
@@ -78,11 +78,11 @@ print(xtable(dt,
 @
 
 <<results='asis'>>=
-mask <- cdat$event > min(cdat$event, na.rm=TRUE)
+mask <- cdat$ties > min(cdat$ties, na.rm=TRUE)
 mask <- mask & !is.na(mask)
 cdat <- cdat[mask,]
 ctbl <- cor(cdat[c(6:ncol(cdat))], use="pairwise.complete.obs")
-dt <- ctbl[1:(nrow(ctbl)-3), 29:31]
+dt <- ctbl[1:(nrow(ctbl)-2), c('training', 'ties')]
 dt[abs(dt) < .1] <- NA
 print(xtable(dt,
              paste("Correlation with plausibly related self-report ",
@@ -92,13 +92,13 @@ print(xtable(dt,
 @
 
 <<results='asis'>>=
-load("../cms-fit.rda")
+load("../ties-fit.rda")
 
-mask <- cdat$event >= pop$uva$event$mean[1]
+mask <- cdat$ties >= tiesPop$uva$ties$mean[1]
 mask <- mask & !is.na(mask)
 cdat <- cdat[mask,]
 ctbl <- cor(cdat[c(6:ncol(cdat))], use="pairwise.complete.obs")
-dt <- ctbl[1:(nrow(ctbl)-3), 29:31]
+dt <- ctbl[1:(nrow(ctbl)-2), c('training', 'ties')]
 dt[abs(dt) < .1] <- NA
 print(xtable(dt,
              paste("Correlation with plausibly related self-report ",
@@ -112,24 +112,25 @@ print(xtable(dt,
 cdat <- read.csv("corr.csv", stringsAsFactors=FALSE)
 
 condCorPlot <- function(vs) {
-  slice <- cdat[,c(vs, 'training', 'event')]
+  if (is.null(cdat[[vs]])) stop(paste("No column", vs))
+  slice <- cdat[,c(vs, 'training', 'ties')]
   minSampleSize <- 30
-  xpoints <- seq(min(slice$event, na.rm=TRUE),
-                 -sort(-slice$event)[minSampleSize],
+  xpoints <- seq(min(slice$ties, na.rm=TRUE),
+                 -sort(-slice$ties)[minSampleSize],
                  length.out=60)
   grid <- expand.grid(x=xpoints,
-                      trait=c('training', 'event'),
+                      trait=c('training', 'ties'),
                       upper=0, lower=0)
   corci <- function(x, c1, c2) {
-    win <- subset(slice, event > x)
+    win <- subset(slice, ties > x)
     win <- win[apply(win, 1, function(r) all(!is.na(r))),]
     #  c(nrow(win),
     ct <- cor.test(win[[c1]], win[[c2]])
     c(ct$conf.int, ct$estimate)
   }
-  ev1 <- sapply(xpoints, corci, vs, 'event')
-  grid[grid$trait=='event', 'lower'] <- ev1[1,]
-  grid[grid$trait=='event', 'upper'] <- ev1[2,]
+  ev1 <- sapply(xpoints, corci, vs, 'ties')
+  grid[grid$trait=='ties', 'lower'] <- ev1[1,]
+  grid[grid$trait=='ties', 'upper'] <- ev1[2,]
   tr1 <- sapply(xpoints, corci, vs, 'training')
   grid[grid$trait=='training', 'lower'] <- tr1[1,]
   grid[grid$trait=='training', 'upper'] <- tr1[2,]
@@ -138,26 +139,25 @@ condCorPlot <- function(vs) {
     geom_ribbon(alpha=.5) +
     geom_hline(yintercept=0, color="yellow") +
     geom_line(aes(y=diff), linetype=2) +
-    labs(title=vs, x="minimum event", y="correlation")
+    labs(title=vs, x="minimum ties", y="correlation")
   pl <- pl + theme(legend.position="none") + ylim(-.75, .75)
   pl
 }
 
 # nothing
 do.call(grid.arrange,
-        list(condCorPlot('mwb'),
-             condCorPlot('ei'),
-             condCorPlot('extravert'),
-             condCorPlot('nonjudge'),
-             condCorPlot('describe'),
-             condCorPlot('observe'),  #actAware similar
-             ncol=2))
+        list(
+          condCorPlot('mwb'),
+          condCorPlot('sleep'),
+          condCorPlot('open'),
+          condCorPlot('ei'),
+          condCorPlot('rumination'),
+          condCorPlot('negAffect'),
+          ncol=2))
 @
-\caption{Correlation conditional on event score.
-Dash line is event minus training.
-All these measures seem more related to training
-than event (the dash line is mostly at or below 0),
-if they are related at all.}
+\caption{Correlation conditional on TIES score.
+Dash line is TIES minus training (blue is TIES, pink is training).
+These measures seem to be more correlated with TIES than training.}
 \label{fig:nothing}
 \end{figure}
 
@@ -165,17 +165,18 @@ if they are related at all.}
 <<fig.height=8>>=
 # not surprising
 do.call(grid.arrange,
-        list(condCorPlot('reflection'),
-             condCorPlot('posAffect'),
-             condCorPlot('perGrowth'),
-             condCorPlot('selfAccept'),
-             ncol=2))
+        list(
+          condCorPlot('dass.a'),
+          condCorPlot('dass.na'),
+          condCorPlot('posAffect'),
+          condCorPlot('neurotic'),
+          condCorPlot('observe'),
+          condCorPlot('envMastery'),
+          ncol=2))
 @
-\caption{Correlation conditional on event score.
-Dash line is event minus training.
-These factor correlations are in the expected direction
-and are more associated with event than training
-(the dashed line is mostly above 0).}
+\caption{Correlation conditional on TIES score.
+Dash line is TIES minus training (blue is TIES, pink is training).
+Not much goin on here.}
 \label{fig:noSurprise}
 \end{figure}
 
@@ -183,19 +184,18 @@ and are more associated with event than training
 <<fig.height=8>>=
 # significant
 do.call(grid.arrange,
-        list(condCorPlot('envMastery'),
-             condCorPlot('autonomy'),
-             condCorPlot('sleep'),
-             ncol=2))
+        list(
+          condCorPlot('perGrowth'),
+          condCorPlot('extravert'),
+          condCorPlot('consc'),
+          condCorPlot('describe'),
+          condCorPlot('agreeable'),
+          condCorPlot('reflection'),
+          ncol=2))
 @
-\caption{Correlation conditional on event score.
-Dash line is event minus training.
-Both envMastery and autonomy are statistically
-significant near the -1 region.
-Sleep exhibits the most dramatic
-discrimination between event and training of all the factors.
-Sleep quality is not correlated with event but it has a significant
-negative correlation with training.}
+\caption{Correlation conditional on TIES score.
+Dash line is TIES minus training (blue is TIES, pink is training).
+These measures seem more associated with training than TIES.}
 \label{fig:sig}
 \end{figure}
 
@@ -204,7 +204,6 @@ are a more continuous version of Tables~\ref{tab:cor-above},~\ref{tab:cor-avg}.
 The dotted line is the difference between the correlation point estimates.
 The shaded area shows the 95\% confidence interval of the correlation
 (assuming that factor scores are measured without error).
-Blue is event. Pink is training.
 The CI gets wider as it approaches the right side of the plot
 because the sample size gets smaller and smaller.
 
