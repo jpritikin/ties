@@ -4,7 +4,7 @@ library(ggplot2)
 {
   wd <- setwd("..")
   source("measures.R")
-  source("cms-score.R")
+  source("ties-score.R")
   setwd(wd)
 }
 
@@ -79,9 +79,9 @@ cms1 <- prep.cms201312(raw1[70:95])
 cms2 <- prep.cms201312(raw2[67:92])
 cms3 <- prep.cms201312(raw3[67:92])
 
-wave1 <- cbind(wave1, cms.score(cms1))
-wave2 <- cbind(wave2, cms.score(cms2))
-wave3 <- cbind(wave3, cms.score(cms3))
+wave1 <- cbind(wave1, ties.score("uva", cms1))
+wave2 <- cbind(wave2, ties.score("uva", cms2))
+wave3 <- cbind(wave3, ties.score("uva", cms3))
 if (0) {
   apply(wave3, 2, function (c) sum(is.na(c)))
 }
@@ -113,16 +113,12 @@ for (c in 1:length(verify.col)) {
 if (0) {
   #cat(deparse(colnames(wave2)))
   cor(wave1[,c("reflection",  "rumination", "psqi", "dass.d", "dass.a",
-               "dass.s", "dass.na",  "barrier", "training", "event")], use="pairwise.complete.obs")
-  plot(wave2[,c("barrier", "event")])
-  plot(wave2[,c("training", "event")])
-  plot(wave2$training - wave2$barrier, wave2[,c("event")])
-  cor(wave2$training - wave2$barrier, wave2[,c("event")], use="pairwise.complete.obs") # .72 for wave2
-  
-  df <- rbind(cbind(t=1, wave1[,c('id','event')]),
-              cbind(t=2, wave2[,c('id','event')]),
-              cbind(t=3, wave3[,c('id','event')]))
-  ggplot(df, aes(x=t, y=event, group=id)) + geom_line()
+               "dass.s", "dass.na", "training", "ties")], use="pairwise.complete.obs")
+
+  df <- rbind(cbind(t=1, wave1[,c('id','ties')]),
+              cbind(t=2, wave2[,c('id','ties')]),
+              cbind(t=3, wave3[,c('id','ties')]))
+  ggplot(df, aes(x=t, y=ties, group=id)) + geom_line(alpha=.1, size=4)
   
   etraj <- cbind(wave1[,c('id','event')], wave2[,c('event')], wave3[,c('event')])
   colnames(etraj) <- c('id',paste('t',1:3,sep=""))

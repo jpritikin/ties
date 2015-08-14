@@ -1,0 +1,94 @@
+\documentclass[12pt]{article}
+\usepackage{fixltx2e}
+\usepackage[margin=1in]{geometry}
+\usepackage{graphicx}
+\usepackage{authblk}
+\usepackage{mathtools}
+\setlength{\parindent}{0cm}
+\setlength{\parskip}{1ex}
+
+<<echo=FALSE, results='hide', warning=FALSE, cache=FALSE>>=
+#options(error = browser)
+library(knitr)
+#knit("ctraw.Rnw", tangle=TRUE)  # to extract only the R chunks
+opts_knit$set(error=TRUE)
+opts_chunk$set(echo=FALSE, cache=FALSE)
+loadlib <- function () {
+  library(rpf)
+  library(OpenMx)
+  library(xtable)
+  library(ctsem)
+}
+suppressPackageStartupMessages(loadlib())
+
+{
+  wd <- setwd("..")
+  source("measures.R")
+  setwd(wd)
+}
+
+# https://github.com/yihui/knitr/issues/1085
+print.xtable <- function(x, ...) {
+  out <- capture.output(xtable::print.xtable(x, ...))
+  cat(gsub('\\s+$', '', paste(out, collapse = '\n')))
+}
+@
+
+\title{Continuous Time Factor Analysis of the 2014~Meditation Class}
+\date{\today}
+\author[1]{Joshua N.~Pritikin}
+\author[2]{Charles C.~Driver}
+\affil[1]{University of Virginia}
+\affil[2]{Max Planck Institute for Human Development, Berlin}
+
+\begin{document}
+\maketitle
+
+<<>>=
+if (!file.exists("prep1.csv")) {
+  source("prep.R")
+}
+
+tformat <- "%m/%d/%Y %H:%M:%S"
+reftime <- strptime("01/14/2014 12:00:00", tformat, tz="GMT")
+
+numWaves <- 3
+manifestNames <- c('ties', 'psqi')
+latents <- manifestNames
+long <- NULL
+
+for (wave in 1:numWaves) {
+  raw <- read.table(sprintf("prep%d.csv", wave), stringsAsFactors=FALSE, header=TRUE)
+  for (col in c('start', 'uid', 'born', 'sex', 'rel')) raw[[col]] <- NULL
+  mask <- apply(raw[,c(manifestNames)], 1, function (r) any(!is.na(r)))
+  raw <- raw[mask,]
+  raw$time <- as.numeric((strptime(raw$end, tformat, tz="GMT") - reftime))/7
+  raw$wave <- wave
+  long <- rbind(long, raw)
+}
+
+wide <- ctLongToWide(
+  long, id="id", time="time", manifestNames=manifestNames)
+wide <- ctIntervalise(
+  wide, numWaves, n.manifest=length(manifestNames), manifestNames=manifestNames)
+
+lambda <- matrix(0, length(manifestNames), length(latents),
+                 dimnames=list(manifestNames, latents))
+lambda[,] <- diag(nrow(lambda))
+
+model <- ctModel(
+  n.manifest=length(manifestNames), n.latent=length(latents),
+    Tpoints=numWaves,
+    LAMBDA=lambda, manifestNames=manifestNames, latentNames=latents, 
+    MANIFESTTRAITVAR = "auto" #to begin, I would use MANIFESTTRAITVAR so that all between person variance is removed (people can be consistently high / low on some manifest variables of a process and not others) - we can work on the between person structure more adequately once we understand the dynamic structure somewhat. 
+  )
+
+model$DRIFT[!diag(length(latents))] <- 0
+
+m1 <- ctFit(
+  wide, model, meanIntervals=F, stationary=c('T0VAR','T0MEANS'),
+  verbose=2L, plotOptimization = T)
+summary(m1)
+@ 
+
+\end{document}

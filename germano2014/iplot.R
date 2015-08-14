@@ -6,7 +6,7 @@ w1 <- read.table("prep1.csv", header=TRUE, stringsAsFactors=FALSE)
 w2 <- read.table("prep2.csv", header=TRUE, stringsAsFactors=FALSE)
 w3 <- read.table("prep3.csv", header=TRUE, stringsAsFactors=FALSE)
 
-alle <- cbind(w1$event, w2$event, w3$event)
+alle <- cbind(w1$ties, w2$ties, w3$ties)
 alleMM <- apply(alle, 1, function(r) c(max(c(-100,r), na.rm=TRUE), min(c(100,r), na.rm = TRUE)))
 alleRange <- alleMM[1,] - alleMM[2,]
 mask <- !(abs(alleRange + 200) < .01 | alleRange == 0)
@@ -16,11 +16,11 @@ w1 <- w1[mask,]
 w2 <- w2[mask,]
 w3 <- w3[mask,]
 tformat <- "%m/%d/%Y %H:%M:%S"
-reftime <- strptime("01/14/2014 12:00:00", tformat)
-minTime <- as.numeric(min(strptime(w1$end, tformat) - reftime, na.rm = TRUE))
-maxTime <- as.numeric(max(strptime(w3$end, tformat) - reftime, na.rm = TRUE))
+reftime <- strptime("01/14/2014 12:00:00", tformat, tz="GMT")
+minTime <- as.numeric(min(strptime(w1$end, tformat, tz="GMT") - reftime, na.rm = TRUE))
+maxTime <- as.numeric(max(strptime(w3$end, tformat, tz="GMT") - reftime, na.rm = TRUE))
 
-measures <- c("event", "barrier", "reflection",  "rumination",
+measures <- c("training", "ties", "reflection",  "rumination",
   "psqi", "dass.d", "dass.a", "dass.s", "dass.na")
 
 wide2long <- function(r) {
@@ -35,7 +35,6 @@ df <- df[!is.na(df$value),]
 sleepMask <- df$variable=="psqi"
 df[sleepMask,"value"] <- -df[sleepMask,"value"]
 
-levels(df$variable)[levels(df$variable)=="event"] <- "mental silence intensity"
 levels(df$variable)[levels(df$variable)=="psqi"] <- "sleep quality"
 levels(df$variable)[match(c("dass.d", "dass.a", "dass.s", "dass.na"), levels(df$variable))] <-
   c("depression", "anxiety", "stress", "negative affect")
