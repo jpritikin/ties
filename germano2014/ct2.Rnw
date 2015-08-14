@@ -79,6 +79,7 @@ lambda[,] <- diag(nrow(lambda))
 model <- ctModel(
   n.manifest=length(manifestNames), n.latent=length(latents),
     Tpoints=numWaves,
+  MANIFESTVAR='free',
     LAMBDA=lambda, manifestNames=manifestNames, latentNames=latents, 
     MANIFESTTRAITVAR = "auto" #to begin, I would use MANIFESTTRAITVAR so that all between person variance is removed (people can be consistently high / low on some manifest variables of a process and not others) - we can work on the between person structure more adequately once we understand the dynamic structure somewhat. 
   )
@@ -87,7 +88,7 @@ model$DRIFT[!diag(length(latents))] <- 0
 
 m1 <- ctFit(
   wide, model, meanIntervals=F, stationary=c('T0VAR','T0MEANS'),
-  verbose=2L, plotOptimization = T)
+  verbose=2L, plotOptimization = T,objective='mxFIML')
 summary(m1)
 @ 
 
