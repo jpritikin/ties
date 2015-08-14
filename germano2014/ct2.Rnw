@@ -97,6 +97,19 @@ m2<-ctFit (
   verbose=2L, plotOptimization = T,objective='mxFIML')
 summary(m2)
 plot(m2)
+
+m3<-ctFit (
+  wide, fulldrift, meanIntervals=F, #stationary=c('T0VAR','T0MEANS'),
+  omxStartValues=omxGetParameters(m2$mxobj),
+  verbose=2L,objective='mxFIML',nofit=T)
+m3<-omxSetParameters(m3,labels=names(omxGetParameters(m2$mxobj)),free=F,values=omxGetParameters(m2$mxobj))
+m3<-mxTryHard(m3,paste=F)
+m4<-m2
+m4$mxobj<-m3
+summary(m4)
+plot(m4,wait=F)
+
+
 @ 
 
 \end{document}
