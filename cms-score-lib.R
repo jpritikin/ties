@@ -107,8 +107,12 @@ cms.testlets <- function(df) {
   }
   if (!is.null(df$pctSuccess)) {
     df$pctSuccess[nchar(df$pctSuccess)==0] <- NA
-    df$successCat <- cut(as.numeric(df$pctSuccess),
-                         breaks=seq(0,100,length.out=8), ordered_result=TRUE)
+    pct <- round(as.numeric(df$pctSuccess))
+    pct[pct < 0] <- 0
+    pct[pct > 100] <- 100
+    # no need to isolate 100 from (80,99] ? TODO
+    df$successCat <- cut(pct, breaks=c(-1,seq(1,99,length.out=6),100),
+                         ordered_result=TRUE)
   }
   for (col in c('msPreoccu', 'msTimeAlloc', 'maxDurationOut', 'msTaught')) {
     if (is.null(df[[col]])) df[[col]] <- factor(NA)

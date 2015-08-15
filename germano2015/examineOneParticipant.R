@@ -1,28 +1,32 @@
+library(OpenMx)
+
 args <- commandArgs(trailingOnly = TRUE)
 if (length(args) != 1) stop("Specify one participant ID after --args")
 
 {
 wd <- setwd("..")
 source("measures.R")
-source("cms-score.R")
 setwd(wd)
 }
 
 targetID <- as.integer(args[1])
 
 df <- NULL
-for (wave in 1:4) {
+for (wave in 1:9) {
   raw <- read.csv(sprintf("wave%d-anon.csv", wave), stringsAsFactors=FALSE)
   r1 <- subset(raw, id == targetID)
+  if (!nrow(r1)) next
   if (wave == 1) {
     for (cx in seq(5,3,-1)) r1[[cx]] <- NULL
-    for (cx in seq(21,17,-1)) r1[[cx]] <- NULL
   }
   colnames(r1)[3:16] <- paste0("em", 1:14)
-  
   offset <- 17
-  cmsCol <- r1[,offset:(offset+24-1)]
-  cmsCol <- cbind(NA,NA,NA,NA,NA,cmsCol)
+  if (wave == 1) {
+    cmsCol <- r1[,offset:(offset+29-1)]
+  } else {
+    cmsCol <- r1[,offset:(offset+24-1)]
+    cmsCol <- cbind(NA,NA,NA,NA,NA,cmsCol)
+  }
   cms <- prep.cms201410(cmsCol)
   o1 <- cbind(r1[1:16], cms)
   df <- rbind(df, o1)
