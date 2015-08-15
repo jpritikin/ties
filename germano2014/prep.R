@@ -7,6 +7,7 @@ library(ggplot2)
   source("ties-score.R")
   setwd(wd)
 }
+source("spammer.R")
 
 raw1 <- read.csv("wave1-anon.csv", stringsAsFactors=FALSE)
 raw2 <- read.csv("wave2-anon.csv", stringsAsFactors=FALSE)
@@ -136,6 +137,12 @@ if (0) {
   df[df$t==1 & is.na(df$training), 'training'] <- min(df$training, na.rm=TRUE)
   ggplot(df, aes(x=t, y=training, group=id)) + geom_line()
 }
+
+mask <- match(spammer, wave1$id)
+mask <- mask[!is.na(mask)]
+wave1[mask,c('training', 'ties')] <- NA
+wave2[mask,c('training', 'ties')] <- NA
+wave3[mask,c('training', 'ties')] <- NA
 
 write.table(wave1, file="prep1.csv", row.names=FALSE)
 write.table(wave2, file="prep2.csv", row.names=FALSE)

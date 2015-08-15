@@ -1,4 +1,5 @@
 library(rpf)
+library(plyr)
 library(OpenMx)
 source("measures.R")
 
@@ -118,4 +119,34 @@ cms.testlets <- function(df) {
     if (is.null(df[[col]])) df[[col]] <- factor(NA)
   }
   df
+}
+
+ties.spam.score <- function(cube) {
+  # cube should be a person by item by time array
+  
+  successConfusion <- aaply(cube, 1, function(vec) {
+    confused <- (vec['successCat',] == 1 & vec['maxDuration',] > 1) |
+      (vec['successCat',] > 1 & vec['maxDuration',] == 1)
+    confused <- !is.na(confused) & confused
+    out <- rep(0, ncol(vec))
+    if (any(confused)) {
+      penalty <- abs(vec['successCat',] - vec['maxDuration',])
+      out[confused] <- penalty[confused]
+    }
+    out
+  })
+
+  oneWayItems <- c('msMetNum','msSharedNum', 'msTeachNum','msTrainTeachNum',
+                   'msEffort', 'msIdentity', 'msAfraid')
+  backward <- apply(cube[,oneWayItems,], 1:2, function(vec) {
+    vec <- vec[!is.na(vec)]
+    if (length(vec) < 2) return(NA)
+    dv <- diff(vec)
+    dv[dv > 0] <- 0
+    sum(dv)
+  })
+  
+  spammer <- apply(backward, 1, sum, na.rm=TRUE) - rowSums(successConfusion)
+  names(spammer) <- rownames(cube)
+  spammer
 }
