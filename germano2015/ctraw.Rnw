@@ -68,6 +68,12 @@ mergeLabData <- function(approxLabTime, long, labTime, UnfilteredID) {
   }
   long
 }
+
+# https://github.com/yihui/knitr/issues/1085
+print.xtable <- function(x, ...) {
+  out <- capture.output(xtable::print.xtable(x, ...))
+  cat(gsub('\\s+$', '', paste(out, collapse = '\n')))
+}
 @
 
 \title{Continuous Time Factor Analysis of the 2015~Meditation Class}
