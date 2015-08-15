@@ -314,13 +314,13 @@ model$DIFFUSION[which(!diag(nrow(model$DIFFUSION)))] <- 0
   
   #diagonal MANIFESTVAR, free-er LAMBDA, correlated factors
   model$DIFFUSION <- fulldiffusion
-  model$LAMBDA[,]<-paste0('lambda',1:(nrow(model$LAMBDA)),rep(1:2,each=nrow(model$LAMBDA)))
+  model$LAMBDA[,]<-paste0('lambda',1:(nrow(model$LAMBDA)),'_',rep(1:2,each=nrow(model$LAMBDA)))
   model$LAMBDA['freqCause', 'ties'] <- 0
 model$LAMBDA['maxDuration', 'training']   <- 0
   fit5 <- ctFit(wide, model, meanIntervals=T,objective='cov',asymptotes=T, 
     # omxStartValues = omxGetParameters(fit3$mxobj),
     verbose=2, stationary=c('T0VAR','T0MEANS'))
-  save(fit5,file='.\fits\fit5_dfacov.rda')
+  save(fit5,file='.\\fits\\fit5_dfacov.rda')
   
   
   
