@@ -187,13 +187,17 @@ loadRawData <- function(approxLabTime) {
       labTA <- raw$labTA
     }
     envMastery <- score.ryff.envMastery14(raw[offset:(offset + 14 - 1)])
-    offset <- offset + 14 + ifelse(wave==1, 5, 0)
-    cmsCol <- raw[,offset:(offset+24-1)]
-    cmsCol <- cbind(NA,NA,NA,NA,NA,cmsCol)
+    offset <- offset + 14
+    if (wave == 1) {
+      cmsCol <- raw[,offset:(offset+29-1)]
+    } else {
+      cmsCol <- raw[,offset:(offset+24-1)]
+      cmsCol <- cbind(NA,NA,NA,NA,NA,cmsCol)
+    }
     cms <- prep.cms201410(cmsCol)
     cms[['instrument']] <- NULL
     cms <- cms.testlets(cms)
-    for (del in c(
+    for (del in c('msNotion',
       'msAny', 'msChildhood', 'msEvery', 'wantLearn', 'skipInt',
       'pctSuccess', 'msEmo', 'msFast1', 'msIdAfraid', 'msIdAfraidLearn',
       'msFastEffort','msFastEffortLife', lifeExperience, 'msYearn',
@@ -234,6 +238,9 @@ manifestNames<-manifestNames[-which(manifestNames  %in% 'msTrainTeachNum')]
 lifeExperience<-lifeExperience[1:3]
 
 long<-long[,-which(colnames(long) %in% 'envMastery')]
+
+#cov(long[,manifestNames],use='pairwise.complete.obs')
+
 latents <- c("training", "ties")
 
 # a plausible factor structure
