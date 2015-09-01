@@ -435,30 +435,31 @@ for (wave in 1:numWaves) {
 }
 
 long <- mergeLabData(TRUE, long, labTime, UnfilteredID)
-longRel <- subset(long, !is.na(labTime))
-longPsy <- subset(long, is.na(labTime))
+# longRel <- subset(long, !is.na(labTime))
+# longPsy <- subset(long, is.na(labTime))
 
 n.TDpred      <- length(TDpredNames)
-container <- mxModel(model="ctraw")
+# container <- mxModel(model="ctraw")
 latents <- c("labeffect", 'trend', "training", "ties")
 
-longUniqueIds <- unique(longRel[,'id'])
+longUniqueIds <- unique(long[,'id'])
 numUniqueObs <- sapply(1:length(longUniqueIds),
-                       function(x) sum(longRel[,'id'] == longUniqueIds[x]))
+                       function(x) sum(long[,'id'] == longUniqueIds[x]))
 uniqueTpoints <- sort(unique(numUniqueObs))
-partition <- cut(uniqueTpoints, 2)
-for (px in c(levels(partition), 'psy')) {
-  if (px == 'psy') {
-    Tpoints <- 6
-    long1 <- longPsy
-  } else {
-    Tpoints <- uniqueTpoints[partition == px]
-    long1 <- subset(longRel, id %in% longUniqueIds[which(numUniqueObs %in% Tpoints)])
-  }
+Tpoints<-max(uniqueTpoints)
+# partition <- cut(uniqueTpoints, 2)
+# for (px in c(levels(partition), 'psy')) {
+#   if (px == 'psy') {
+#     Tpoints <- 6
+#     long1 <- longPsy
+#   } else {
+#     Tpoints <- uniqueTpoints[partition == px]
+#     long1 <- subset(longRel, id %in% longUniqueIds[which(numUniqueObs %in% Tpoints)])
+#   }
   wide <- suppressMessages(ctLongToWide(
-    long1, id="id", time="time", manifestNames=manifestNames, TDpredNames=TDpredNames))
+    long, id="id", time="time", manifestNames=manifestNames, TDpredNames=TDpredNames))
   wide <- suppressMessages(ctIntervalise(
-    wide, max(Tpoints), n.manifest=length(manifestNames), n.TDpred=n.TDpred,
+    wide, max(Tpoints), n.manifest=length(manifestNames), n.TDpred=n.TDpred, mininterval = 0.1,
     manifestNames=manifestNames, TDpredNames = TDpredNames))
 
   lambda <- matrix(0, length(manifestNames), length(latents),
@@ -490,30 +491,46 @@ for (px in c(levels(partition), 'psy')) {
   driftindex[which(latents %in% "trend"),which(latents %in% 'labeffect')] <- TRUE
   model$DRIFT[driftindex] <- 0
   model$TDPREDVAR <- diag(0.1,max(Tpoints)-1)
+  
+  
+  
+  freemodel<-model
+  freemodel$MANIFESTMEANS[,]<-'groupfree'
+  freemodel$DRIFT[which(latents %in% c('training','ties')),which(latents %in% c('trend'))]<-'groupfree'
 
-  m1 <- suppressMessages(ctFit(
-    wide, model, objective='mxFIML',nofit=TRUE, meanIntervals=F,stationary=c('T0VAR','T0MEANS')))
-  if (px == 'psy') {
-    m1 <- mxRename(m1, "psy")
-    m1$DRIFTlog$labels[3:4,2] <- paste0("PSY", m1$DRIFTlog$labels[3:4,2])
-  } else {
-    m1 <- mxRename(m1, sprintf("group%02d_%02d", min(Tpoints), max(Tpoints)))
+  groupings<-apply(wide[,paste0('lab_T',1:(Tpoints-2))], 1, function(x) {
+    x[is.na(x)]<-0
+    ifelse(any(x==1),'treatment','control')
   }
-  container <- mxModel(container, m1)
-}
-
-container <- mxModel(container,
-                     mxFitFunctionMultigroup(names(container$submodels)))
-container <- omxAssignFirstParameters(container)
-
-container<- OpenMx::mxOption(container, 'Always Checkpoint', 'Yes')
-container<- OpenMx::mxOption(container, 'Checkpoint Units', 'iterations')
-container<- OpenMx::mxOption(container, 'Checkpoint Count', 1)    
-
-container<-mxTryHard(container,paste=F,initialTolerance=1e-14,verbose=2)
-oldparams<-omxGetParameters(container)
-ctsummary(object=container$group07_09)
-mxEval(MANIFESTTRAITVAR,container$group07_09,compute=T)
+  )
+  
+  wide[,paste0('dT',1:(Tpoints-1))]<-round(wide[,paste0('dT',1:(Tpoints-1))],digits=1) #round to reduce unique intervals for easier computing
+  
+  fit <- ctMultigroupFit(
+    wide, groupings, model, freemodel=freemodel, showInits=FALSE,verbose=2,
+    objective='mxFIML',
+    stationary=c('T0VAR','T0MEANS'))
+#   
+#   if (px == 'psy') {
+#     m1 <- mxRename(m1, "psy")
+#     m1$DRIFTlog$labels[3:4,2] <- paste0("PSY", m1$DRIFTlog$labels[3:4,2])
+#   } else {
+#     m1 <- mxRename(m1, sprintf("group%02d_%02d", min(Tpoints), max(Tpoints)))
+#   }
+#   container <- mxModel(container, m1)
+# }
+# 
+# container <- mxModel(container,
+#                      mxFitFunctionMultigroup(names(container$submodels)))
+# container <- omxAssignFirstParameters(container)
+# 
+# container<- OpenMx::mxOption(container, 'Always Checkpoint', 'Yes')
+# container<- OpenMx::mxOption(container, 'Checkpoint Units', 'iterations')
+# container<- OpenMx::mxOption(container, 'Checkpoint Count', 1)    
+# 
+# container<-mxTryHard(container,paste=F,initialTolerance=1e-14,verbose=2)
+oldparams<-omxGetParameters(fit)
+summary(fit, group='treatment')
 
 #refit with full drift matrix
 container2<- mxRename(container, "ctrawFull")
