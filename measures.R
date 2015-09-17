@@ -360,11 +360,11 @@ score.5fMindfulness2 <- function(raw) {
          nonjudge=mean.or.na(nonjudge, 7))
 }
 
-NotionItem = c('This is the first time I have thought about it.',
-               "The notion has crossed my mind, but I'm not sure what it means to me.",
-               'I have discussed it with friends.',
-               'I have read something about it.',
-               'I study the topic with interest.')
+NotionItem = c('This is the first time I have thought about it',
+               "The notion has crossed my mind, but I'm not sure what it means to me",
+               'I have discussed it with friends',
+               'I have read something about it',
+               'I study the topic with interest')
 
 MSAgreementItem = tolower(c('Agree','Agree somewhat','Not sure','Disagree somewhat','Disagree'))
 
@@ -387,11 +387,11 @@ maxDurationItem = c('A moment (e.g., a second or shorter)',
                     'More than 10 minutes')
 
 
-MSNotionItem <- tolower(c("This is the first time I have thought about it.",
-                          "The notion has crossed my mind, but I'm not sure what it means to me.",
-                          "I have discussed it with friends.",
-                          "I have read something about it.",
-                          "I have an interest in this topic."))
+MSNotionItem <- tolower(c("This is the first time I have thought about it",
+                          "The notion has crossed my mind, but I'm not sure what it means to me",
+                          "I have discussed it with friends",
+                          "I have read something about it",
+                          "I have an interest in this topic"))
 
 MSFrequencyItem2 <- tolower(c("more than 2 times a day",
                               "1-2 times a day",
@@ -407,7 +407,7 @@ MSTimeAlloc <- tolower(c("Less than 10 minutes",
                          "More than 1 hour"))
 
 MSMaxDurationItem2 = tolower(c(
-  "I didn't experience complete mental silence.",
+  "I didn't experience complete mental silence",
   'A moment (e.g., a second or shorter)',
   'Longer than a moment but shorter than 10 seconds',
   'Between 10 seconds and 1 minute',
@@ -429,8 +429,14 @@ cms.fixOldData <- function(raw) {
   raw
 }
 
+stripPeriods <- function(df) {
+  as.data.frame(lapply(df, sub, pattern="\\.$", replacement="", perl=TRUE),
+                stringsAsFactors = FALSE)
+}
+
 prep.cms201309 <- function(raw) {
   if (ncol(raw) != 23) stop("Expecting 23 columns")
+  raw <- stripPeriods(raw)
   
   df <- data.frame(
     msNotion=safe.ordered(raw[[1]], NotionItem),
@@ -438,7 +444,7 @@ prep.cms201309 <- function(raw) {
     msAny=safe.ordered(raw[[3]], MSAgreementItem),
     msEvery=safe.ordered(raw[[4]], MSAgreementItem),
     wantLearn=safe.ordered(raw[[5]], LearnItem,
-                           "I know how to cause myself to experience complete mental silence.")
+                           "I know how to cause myself to experience complete mental silence")
   )
   
   item1 <- c("msEffort", "msEmo", "msDescarte", "msAfraid", "msFast", "msLife", "msIdentity")
@@ -473,13 +479,14 @@ prep.cms201309 <- function(raw) {
 
 prep.cms201312 <- function(raw) {
   if (ncol(raw) != 26) stop("Expecting 26 columns")
-
+  raw <- stripPeriods(raw)
+  
   df <- data.frame(
     msNotion=safe.ordered(raw[[1]], NotionItem),
     msAny=safe.ordered(raw[[2]], MSAgreementItem),
     msEvery=safe.ordered(raw[[3]], MSAgreementItem),
     wantLearn=safe.ordered(raw[[4]], LearnItem,
-                      "I know how to cause myself to experience complete mental silence.")
+                      "I know how to cause myself to experience complete mental silence")
   )
 
   item1 <- c("msEffort", "msEmo", "msDescarte", "msAfraid", "msFast", "msLife", "msIdentity")
@@ -491,7 +498,7 @@ prep.cms201312 <- function(raw) {
   
   item2 <- c("msYearn", "msEnv", "msAllow", "msCause")
   for (x2 in 1:4) {
-    df[,item2[x2]] <- safe.ordered(raw[[11+x2]], rev(MSAgreementItem), "I don't understand this question.")
+    df[,item2[x2]] <- safe.ordered(raw[[11+x2]], rev(MSAgreementItem), "I don't understand this question")
   }
   evItems <- c('freqCause', 'pctSuccess', 'maxDuration')
   df$freqCause <- safe.ordered(raw[[16]], rev(MSFrequencyItem))
@@ -520,9 +527,10 @@ prep.cms201312 <- function(raw) {
 
 prep.cms201409 <- function(raw, hack=FALSE) {
   if (ncol(raw) != 29) stop("Expecting 29 columns")
+  raw <- stripPeriods(raw)
   
   # Only affects wave earlydata/short-20140915
-  raw[[1]][raw[[1]] == "It is a topic of interest."] <- "I have an interest in this topic."
+  raw[[1]][raw[[1]] == "It is a topic of interest"] <- "I have an interest in this topic"
   
   df <- data.frame(
     msNotion=mxFactor(tolower(raw[[1]]), MSNotionItem, exclude=""),
@@ -530,7 +538,7 @@ prep.cms201409 <- function(raw, hack=FALSE) {
     msChildhood=mxFactor(tolower(raw[[3]]), MSAgreementItem, exclude=""),
     msEvery=mxFactor(tolower(raw[[4]]), MSAgreementItem, exclude=""),
     wantLearn=mxFactor(tolower(raw[[5]]), LearnItem,
-                       exclude=tolower(c('',"I have experienced complete mental silence.")))
+                       exclude=tolower(c('',"I have experienced complete mental silence")))
   )
   
   item1 <- c("msEffort", "msEmo", "msAfraid", "msFast", "msLife", "msIdentity", "msPreoccu")
@@ -543,25 +551,21 @@ prep.cms201409 <- function(raw, hack=FALSE) {
   item2 <- c("msYearn", "msEnv", "msAllow", "msCause")
   for (x2 in 1:4) {
     df[,item2[x2]] <- mxFactor(tolower(raw[[12+x2]]), rev(MSAgreementItem),
-                               exclude=tolower(c('',"I don't understand this question.")))
+                               exclude=tolower(c('',"I don't understand this question")))
   }
 
   evItems <- c('freqCause', 'msTimeAlloc', 'pctSuccess', 'maxDuration', "maxDurationOut")
 
-  # add trailing period (oops)
-  raw[[17]][ raw[[17]] == "I don't specifically allocate my time for complete mental silence" ] <-
-      "I don't specifically allocate my time for complete mental silence."
-  
   df$freqCause <- mxFactor(tolower(raw[[17]]), rev(MSFrequencyItem2),
-                           exclude=tolower(c('',"I don't specifically allocate my time for complete mental silence.")))
+                           exclude=tolower(c('',"I don't specifically allocate my time for complete mental silence")))
   df$msTimeAlloc <- mxFactor(tolower(raw[[18]]), MSTimeAlloc,
                              exclude=tolower(c("","I don't plan any particular amount of time")))
   df$pctSuccess <- raw[[19]]
   # table(df$pctSuccess[df$freqCause == "i don't specifically allocate my time for complete mental silence"])   #crazy?
   df$maxDuration <- mxFactor(tolower(raw[[20]]), MSMaxDurationItem2,
-                             exclude=tolower(c("", "I have no idea of how much time elapsed.")))
+                             exclude=tolower(c("", "I have no idea of how much time elapsed")))
   df$maxDurationOut <- mxFactor(tolower(raw[[21]]), MSMaxDurationItem2,
-                             exclude=tolower(c("", "I have no idea of how much time elapsed.")))
+                             exclude=tolower(c("", "I have no idea of how much time elapsed")))
 
   if (hack) {
     # Only affects wave earlydata/short-20140915
@@ -585,6 +589,7 @@ prep.cms201409 <- function(raw, hack=FALSE) {
 
 prep.cms201410 <- function(raw) {
   if (ncol(raw) != 29) stop("Expecting 29 columns")
+  raw <- stripPeriods(raw)
   
   df <- data.frame(
     msNotion=mxFactor(tolower(raw[[1]]), MSNotionItem, exclude=""),
@@ -592,7 +597,7 @@ prep.cms201410 <- function(raw) {
     msChildhood=mxFactor(tolower(raw[[3]]), MSAgreementItem, exclude=""),
     msEvery=mxFactor(tolower(raw[[4]]), MSAgreementItem, exclude=""),
     wantLearn=mxFactor(tolower(raw[[5]]), LearnItem,
-                       exclude=tolower(c('',"I have experienced complete mental silence.")))
+                       exclude=tolower(c('',"I have experienced complete mental silence")))
   )
   
   item1 <- c("msEffort", "msEmo", "msAfraid", "msFast", "msLife", "msIdentity", "msPreoccu")
@@ -605,19 +610,19 @@ prep.cms201410 <- function(raw) {
   item2 <- c("msYearn", "msEnv", "msAllow", "msTaught")
   for (x2 in 1:4) {
     df[,item2[x2]] <- mxFactor(tolower(raw[[12+x2]]), rev(MSAgreementItem),
-                               exclude=tolower(c('',"I don't understand this question.")))
+                               exclude=tolower(c('',"I don't understand this question")))
   }
   
   df$freqCause <- mxFactor(tolower(raw[[17]]), rev(MSFrequencyItem2),
-                           exclude=tolower(c('',"I don't specifically allocate my time for complete mental silence.")))
+                           exclude=tolower(c('',"I don't specifically allocate my time for complete mental silence")))
   df$msTimeAlloc <- mxFactor(tolower(raw[[18]]), MSTimeAlloc,
                              exclude=tolower(c("","I don't plan any particular amount of time")))
   df$pctSuccess <- raw[[19]]
   # table(df$pctSuccess[df$freqCause == "i don't specifically allocate my time for complete mental silence"])   #crazy?
   df$maxDuration <- mxFactor(tolower(raw[[20]]), MSMaxDurationItem2,
-                             exclude=tolower(c("", "I have no idea of how much time elapsed.")))
+                             exclude=tolower(c("", "I have no idea of how much time elapsed")))
   df$maxDurationOut <- mxFactor(tolower(raw[[21]]), MSMaxDurationItem2,
-                                exclude=tolower(c("", "I have no idea of how much time elapsed.")))
+                                exclude=tolower(c("", "I have no idea of how much time elapsed")))
   
   item3 <- c('msMet', 'msShared', 'msTeach', 'msTrainTeach')
   for (x3 in 1:4) {
@@ -627,6 +632,96 @@ prep.cms201410 <- function(raw) {
   }
   
   df$instrument <- "2014-10-22"
+  
+  df
+}
+
+MSFrequencyItem3 <- tolower(c("continuously",
+                              "frequently",
+                              "occasionally",
+                              "not at all"))
+
+MSPhysicalLoc <- tolower(c("I consistently felt that I was sitting in the room",
+                           "Sometimes I was sitting in the room and sometimes I lost track of the boundaries of my physical body",
+                           "I consistently lost track of the boundaries of my physical body",
+                           "The distinction between self and other dissolved",
+                           "I felt a sense of oneness with the whole"))
+
+MSRoughDuration <- tolower(c("Up to 1 minute",
+                             "Between 1 minute and 10 minutes",
+                             "Between 10 minutes and 2 hours",
+                             "More than 2 hours"))
+
+MSConsciousWill <- tolower(c("I had to struggle and force myself to get through the session",
+                             "I had to make a moderate effort to attend to what I was supposed to do during the session",
+                             "I drifted between effortfulness and effortlessness during the session",
+                             "I enjoyed some relief from conscious will and simultaneously attended to the session",
+                             "I enjoyed the stillness of not willing anything and simultaneously attended closely to the session"))
+  
+prep.cms201508 <- function(raw) {
+  if (ncol(raw) != 34) stop("Expecting 34 columns")
+  raw <- stripPeriods(raw)
+  
+  df <- data.frame(
+    msNotion=mxFactor(tolower(raw[[1]]), MSNotionItem, exclude=""),
+    msAny=mxFactor(tolower(raw[[2]]), MSAgreementItem, exclude=""),
+    msChildhood=mxFactor(tolower(raw[[3]]), MSAgreementItem, exclude=""),
+    wantLearn=mxFactor(tolower(raw[[4]]), LearnItem,
+                       exclude=tolower(c('',"I have experienced complete mental silence")))
+  )
+  
+  item1 <- c("msEffort", "msAfraid", "msFast", "msLife", "msIdentity", "msPreoccu")
+  for (x1 in 1:6) {
+    df[,item1[x1]] <- mxFactor(tolower(raw[[4+x1]]), MSAgreementItem, exclude="")
+  }
+
+  item3 <- c('msShared', 'msMet', 'msTeach', 'msTrainTeach')
+  for (x3 in 1:4) {
+    df[, paste(item3[x3], "Num", sep="")] <- raw[[10+x3]]
+  }
+
+  item2 <- c("msYearn", "msEnv", "msAllow", "msTaught")
+  for (x2 in 1:4) {
+    df[,item2[x2]] <- mxFactor(tolower(raw[[14+x2]]), rev(MSAgreementItem),
+                               exclude=tolower(c('',"I don't understand this question")))
+  }
+  
+  df$freqCause <- mxFactor(tolower(raw[[19]]), rev(MSFrequencyItem2),
+                           exclude=tolower(c('',"I didn't specifically allocate my time for complete mental silence")))
+  df$msTimeAlloc <- mxFactor(tolower(raw[[20]]), MSTimeAlloc,
+                             exclude=tolower(c("","I didn't plan any particular amount of time")))
+
+  item4 <- c('thinkTime', 'thinkFuture', 'thinkPast')
+  for (x1 in 1:length(item4)) {
+    df[,item4[x1]] <- mxFactor(tolower(raw[[20+x1]]), MSFrequencyItem3,
+                                exclude=c(''))
+  }
+  
+  df$pctSuccess <- raw[[24]]
+  
+  df$physicalLoc <- mxFactor(tolower(raw[[25]]), MSPhysicalLoc, exclude=c(''))
+  df$phyLocDepth <- mxFactor(tolower(raw[[26]]),
+                             c(tolower("I didn't feel any change in my sense of physical location"),
+                               MSRoughDuration), exclude=c(''))
+  
+  # table(df$pctSuccess[df$freqCause == "i don't specifically allocate my time for complete mental silence"])   #crazy?
+  df$maxDuration <- mxFactor(tolower(raw[[27]]), MSMaxDurationItem2,
+                             exclude=tolower(c("", "I have no idea of how much time elapsed")))
+  df$maxDurationOut <- mxFactor(tolower(raw[[28]]), MSMaxDurationItem2,
+                                exclude=tolower(c("", "I have no idea of how much time elapsed")))
+  
+  cw <- raw[,29:33]
+  colnames(cw) <- NULL
+  for (rx in 1:2) {
+    df[,paste0("spon",rx)] <-
+      mxFactor(MSConsciousWill[apply(cw, 1, match, x=rx)], MSConsciousWill)
+  }
+  df$sponDepth <- mxFactor(tolower(raw[[34]]),
+                           c(tolower("I didn't feel any reduction in conscious will"),
+                             MSRoughDuration),
+                           exclude=c(''))
+  
+  df$instrument <- "2015-08"
   
   df
 }

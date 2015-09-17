@@ -91,16 +91,16 @@ prepare.espt <- function(espt, scores) {
   espt$rel <- mxFactor(tolower(espt$rel), levels=tolower(RelaItem), exclude=c(''))
 
   agreement.levels <- c('Agree','Agree somewhat','Not sure','Disagree somewhat','Disagree')
-  notion.levels <- c('This is the first time I have thought about it.',
-                     "The notion has crossed my mind, but I'm not sure what it means to me.",
-                     'I have discussed it with friends.',
-                     'I have read something about it.',
-                     'I study the topic with interest.')
-  ethics.levels <- c('This is the first time I have thought about it.',
-                     "The question has crossed my mind but I'm not sure.",
-                     "I have discussed it with friends but I'm not sure.",
-                     'I have a gut feeling about whether it is ethical.',
-                     'My mind is made up about whether it is ethical.')
+  notion.levels <- c('This is the first time I have thought about it',
+                     "The notion has crossed my mind, but I'm not sure what it means to me",
+                     'I have discussed it with friends',
+                     'I have read something about it',
+                     'I study the topic with interest')
+  ethics.levels <- c('This is the first time I have thought about it',
+                     "The question has crossed my mind but I'm not sure",
+                     "I have discussed it with friends but I'm not sure",
+                     'I have a gut feeling about whether it is ethical',
+                     'My mind is made up about whether it is ethical')
   for (col in c('msAny','msMet','msYearn','msAllow',
                 'msShared','msEnv','msCause','msTeach','msEvery','msPay',
                 'msTrainTeach', 'msAfraid', 'msEmo', 'msLife', 'msFast', 'msEffort',
@@ -130,7 +130,7 @@ prepare.espt <- function(espt, scores) {
   espt$msCause0 <- lax.ordered(espt, 'msCause0', rev(cause0.levels))
 
   oldlearn.levels <- c('Yes',
-                       "I know how to cause myself to experience complete mental silence.")
+                       "I know how to cause myself to experience complete mental silence")
   # Don't ask them if they know how to cause here MS because we ask them later.
   learn.levels <- c('No', 'Not Sure',
                     'Yes, if it was easy to learn',
@@ -142,7 +142,7 @@ prepare.espt <- function(espt, scores) {
                         'Infrequently', 'Weekly', 'Daily')
   espt$freqCause <- lax.ordered(espt, 'freqCause', freqCause.levels)
 
-  msFreq.levels <- c("i haven't experienced complete mental silence.",
+  msFreq.levels <- c("i haven't experienced complete mental silence",
                      'Infrequently', 'Weekly', 'Daily')
   espt$msFreq <- lax.ordered(espt, 'msFreq', msFreq.levels)
 
@@ -169,11 +169,11 @@ prepare.espt <- function(espt, scores) {
 
   freq.levels <- c('Every time','Frequently','Infrequently',
                    'Almost never','Not at all')
-  subj.time.levels <- c('I am unaware of actual time.',
-                        'Subjective time is somewhat faster than actual time.',
-                        'Subjective time is typical.',
-                        'Subjective time is somewhat slower than actual time.',
-                        'I am watching the clock.')
+  subj.time.levels <- c('I am unaware of actual time',
+                        'Subjective time is somewhat faster than actual time',
+                        'Subjective time is typical',
+                        'Subjective time is somewhat slower than actual time',
+                        'I am watching the clock')
   importance.levels <- c('Important', 'Somewhat important', 'Not sure',
                          'Somewhat inappropriate', 'Inappropriate')
   for (context in c('re','sp','ps','rx','pe','wo','me','dd','fl')) {

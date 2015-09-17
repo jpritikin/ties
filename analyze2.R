@@ -11,6 +11,7 @@ source("measures.R")
 
 source("prepare.R")
 raw <- read.csv("raw.csv", stringsAsFactors=FALSE)
+raw <- stripPeriods(raw)
 espt <- prepare.espt(raw)
 
 when <- strptime(espt[['instrument']], "%Y-%m-%d")
@@ -24,8 +25,7 @@ espt$population[grepl("ppool",espt$wave)] <- 'uva'
 espt$population[grepl("grad",espt$wave)] <- 'uva'
 
 manocha2013 <- read.csv("au/2013combined.csv", stringsAsFactors=FALSE)
-if (1) {
-  # exclude later when we have more data TODO
+if (TRUE) {
   manocha2013.mask <- (manocha2013$time == 2 | (manocha2013$time == 1 & !(manocha2013$id %in% manocha2013[manocha2013$time == 2, 'id'])))
   manocha2013 <- manocha2013[manocha2013.mask,]
   if (any(table(manocha2013$id) != 1)) stop("More than 1 measurement from a single participant")
@@ -80,11 +80,17 @@ espt <- smartbind(espt, local({
   germano2015.cms
 }))
 
-web201410 <- read.csv("earlydata/short-20141022p.csv", stringsAsFactors=FALSE)
+web201410 <- read.csv("earlydata/short-20141022.csv", stringsAsFactors=FALSE)
 web201410Prep <- cbind(prepDemographics(web201410[1:16]),
                        prep.cms201410(web201410[17:(17+29-1)]))
-web201410Prep$wave <- "earlydata/short-20141022p"
+web201410Prep$wave <- "earlydata/short-20141022"
 espt <- smartbind(espt, web201410Prep)
+
+web201509 <- read.csv("earlydata/web-201509p.csv", stringsAsFactors=FALSE)
+web201509Prep <- cbind(prepDemographics(web201509[1:16]),
+                       prep.cms201508(web201509[17:(17+34-1)]))
+web201509Prep$wave <- "earlydata/short-201509"
+espt <- smartbind(espt, web201509Prep)
 
 espt$population[is.na(espt$population)] <- 'general'
 

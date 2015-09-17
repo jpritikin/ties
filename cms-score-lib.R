@@ -41,6 +41,7 @@ set.nominal.rank <- function(spec, ip.mat, name, a, c) {
 }
 
 num2cat <- function(num) {
+    num <- as.numeric(num)
   zero <- num <= 0
   high <- num >= 1000
   level.coef <- 2
