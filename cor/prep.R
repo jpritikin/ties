@@ -147,6 +147,47 @@ cdat3 <- cbind(cdat3, ties.score('uva', prep.cms201410(raw3[282:(282+29-1)])))
 
 cdat3$sleep <- -score.psqi(raw3[311:(311+19-1)])
 
+# ------------------------------------------------------------------
+raw4 <- read.csv("data-201509.csv", stringsAsFactors=FALSE)
+
+cdat4 <- data.frame(
+  start=raw4$StartDate,
+  end=raw4$EndDate,
+  born=raw4[[3]],
+  sex=factor(raw4[[4]], levels=SexItem, labels=tolower(SexItem)),
+  rel=factor(raw4[[5]], levels=RelaItem, labels=tolower(RelaItemShort)))
+
+# SF12 (ignore for now) 6:17
+
+got <- score.ipipBig5(raw4[18:67])
+for (n in names(got)) cdat4[[n]] <- got[[n]]
+
+got <- score.panas(raw4[68:87])
+for (n in names(got)) cdat4[[n]] <- got[[n]]
+
+got <- score.5fMindfulness2(code.5fMindfulness2(raw4[88:126]))
+for (n in names(got)) cdat4[[n]] <- got[[n]]
+
+got <- score.ryff9(raw4[127:180])
+for (n in names(got)) cdat4[[n]] <- got[[n]]
+
+got <- score.mcFormC(raw4[184:196])
+cdat4$socialDesirable <- got - mean(got, na.rm=TRUE)
+
+got <- score.dass(raw4[197:(197+21-1)])
+for (n in names(got)) cdat4[[n]] <- got[[n]]
+
+cdat4$mwb <- score.wemwbs(raw4[218:(218+7-1)])
+
+cdat4$ei <- score.ei(raw4[225:(225+33-1)])
+
+got <- score.rrq(raw4[258:(258+24-1)])
+for (n in names(got)) cdat4[[n]] <- got[[n]]
+
+cdat4 <- cbind(cdat4, ties.score('uva', prep.cms201508(raw4[282:(282+34-1)])))
+
+cdat4$sleep <- -score.psqi(raw4[316:(316+19-1)])
+
 # --------------------------------------------------------
 
 cdat <- smartbind(cdat1, cdat2)

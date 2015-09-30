@@ -48,3 +48,4 @@ processDate <- function(when) {
 processDate("201405")
 processDate("201410")
 processDate("201412")
+processDate("201509")
