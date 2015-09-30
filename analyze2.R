@@ -86,7 +86,7 @@ web201410Prep <- cbind(prepDemographics(web201410[1:16]),
 web201410Prep$wave <- "earlydata/short-20141022"
 espt <- smartbind(espt, web201410Prep)
 
-web201509 <- read.csv("earlydata/web-201509p.csv", stringsAsFactors=FALSE)
+web201509 <- read.csv("earlydata/web-201509.csv", stringsAsFactors=FALSE)
 web201509Prep <- cbind(prepDemographics(web201509[1:16]),
                        prep.cms201508(web201509[17:(17+34-1)]))
 web201509Prep$wave <- "earlydata/short-201509"

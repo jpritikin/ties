@@ -686,10 +686,18 @@ prep.cms201508 <- function(raw) {
                                exclude=tolower(c('',"I don't understand this question")))
   }
   
+  # revisit after 18Sep2015 revision that added another response option TODO
+  noSession <- ((tolower(raw[[19]]) == tolower("I didn't specifically allocate my time for complete mental silence") &
+                     tolower(raw[[20]]) == tolower("I didn't plan any particular amount of time") &
+                         raw[[24]] == "0") |
+                (tolower(raw[[19]]) == tolower("I didn't specifically allocate my time for complete mental silence") &
+                     tolower(raw[[20]]) == tolower("not applicable, since i do not allocate time for structured sessions")))
+
   df$freqCause <- mxFactor(tolower(raw[[19]]), rev(MSFrequencyItem2),
                            exclude=tolower(c('',"I didn't specifically allocate my time for complete mental silence")))
   df$msTimeAlloc <- mxFactor(tolower(raw[[20]]), MSTimeAlloc,
-                             exclude=tolower(c("","I didn't plan any particular amount of time")))
+                             exclude=tolower(c("","I didn't plan any particular amount of time",
+                                 "not applicable, since i do not allocate time for structured sessions")))
 
   item4 <- c('thinkTime', 'thinkFuture', 'thinkPast')
   for (x1 in 1:length(item4)) {
@@ -709,7 +717,7 @@ prep.cms201508 <- function(raw) {
                              exclude=tolower(c("", "I have no idea of how much time elapsed")))
   df$maxDurationOut <- mxFactor(tolower(raw[[28]]), MSMaxDurationItem2,
                                 exclude=tolower(c("", "I have no idea of how much time elapsed")))
-  
+
   cw <- raw[,29:33]
   colnames(cw) <- NULL
   for (rx in 1:2) {
@@ -720,6 +728,12 @@ prep.cms201508 <- function(raw) {
                            c(tolower("I didn't feel any reduction in conscious will"),
                              MSRoughDuration),
                            exclude=c(''))
+  
+  # participants often select some responses instead of skipping these items
+  sessionItems <- c(item4, 'pctSuccess', 'physicalLoc', 'phyLocDepth', 'maxDuration',
+                    paste0("spon",1:2), 'sponDepth')
+  noSession <- !is.na(noSession) & noSession
+  df[noSession, sessionItems] <- NA
   
   df$instrument <- "2015-08"
   

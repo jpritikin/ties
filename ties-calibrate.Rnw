@@ -408,7 +408,7 @@ print(xtable(got$pval[,9:15], paste("Log p-value of local dependence between ite
 \end{center}
 
 <<results='asis'>>=
-numToOmit <- 4
+numToOmit <- 3
 toOmit <- lapply(evItems, function(x) bestToOmit(pop$general$ties, numToOmit, x))
 sfit <- Reduce('+', lapply(pop, function (x) SitemFit(x$ties, omit = toOmit)))
 tbl <- t(sapply(sfit, function(r) c(n=r$n, df=r$df, stat=r$statistic, pval=r$pval)))

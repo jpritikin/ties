@@ -116,7 +116,9 @@ cms.testlets <- function(df) {
     df$successCat <- cut(pct, breaks=c(-1,seq(1,99,length.out=6),100),
                          ordered_result=TRUE)
   }
-  for (col in c('msPreoccu', 'msTimeAlloc', 'maxDurationOut', 'msTaught')) {
+    for (col in c('msPreoccu', 'msTimeAlloc', 'maxDurationOut', 'msTaught',
+                  'thinkTime', 'thinkFuture', 'thinkPast', 'physicalLoc', 'phyLocDepth',
+                  'spon1', 'spon2', 'sponDepth')) {
     if (is.null(df[[col]])) df[[col]] <- factor(NA)
   }
   df
