@@ -2,7 +2,7 @@
   wd <- setwd("..")
   source("measures.R")
   source("ties-score.R")
-  source("envm-score.R")
+#  source("envm-score.R")
   setwd(wd)
 }
 source("spammer.R")
@@ -23,6 +23,7 @@ rel <- NULL
 labTime <- NULL
 labTA <- NULL
 
+sampleSize <- rep(NA, 9)
 for (wave in 1:9) {
   raw <- read.csv(sprintf("wave%d-anon.csv", wave), stringsAsFactors=FALSE)
   offset <- 3+ifelse(wave==1, 3, 0)
@@ -58,6 +59,7 @@ for (wave in 1:9) {
   mask <- match(spammer, scored$id)
   mask <- mask[!is.na(mask)]
   scored[mask,c('envMastery', 'training', 'ties')] <- NA
+  sampleSize[wave] <- sum(!is.na(scored$labTA) & !is.na(scored$ties))
   write.table(scored, file=sprintf("prep%d.csv", wave), row.names=FALSE)
 }
 
