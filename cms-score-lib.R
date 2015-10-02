@@ -80,6 +80,10 @@ cms.testlets <- function(df) {
     df$msFastEffortLife <- ordered(unclass(df$msFast) + unclass(df$msEffort) + unclass(df$msLife) - 15,
                                    levels=seq(-12,0,1))
   }
+    if (is.null(df[['msEffortX']])) {
+        MSAgreementItemX = tolower(c('Not sure','Agree','Agree somewhat','Disagree somewhat','Disagree'))
+        df$msEffortX <- mxFactor(df$msEffort, MSAgreementItemX)
+    }
 
   for (col in c('msMet', 'msShared', 'msTeach', 'msTrainTeach')) {
     ncol <- paste0(col, "Num")

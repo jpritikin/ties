@@ -83,8 +83,8 @@ fitTraining <- function(tr.data) {
 
         tr.data <- tr.data[rowSums(!is.na(tr.data[,training.items])) > 0,]
 
-#  factors <- c('training', 'lifetime', 'backward')
-  factors <- c('training', 'lifetime')
+  factors <- c('training', 'lifetime', 'backward')
+#  factors <- c('training', 'lifetime')
 #  factors <- c('training')
 #  factors <- c('training', 'fear')
   spec <- lapply(training.items, function(nm) {
@@ -94,7 +94,8 @@ fitTraining <- function(tr.data) {
   names(spec) <- training.items
   
   # remove msTimeAlloc from here once we have enough data TODO
-  for (item in intersect(c(leItems, 'msTimeAlloc'), names(spec))) {
+  for (item in intersect(paste0(c('msTeach', 'msTrainTeach'), "Num"),
+                         names(spec))) {
     spec[item] <- mkspec(tr.data, item, length(factors))
   }
   numItems <- length(training.items)
@@ -108,11 +109,8 @@ fitTraining <- function(tr.data) {
   imat$values['training',] <- 1
   imat$free[,] <- !is.na(imat$values) & imat$values[,] != 0
 
-  for (item in leItems) {
-    imat <- set.nominal.rank(spec, imat, item, 0, 0.25)
-  }
-  imat <- set.nominal.rank(spec, imat, 'msMetNum', 0, 0.7)
-  imat <- set.nominal.rank(spec, imat, 'msSharedNum', 0, 0.7)
+  imat <- set.nominal.rank(spec, imat, 'msTeachNum', 0, 0.7)
+  imat <- set.nominal.rank(spec, imat, 'msTeachTrainNum', 0, 0)
   imat <- set.nominal.rank(spec, imat, 'msTimeAlloc', 0, 0.25)
 
   if (any('fear' == factors)) {
@@ -123,8 +121,8 @@ fitTraining <- function(tr.data) {
     imat$free['lifetime', intersect(leItems, training.items)] <- TRUE
   }
   if (any('backward' == factors)) {
-    imat$values['backward', intersect(c('msEffort', 'msIdentity'), training.items)] <- 1
-    imat$free['backward', intersect(c('msEffort', 'msIdentity'), training.items)] <- TRUE
+    imat$values['backward', intersect(c('msEffortX', 'msIdentity', 'msAfraid'), training.items)] <- 1
+    imat$free['backward', intersect(c('msEffortX', 'msIdentity', 'msAfraid'), training.items)] <- TRUE
   }
 
     train <- mxModel(model="training", imat,
@@ -143,20 +141,22 @@ fitTraining <- function(tr.data) {
     trM <- mxModel(trM, up)
     trM$fitfunction$groups <- c(trM$fitfunction$groups, up$name)
   }
-  trM$compute$steps[[1]]$maxIter <- 750L  # TODO
-  trM$fitfunction$groups <- c(trM$fitfunction$groups, 'latentFit')
+#  trM$compute$steps[[1]]$maxIter <- 750L  # TODO
   got <- mxRun(trM, silent=TRUE)
   got
 }
 
+# 'freqCause', 'msTimeAlloc' -- don't fit with these items
+
 #'msAfraid' too similar to msIdentity TODO
-tr.items <- c('msNotion', 'msEffort', 'msIdentity', 'freqCause',
-              'msTimeAlloc',
+# 'msTrainTeach' not enough data TODO
+tr.items <- c('msNotion', 'msEffortX', 'msIdentity', 'msAfraid', 
               paste0(c('msShared', 'msMet', 'msTeach'), 'Num'))
 
 when <- strptime(espt[['instrument']], "%Y-%m-%d")
-revision1 <- strptime("2013-12-15", "%Y-%m-%d")  # slowly increase to 2014-09-15
-ver.mask <- difftime(when, revision1) > 0
+#revision1 <- strptime("2013-12-15", "%Y-%m-%d")  # slowly increase to 2014-09-15
+revision1 <- strptime("2014-09-15", "%Y-%m-%d")  # slowly increase to 2014-09-15
+ver.mask <- difftime(when, revision1) > 0 | is.na(when)
 
 tr.data <- espt[ver.mask, c('population', tr.items)]
 tr.est <- fitTraining(tr.data)
@@ -166,7 +166,8 @@ pops <- sapply(strsplit(tr.est$compute$steps[[1]]$expectation, ".", fixed=TRUE),
 
 for (p1 in pops) {
   pop[[p1]][['training']] <- as.IFAgroup(tr.est[[p1]], minItemsPerScore = 2L)
-  if (FALSE && !is.null(pop[[p1]]$training$mean)) {
+  if (TRUE && !is.null(pop[[p1]]$training$mean)) {
+    print(p1)
     print(pop[[p1]]$training$mean)
     print(pop[[p1]]$training$cov)
   }
@@ -185,7 +186,6 @@ if (0) {
   }
   log(sum(stat > mnf$statistic) / mcReps)
 }
-
 @
 
 %Two subfactors were hypothesized: a self subfactor for
@@ -224,7 +224,7 @@ print(xtable(got$pval, paste("Log p-value of local dependence between item pairs
 \end{center}
 
 <<results='asis'>>=
-numToOmit <- 2
+numToOmit <- 1
 toOmit <- lapply(tr.items, function(x) bestToOmit(pop$general$training, numToOmit, x))
 sfit <- Reduce('+', lapply(pop, function (x) SitemFit(x$training, omit = toOmit)))
 tbl <- t(sapply(sfit, function(r) c(n=r$n, df=r$df, stat=r$statistic, pval=r$pval)))
@@ -348,7 +348,8 @@ pops <- sapply(strsplit(ev.est$compute$steps[[1]]$expectation, ".", fixed=TRUE),
                function(x) x[[1]])
 for (p1 in pops) {
   pop[[p1]][['ties']] <- as.IFAgroup(ev.est[[p1]], minItemsPerScore = 2L)
-  if (FALSE && !is.null(pop[[p1]]$ties$mean)) {
+  if (TRUE && !is.null(pop[[p1]]$ties$mean)) {
+    print(p1)
     print(pop[[p1]]$ties$mean)
     print(pop[[p1]]$ties$cov)
   }
