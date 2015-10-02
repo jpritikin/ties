@@ -12,6 +12,7 @@ ifa.score <- function(grp, df) {
 ties.score <- function(population, df) {
   df <- cms.testlets(df)
   cms <- cbind(training=ifa.score(tiesPop[[population]]$training, df),
+               practice=ifa.score(tiesPop[[population]]$practice, df),
                ties=ifa.score(tiesPop[[population]]$ties, df))
   cms
 }

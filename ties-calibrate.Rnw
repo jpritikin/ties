@@ -248,6 +248,110 @@ basis[1] <- 1
 print(plotInformation(pop$general$training, width=5, basis=basis))
 @
 
+\section{Practice}
+
+<<cache=FALSE>>=
+fitPractice <- function(pr.data) {
+  practice.items <- setdiff(colnames(pr.data), "population")
+
+  pr.data <- pr.data[rowSums(!is.na(pr.data[,practice.items])) > 0,]
+
+  factors <- c('practice')
+  spec <- lapply(practice.items, function(nm) {
+    lev <- length(levels(pr.data[[ nm ]]))
+    rpf.grm(outcomes=lev, factors=length(factors))
+  })
+  names(spec) <- practice.items
+  
+  numItems <- length(practice.items)
+  maxParam <- max(sapply(spec, rpf.numParam))
+  
+  imat <- mxMatrix(name="item", nrow=maxParam, ncol=numItems,
+                     dimnames=list(c(factors,
+                                     paste('p',(length(factors)+1):maxParam,sep="")), practice.items))
+  imat$values[,] <- mxSimplify2Array(lapply(spec, rpf.rparam))
+  imat$values[factors,] <- 0
+  imat$values['practice',] <- 1
+  imat$free[,] <- !is.na(imat$values) & imat$values[,] != 0
+  imat$labels['practice',] <- 'slope'
+
+    pract <- mxModel(model="practice", imat,
+                   mxExpectationBA81(spec, qwidth=5, qpoints=39),
+                   mxFitFunctionML())
+
+  mMat <- mxMatrix(name='mean', nrow=length(factors), ncol=1, values=0, free=TRUE)
+  rownames(mMat) <- factors
+  covMat <- mxMatrix(name='cov', values=diag(length(factors)))
+  diag(covMat$free) <- TRUE
+  dimnames(covMat) <- list(factors, factors)
+
+  trM <- replicateModelBy(pract, pr.data, mMat, covMat, split=popSplit)
+  got <- mxRun(trM, silent=TRUE)
+  got
+}
+
+pr.items <- c('freqCause', 'msTimeAlloc')
+pr.data <- espt[, c('population', pr.items)]
+pr.est <- fitPractice(pr.data)
+
+pops <- sapply(strsplit(pr.est$compute$steps[[1]]$expectation, ".", fixed=TRUE),
+               function(x) x[[1]])
+for (p1 in pops) {
+  pop[[p1]][['practice']] <- as.IFAgroup(pr.est[[p1]], minItemsPerScore = 1L)
+  if (TRUE && !is.null(pop[[p1]]$practice$mean)) {
+    print(p1)
+    print(pop[[p1]]$practice$mean)
+    print(pop[[p1]]$practice$cov)
+  }
+}
+@
+
+A candidate model obtains $-2LL=\Sexpr{pr.est$output$fit}$
+with condition number \Sexpr{pr.est$output$conditionNumber}.
+
+<<fig.height=2>>=
+toOmit <- bestToOmit(pop$general$practice, 0)
+got <- Reduce('+',lapply(pop, function (x) sumScoreEAPTest(omitItems(x$practice, toOmit))))
+
+df <- data.frame(score=as.numeric(names(got$observed)),
+            expected=got$expected, observed=got$observed)
+df <- melt(df, id="score", variable.name="source", value.name="n")
+ggplot(df, aes(x=score, y=n, color=source)) + geom_line()
+@
+
+\begin{center}
+<<results='asis'>>=
+got <- Reduce('+', lapply(pop, function (x) ChenThissen1997(x$practice)))
+print(xtable(got$pval, paste("Log p-value of local dependence between item pairs.")),
+      size="\\footnotesize", floating=FALSE)
+@ 
+\end{center}
+
+<<results='asis'>>=
+numToOmit <- 0
+toOmit <- lapply(tr.items, function(x) bestToOmit(pop$general$practice, numToOmit, x))
+sfit <- Reduce('+', lapply(pop, function (x) SitemFit(x$practice, omit = toOmit)))
+tbl <- t(sapply(sfit, function(r) c(n=r$n, df=r$df, stat=r$statistic, pval=r$pval)))
+print(xtable(tbl, paste0("Sum-score item-wise fit, omitting ",numToOmit," item.")))
+@
+
+<<fig.height=2>>=
+map1 <- itemResponseMap(pop$general$practice, factor=1)
+ggplot(map1, aes(x=score, y=item, label=outcome)) + itemMapText
+@
+
+<<fig.height=3>>=
+pl <- lapply(names(sfit), function(item) {
+  SitemPlot(sfit, item)
+})
+for (px in 1:length(pl)) {
+  print(pl[[px]])
+}
+basis <- rep(0, pop$general$practice$spec[[1]]$factors)
+basis[1] <- 1
+print(plotInformation(pop$general$practice, width=5, basis=basis))
+@
+
 \section{TIES}
 
 The \emph{TIES} factor is intended to assess the self-reported

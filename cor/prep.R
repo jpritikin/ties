@@ -195,8 +195,8 @@ cdat <- smartbind(cdat, cdat3)
 mind5f <- c('nonreact', 'observe', 'actAware', 'describe', 'nonjudge')
 perm <- c(setdiff(colnames(cdat), mind5f), mind5f)
 cdat <- cdat[,perm]
-perm <- c(setdiff(colnames(cdat), c('training', 'ties')),
-          c('training', 'ties'))
+perm <- c(setdiff(colnames(cdat), c('training', 'practice', 'ties')),
+          c('training', 'practice', 'ties'))
 cdat <- cdat[,perm]
 
 if (0) {
