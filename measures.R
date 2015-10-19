@@ -399,7 +399,8 @@ MSFrequencyItem2 <- tolower(c("more than 2 times a day",
                               "1-3 times a week",
                               "1-3 times a month"))
 
-MSTimeAlloc <- tolower(c("Less than 10 minutes",
+MSTimeAlloc <- tolower(c("not applicable, since i do not allocate time for structured sessions",
+                         "Less than 10 minutes",
                          "10-20 minutes",
                          "21-30 minutes",
                          "31-45 minutes",
@@ -696,8 +697,7 @@ prep.cms201508 <- function(raw) {
   df$freqCause <- mxFactor(tolower(raw[[19]]), rev(MSFrequencyItem2),
                            exclude=tolower(c('',"I didn't specifically allocate my time for complete mental silence")))
   df$msTimeAlloc <- mxFactor(tolower(raw[[20]]), MSTimeAlloc,
-                             exclude=tolower(c("","I didn't plan any particular amount of time",
-                                 "not applicable, since i do not allocate time for structured sessions")))
+                             exclude=tolower(c("","I didn't plan any particular amount of time")))
 
   item4 <- c('thinkTime', 'thinkFuture', 'thinkPast')
   for (x1 in 1:length(item4)) {
