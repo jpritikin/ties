@@ -739,3 +739,180 @@ prep.cms201508 <- function(raw) {
   
   df
 }
+
+MSConsciousWill2 <- tolower(c("most prevalent",
+                             "2nd most prevalent",
+                             "3rd most prevalent"))
+  
+prep.cms201510 <- function(raw) {
+  if (ncol(raw) != 34) stop("Expecting 34 columns")
+  raw <- stripPeriods(raw)
+  
+  df <- data.frame(
+    msNotion=mxFactor(tolower(raw[[1]]), MSNotionItem, exclude=""),
+    msAny=mxFactor(tolower(raw[[2]]), MSAgreementItem, exclude=""),
+    msChildhood=mxFactor(tolower(raw[[3]]), MSAgreementItem, exclude=""),
+    wantLearn=mxFactor(tolower(raw[[4]]), LearnItem,
+                       exclude=tolower(c('',"I have experienced complete mental silence")))
+  )
+  
+  item1 <- c("msEffort", "msAfraid", "msFast", "msLife", "msIdentity", "msPreoccu")
+  for (x1 in 1:6) {
+    df[,item1[x1]] <- mxFactor(tolower(raw[[4+x1]]), MSAgreementItem, exclude="")
+  }
+
+  item3 <- c('msShared', 'msMet', 'msTeach', 'msTrainTeach')
+  for (x3 in 1:4) {
+    df[, paste(item3[x3], "Num", sep="")] <- raw[[10+x3]]
+  }
+
+  item2 <- c("msYearn", "msEnv", "msAllow", "msTaught")
+  for (x2 in 1:4) {
+    df[,item2[x2]] <- mxFactor(tolower(raw[[14+x2]]), rev(MSAgreementItem),
+                               exclude=tolower(c('',"I don't understand this question")))
+  }
+  
+  noSession <- (tolower(raw[[19]]) == tolower("I didn't specifically allocate my time for complete mental silence") &
+                    tolower(raw[[20]]) == tolower("not applicable, since i do not allocate time for structured sessions"))
+
+  df$freqCause <- mxFactor(tolower(raw[[19]]), rev(MSFrequencyItem2),
+                           exclude=tolower(c('',"I didn't specifically allocate my time for complete mental silence")))
+  df$msTimeAlloc <- mxFactor(tolower(raw[[20]]), MSTimeAlloc,
+                             exclude=tolower(c("","I didn't plan any particular amount of time")))
+
+  item4 <- c('thinkTime', 'thinkFuture', 'thinkPast')
+  for (x1 in 1:length(item4)) {
+    df[,item4[x1]] <- mxFactor(tolower(raw[[20+x1]]), MSFrequencyItem3,
+                                exclude=c(''))
+  }
+  
+  df$pctSuccess <- raw[[24]]
+  
+  df$physicalLoc <- mxFactor(tolower(raw[[25]]), MSPhysicalLoc, exclude=c(''))
+  df$phyLocDepth <- mxFactor(tolower(raw[[26]]),
+                             c(tolower("I didn't feel any change in my sense of physical location"),
+                               MSRoughDuration), exclude=c(''))
+  
+  # table(df$pctSuccess[df$freqCause == "i don't specifically allocate my time for complete mental silence"])   #crazy?
+  df$maxDuration <- mxFactor(tolower(raw[[27]]), MSMaxDurationItem2,
+                             exclude=tolower(c("", "I have no idea of how much time elapsed")))
+  df$maxDurationOut <- mxFactor(tolower(raw[[28]]), MSMaxDurationItem2,
+                                exclude=tolower(c("", "I have no idea of how much time elapsed")))
+
+  cw <- raw[,29:33]
+  colnames(cw) <- 1:5
+  cwf <- sapply(cw, mxFactor, MSConsciousWill2, exclude="")
+  for (rx in 1:2) {
+      pick1 <- apply(cwf == MSConsciousWill2[rx], 1,
+                     function(x) if (any(x[!is.na(x)])) {which(x)} else {NA})
+      df[,paste0("spon",rx)] <- mxFactor(MSConsciousWill[pick1], MSConsciousWill)
+  }
+  df$sponDepth <- mxFactor(tolower(raw[[34]]),
+                           c(tolower("I didn't feel any reduction in conscious will"),
+                             MSRoughDuration),
+                           exclude=c(''))
+  
+  # participants often select some responses instead of skipping these items
+  sessionItems <- c(item4, 'pctSuccess', 'physicalLoc', 'phyLocDepth', 'maxDuration',
+                    paste0("spon",1:2), 'sponDepth')
+  noSession <- !is.na(noSession) & noSession
+  df[noSession, sessionItems] <- NA
+  
+  df$instrument <- "2015-10"
+  
+  df
+}
+
+MSWaveform <- tolower(c("Complete mental silence",
+                        "Occasional thoughts separated by longer periods of silence",
+                        "A few thoughts separated by brief periods of silence",
+                        "Slowing of my usual thinking",
+                        "My usual rate of thinking",
+                        "Somewhat more frequent thoughts than usual",
+                        "Much more frequent thoughts than usual"))
+
+prep.cms201511 <- function(raw) {
+  if (ncol(raw) != 36) stop("Expecting 36 columns")
+  raw <- stripPeriods(raw)
+  
+  df <- data.frame(
+    msNotion=mxFactor(tolower(raw[[1]]), MSNotionItem, exclude=""),
+    msAny=mxFactor(tolower(raw[[2]]), MSAgreementItem, exclude=""),
+    msChildhood=mxFactor(tolower(raw[[3]]), MSAgreementItem, exclude=""),
+    wantLearn=mxFactor(tolower(raw[[4]]), LearnItem,
+                       exclude=tolower(c('',"I have experienced complete mental silence")))
+  )
+  
+  item1 <- c("msEffort", "msAfraid", "msFast", "msLife", "msIdentity", "msPreoccu")
+  for (x1 in 1:6) {
+    df[,item1[x1]] <- mxFactor(tolower(raw[[4+x1]]), MSAgreementItem, exclude="")
+  }
+
+  item3 <- c('msShared', 'msMet', 'msTeach', 'msTrainTeach')
+  for (x3 in 1:4) {
+    df[, paste(item3[x3], "Num", sep="")] <- raw[[10+x3]]
+  }
+
+  item2 <- c("msEnv", "msAllow", "msTaught")
+  for (x2 in 1:3) {
+    df[,item2[x2]] <- mxFactor(tolower(raw[[14+x2]]), rev(MSAgreementItem),
+                               exclude=tolower(c('',"I don't understand this question")))
+  }
+  
+  noSession <- (tolower(raw[[18]]) == tolower("I didn't specifically allocate my time for complete mental silence") &
+                    tolower(raw[[19]]) == tolower("not applicable, since i do not allocate time for structured sessions"))
+
+  df$freqCause <- mxFactor(tolower(raw[[18]]), rev(MSFrequencyItem2),
+                           exclude=tolower(c('',"I didn't specifically allocate my time for complete mental silence")))
+  df$msTimeAlloc <- mxFactor(tolower(raw[[19]]), MSTimeAlloc,
+                             exclude=tolower(c("","I didn't plan any particular amount of time")))
+
+  df$pctRelaxed <- raw[[20]]
+  
+  item5 <- c('waveBefore', 'waveAfter')
+  for (x1 in 1:length(item5)) {
+      df[,item5[x1]] <- mxFactor(tolower(raw[[20+x1]]), rev(MSWaveform), exclude=c(''))
+  }
+  
+  item4 <- c('thinkTime', 'thinkFuture', 'thinkPast')
+  for (x1 in 1:length(item4)) {
+    df[,item4[x1]] <- mxFactor(tolower(raw[[22+x1]]), MSFrequencyItem3,
+                                exclude=c(''))
+  }
+  
+  df$pctSuccess <- raw[[26]]
+  df$maxDuration <- mxFactor(tolower(raw[[27]]), MSMaxDurationItem2,
+                             exclude=tolower(c("", "I have no idea of how much time elapsed")))
+  df$pctAsleep <- raw[[28]]
+  
+  df$physicalLoc <- mxFactor(tolower(raw[[29]]), MSPhysicalLoc, exclude=c(''))
+  df$phyLocDepth <- mxFactor(tolower(raw[[30]]),
+                             c(tolower("I didn't feel any change in my sense of physical location"),
+                               MSRoughDuration), exclude=c(''))
+  
+  # table(df$pctSuccess[df$freqCause == "i don't specifically allocate my time for complete mental silence"])   #crazy?
+
+  cw <- raw[,31:35]
+  colnames(cw) <- 1:5
+  cwf <- sapply(cw, mxFactor, MSConsciousWill2, exclude="")
+  for (rx in 1:2) {
+      pick1 <- apply(cwf == MSConsciousWill2[rx], 1,
+                     function(x) if (any(x[!is.na(x)])) {which(x)} else {NA})
+      df[,paste0("spon",rx)] <- mxFactor(MSConsciousWill[pick1], MSConsciousWill)
+  }
+  df$sponDepth <- mxFactor(tolower(raw[[36]]),
+                           c(tolower("I didn't feel any reduction in conscious will"),
+                             MSRoughDuration),
+                           exclude=c(''))
+  
+  # participants often select some responses instead of skipping these items
+  sessionItems <- c(item4, 'pctRelaxed', 'waveBefore', 'waveAfter', 'pctSuccess',
+                    'maxDuration', 'pctAsleep', 'physicalLoc', 'phyLocDepth',
+                    paste0("spon",1:2), 'sponDepth')
+  noSession <- !is.na(noSession) & noSession
+  df[noSession, sessionItems] <- NA
+  
+  df$instrument <- "2015-11"
+  
+  df
+}

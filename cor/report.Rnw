@@ -56,6 +56,8 @@ Factors \emph{autonomy}, \emph{envMastery} (environmental mastery),
 were measured using \textcite{ryff1989}.
 Factor \emph{sleep} is the composite score from
 the Pittsburgh Sleep Quality Index \parencite{buysse1989}.
+Sleep is coded such that more positive numbers mean better quality sleep
+and negative numbers mean poorer quality sleep (this is opposite the raw score).
 Factor \emph{socialDesirable} is a MMPI derived measure \parencite{crowne1960,reynolds1982}.
 Factor \emph{dass.d} (depression), \emph{dass.a} (anxiety), \emph{dass.s} (stress),
 and \emph{dass.na} (negative affect, the total mean of all factors)
@@ -65,10 +67,18 @@ Factor \emph{ei} is a measure of emotional intelligence \parencite{schutte1998}.
 Factors \emph{rumination} and \emph{reflection} were measured with
 Reflection/Rumination scale \parencite{trapnell1999}.
 
+\begin{figure}
+<<fig.height=3>>=
+cdat <- read.csv("corr.csv", stringsAsFactors=FALSE)
+ggplot(cdat, aes(ties)) + geom_histogram(binwidth=.1)
+@
+\caption{Distribution of TIES, $N=\Sexpr{nrow(cdat)}$,
+range \Sexpr{fivenum(cdat$ties)[1]} to \Sexpr{fivenum(cdat$ties)[5]}.}
+\label{fig:ties-dist}
+\end{figure}
+
 <<results='asis'>>=
 interest <- c('training', 'ties')
-cdat <- read.csv("corr.csv", stringsAsFactors=FALSE)
-
 ctbl <- cor(cdat[c(6:ncol(cdat))], use="pairwise.complete.obs")
 dt <- ctbl[setdiff(rownames(ctbl), interest), interest]
 dt[abs(dt) < .1] <- NA
@@ -149,11 +159,11 @@ condCorPlot <- function(vs) {
 do.call(grid.arrange,
         list(
           condCorPlot('mwb'),
-          condCorPlot('sleep'),
-          condCorPlot('open'),
           condCorPlot('ei'),
-          condCorPlot('rumination'),
-          condCorPlot('negAffect'),
+          condCorPlot('nonreact'),
+          condCorPlot('posAffect'),
+          condCorPlot('open'),
+          condCorPlot('perGrowth'),
           ncol=2))
 @
 \caption{Correlation conditional on TIES score.
@@ -167,9 +177,9 @@ These measures seem to be more correlated with TIES than training.}
 # not surprising
 do.call(grid.arrange,
         list(
-          condCorPlot('dass.a'),
-          condCorPlot('dass.na'),
-          condCorPlot('posAffect'),
+          condCorPlot('dass.s'),
+          condCorPlot('sleep'),
+          condCorPlot('reflection'),
           condCorPlot('neurotic'),
           condCorPlot('observe'),
           condCorPlot('envMastery'),
@@ -177,7 +187,7 @@ do.call(grid.arrange,
 @
 \caption{Correlation conditional on TIES score.
 Dash line is TIES minus training (blue is TIES, pink is training).
-Not much goin on here.}
+Not much goin' on here.}
 \label{fig:noSurprise}
 \end{figure}
 
@@ -191,7 +201,7 @@ do.call(grid.arrange,
           condCorPlot('consc'),
           condCorPlot('describe'),
           condCorPlot('agreeable'),
-          condCorPlot('reflection'),
+          condCorPlot('actAware'),
           ncol=2))
 @
 \caption{Correlation conditional on TIES score.
@@ -200,6 +210,8 @@ These measures seem more associated with training than TIES.}
 \label{fig:sig}
 \end{figure}
 
+Figure~\ref{fig:ties-dist} shows the distribution of TIES in
+our combined sample.
 Figures~\ref{fig:nothing},~\ref{fig:noSurprise},~\ref{fig:sig}
 are a more continuous version of Tables~\ref{tab:cor-above},~\ref{tab:cor-avg}.
 The dotted line is the difference between the correlation point estimates.

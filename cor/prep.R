@@ -188,10 +188,93 @@ cdat4 <- cbind(cdat4, ties.score('uva', prep.cms201508(raw4[282:(282+34-1)])))
 
 cdat4$sleep <- -score.psqi(raw4[316:(316+19-1)])
 
+# ------------------------------------------------------------------
+raw5 <- read.csv("data-201510.csv", stringsAsFactors=FALSE)
+
+cdat5 <- data.frame(
+  start=raw5$StartDate,
+  end=raw5$EndDate,
+  born=raw5[[3]],
+  sex=factor(raw5[[4]], levels=SexItem, labels=tolower(SexItem)),
+  rel=factor(raw5[[5]], levels=RelaItem, labels=tolower(RelaItemShort)))
+
+# SF12 (ignore for now) 6:17
+
+got <- score.ipipBig5(raw5[18:67])
+for (n in names(got)) cdat5[[n]] <- got[[n]]
+
+got <- score.panas(raw5[68:87])
+for (n in names(got)) cdat5[[n]] <- got[[n]]
+
+got <- score.5fMindfulness2(code.5fMindfulness2(raw5[88:126]))
+for (n in names(got)) cdat5[[n]] <- got[[n]]
+
+got <- score.ryff9(raw5[127:180])
+for (n in names(got)) cdat5[[n]] <- got[[n]]
+
+got <- score.mcFormC(raw5[184:196])
+cdat5$socialDesirable <- got - mean(got, na.rm=TRUE)
+
+got <- score.dass(raw5[197:(197+21-1)])
+for (n in names(got)) cdat5[[n]] <- got[[n]]
+
+cdat5$mwb <- score.wemwbs(raw5[218:(218+7-1)])
+
+cdat5$ei <- score.ei(raw5[225:(225+33-1)])
+
+got <- score.rrq(raw5[258:(258+24-1)])
+for (n in names(got)) cdat5[[n]] <- got[[n]]
+
+cdat5 <- cbind(cdat5, ties.score('uva', prep.cms201510(raw5[282:(282+34-1)])))
+
+cdat5$sleep <- -score.psqi(raw5[316:(316+19-1)])
+
+# ------------------------------------------------------------------
+raw6 <- read.csv("data-201512.csv", stringsAsFactors=FALSE)
+
+cdat6 <- data.frame(
+  start=raw6$StartDate,
+  end=raw6$EndDate,
+  born=raw6[[3]],
+  sex=factor(raw6[[4]], levels=SexItem, labels=tolower(SexItem)),
+  rel=factor(raw6[[5]], levels=RelaItem, labels=tolower(RelaItemShort)))
+
+# SF12 (ignore for now) 6:17
+
+got <- score.ipipBig5(raw6[18:67])
+for (n in names(got)) cdat6[[n]] <- got[[n]]
+
+got <- score.panas(raw6[68:87])
+for (n in names(got)) cdat6[[n]] <- got[[n]]
+
+got <- score.5fMindfulness2(code.5fMindfulness2(raw6[88:126]))
+for (n in names(got)) cdat6[[n]] <- got[[n]]
+
+got <- score.ryff9(raw6[127:180])
+for (n in names(got)) cdat6[[n]] <- got[[n]]
+
+got <- score.mcFormC(raw6[184:196])
+cdat6$socialDesirable <- got - mean(got, na.rm=TRUE)
+
+got <- score.dass(raw6[197:(197+21-1)])
+for (n in names(got)) cdat6[[n]] <- got[[n]]
+
+cdat6$mwb <- score.wemwbs(raw6[218:(218+7-1)])
+
+cdat6$ei <- score.ei(raw6[225:(225+33-1)])
+
+got <- score.rrq(raw6[258:(258+24-1)])
+for (n in names(got)) cdat6[[n]] <- got[[n]]
+
+cdat6 <- cbind(cdat6, ties.score('uva', prep.cms201511(raw6[282:(282+36-1)])))
+
+cdat6$sleep <- -score.psqi(raw6[318:(318+19-1)])
+
 # --------------------------------------------------------
 
-cdat <- smartbind(cdat1, cdat2)
-cdat <- smartbind(cdat, cdat3)
+# a harmless warning is issued here with gtools 3.5
+cdat <- smartbind(cdat1, cdat2, cdat3, cdat4, cdat5, cdat6)
+
 mind5f <- c('nonreact', 'observe', 'actAware', 'describe', 'nonjudge')
 perm <- c(setdiff(colnames(cdat), mind5f), mind5f)
 cdat <- cdat[,perm]

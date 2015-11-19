@@ -92,6 +92,19 @@ web201509Prep <- cbind(prepDemographics(web201509[1:16]),
 web201509Prep$wave <- "earlydata/short-201509"
 espt <- smartbind(espt, web201509Prep)
 
+web201510 <- read.csv("earlydata/web-201510.csv", stringsAsFactors=FALSE)
+web201510Prep <- cbind(prepDemographics(web201510[1:16]),
+                       prep.cms201510(web201510[17:(17+34-1)]))
+web201510Prep$wave <- "earlydata/short-201510"
+espt <- smartbind(espt, web201510Prep)
+
+# still collecting data TODO
+web201511 <- read.csv("earlydata/web-201511.csv", stringsAsFactors=FALSE)
+web201511Prep <- cbind(prepDemographics(web201511[1:16]),
+                       prep.cms201511(web201511[17:(17+36-1)]))
+web201511Prep$wave <- "earlydata/short-201511"
+espt <- smartbind(espt, web201511Prep)
+
 espt$population[is.na(espt$population)] <- 'general'
 
 if (length(unique(espt$uid[!is.na(espt$uid)])) != sum(!is.na(espt$uid))) stop("mismatch")

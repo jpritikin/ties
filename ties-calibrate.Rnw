@@ -93,7 +93,6 @@ fitTraining <- function(tr.data) {
   })
   names(spec) <- training.items
   
-  # remove msTimeAlloc from here once we have enough data TODO
   for (item in intersect(paste0(c('msTeach', 'msTrainTeach'), "Num"),
                          names(spec))) {
     spec[item] <- mkspec(tr.data, item, length(factors))
@@ -372,18 +371,19 @@ fitTies <- function(ev.data) {
 
 #      factors <- c('ties')
 #      factors <- c('ties', "roadbump")
-#      factors <- c('ties', "roadbump", 'think')
-#      factors <- c('ties', "roadbump", 'think', 'try')
       factors <- c('ties', "roadbump", 'try')
+#      factors <- c('ties', "roadbump", 'think', 'try')
+#      factors <- c('ties', "roadbump", 'try', 'ms')
   spec <- lapply(ties.items, function(nm) {
     lev <- length(levels(ev.data[[ nm ]]))
     rpf.grm(outcomes=lev, factors=length(factors))
   })
   names(spec) <- ties.items
 
-#   for (item in intersect(c(leItems, 'msTimeAlloc'), names(spec))) {
-#     spec[item] <- mkspec(tr.data, item, length(factors))
-#   }
+  for (item in intersect(c('relaxedCat', 'waveBefore', 'waveAfter', 'asleepCat'),
+                         names(spec))) {
+    spec[item] <- mkspec(ev.data, item, length(factors))
+  }
 
     numItems <- length(ties.items)
   maxParam <- max(sapply(spec, rpf.numParam))
@@ -396,10 +396,10 @@ fitTies <- function(ev.data) {
   imat$values['ties',] <- 1
   imat$free[,] <- !is.na(imat$values) & imat$values[,] != 0
 
-#   imat <- set.nominal.rank(spec, imat, 'freqCause', 0, 1)
-#   imat <- set.nominal.rank(spec, imat, 'successCat', .35, 1)
-#   imat <- set.nominal.rank(spec, imat, 'maxDuration', .25, .75)
-#   imat <- set.nominal.rank(spec, imat, 'maxDurationOut', 0, .5)
+  imat <- set.nominal.rank(spec, imat, 'relaxedCat', 0, .5)
+  imat <- set.nominal.rank(spec, imat, 'waveBefore', 0, .25)
+  imat <- set.nominal.rank(spec, imat, 'waveAfter', 0, .25)
+  imat <- set.nominal.rank(spec, imat, 'asleepCat', 0, .5)
 
   if (any('roadbump' == factors)) {
     roadbump.items <- intersect(c('msFast', 'msLife', 'msPreoccu'), ties.items)
@@ -407,9 +407,14 @@ fitTies <- function(ev.data) {
     imat$free['roadbump', roadbump.items] <- TRUE
   }
   if (any('think' == factors)) {
-    similar <- intersect(c('thinkTime', 'thinkFuture', 'thinkPast', 'successCat'), ties.items)
+    similar <- intersect(c('thinkTime', 'thinkFuture', 'thinkPast'), ties.items)
     imat$values['think', similar] <- 1
     imat$free['think', similar] <- TRUE
+  }
+  if (any('ms' == factors)) {
+    similar <- intersect(c('successCat', 'maxDuration'), ties.items)
+    imat$values['ms', similar] <- 1
+    imat$free['ms', similar] <- TRUE
   }
   if (any('spon' == factors)) {
     similar <- intersect(c('spon1', 'spon2'), ties.items)
@@ -417,13 +422,18 @@ fitTies <- function(ev.data) {
     imat$free['spon', similar] <- TRUE
   }
   if (any('try' == factors)) {
-    try.items <- intersect(c('msYearn', 'msEnv', 'msAllow'), ties.items)
-    imat$values['try', try.items] <- 1
-    imat$free['try', try.items] <- TRUE
+    similar <- intersect(c('msEnv', 'msAllow'), ties.items)
+    imat$values['try', similar] <- 1
+    imat$free['try', similar] <- TRUE
+  }
+  if (any('physical' == factors)) {
+    cr <- intersect(c('physicalLoc', 'phyLocDepth'), ties.items)
+    imat$values['physical', cr] <- 1
+    imat$free['physical', cr] <- TRUE
   }
 
   eTmpl <- mxModel(model="ties", imat,
-                mxExpectationBA81(spec),
+                mxExpectationBA81(spec, qpoints=35L, qwidth=5),
                 mxFitFunctionML())
   
   mMat <- mxMatrix(name='mean', nrow=length(factors), ncol=1, values=0, free=TRUE)
@@ -433,13 +443,17 @@ fitTies <- function(ev.data) {
   dimnames(covMat) <- list(factors, factors)
 
   ev <- replicateModelBy(eTmpl, ev.data, mMat, covMat, split=popSplit)
+#  ev$compute$steps[[1]]$verbose <- 2L
+#  ev$compute$steps[[1]]$mstep$verbose <- 5L
   ev <- mxRun(ev, silent=TRUE)
   ev
 }
 
-# reconsider "maxDurationOut", 'msYearn', TODO
+# reconsider "maxDurationOut"? 'waveBefore' TODO
+# 'asleepCat' needs more data TODO
 evItems <- c("msFast", "msLife", "msPreoccu",
              "msEnv", "msAllow", "msTaught",
+             'relaxedCat', 'waveAfter',
              'maxDuration', 'successCat',
              'thinkTime', 'thinkFuture', 'thinkPast',
              'physicalLoc', 'phyLocDepth',
@@ -480,8 +494,10 @@ condition number \Sexpr{ev.est$output$conditionNumber}.
 % $n=\Sexpr{mnf$n}$, $G^2(\Sexpr{mnf$df})=\Sexpr{mnf$statistic}$.
 
 <<fig.height=2>>=
-toOmit <- bestToOmit(pop$general$ties, 9)
-got <- Reduce('+',lapply(pop, function (x) sumScoreEAPTest(omitItems(x$ties, toOmit))))
+toOmit <- bestToOmit(pop$general$ties, 11)
+got <- Reduce('+',lapply(pop, function (x) {
+  sumScoreEAPTest(omitItems(x$ties, toOmit), qpoints=25, qwidth=4)
+}))
 
 df <- data.frame(score=as.numeric(names(got$observed)),
             expected=got$expected, observed=got$observed)
@@ -509,11 +525,13 @@ print(xtable(got$pval[,1:8], paste("Log p-value of local dependence between item
       size="\\footnotesize", floating=FALSE)
 print(xtable(got$pval[,9:15], paste("Log p-value of local dependence between item pairs.")),
       size="\\footnotesize", floating=FALSE)
+print(xtable(got$pval[,16:ncol(got$pval)], paste("Log p-value of local dependence between item pairs.")),
+      size="\\footnotesize", floating=FALSE)
 @ 
 \end{center}
 
 <<results='asis'>>=
-numToOmit <- 3
+numToOmit <- 5
 toOmit <- lapply(evItems, function(x) bestToOmit(pop$general$ties, numToOmit, x))
 sfit <- Reduce('+', lapply(pop, function (x) SitemFit(x$ties, omit = toOmit)))
 tbl <- t(sapply(sfit, function(r) c(n=r$n, df=r$df, stat=r$statistic, pval=r$pval)))
@@ -527,9 +545,16 @@ pl <- lapply(names(sfit), function(item) {
 for (px in 1:length(pl)) {
   print(pl[[px]])
 }
+
 basis <- rep(0, pop$general$ties$spec[[1]]$factors)
 basis[1] <- 1
-print(plotInformation(pop$general$ties, width=5, basis=basis))
+byLoading <- rownames(fl)[order(fl[,1])]
+pageMask <- cut(order(fl[,1]), 2)
+for (l in levels(pageMask)) {
+  pl <- plotInformation(omitItems(pop$general$ties, byLoading[pageMask != l]),
+                        width=5, basis=basis)
+  print(pl)
+}
 @
 
 <<>>=

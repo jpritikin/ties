@@ -23,6 +23,7 @@ set.nominal.rank <- function(spec, ip.mat, name, a, c) {
   if (is.null(spec1)) {
     return(ip.mat)
   }
+  if (!is(spec1, 'rpf.mdim.nrm')) stop(paste("spec is",class(spec),"not nominal"))
   thresh <- spec1$outcomes-1
   free <- rep(FALSE, spec1@factors + 2 * thresh)
   free[1] <- TRUE
@@ -119,10 +120,28 @@ cms.testlets <- function(df) {
     # no need to isolate 100 from (80,99] ? TODO
     df$successCat <- cut(pct, breaks=c(-1,seq(1,99,length.out=6),100),
                          ordered_result=TRUE)
+    }
+    if (!is.null(df$pctAsleep)) {
+        df$pctAsleep[nchar(df$pctAsleep)==0] <- NA
+        pct <- round(as.numeric(df$pctAsleep))
+        pct[pct < 0] <- 0
+        pct[pct > 100] <- 100
+        # probably not a log scale? TODO
+        df$alseepCat <- cut(pct, breaks=seq(-.1,100,length.out=6), ordered_result=TRUE)
+        # reverse order
+        df$asleepCat <- mxFactor(df$alseepCat, levels=rev(levels(df$alseepCat)))
+    }
+  if (!is.null(df$pctRelaxed)) {
+    df$pctRelaxed[nchar(df$pctRelaxed)==0] <- NA
+    pct <- round(as.numeric(df$pctRelaxed))
+    pct[pct < 0] <- 0
+    pct[pct > 100] <- 100
+    # increase to 7 or 9 breaks? TODO
+    df$relaxedCat <- cut(pct, breaks=seq(-.1,100,length.out=6), ordered_result=TRUE)
   }
-    for (col in c('msPreoccu', 'msTimeAlloc', 'maxDurationOut', 'msTaught',
+  for (col in c('msPreoccu', 'msTimeAlloc', 'maxDurationOut', 'msTaught',
                   'thinkTime', 'thinkFuture', 'thinkPast', 'physicalLoc', 'phyLocDepth',
-                  'spon1', 'spon2', 'sponDepth')) {
+                  'spon1', 'spon2', 'sponDepth', 'relaxedCat', 'asleepCat', 'waveAfter', 'waveBefore')) {
     if (is.null(df[[col]])) df[[col]] <- factor(NA)
   }
   df
