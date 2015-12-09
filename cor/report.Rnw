@@ -69,7 +69,15 @@ Reflection/Rumination scale \parencite{trapnell1999}.
 
 \begin{figure}
 <<fig.height=3>>=
-cdat <- read.csv("corr.csv", stringsAsFactors=FALSE)
+origCdat <- read.csv("corr.csv", stringsAsFactors=FALSE)
+if (0) {
+  tformat <- "%m/%d/%Y %H:%M:%S"
+  reftime <- strptime("01/07/2015 12:00:00", tformat, tz="GMT")
+  mask <- strptime(origCdat$start, tformat, tz="GMT") > reftime
+  origCdat <- origCdat[mask,]
+}
+
+cdat <- origCdat
 ggplot(cdat, aes(ties)) + geom_histogram(binwidth=.1)
 @
 \caption{Distribution of TIES, $N=\Sexpr{nrow(cdat)}$,
@@ -120,7 +128,7 @@ print(xtable(dt,
 
 \begin{figure}[p!]
 <<fig.height=8>>=
-cdat <- read.csv("corr.csv", stringsAsFactors=FALSE)
+cdat <- origCdat
 
 condCorPlot <- function(vs) {
   if (is.null(cdat[[vs]])) stop(paste("No column", vs))

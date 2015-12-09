@@ -50,4 +50,4 @@ processDate("201410")
 processDate("201412")
 processDate("201509")
 processDate("201510")
-processDate("201512")  # not done with data collection TODO
+processDate("201512")

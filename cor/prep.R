@@ -20,7 +20,7 @@ RelaItemShort = c('Single',
                   'Together',
                   'Other')
 
-cdat1 <- data.frame(
+cdat1 <- data.frame(stringsAsFactors=FALSE,
   start=raw1$StartDate,
   end=raw1$EndDate,
   born=raw1[[3]],
@@ -68,7 +68,7 @@ cdat1$sleep <- -score.psqi(raw1[284:(284+19-1)])
 # ------------------------------------------------------------------
 raw2 <- read.csv("data-201410.csv", stringsAsFactors=FALSE)
 
-cdat2 <- data.frame(
+cdat2 <- data.frame(stringsAsFactors=FALSE,
   start=raw2$StartDate,
   end=raw2$EndDate,
   born=raw2[[3]],
@@ -109,7 +109,7 @@ cdat2$sleep <- -score.psqi(raw2[311:(311+19-1)])
 # ------------------------------------------------------------------
 raw3 <- read.csv("data-201412.csv", stringsAsFactors=FALSE)
 
-cdat3 <- data.frame(
+cdat3 <- data.frame(stringsAsFactors=FALSE,
   start=raw3$StartDate,
   end=raw3$EndDate,
   born=raw3[[3]],
@@ -150,7 +150,7 @@ cdat3$sleep <- -score.psqi(raw3[311:(311+19-1)])
 # ------------------------------------------------------------------
 raw4 <- read.csv("data-201509.csv", stringsAsFactors=FALSE)
 
-cdat4 <- data.frame(
+cdat4 <- data.frame(stringsAsFactors=FALSE,
   start=raw4$StartDate,
   end=raw4$EndDate,
   born=raw4[[3]],
@@ -191,7 +191,7 @@ cdat4$sleep <- -score.psqi(raw4[316:(316+19-1)])
 # ------------------------------------------------------------------
 raw5 <- read.csv("data-201510.csv", stringsAsFactors=FALSE)
 
-cdat5 <- data.frame(
+cdat5 <- data.frame(stringsAsFactors=FALSE,
   start=raw5$StartDate,
   end=raw5$EndDate,
   born=raw5[[3]],
@@ -232,7 +232,7 @@ cdat5$sleep <- -score.psqi(raw5[316:(316+19-1)])
 # ------------------------------------------------------------------
 raw6 <- read.csv("data-201512.csv", stringsAsFactors=FALSE)
 
-cdat6 <- data.frame(
+cdat6 <- data.frame(stringsAsFactors=FALSE,
   start=raw6$StartDate,
   end=raw6$EndDate,
   born=raw6[[3]],
