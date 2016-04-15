@@ -1,0 +1,243 @@
+\documentclass[12pt]{article}
+\usepackage{fixltx2e}
+\usepackage[margin=.5in]{geometry}
+\usepackage{graphicx}
+\setlength{\parindent}{0cm}
+\setlength{\parskip}{1ex}
+
+<<echo=FALSE, results='hide', warning=FALSE, cache=FALSE>>=
+#options(error = browser)
+library(knitr)
+#knit("cms-calibrate.Rnw", tangle=TRUE)  # to extract only the R chunks
+opts_knit$set(error=TRUE)
+opts_chunk$set(echo=FALSE, cache=FALSE)
+loadlib <- function () {
+library(rpf)
+library(OpenMx)
+library(xtable)
+  library(plyr)
+}
+suppressPackageStartupMessages(loadlib())
+@
+
+\title{Simple Analysis of Raw Data from the 2015 Meditation Class}
+\date{\today}
+\author{Joshua N.~Pritikin\\ University of Virginia}
+
+\begin{document}
+\maketitle
+
+\section{Life experience}
+
+\begin{figure}
+\includegraphics[page=8,scale=.4]{../archive/short-201410.pdf}
+\includegraphics[page=9,scale=.4]{../archive/short-201410.pdf}
+\caption{Life experience items.}
+\label{fig:le}
+\end{figure}
+
+With respect to the life experience items (Figure~\ref{fig:le}),
+participant 930 answered ``not sure'' to all the \emph{agree-disagree}
+items and 0 to all the numeric items in wave 1.
+After this, participant 930 switched to \emph{agree}
+for msMet and msShared and \emph{disagree} for
+msTeach and msTrainTeach.
+The \emph{not sure} responses are very difficult to score
+because they might mean that the participant didn't
+understand the question.
+Based on this kind of response pattern,
+I suspected that the numeric response items would
+perform better than the \emph{agree-disagree} items.
+Both items are meant to ask about roughly the same thing,
+so we probably only need one set of these items.
+
+The life experience items are meant to accrue in one direction,
+especially for students enrolled in the meditation course.
+We can check whether the items are being used as intended
+by summing negative differences per item.
+For example, these negative differences represent
+going from \emph{agree} to \emph{disagree} on whether you
+have taught people to experience mental silence.
+Or for a numeric response, going from taught 10 people
+to 0 people.
+This might indicate that the participant's idea of
+mental silence is evolving, but that is difficult
+to interpret.
+
+<<>>=
+{
+  wd <- setwd("..")
+  source("measures.R")
+  source("cms-score.R")
+  setwd(wd)
+}
+
+SexItem <- c("Male","Female")
+
+RelaItem = c('Single',
+             'In a long-term relationship (i.e. together more than a year)',
+             'Other')
+RelaItemShort = c('Single',
+                  'Together',
+                  'Other')
+numWaves <- 9
+
+# declare global variables
+born <- NULL
+sex <- NULL
+rel <- NULL
+labTime <- NULL
+labTA <- NULL
+cube <- NULL
+itemLev <- NULL
+rowToId <- NULL
+
+for (wave in 1:numWaves) {
+  raw <- read.csv(sprintf("wave%d-anon.csv", wave), stringsAsFactors=FALSE)
+  offset <- 3+ifelse(wave==1, 3, 0)
+  if (wave == 1) {
+    born <- raw[[3]]
+    sex <- factor(raw[[4]], levels=SexItem, labels=tolower(SexItem))
+    rel <- factor(raw[[5]], levels=RelaItem, labels=tolower(RelaItemShort))
+    labTime <- raw$labTime
+    labTA <- raw$labTA
+    rowToId <- raw$id
+  }
+  offset <- offset + 14
+  if (wave == 1) {
+    cmsCol <- raw[,offset:(offset+29-1)]
+  } else {
+    cmsCol <- raw[,offset:(offset+24-1)]
+    cmsCol <- cbind(NA,NA,NA,NA,NA,cmsCol)
+  }
+  cms <- prep.cms201410(cmsCol)
+  cms[['instrument']] <- NULL
+  cms <- cms.testlets(cms)
+  for (del in c(
+    'msEvery', 'wantLearn', 'skipInt', 'msEmo',
+    'pctSuccess', 'msFast1', 'msIdAfraid', 'msIdAfraidLearn',
+                'msFastEffort','msFastEffortLife')) {
+    cms[[del]] <- NULL
+  }
+  if (is.null(itemLev)) itemLev <- unlist(lapply(cms, function(col) length(levels(col))))
+  cms <- sapply(cms, unclass)
+  if (is.null(cube)) {
+    cube <- array(dim=c(dim(cms), numWaves))
+    colnames(cube) <- colnames(cms)
+    rownames(cube) <- rowToId
+  }
+  cube[,,wave] <- cms
+}
+names(dimnames(cube)) <- c('person','item','wave')
+
+lifeExperience <- c('msMet', 'msMetNum','msShared','msSharedNum',
+                    'msTeach','msTeachNum','msTrainTeach','msTrainTeachNum')
+backward <- apply(cube[!is.na(labTA),lifeExperience,], 1:2, function(vec) {
+  vec <- vec[!is.na(vec)]
+  if (length(vec) < 2) return(NA)
+  dv <- diff(vec)
+  dv[dv > 0] <- 0
+  sum(dv)
+})
+apply(backward, 2, sum, na.rm=TRUE)
+@
+
+Here we can see that the numeric response items
+are being used more as intended. There are fewer
+backwards steps.
+If we look at the difference between the first
+and last measurement then we should see a
+difference between the meditation class
+and participant pool data. We can obtain
+a $t$ statistic using the Welch approximation
+to the degrees of freedom.
+
+<<>>=
+t0 <- apply(cube, 1:2, function(vec) {
+  vec <- vec[!is.na(vec)]
+  if (length(vec) < 2) return(NA)
+  vec[1]
+})
+
+tn <- apply(cube, 1:2, function(vec) {
+  vec <- vec[!is.na(vec)]
+  if (length(vec) < 2) return(NA)
+  vec[length(vec)]
+})
+
+chg <- (tn - t0) / itemLev
+chgClass <- chg[!is.na(labTA),]
+chgPool <- chg[is.na(labTA),]
+
+stat <- rep(NA, ncol(chg))
+names(stat) <- colnames(chg)
+for (ix in 1:ncol(chg)) {
+  if (all(is.na(chgClass[,ix]))) next
+  tt <- t.test(x=chgClass[,ix], y=chgPool[,ix])
+  stat[ix] <- tt[['statistic']]
+}
+stat[lifeExperience]
+#apply(chgClass, 2, mean, na.rm=TRUE)
+#apply(chgPool, 2, mean, na.rm=TRUE)
+@
+
+Here it is clear that the numeric responses
+discriminate between the groups better than
+the \emph{agree-disagree} responses.
+A quick look at the variance of the difference between first
+to last measurement for the participant pool group
+also suggests that the numeric
+responses contain less random error.
+
+<<>>=
+apply(chgPool, 2, var, na.rm=TRUE)[lifeExperience]
+@ 
+
+\section{Training}
+
+Similarly,
+ratings on items \verb\msEffort\, \verb\msIdentity\, and \verb\msAfraid\
+should only move in one direction.
+A few spammers were identified.
+
+<<>>=
+successConfusion <- aaply(cube, 1, function(vec) {
+  confused <- (vec['successCat',] == 1 & vec['maxDuration',] > 1) |
+    (vec['successCat',] > 1 & vec['maxDuration',] == 1)
+  confused <- !is.na(confused) & confused
+  out <- rep(0, ncol(vec))
+  if (any(confused)) {
+    penalty <- abs(vec['successCat',] - vec['maxDuration',])
+    out[confused] <- penalty[confused]
+  }
+  out
+})
+
+oneWayItems <- c(lifeExperience, 'msEffort', 'msIdentity', 'msAfraid')
+backward <- apply(cube[,oneWayItems,], 1:2, function(vec) {
+  vec <- vec[!is.na(vec)]
+  if (length(vec) < 2) return(NA)
+  dv <- diff(vec)
+  dv[dv > 0] <- 0
+  sum(dv)
+})
+
+spammer <- apply(backward, 1, sum, na.rm=TRUE) - 2*rowSums(successConfusion)
+names(spammer) <- rowToId
+stem(spammer)
+spammer[order(spammer)[1:10]]
+
+spammer <- ties.spam.score(cube)
+spammer[order(spammer)[1:10]]
+@ 
+
+<<>>=
+notsure <- apply(cube[,c("msEffort", "msAfraid", "msFast",
+                         "msLife", "msIdentity", "msPreoccu"),1], 1,
+                 function(x) sum(x == 3, na.rm = TRUE)) == 6
+noexp <- apply(cube[,c("msNotion", "msAny", "msChildhood"),1], 1,
+      function(x) sum(x <= 3, na.rm=TRUE)) == 3
+@
+
+
+\end{document}
