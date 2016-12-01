@@ -1,0 +1,5 @@
+#!/bin/sh
+
+# http://visjs.org/index.html#download_install
+
+rsync --size-only -arv ./ ~/UVa/public_html/rcpa/

@@ -1,0 +1,283 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use Archive::Zip qw(AZ_OK);
+use Text::CSV_XS;
+use Fatal qw(open);
+use Time::localtime;
+use Data::Dumper;
+
+# hiking == walking?
+
+my %ShortDict =
+  ('mountainbiking' => 'mountain biking');
+
+my %LongDict =
+  (
+   'basketball@indoor basketball' => 'basketball',
+   'skiing@snow skiing' => 'snow skiing',
+   'swimming@butterfly' => 'swimming',
+   'weightlifting@i do a 6 day a week push-pull-leg routine (search up coolcicadas ppl for an idea of what i do), in the gym anytime from 45 minutes to an hour.' => 'weightlifting',
+   'lifting@weight lifting' => 'weightlifting',
+   'weight lifting@repeat, weight lifting' => 'weightlifting',
+   'hockey@ice hockey goalie' => 'ice hockey',
+   'body balance@it is mixture of yoga and pilates, but more dynamic and the exercises  have "choreographies" that fit with specific songs' => 'pilates',
+   'golf@college golf' => 'golf',
+   'baseball@college baseball' => 'baseball',
+   'belly dancing@middle eastern dance. low impact' => 'belly dancing',
+   'bowling@10-pin style' => 'bowling',
+   'baseball@college baseball' => 'baseball',
+   'running@marathon and mini-marathon training' => 'running',
+   'running@road running' => 'running',
+   'running@running to get in shape' => 'running',
+   'basketball@playing basketball 3 on 3' => 'basketball',
+   'running@running on a track' => 'running',
+   'golf@college golf' => 'golf',
+   'baseball@college baseball' => 'baseball',
+   'mma@mixed martial arts' => 'mixed martial arts',
+   'football@american football' => 'football',
+   'basketball@american basketball' => 'basketball',
+   'walking@walking at a brisk pace through the neighborhood' => 'walking',
+   'swimming@swimming at the beach and riding the waves' => 'swimming',
+   'running@recreational running for the health and stress relief with the occasional race for fun' => 'running',
+   'basketball@semi competitive club basketball on a college team' => 'basketball',
+   'football@running and chasing after the running back' => 'football',
+   'running@free running outside.' => 'running',
+   'swimming@distance swimming' => 'swimming',
+   'running@running on treadmill' => 'running',
+   'running@running on a treadmill to burn fat' => 'running',
+   'mma@mixed martial arts.'=> 'mixed martial arts',
+   'football@intramural flag football' => 'football',
+   'running@ran 1 mile.' => 'running',
+   'ultimate frisbee@7 vs 7 frisbee on an approximate 50 yard field in college. 2-3x per week.' => 'ultimate frisbee',
+   'gymnastics@i compete in womens gymnastics' => 'gymnastics',
+   'gymnastics@i compete in womens gymnastics.' => 'gymnastics',
+   'soccer@intramural indoor soccer' => 'soccer',
+   'soccer@advanced soccer, collegial elective course.' => 'soccer',
+   'soccer@i play soccer with a group.' => 'soccer',
+   'soccer@i play soccer when i am not dancing.' => 'soccer',
+   'tennis@womens singles tennis' => 'tennis',
+   'hiking@hiking in local park' => 'hiking',
+   'tennis@singles' => 'tennis',
+   'skiing@water skiing' => 'water skiing',
+   'ping pong@also known as table tennis' => 'table tennis',
+   'cricket@cricket- will answer questions in relation to bowling only' => 'cricket',
+   'weight lifting@core and weight lifting to lean muscles' => 'weightlifting',
+   'lifting@lifting weights' => 'weightlifting',
+   'lifting@lifting weights to make my muscles stronger.' => 'weightlifting',
+   'tennis@singles tennis' => 'tennis',
+   'cycling@bike riding for exercise, sport, and transportation.' => 'cycling',
+   'dance@hiphop dance' => 'dance',
+   'dance@dance is what i rote and it is basically just hip hop dance!' => 'dance',
+   'snowboarding@downhill snowboarding' => 'snowboarding',
+   'vinyasa yoga@hot flow yoga' => 'yoga',
+   'hiit@high intensity interval training class at ymca (45-55 min)' => 'cardio',
+   'track and field@shot-put and discus' => 'throwing',
+   'netball@position- goal defence' => 'netball',
+  );
+
+my %NodeInfo;
+for my $k (values %ShortDict) { $NodeInfo{$k} = {count => 0 }; }
+for my $k (values %LongDict)  { $NodeInfo{$k} = {count => 0 }; }
+
+sub trim {
+    my ($str) = @_;
+    $str =~ s/^\s+//;
+    $str =~ s/\s+$//;
+    $str
+}
+
+sub useNode {
+    my ($name) = @_;
+    if (!exists $NodeInfo{$name}) {
+	$NodeInfo{$name} = { count => 0 };
+    }
+    ++$NodeInfo{$name}{count};
+    $name
+}
+
+sub node {
+    my ($short, $long) = @_;
+    $long = lc trim($long);
+    $short = lc trim($short);
+    $short =~ s/\@//g;
+    if ($long eq '' or $short eq $long) {
+	if (exists $ShortDict{$short}) {
+	    $short = $ShortDict{$short};
+	}
+	return useNode($short);
+    } else {
+	$long =~ s/\'//g;
+	my $full = $short . '@' . $long;
+	if (exists $LongDict{$full}) {
+	    $short = $LongDict{$full};
+	    return useNode($short);
+	}
+	if (exists $NodeInfo{$short}) {
+	    print "   '$full' => '$short',\n";
+	} else {
+	    print("   '$full' => '',\n");
+	}
+    }
+    undef
+}
+
+my %EdgeInfo;
+
+sub edge {
+    my ($n1, $n2) = @_;
+    return if (!defined $n1 or !defined $n2);
+    my @k = ($n1,$n2);
+    my $k = join ':', sort @k;
+    if (!exists $EdgeInfo{$k}) {
+	$EdgeInfo{$k} = { n1 => $n1, n2 => $n2 };
+    }
+    my $info = $EdgeInfo{$k};
+    ++$info->{count};
+}
+
+my $zip = shift;
+
+my $somezip = Archive::Zip->new();
+$somezip->read( $zip ) == AZ_OK or die $!;
+my $rawData = $somezip->contents('CSV/Sheet_1.csv');
+#open my $fh, '<', \$rawData or die $!;
+$rawData =~ tr/\xa0/ /;  # nonbreaking space
+$rawData =~ s/\xc2//gs;  # garbage?
+
+my @line = split /[\r\n]+/, $rawData;
+
+my $csv = Text::CSV_XS->new ({ keep_meta_info => 1, binary => 1 });
+
+for my $lx (1..$#line) {
+    if ($csv->parse($line[$lx])) {
+	my @field = $csv->fields;
+#	 foreach my $col (0 .. $#field) {
+#	     printf "%2d: %s\n", $col, $field[$col];
+#	 }
+	next if ($field[14] =~ m/^\s*$/ or $field[16] =~ m/^\s*$/);
+	my $skipped = 0;
+	for my $col (17..42) {
+	    ++$skipped if $field[$col] =~ /^\s*$/;
+	}
+	next if $skipped > 10;
+
+	my $n1 = node($field[14], $field[15]);
+	my $n2 = node($field[16], $field[17]);
+	edge($n1,$n2);
+    } else {
+	print STDERR "parse () failed on argument: ",
+	  $csv->error_input, "\n";
+	$csv->error_diag ();
+    }
+}
+
+sub assignNodeId {
+    my @k = sort keys %NodeInfo;
+    for my $id (1..@k) {
+	$NodeInfo{ $k[$id-1] }{id} = $id;
+    }
+}
+
+assignNodeId();
+
+sub outputGraph {
+    my $stamp = sprintf "%04d-%02d-%02d", localtime->year() + 1900, 1+localtime->mon, localtime->mday;
+    open my $fh, ">", "graph.html";
+    my $oldOut = select $fh;
+    print q[<!doctype html>
+<html>
+<head>
+  <title>Connectivity</title>
+
+  <style type="text/css">
+    html, body {
+      font: 10pt arial;
+    }
+    #mynetwork {
+      width: 90%;
+      height: 800px;
+      border: 1px solid lightgray;
+    }
+   </style>
+
+  <script type="text/javascript" src="vis.min.js"></script>
+  <link href="vis-network.min.css" rel="stylesheet" type="text/css" />
+
+  <script type="text/javascript">
+    var nodes = null;
+    var edges = null;
+    var network = null;
+
+    function destroy() {
+      if (network !== null) {
+        network.destroy();
+        network = null;
+      }
+    }
+
+    function draw() {
+      destroy();
+];
+    print "      nodes = [\n";
+    for my $k (sort keys %NodeInfo) {
+	print "        {id: $NodeInfo{$k}{id},  value: $NodeInfo{$k}{count},  label: '$k' },\n";
+    }
+    print "      ];\n";
+
+    print "      edges = [\n";
+    for my $k (sort keys %EdgeInfo) {
+	my $i = $EdgeInfo{$k};
+	my $n1 = $NodeInfo{ $i->{n1} };
+	my $n2 = $NodeInfo{ $i->{n2} };
+	print "        {from: $n1->{id}, to: $n2->{id}, value: $i->{count} },\n";
+    }
+    print "      ];\n";
+    print q[
+      // Instantiate our network object.
+      var container = document.getElementById('mynetwork');
+      var data = {
+        nodes: nodes,
+        edges: edges
+      };
+      var options = {
+        nodes: {
+          shape: 'dot',
+        },
+        interaction: {
+          navigationButtons: true,
+          keyboard: true
+        }
+      };
+      network = new vis.Network(container, data, options);
+
+      // add event listeners
+      network.on('select', function(params) {
+        document.getElementById('selection').innerHTML = 'Selection: ' + params.nodes;
+      });
+    }
+  </script>
+</head>
+<body onload="draw()">
+<p>];
+    print "Scroll or use keys '[' and ']' to zoom in and out. Drag background or use arrow keys to recenter. Last updated $stamp.";
+    print q[
+</p>
+<div id="mynetwork"></div>
+</body>
+</html>
+];
+    select $oldOut;
+}
+
+sub outputDebug {
+    for my $k (sort keys %NodeInfo) {
+	print "$k $NodeInfo{$k}{count}\n";
+    }
+    for my $k (sort keys %EdgeInfo) {
+	print "$k $EdgeInfo{$k}{count}\n";
+    }
+}
+
+outputGraph();
