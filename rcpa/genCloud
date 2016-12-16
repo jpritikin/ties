@@ -6,12 +6,17 @@ use Archive::Zip qw(AZ_OK);
 use Text::CSV_XS;
 use Fatal qw(open);
 use Time::localtime;
+use Graph;
 use Data::Dumper;
 
 # hiking == walking?
 
 my %ShortDict =
-  ('mountainbiking' => 'mountain biking');
+  ('mountainbiking' => 'mountain biking',
+   'powerlifting' => 'weightlifting',
+   'lifting' => 'weightlifting',
+   'weight lifting' => 'weightlifting',
+  );
 
 my %LongDict =
   (
@@ -75,11 +80,43 @@ my %LongDict =
    'hiit@high intensity interval training class at ymca (45-55 min)' => 'cardio',
    'track and field@shot-put and discus' => 'throwing',
    'netball@position- goal defence' => 'netball',
+   'swimming@competitive lap swimming' => 'swimming',
+   'running@running around a track' => 'running',
+   'swimming@doing laps in a pool' => 'swimming',
+   'running@running long distances of 1-2 miles or more' => 'running',
+   'powerlifting@powerlifting is a sport that is based on your 1-rm.  in a competition setting, the athlete (myself) will have 3 chances to execute each one of the big lifts.  the big lifts are, squat, bench, and deadlift.  in a competition setting you will be judged for your performance and based on the rules if you succeed your score will be in the form of white lights.  a lifter must have 2 white lights out of the 3 for the attempt to count towards the final total you obtain at the end of the competition.' => 'weightlifting',
+   'softball@high school' => 'softball',
+   'softball@i practice hitting and fielding' => 'softball',
+   'basketball@i run, dribble, and shoot basketballs' => 'basketball',
+   'softball@hit and through softballs, ran, and had several workouts' => 'softball',
+   'basketball@ran, dribbled, and shot the basketballs' => 'basketball',
+   'basketball@womens college basketball' => 'basketball',
+   'basketball@college womens basketball' => 'basketball',
+   'softball@church league softball' => 'softball',
+   'slow-pitch softball@slow-pitch softball is a recreational co-ed sport that i participate in.  generally you will have 4 out fielders and a regular infield set up, the pitcher will lob the ball for the batter to hit.  the game generally lasts an hour and 15 minutes depending on the league, and umpire is present to keep the game flowing smoothly.' => 'softball',
+   'swimming@swimming laps in a pool back and forth.' => 'swimming',
+   'surfboard surfing@riding medium size (10) waves on the n shore and california' => 'surfing',
+   'stand up paddle surfing@riding medium size (10) waves on the n shore and california but with less effort and risk than on a surfboard as standing minimizes take off risk' => 'stand up paddle surfing',
+   'volleyball@hitting a ball back and forth over a net. avoiding it from touching the ground.' => 'volleyball',
+   'springboard diving@1-meter and 3-meter springboard diving' => 'diving',
+   'weight lifting@dumbbells' => 'weightlifting',
+   'lifting@lifting weights in a gym setting' => 'weightlifting',
   );
 
+use constant PA1_START  => 15;
+use constant PA2_START  => 17;
+use constant RCPA_START => 19;
+
+### BEGIN GLOBAL STATE
+
 my %NodeInfo;
+my %EdgeInfo;
+my $Graph = Graph::Undirected->new();
+
 for my $k (values %ShortDict) { $NodeInfo{$k} = {count => 0 }; }
 for my $k (values %LongDict)  { $NodeInfo{$k} = {count => 0 }; }
+
+### END GLOBAL STATE
 
 sub trim {
     my ($str) = @_;
@@ -98,7 +135,7 @@ sub useNode {
 }
 
 sub node {
-    my ($short, $long) = @_;
+    my ($short, $long, $solo, $mastery) = @_;
     $long = lc trim($long);
     $short = lc trim($short);
     $short =~ s/\@//g;
@@ -114,6 +151,9 @@ sub node {
 	    $short = $LongDict{$full};
 	    return useNode($short);
 	}
+	if (exists $ShortDict{$short}) {
+	    $short = $ShortDict{$short};
+	}
 	if (exists $NodeInfo{$short}) {
 	    print "   '$full' => '$short',\n";
 	} else {
@@ -123,53 +163,209 @@ sub node {
     undef
 }
 
-my %EdgeInfo;
+our @RC_SKILL_MAP =
+  ('{{Q8}} requires much more skill than {{Q6}}.',
+   '{{Q8}} requires somewhat more skill than {{Q6}}.',
+   'Both require roughly equal skill.',
+   '{{Q6}} requires somewhat more skill than {{Q8}}.',
+   '{{Q6}} requires much more skill than {{Q8}}.');
+
+our @RC_UNPREDICT_MAP =
+  ('{{Q6}} is much more unpredictable than {{Q8}}.',
+   '{{Q6}} is somewhat more unpredictable than {{Q8}}.',
+   'Both offer roughly equal predictability.',
+   '{{Q8}} is somewhat more unpredictable than {{Q6}}.',
+   '{{Q8}} is much more unpredictable than {{Q6}}.');
+
+our @RC_NOVELTY_MAP =
+  ('{{Q8}} offers a much more novelty than {{Q6}}.',
+   '{{Q8}} offers a somewhat more novelty than {{Q6}}.',
+   'Both offer roughly equal novelty.',
+   '{{Q6}} offers a somewhat more novelty than {{Q8}}.',
+   '{{Q6}} offers a much more novelty than {{Q8}}.');
+
+our @RC_CREATIVE_MAP =
+  ('{{Q6}} admits much more creativity than {{Q8}}.',
+   '{{Q6}} admits somewhat more creativity than {{Q8}}.',
+   'Both admit roughly the same amount of creativity.',
+   '{{Q8}} admits somewhat more creativity than {{Q6}}.',
+   '{{Q8}} admits much more creativity than {{Q6}}.');
+
+our @RC_COMPLEX_MAP =
+  ('{{Q8}} is much more complex than {{Q6}}.',
+   '{{Q8}} is somewhat more complex than {{Q6}}.',
+   'Both are of roughly equal complexity.',
+   '{{Q6}} is somewhat more complex than {{Q8}}.',
+   '{{Q6}} is much more complex than {{Q8}}.');
+
+our @RC_GOAL_MAP =
+  ('{{Q6}} has much more clear rules and goals than {{Q8}}.',
+   '{{Q6}} has somewhat more clear rules and goals than {{Q8}}.',
+   'Both have equally clear rules and goals.',
+   '{{Q8}} has somewhat more clear rules and goals than {{Q6}}.',
+   '{{Q8}} has much more clear rules and goals than {{Q6}}.');
+
+our @RC_FEEDBACK_MAP =
+  ('{{Q8}} has much more immediate feedback than {{Q6}}.',
+   '{{Q8}} has somewhat more immediate feedback than {{Q6}}.',
+   'Both offer roughly equally immediate feedback.',
+   '{{Q6}} has somewhat more immediate feedback than {{Q8}}.',
+   '{{Q6}} has much more immediate feedback than {{Q8}}.');
+
+our @RC_CHATTER_MAP =
+  ('{{Q6}} turns off my mental chatter much more than {{Q8}}.',
+   '{{Q6}} turns off my mental chatter somewhat more than {{Q8}}.',
+   'Both turn off my mental chatter to a roughly equal extent.',
+   '{{Q8}} turns off my mental chatter somewhat more than {{Q6}}.',
+   '{{Q8}} turns off my mental chatter much more than {{Q6}}.');
+
+our @RC_WAITING_MAP =
+  ('{{ Q8 }} involves a lot more waiting than {{ Q6 }}.',
+   '{{ Q8 }} involves a somewhat more waiting than {{ Q6}}.',
+   'Both involve about the same amount of waiting.',
+   '{{ Q6 }} involves a somewhat more waiting than {{ Q8}}.',
+   '{{ Q6 }} involves a lot more waiting than {{ Q8 }}.');
+
+our @RC_BODY_MAP =
+  ('{{Q6}} involves much more of my body than {{Q8}}.',
+   '{{Q6}} involves somewhat more of my body than {{Q8}}.',
+   'Both involve my body to a roughly equal extent.',
+   '{{Q8}} involves somewhat more of my body than {{Q6}}.',
+   '{{Q8}} involves much more of my body than {{Q6}}.');
+
+our @RC_CONTROL_MAP =
+  ('{{Q8}} permits much more control than {{Q6}}.',
+   '{{Q8}} permits somewhat more control than {{Q6}}.',
+   'Both admit roughly equal control.',
+   '{{Q6}} permits somewhat more control than {{Q8}}.',
+   '{{Q6}} permits much more control than {{Q8}}.');
+
+our @RC_PRESENT_MAP =
+  ('{{Q6}} brings me into the present much more than {{Q8}}.',
+   '{{Q6}} brings me into the present somewhat more than {{Q8}}.',
+   'Both bring me into the present to a roughly equal extent.',
+   '{{Q8}} brings me into the present somewhat more than {{Q6}}.',
+   '{{Q8}} brings me into the present much more than {{Q6}}.');
+
+our @RC_SPONT_MAP =
+  ('{{Q8}} feels effortless compare to {{Q6}} where I have to struggle and force myself.',
+   '{{Q8}} feels like less effort than {{Q6}}.',
+   'Both require about the same extent of effort (both either effortless or effortful).',
+   '{{Q6}} feels like less effort than {{Q8}}.',
+   '{{Q6}} feels effortless compare to {{Q8}} where I have to struggle and force myself.');
+
+our @RC_STAKES_MAP =
+  ('{{Q6}} has much higher stakes than {{Q8}}.',
+   '{{Q6}} has somewhat higher stakes than {{Q8}}.',
+   'Both have roughly equal stakes.',
+   '{{Q8}} has somewhat higher stakes than {{Q6}}.',
+   '{{Q8}} has much higher stakes than {{Q6}}.');
+
+our @RC_EVALUATED_MAP =
+  ("During {{Q8}}, I am much more concerned about others' evaluations than during {{Q6}}.",
+   "During {{Q8}}, I am somewhat more concerned about others' evaluations than during {{Q6}}.",
+   "During both {{Q8}} and {{Q6}}, I have roughly equal concern about others' evaluations.",
+   "During {{Q6}}, I am somewhat more concerned about others' evaluations than during {{Q8}}.",
+   "During {{Q6}}, I am much more concerned about others' evaluations than during {{Q8}}.");
+
+our @RC_REWARD_MAP =
+  ('{{Q6}} is much more rewarding than {{Q8}}.',
+   '{{Q6}} is somewhat more rewarding than {{Q8}}.',
+   'Both are roughly equally rewarding.',
+   '{{Q8}} is somewhat more rewarding than {{Q6}}.',
+   '{{Q8}} is much more rewarding than {{Q6}}.');
+
+our @RC_INJURY1_MAP =
+  ('{{Q8}} has much more chance of physical injury compare to {{Q6}}.',
+   '{{Q8}} has somewhat more chance of physical injury compare to {{Q6}}.',
+   'The chance of physical injury is roughly equal.',
+   '{{Q6}} has somewhat more chance of physical injury compare to {{Q8}}.',
+   '{{Q6}} has much more chance of physical injury compare to {{Q8}}.');
+
+our @RC_INJURY2_MAP =
+  ('{{Q6}} has much more chance of serious physical injury compare to {{Q8}}.',
+   '{{Q6}} has somewhat more chance of serious physical injury compare to {{Q8}}.',
+   'The chance of serious physical injury is roughly equal.',
+   '{{Q8}} has somewhat more chance of serious physical injury compare to {{Q6}}.',
+   '{{Q8}} has much more chance of serious physical injury compare to {{Q6}}.');
+
+sub cmpToNum {
+    my ($map, $cmp) = @_;
+    return 'NA' if (!length $cmp);
+    $map->[0] =~ m/\{\{\s*Q(\d)\s*\}\}/;
+    die $1 if ($1 != 6 and $1 != 8);
+    my $sign = $1==8? 1 : -1;
+    for my $x (0..4) {
+	if ($map->[$x] eq $cmp) {
+	    return $sign * ($x - 2)
+	}
+    }
+    die "'$cmp' no found";
+}
 
 sub edge {
-    my ($n1, $n2) = @_;
+    my ($n1, $n2, $field) = @_;
     return if (!defined $n1 or !defined $n2);
     my @k = ($n1,$n2);
-    my $k = join ':', sort @k;
+    my @sk = sort @k;
+    my $sign = $k[0] ne $sk[0]? -1 : 1;
+    my $k = join ':', @sk;
     if (!exists $EdgeInfo{$k}) {
 	$EdgeInfo{$k} = { n1 => $n1, n2 => $n2 };
+	$Graph->add_edge($n1, $n2);
     }
     my $info = $EdgeInfo{$k};
     ++$info->{count};
+    my @map = (\@RC_SKILL_MAP, \@RC_UNPREDICT_MAP, \@RC_NOVELTY_MAP, \@RC_CREATIVE_MAP,
+	       \@RC_COMPLEX_MAP, \@RC_GOAL_MAP, \@RC_FEEDBACK_MAP, \@RC_GOAL_MAP, \@RC_FEEDBACK_MAP,
+	       \@RC_CHATTER_MAP, \@RC_WAITING_MAP, \@RC_BODY_MAP, \@RC_CONTROL_MAP, \@RC_PRESENT_MAP,
+	       \@RC_SPONT_MAP, \@RC_STAKES_MAP, \@RC_EVALUATED_MAP, \@RC_REWARD_MAP, \@RC_INJURY1_MAP,
+	       \@RC_INJURY2_MAP);
+    my $rating = [];
+    for my $x (0..19) {
+	my $got = cmpToNum($map[$x], $field->[RCPA_START + 4 + $x]);
+	$got *= $sign if $got ne 'NA';
+	push @$rating, $got;
+    }
+    push @{ $info->{rating} }, $rating;
 }
 
-my $zip = shift;
+sub loadZip {
+    my ($zip) = @_;
+    my $somezip = Archive::Zip->new();
+    $somezip->read( $zip ) == AZ_OK or die $!;
+    my $rawData = $somezip->contents('CSV/Sheet_1.csv');
+    $rawData =~ tr/\xa0/ /;	# nonbreaking space
+    $rawData =~ s/\xc2//gs;	# garbage?
 
-my $somezip = Archive::Zip->new();
-$somezip->read( $zip ) == AZ_OK or die $!;
-my $rawData = $somezip->contents('CSV/Sheet_1.csv');
-#open my $fh, '<', \$rawData or die $!;
-$rawData =~ tr/\xa0/ /;  # nonbreaking space
-$rawData =~ s/\xc2//gs;  # garbage?
+    my @line = split /[\r\n]+/, $rawData;
 
-my @line = split /[\r\n]+/, $rawData;
+    my $csv = Text::CSV_XS->new ({ keep_meta_info => 1, binary => 1 });
 
-my $csv = Text::CSV_XS->new ({ keep_meta_info => 1, binary => 1 });
+    for my $lx (1..$#line) {
+	if ($csv->parse($line[$lx])) {
+	    my @field = $csv->fields;
+	    if (0) {
+		foreach my $col (0 .. $#field) {
+		    printf "%2d: %s\n", $col, $field[$col];
+		}
+	    }
+	    next if ($field[PA1_START] =~ m/^\s*$/ or $field[PA2_START] =~ m/^\s*$/);
+	    my $skipped = 0;
+	    for my $col (RCPA_START .. 42) {
+		++$skipped if $field[$col] =~ /^\s*$/;
+	    }
+	    next if $skipped > 10;
 
-for my $lx (1..$#line) {
-    if ($csv->parse($line[$lx])) {
-	my @field = $csv->fields;
-#	 foreach my $col (0 .. $#field) {
-#	     printf "%2d: %s\n", $col, $field[$col];
-#	 }
-	next if ($field[14] =~ m/^\s*$/ or $field[16] =~ m/^\s*$/);
-	my $skipped = 0;
-	for my $col (17..42) {
-	    ++$skipped if $field[$col] =~ /^\s*$/;
+	    my $n1 = node($field[PA1_START], $field[PA1_START + 1], $field[RCPA_START+0], $field[RCPA_START+2]);
+	    my $n2 = node($field[PA2_START], $field[PA2_START + 1], $field[RCPA_START+1], $field[RCPA_START+3]);
+	    next if $n1 eq $n2;
+	    edge($n1,$n2, \@field);
+	} else {
+	    print STDERR "parse () failed on argument: ",
+	      $csv->error_input, "\n";
+	    $csv->error_diag ();
 	}
-	next if $skipped > 10;
-
-	my $n1 = node($field[14], $field[15]);
-	my $n2 = node($field[16], $field[17]);
-	edge($n1,$n2);
-    } else {
-	print STDERR "parse () failed on argument: ",
-	  $csv->error_input, "\n";
-	$csv->error_diag ();
     }
 }
 
@@ -179,8 +375,6 @@ sub assignNodeId {
 	$NodeInfo{ $k[$id-1] }{id} = $id;
     }
 }
-
-assignNodeId();
 
 sub outputGraph {
     my $stamp = sprintf "%04d-%02d-%02d", localtime->year() + 1900, 1+localtime->mon, localtime->mday;
@@ -280,4 +474,28 @@ sub outputDebug {
     }
 }
 
+sub outputData {
+    my $csv = Text::CSV_XS->new ({ binary => 1, auto_diag => 1 });
+    open my $fh, ">:encoding(utf8)", "rawData.csv";
+    $csv->say($fh, ['pa1', 'pa2', 'skill', 'unpredict', 'novelty', 'creative', 'complex',
+		    'goal1', 'feedback1', 'goal2', 'feedback2', 'chatter', 'waiting',
+		    'body', 'control', 'present', 'spont', 'stakes', 'evaluated', 'reward',
+		    'injury1', 'injury2']);
+    my @cc = sort { $#$b <=> $#$a  } $Graph->connected_components();
+    my %white;
+    $white{$_}=1 for @{ $cc[0] };
+    for my $edge (values %EdgeInfo) {
+	next if (!$white{$edge->{n1}} or !$white{$edge->{n2}});
+	for my $rate (@{ $edge->{rating} }) {
+	    $csv->say($fh, [$edge->{n1}, $edge->{n2}, @$rate]);
+	}
+    }
+}
+
+loadZip(shift);
+
+assignNodeId();
+
 outputGraph();
+
+outputData();
