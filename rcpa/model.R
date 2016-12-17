@@ -20,7 +20,7 @@ extractFacet <- function(facet) {
   })
   tmp$pa1 <- factor(as.character(tmp$pa1), levels=palist)
   tmp$pa2 <- factor(as.character(tmp$pa2), levels=palist)
-  tmp <- tmp[tmp$win1 != 0 | tmp$win2 != 0,]
+  tmp <- tmp[tmp$win1 != 0 | tmp$win2 != 0,]  # this is bad, discarding valuable info
   tmp
 }
 
@@ -45,7 +45,7 @@ if(0) {
 
 sink("pa-browser/rcpa-data.js")
 cat("var RCPA_DATA=")
-cat(toJSON(result, matrix="columnmajor", digits=0))
+cat(toJSON(result, matrix="rowmajor", digits=0))
 cat(";", fill=TRUE)
 cat("var RCPA_FACETS=")
 cat(toJSON(colnames(result)))
