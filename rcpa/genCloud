@@ -126,7 +126,8 @@ sub trim {
 }
 
 sub useNode {
-    my ($name) = @_;
+    my ($pa,$solo,$mastery) = @_;
+    my $name = join(';', $pa, $mastery); #lc $solo,
     if (!exists $NodeInfo{$name}) {
 	$NodeInfo{$name} = { count => 0 };
     }
@@ -134,8 +135,15 @@ sub useNode {
     $name
 }
 
+our %SHORT_MASTERY =
+  ('Beginner' => 'novice',
+   'Competent amateur' => 'amateur',
+   'Expert or professional' => 'expert');
+
 sub node {
     my ($short, $long, $solo, $mastery) = @_;
+    my $sm = $SHORT_MASTERY{$mastery};
+    die $mastery if !defined $sm;
     $long = lc trim($long);
     $short = lc trim($short);
     $short =~ s/\@//g;
@@ -143,13 +151,13 @@ sub node {
 	if (exists $ShortDict{$short}) {
 	    $short = $ShortDict{$short};
 	}
-	return useNode($short);
+	return useNode($short,$solo,$sm);
     } else {
 	$long =~ s/\'//g;
 	my $full = $short . '@' . $long;
 	if (exists $LongDict{$full}) {
 	    $short = $LongDict{$full};
-	    return useNode($short);
+	    return useNode($short,$solo,$sm);
 	}
 	if (exists $ShortDict{$short}) {
 	    $short = $ShortDict{$short};
