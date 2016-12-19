@@ -126,24 +126,19 @@ sub trim {
 }
 
 sub useNode {
-    my ($pa,$solo,$mastery) = @_;
-    my $name = join(';', $pa, $mastery); #lc $solo,
+    my ($pa,$solo) = @_;
+    #my $name = join(';', $pa, $solo); #lc $solo,
+    my $name = $pa;
     if (!exists $NodeInfo{$name}) {
 	$NodeInfo{$name} = { count => 0 };
     }
     ++$NodeInfo{$name}{count};
+    ++$NodeInfo{$name}{$solo};
     $name
 }
 
-our %SHORT_MASTERY =
-  ('Beginner' => 'novice',
-   'Competent amateur' => 'amateur',
-   'Expert or professional' => 'expert');
-
 sub node {
-    my ($short, $long, $solo, $mastery) = @_;
-    my $sm = $SHORT_MASTERY{$mastery};
-    die $mastery if !defined $sm;
+    my ($short, $long, $solo) = @_;
     $long = lc trim($long);
     $short = lc trim($short);
     $short =~ s/\@//g;
@@ -151,13 +146,13 @@ sub node {
 	if (exists $ShortDict{$short}) {
 	    $short = $ShortDict{$short};
 	}
-	return useNode($short,$solo,$sm);
+	return useNode($short,$solo);
     } else {
 	$long =~ s/\'//g;
 	my $full = $short . '@' . $long;
 	if (exists $LongDict{$full}) {
 	    $short = $LongDict{$full};
-	    return useNode($short,$solo,$sm);
+	    return useNode($short,$solo);
 	}
 	if (exists $ShortDict{$short}) {
 	    $short = $ShortDict{$short};
@@ -311,8 +306,20 @@ sub cmpToNum {
     die "'$cmp' no found";
 }
 
+our %SHORT_MASTERY =
+  ('Beginner' => 1,
+   'Competent amateur' => 2,
+   'Expert or professional' => 3);
+
+sub shortenMastery {
+    my ($mastery) = @_;
+    my $sm = $SHORT_MASTERY{$mastery};
+    die $mastery if !defined $sm;
+    $sm;
+}
+
 sub edge {
-    my ($n1, $n2, $field) = @_;
+    my ($n1, $l1, $n2, $l2, $field) = @_;
     return if (!defined $n1 or !defined $n2);
     my @k = ($n1,$n2);
     my @sk = sort @k;
@@ -323,6 +330,8 @@ sub edge {
 	$Graph->add_edge($n1, $n2);
     }
     my $info = $EdgeInfo{$k};
+    $info->{l1} = shortenMastery($l1);
+    $info->{l2} = shortenMastery($l2);
     ++$info->{count};
     my @map = (\@RC_SKILL_MAP, \@RC_UNPREDICT_MAP, \@RC_NOVELTY_MAP, \@RC_CREATIVE_MAP,
 	       \@RC_COMPLEX_MAP, \@RC_GOAL_MAP, \@RC_FEEDBACK_MAP, \@RC_GOAL_MAP, \@RC_FEEDBACK_MAP,
@@ -365,10 +374,10 @@ sub loadZip {
 	    }
 	    next if $skipped > 10;
 
-	    my $n1 = node($field[PA1_START], $field[PA1_START + 1], $field[RCPA_START+0], $field[RCPA_START+2]);
-	    my $n2 = node($field[PA2_START], $field[PA2_START + 1], $field[RCPA_START+1], $field[RCPA_START+3]);
+	    my $n1 = node($field[PA1_START], $field[PA1_START + 1], $field[RCPA_START+0]);
+	    my $n2 = node($field[PA2_START], $field[PA2_START + 1], $field[RCPA_START+1]);
 	    next if $n1 eq $n2;
-	    edge($n1,$n2, \@field);
+	    edge($n1, $field[RCPA_START+2], $n2, $field[RCPA_START+3], \@field);
 	} else {
 	    print STDERR "parse () failed on argument: ",
 	      $csv->error_input, "\n";
@@ -380,7 +389,10 @@ sub loadZip {
 sub assignNodeId {
     my @k = sort keys %NodeInfo;
     for my $id (1..@k) {
-	$NodeInfo{ $k[$id-1] }{id} = $id;
+	my $info = $NodeInfo{ $k[$id-1] };
+	$info->{id} = $id;
+	# May want to allow separate estimates for these? TODO
+	#warn $k[$id-1] if ($info->{Group} and $info->{Solo});
     }
 }
 
@@ -485,7 +497,7 @@ sub outputDebug {
 sub outputData {
     my $csv = Text::CSV_XS->new ({ binary => 1, auto_diag => 1 });
     open my $fh, ">:encoding(utf8)", "rawData.csv";
-    $csv->say($fh, ['pa1', 'pa2', 'skill', 'unpredict', 'novelty', 'creative', 'complex',
+    $csv->say($fh, ['pa1', 'l1', 'pa2', 'l2', 'skill', 'unpredict', 'novelty', 'creative', 'complex',
 		    'goal1', 'feedback1', 'goal2', 'feedback2', 'chatter', 'waiting',
 		    'body', 'control', 'present', 'spont', 'stakes', 'evaluated', 'reward',
 		    'injury1', 'injury2']);
@@ -495,7 +507,7 @@ sub outputData {
     for my $edge (values %EdgeInfo) {
 	next if (!$white{$edge->{n1}} or !$white{$edge->{n2}});
 	for my $rate (@{ $edge->{rating} }) {
-	    $csv->say($fh, [$edge->{n1}, $edge->{n2}, @$rate]);
+	    $csv->say($fh, [$edge->{n1}, $edge->{l1}, $edge->{n2}, $edge->{l2}, @$rate]);
 	}
     }
 }

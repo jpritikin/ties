@@ -1,4 +1,4 @@
-{ div, h1, p, a, form, thead, th, td, tr, table, tbody, input, li, ul } = React.DOM
+{ div, h1, p, a, form, button, thead, th, td, tr, table, tbody, input, li, ul } = React.DOM
 
 descriptionIntro = "This box displays the item that was used to ask about the currently hovered characteristic."
 
@@ -23,6 +23,13 @@ descriptionMap =
   reward: "After engaging in the physical activity, to what extent do you feel great?"
   injury1: "What is the risk of minor physical injury (more than just muscle soreness)?"
   injury2: "What is the risk of serious physical injury?"
+
+Skills=["Novice", "Amateur", "Expert"];
+
+RCPA_DATA=
+  Novice: RCPA_DATA1
+  Amateur: RCPA_DATA2
+  Expert: RCPA_DATA3
 
 weightLine = (props) ->
     tr { key: props.key },
@@ -121,7 +128,7 @@ dotprod = (v1, v2) ->
 resultPanel = (props) ->
   maxPA = RCPA_PA.length - 1
   score = new Array(RCPA_PA.length)
-  score[x] = dotprod(props.weight, RCPA_DATA[x]) for x in [0..maxPA]
+  score[x] = dotprod(props.weight, RCPA_DATA[props.currentSkill][x]) for x in [0..maxPA]
   order = [0..maxPA]
   order.sort (a,b) ->
     cmp = score[a] - score[b]
@@ -140,6 +147,17 @@ resultPanel = (props) ->
   div
     className: "three wide column"
     div
+      className: "ui buttons"
+      Skills.map((text) ->
+        isActive = ""
+        isActive = "active" if text is props.currentSkill
+        div
+          className: "ui button #{isActive}"
+          key: text
+          onClick: () ->
+            props.setSkill(text)
+          text)
+    div
       className: "ui list"
       lis
 
@@ -149,6 +167,7 @@ class Jumbotron extends React.Component
     @state =
       facetDescription: descriptionIntro
       weight: new Array(RCPA_FACETS.length).fill(0)
+      skill: Skills[1]
 
   handleChange: (index, value) =>
     foo = @state.weight.slice()
@@ -164,9 +183,14 @@ class Jumbotron extends React.Component
     this.setState
       facetDescription: descriptionMap[current]
 
+  setCurrentSkill: (value) =>
+    this.setState
+      skill: value
+
   render: ->
     fn = this.handleChange
     fn2 = this.updateHelp
+    fn3 = this.setCurrentSkill
     div {},
       weightPanelHelp
         facetDescription: @state.facetDescription
@@ -175,8 +199,10 @@ class Jumbotron extends React.Component
         weightPanel
           onClick: (index, value) ->
             fn(index, value)
-          updateHelp: (current) => fn2(current)
+          updateHelp: (current) -> fn2(current)
         resultPanel
           weight: @state.weight
+          currentSkill: @state.skill
+          setSkill: (current) -> fn3(current)
 
 ReactDOM.render(React.createElement(Jumbotron), document.getElementById('content'))
