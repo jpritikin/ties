@@ -4,7 +4,7 @@ library(jsonlite)
 rstan_options(auto_write = TRUE)
 options(mc.cores = parallel::detectCores())
 
-if (0) {
+if (1) {
   rcd <- read.csv("rawData.csv")
   
   NCMP <- nrow(rcd)
@@ -63,10 +63,13 @@ sim_fit <- stan(file = "model2.stan",
                 chains = 6, 
                 iter = 200)
 
-summary(summary(sim_fit)$summary[,'Rhat'])
+summary(summary(sim_fit)$summary[,c('Rhat', 'n_eff')])
 
 #plot(sim_fit, pars=c("thetaScale"))
 plot(sim_fit, pars=c(paste0("threshold",1:2)))
+
+df <- summary(sim_fit, pars=c("alpha","theta"), probs=.5)$summary
+summary(df[,'mean'] - df[,'50%'])
 
 facetNames <- colnames(rcd[-1:-4])
 
@@ -76,8 +79,8 @@ print(matrix(df[,"50%"], nrow=1,
 
 df <- summary(sim_fit, pars=c("theta"), probs=.5)$summary
 tar <- array(df[,"50%"], dim=c(NFACETS, NPA, 3))
-cor(c(tar[,,1]), c(tar[,,2]))  #.85
-cor(c(tar[,,2]), c(tar[,,3]))  #.8
+cor(c(tar[,,1]), c(tar[,,2]))  #.7
+cor(c(tar[,,2]), c(tar[,,3]))  #.62
 
 if (0) {
   toJSON(array(1:8, dim=c(2,2,2)), matrix="columnmajor")
