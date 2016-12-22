@@ -23,14 +23,7 @@ data {
   int<lower=-2, upper=2> diff[NCMP,NFACETS];   // comparisons
 }
 transformed data {
-  matrix[NFACETS,NFACETS] FacetIdentity;
   int rcat[NCMP,NFACETS];
-
-  for (f1 in 1:NFACETS) {
-    for (f2 in 1:NFACETS) {
-    	FacetIdentity[f1,f2] = f1==f2;
-    }
-  }
 
   for (cmp in 1:NCMP) {
     for (ff in 1:NFACETS) {
@@ -51,7 +44,7 @@ model {
 //  thetaScale ~ lognormal(1,1);
   for (lev in 1:2) {
     for (pa in 1:NPA) {
-      theta[lev,pa,1:NFACETS] ~ multi_normal(theta[lev+1,pa,1:NFACETS], FacetIdentity);
+      theta[lev,pa,1:NFACETS] ~ normal(theta[lev+1,pa,1:NFACETS], 1);
     }
   }
   for (lev in 1:3) {

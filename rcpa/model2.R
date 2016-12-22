@@ -55,6 +55,8 @@ if (1) {
   rcd <- simData
 }
 
+# Nice to add a prior when the only difference is solo/group TODO
+
 sim_fit <- stan(file = "model2.stan",
                 data = list(NPA=NPA, NFACETS=NFACETS, NCMP=NCMP,
                             pa1=match(rcd$pa1, palist), l1=rcd$l1,
@@ -70,15 +72,16 @@ plot(sim_fit, pars=c(paste0("threshold",1:2)))
 
 df <- summary(sim_fit, pars=c("alpha","theta"), probs=.5)$summary
 summary(df[,'mean'] - df[,'50%'])
+estimator <- 'mean'
 
 facetNames <- colnames(rcd[-1:-4])
 
 df <- summary(sim_fit, pars=c("alpha"), probs=.5)$summary
-print(matrix(df[,"50%"], nrow=1,
+print(matrix(df[,estimator], nrow=1,
              dimnames=list(NULL, facetNames)))
 
 df <- summary(sim_fit, pars=c("theta"), probs=.5)$summary
-tar <- array(df[,"50%"], dim=c(NFACETS, NPA, 3))
+tar <- array(df[,estimator], dim=c(NFACETS, NPA, 3))
 cor(c(tar[,,1]), c(tar[,,2]))  #.7
 cor(c(tar[,,2]), c(tar[,,3]))  #.62
 

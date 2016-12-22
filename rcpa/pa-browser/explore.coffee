@@ -1,5 +1,5 @@
-{ div, h1, h2, h3, p, a, i, select, option, label, form, button,
- thead, th, td, tr, table, tbody, input, li, ul } = React.DOM
+{ div, h1, h2, h3, h4, p, a, i, select, option, label, form, button,
+ thead, th, td, tr, table, tbody, input, li, ul, br } = React.DOM
 
 descriptionIntro = "This box displays the item that was used to ask
   about the currently hovered characteristic."
@@ -60,14 +60,14 @@ weightPanel = (props) ->
       onClick: props.onClick
       weight: props.weight[index])
   div
-    className: "fixed seven wide column"
+    className: "column"
     div
       className: "ui message"
       div
         className: "header"
         "Which characteristics do you value?"
       table
-        className: "ui selectable celled table"
+        className: "ui celled table"
         thead {},
           tr {},
             th {}, "Characteristic"
@@ -122,7 +122,7 @@ resultPanel = (props) ->
         target: "_blank"
         prettyName(RCPA_PA[index]))
   div
-    className: "three wide column"
+    className: "column"
     div
       className: "ui buttons"
       Skills.map((text) ->
@@ -137,6 +137,41 @@ resultPanel = (props) ->
     div
       className: "ui list"
       lis
+
+class Graph extends React.Component
+  constructor: (props) ->
+    super(props)
+    @state =
+      network: null
+
+  componentDidMount: ->
+    data =
+      nodes: RCPA_nodes
+      edges: RCPA_edges
+    options =
+      height: '700px'
+      nodes:
+        shape: 'dot'
+      interaction:
+        navigationButtons: true
+        keyboard: true
+    elem = $('#graph')
+    @state.network = new vis.Network(elem[0], data, options)
+
+  componentWillUnmount: ->
+    if network? then network.destroy()
+
+  render: ->
+    div
+      className: "ui message"
+      div
+        id: "graph"
+      div
+        className: "ui info message"
+        "Scroll or use keys '[' and ']' to zoom in and out.
+        Drag background or use arrow keys to recenter.
+        Size of node and thickness of edge indicate sample size.
+        Activities with only one sample are excluded from the model."
 
 class Jumbotron extends React.Component
   constructor: (props) ->
@@ -160,48 +195,131 @@ class Jumbotron extends React.Component
     this.setState
       skill: value
 
+  # componentDidMount: ->
+  #   $('.ui.sticky').sticky
+  #     context: "#introduction"
+
   render: ->
     fn = this.handleChange
     fn2 = this.setAbbreviateFacet
     fn3 = this.setCurrentSkill
     div {},
+      div
+        className: "ui right rail"
+        style:
+          position: "fixed"  # visibility is too confusing, force it
+          left: "80%"
+          marginTop: "30px"
+        div
+          className: "ui segment"
+          h4
+            className: "ui header"
+            "Contents"
+          div
+            className: "ui vertical text menu"
+            div
+              className: "content menu" # Should auto-generate this with jquery TODO
+              a
+                className: "item"
+                href: "#introduction"
+                "Introduction"
+              a
+                className: "item"
+                href: "#data-explorer"
+                "Data Explorer"
+              a
+                className: "item"
+                href: "#data-connectivity"
+                "Data Connectivity"
+              a
+                className: "item"
+                href: "#invitation"
+                "Invitation to Participate"
       h1
         className: "ui header center aligned"
         "Relative characteristics of physical activities:"
       h2
         className: "ui header center aligned"
         "Preliminary results"
+      h3
+        className: "ui header center aligned"
+        "updated #{RCPA_date}"
       div
         className: "ui text container"
         h3
           className: "ui header"
+          id: "introduction"
           "Introduction"
         "Flow is a state in which an individual is completely immersed in
         an activity without reflective self-consciousness but with a deep sense of control.
-        We selected 20 characteristics of activities that are thought to relate to flow.
         One goal of this study is figure out which physical activities are more or less conducive to flow.
-        However, in the short term, we invite you to select characteristics that you care about.
-        Physical activities will be ranked according to your priorities.
+        However, in the short term, we invite you to select characteristics that are of interest to you.
+        Physical activities are ranked according to your criteria.
         Which physical activities that you haven’t tried yet might be worth considering?"
         h3
           className: "ui header"
-          "Explorer"
+          id: "data-explorer"
+          "Data Explorer"
         "These results are obtained by fitting responses from participants with a statistical model.
         This model considers each characteristic independently of other characteristics.
-        For example, creativity is ranked independently of novelty.
-        Currently, sample size is very limited and rankings may not match intuition very well.
+        For example, "
+        i({}, "creativity")
+        " is ranked independently of "
+        i({}, "novelty.")
+        " Currently, sample size is limited and rankings may not match intuition very well.
         Model estimates should improve with additional data."
-      div
-        className: "ui grid padded"
-        weightPanel
-          onClick: (index, value) ->
-            fn(index, value)
-          abbreviateFacet: @state.abbreviateFacet
-          setAbbreviateFacet: fn2
-          weight: @state.weight
-        resultPanel
-          weight: @state.weight
-          skill: @state.skill
-          setSkill: (current) -> fn3(current)
+        br()
+        br()
+        div
+          className: "ui stackable two column grid"
+          weightPanel
+            onClick: (index, value) ->
+              fn(index, value)
+            abbreviateFacet: @state.abbreviateFacet
+            setAbbreviateFacet: fn2
+            weight: @state.weight
+          resultPanel
+            weight: @state.weight
+            skill: @state.skill
+            setSkill: (current) -> fn3(current)
+        h3
+          className: "ui header"
+          id: "data-connectivity"
+          "Data Connectivity"
+        "The graph below shows the responses from participants and how they fit together.
+        We can only analyze data that are connected.
+        Analysis is restricted to the largest connected group of activities.
+        World Sports Encyclopedia (2003) estimated that there are about 8,000 sports.
+        Of course, physical activities are a superset of that.
+        Even if we restrict our interest to, say, the 400 most popular physical activities,
+        there are still about eighty thousand pairs.
+        Our statistical model can fill in the gaps, but the more data the better."
+        React.createElement(Graph)
+        h3
+          className: "ui header"
+          id: "invitation"
+          "Invitation to Participate"
+        "If you'd like to contribute more data,
+        you can take this survey again with a different pair of physical activities."
+        br()
+        br()
+        "If you enjoyed participating, you may want to invite others to participate. "
+        """
+        Suggested text for invitation: "I recently participated in a five minute
+        survey that examined the relative characteristics of physical activities.
+        I found it thought provoking and enjoyed going through it.
+        You might enjoy it too. Take a look,
+        """
+        " "
+        a
+          href: "http://tiny.cc/physical"
+          "http://tiny.cc/physical"
+        br()
+        br()
+        br()
+        br()
+        br()
+        br()
+        br()
 
 ReactDOM.render(React.createElement(Jumbotron), document.getElementById('content'))

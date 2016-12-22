@@ -9,8 +9,6 @@ use Time::localtime;
 use Graph;
 use Data::Dumper;
 
-# hiking == walking?
-
 my %ShortDict =
   ('mountainbiking' => 'mountain biking',
    'powerlifting' => 'weightlifting',
@@ -109,12 +107,14 @@ use constant RCPA_START => 19;
 
 ### BEGIN GLOBAL STATE
 
+my %VettedName;
 my %NodeInfo;
+my %NodeGroupInfo;
 my %EdgeInfo;
 my $Graph = Graph::Undirected->new();
 
-for my $k (values %ShortDict) { $NodeInfo{$k} = {count => 0 }; }
-for my $k (values %LongDict)  { $NodeInfo{$k} = {count => 0 }; }
+for my $k (values %ShortDict) { $VettedName{$k} = 1 }
+for my $k (values %LongDict)  { $VettedName{$k} = 1 }
 
 ### END GLOBAL STATE
 
@@ -127,13 +127,13 @@ sub trim {
 
 sub useNode {
     my ($pa,$solo) = @_;
-    #my $name = join(';', $pa, $solo); #lc $solo,
-    my $name = $pa;
+    my $name = join(';', $pa, lc $solo);
     if (!exists $NodeInfo{$name}) {
 	$NodeInfo{$name} = { count => 0 };
+	$NodeGroupInfo{$pa} = {};
     }
     ++$NodeInfo{$name}{count};
-    ++$NodeInfo{$name}{$solo};
+    ++$NodeGroupInfo{$pa}{$solo};
     $name
 }
 
@@ -157,7 +157,7 @@ sub node {
 	if (exists $ShortDict{$short}) {
 	    $short = $ShortDict{$short};
 	}
-	if (exists $NodeInfo{$short}) {
+	if (exists $VettedName{$short}) {
 	    print "   '$full' => '$short',\n";
 	} else {
 	    print("   '$full' => '',\n");
@@ -326,13 +326,14 @@ sub edge {
     my $sign = $k[0] ne $sk[0]? -1 : 1;
     my $k = join ':', @sk;
     if (!exists $EdgeInfo{$k}) {
-	$EdgeInfo{$k} = { n1 => $n1, n2 => $n2 };
-	$Graph->add_edge($n1, $n2);
+	$EdgeInfo{$k} = { n1 => $n1, n2 => $n2, count => 0 };
     }
     my $info = $EdgeInfo{$k};
+    if (++$info->{count} == 2) { # increase to limit to a minimum sample size TODO
+	$Graph->add_edge($n1, $n2);
+    }
     $info->{l1} = shortenMastery($l1);
     $info->{l2} = shortenMastery($l2);
-    ++$info->{count};
     my @map = (\@RC_SKILL_MAP, \@RC_UNPREDICT_MAP, \@RC_NOVELTY_MAP, \@RC_CREATIVE_MAP,
 	       \@RC_COMPLEX_MAP, \@RC_GOAL_MAP, \@RC_FEEDBACK_MAP, \@RC_GOAL_MAP, \@RC_FEEDBACK_MAP,
 	       \@RC_CHATTER_MAP, \@RC_WAITING_MAP, \@RC_BODY_MAP, \@RC_CONTROL_MAP, \@RC_PRESENT_MAP,
@@ -398,90 +399,27 @@ sub assignNodeId {
 
 sub outputGraph {
     my $stamp = sprintf "%04d-%02d-%02d", localtime->year() + 1900, 1+localtime->mon, localtime->mday;
-    open my $fh, ">", "graph.html";
+    open my $fh, ">", "pa-browser/rcpa-graph.js";
     my $oldOut = select $fh;
-    print q[<!doctype html>
-<html>
-<head>
-  <title>Connectivity</title>
 
-  <style type="text/css">
-    html, body {
-      font: 10pt arial;
-    }
-    #mynetwork {
-      width: 90%;
-      height: 800px;
-      border: 1px solid lightgray;
-    }
-   </style>
-
-  <script type="text/javascript" src="vis.min.js"></script>
-  <link href="vis-network.min.css" rel="stylesheet" type="text/css" />
-
-  <script type="text/javascript">
-    var nodes = null;
-    var edges = null;
-    var network = null;
-
-    function destroy() {
-      if (network !== null) {
-        network.destroy();
-        network = null;
-      }
-    }
-
-    function draw() {
-      destroy();
-];
-    print "      nodes = [\n";
+    print "var RCPA_date = '$stamp';\n";
+    print "var RCPA_nodes = [\n";
     for my $k (sort keys %NodeInfo) {
-	print "        {id: $NodeInfo{$k}{id},  value: $NodeInfo{$k}{count},  label: '$k' },\n";
+	my $name = simplifyName($k);
+	my @part = split /;/, $name;
+	if (@part == 2) { $name = "$part[0] ($part[1])" }
+	print "  {id: $NodeInfo{$k}{id},  value: $NodeInfo{$k}{count},  label: '$name' },\n";
     }
-    print "      ];\n";
+    print "];\n";
 
-    print "      edges = [\n";
+    print "var RCPA_edges = [\n";
     for my $k (sort keys %EdgeInfo) {
 	my $i = $EdgeInfo{$k};
 	my $n1 = $NodeInfo{ $i->{n1} };
 	my $n2 = $NodeInfo{ $i->{n2} };
-	print "        {from: $n1->{id}, to: $n2->{id}, value: $i->{count} },\n";
+	print "  {from: $n1->{id}, to: $n2->{id}, value: $i->{count} },\n";
     }
-    print "      ];\n";
-    print q[
-      // Instantiate our network object.
-      var container = document.getElementById('mynetwork');
-      var data = {
-        nodes: nodes,
-        edges: edges
-      };
-      var options = {
-        nodes: {
-          shape: 'dot',
-        },
-        interaction: {
-          navigationButtons: true,
-          keyboard: true
-        }
-      };
-      network = new vis.Network(container, data, options);
-
-      // add event listeners
-      network.on('select', function(params) {
-        document.getElementById('selection').innerHTML = 'Selection: ' + params.nodes;
-      });
-    }
-  </script>
-</head>
-<body onload="draw()">
-<p>];
-    print "Scroll or use keys '[' and ']' to zoom in and out. Drag background or use arrow keys to recenter. Last updated $stamp.";
-    print q[
-</p>
-<div id="mynetwork"></div>
-</body>
-</html>
-];
+    print "];\n";
     select $oldOut;
 }
 
@@ -491,6 +429,17 @@ sub outputDebug {
     }
     for my $k (sort keys %EdgeInfo) {
 	print "$k $EdgeInfo{$k}{count}\n";
+    }
+}
+
+sub simplifyName {
+    my ($nn) = @_;
+    my @part = split /;/, $nn;
+    my $gi = $NodeGroupInfo{ $part[0] };
+    if (keys %$gi == 1) {
+	return $part[0]
+    } else {
+	return $nn;
     }
 }
 
@@ -507,7 +456,8 @@ sub outputData {
     for my $edge (values %EdgeInfo) {
 	next if (!$white{$edge->{n1}} or !$white{$edge->{n2}});
 	for my $rate (@{ $edge->{rating} }) {
-	    $csv->say($fh, [$edge->{n1}, $edge->{l1}, $edge->{n2}, $edge->{l2}, @$rate]);
+	    $csv->say($fh, [simplifyName($edge->{n1}), $edge->{l1},
+			    simplifyName($edge->{n2}), $edge->{l2}, @$rate]);
 	}
     }
 }
@@ -519,3 +469,6 @@ assignNodeId();
 outputGraph();
 
 outputData();
+
+# TODO:
+# What happens when the activities list gets too long? -- Only show beginning and end?
