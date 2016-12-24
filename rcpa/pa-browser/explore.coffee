@@ -1,5 +1,20 @@
 { div, h1, h2, h3, h4, p, a, i, select, option, label, form, button,
- thead, th, td, tr, table, tbody, input, li, ul, br } = React.DOM
+ thead, tfoot, th, td, tr, table, tbody, input, li, ul, br } = React.DOM
+
+queryString = ((a) ->
+  if a is ''
+    return {}
+  b = {}
+  ind = 0
+  while ind < a.length
+    p = a[ind].split('=', 2)
+    if p.length == 1
+      b[p[0]] = ''
+    else
+      b[p[0]] = decodeURIComponent(p[1].replace(/\+/g, ' '))
+    ++ind
+  b
+)(window.location.search.substr(1).split('&'))
 
 descriptionIntro = "This box displays the item that was used to ask
   about the currently hovered characteristic."
@@ -34,11 +49,11 @@ RCPA_DATA=
   Expert: RCPA_DATA3
 
 weightLine = (props) ->
-  items = [-1,-.5,0,.5,1].map((val) ->
+  items = [-1,-.5,0,.5,1].map (val) ->
     option
       key: val
       value: val
-      val)
+      val
   tr
     key: props.facet
     td {},
@@ -48,17 +63,21 @@ weightLine = (props) ->
         name: props.facet
         value: props.weight
         onChange: (event) ->
-          props.onClick(props.index, event.target.value)
+          props.onClick(RCPA_FACETS.indexOf(props.facet), event.target.value)
         items
 
 weightPanel = (props) ->
-  lis = RCPA_FACETS.map((text, index) ->
+  lis = (RCPA_FACETS[x] for x in props.facetOrder).map (text) ->
     weightLine
       facet: text
       abbreviateFacet: props.abbreviateFacet
-      index: index
       onClick: props.onClick
-      weight: props.weight[index])
+      weight: props.weight[RCPA_FACETS.indexOf text]
+  sortIndicatorC = ""
+  sortIndicatorW = ""
+  sortDir = if props.sortAsc then 'ascending' else 'descending'
+  if props.sortedBy is 'characteristic' then sortIndicatorC = sortDir
+  if props.sortedBy is 'weight'         then sortIndicatorW = sortDir
   div
     className: "column"
     div
@@ -67,25 +86,64 @@ weightPanel = (props) ->
         className: "header"
         "Which characteristics do you value?"
       table
-        className: "ui celled table"
+        className: "ui very compact table sortable"
         thead {},
           tr {},
-            th {}, "Characteristic"
-            th {}, "Weight"
+            th
+              className: "sorted #{sortIndicatorC}"
+              onClick: ->
+                if sortIndicatorC is "descending"
+                  props.setFacetOrder null, null, [0..RCPA_FACETS.length-1]
+                  return
+                props.sortAsc = true if sortIndicatorC is ""
+                props.sortAsc = false if sortIndicatorC is "ascending"
+                newOrder = props.facetOrder.slice()
+                newOrder.sort (a,b) ->
+                  [a,b]=[b,a] if not props.sortAsc
+                  RCPA_FACET_ALPHA[a] - RCPA_FACET_ALPHA[b]
+                props.setFacetOrder "characteristic", props.sortAsc, newOrder
+              "Characteristic"
+            th
+              className: "sorted #{sortIndicatorW}"
+              onClick: ->
+                if sortIndicatorW is "descending"
+                  props.setFacetOrder null, null, [0..RCPA_FACETS.length-1]
+                  return
+                props.sortAsc = true if sortIndicatorW is ""
+                props.sortAsc = false if sortIndicatorW is "ascending"
+                newOrder = props.facetOrder.slice()
+                newOrder.sort (a,b) ->
+                  [c,d]=[a,b]
+                  [c,d]=[b,a] if not props.sortAsc
+                  cmp = props.weight[c] - props.weight[d]
+                  cmp = a - b if cmp is 0
+                  cmp
+                props.setFacetOrder "weight", props.sortAsc, newOrder
+              "Weight"
         tbody {},
           lis
-      div
-        className: "inline field"
-        div
-          className: "ui toggle checkbox"
-          input
-            className: "hidden"
-            type: "checkbox"
-            checked: props.abbreviateFacet
-          label
-            onClick: ->
-              props.setAbbreviateFacet(!props.abbreviateFacet)
-            "Abbreviate characteristics"
+        tfoot {},
+          tr {},
+            th {},
+              div
+                className: "ui toggle checkbox"
+                input
+                  className: "hidden"
+                  type: "checkbox"
+                  checked: props.abbreviateFacet
+                label
+                  onClick: ->
+                    props.setAbbreviateFacet(!props.abbreviateFacet)
+                  "Abbreviate"
+            th {},
+              button
+                className: "negative ui button"
+                onClick: ->
+                  $("#reset-weights-modal").modal
+                    onApprove: ->
+                      props.resetWeights()
+                  .modal("show")
+                "Reset"
 
 dotprod = (v1, v2) ->
   throw new Error("dotprod: #{v1.length} != #{v2.length}") if v1.length isnt v2.length
@@ -111,7 +169,8 @@ resultPanel = (props) ->
       cmp = -1 if RCPA_PA[a] < RCPA_PA[b]
       cmp = 1  if RCPA_PA[a] > RCPA_PA[b]
     cmp
-  lis = order.map((index) ->
+  # when list gets too long, only show beginning and end TODO
+  lis = order.map (index) ->
     rawName = RCPA_PA[index]
     part = rawName.split(';')
     div
@@ -120,12 +179,12 @@ resultPanel = (props) ->
       a
         href: "https://en.wikipedia.org/wiki/#{encodeURI(part[0])}"
         target: "_blank"
-        prettyName(RCPA_PA[index]))
+        prettyName(RCPA_PA[index])
   div
     className: "column"
     div
       className: "ui buttons"
-      Skills.map((text) ->
+      Skills.map (text) ->
         isActive = ""
         isActive = "active" if text is props.skill
         div
@@ -133,7 +192,7 @@ resultPanel = (props) ->
           key: text
           onClick: () ->
             props.setSkill(text)
-          text)
+          text
     div
       className: "ui list"
       lis
@@ -154,7 +213,9 @@ class Graph extends React.Component
         shape: 'dot'
       interaction:
         navigationButtons: true
-        keyboard: true
+        keyboard:
+          enabled: true
+          bindToWindow: false
     elem = $('#graph')
     @state.network = new vis.Network(elem[0], data, options)
 
@@ -176,14 +237,42 @@ class Graph extends React.Component
 class Jumbotron extends React.Component
   constructor: (props) ->
     super(props)
+    iw = RCPA_FACETS.map (facet) ->
+      val = Number(queryString[facet])
+      aval = Math.abs(val)
+      if aval is 1 or aval is 0.5 or aval is 0 then val
+      else 0
     @state =
       abbreviateFacet: false
-      weight: new Array(RCPA_FACETS.length).fill(0)
+      weight: iw
       skill: Skills[1]
+      facetOrder: [0..RCPA_FACETS.length-1]
+      sortedBy: null
+      sortAsc: null
+
+  maybeResetSort: ->
+    return if @state.sortedBy isnt "weight"
+    this.setState
+      sortedBy: null
+      sortAsc: null
+
+  setFacetOrder: (col, asc, order) =>
+    this.setState
+      sortedBy: col
+      sortAsc: asc
+      facetOrder: order
 
   handleChange: (index, value) =>
+    this.maybeResetSort()
     foo = @state.weight.slice()
-    foo[index] = value
+    foo[index] = Number(value)
+    this.setState
+      weight: foo
+
+  resetWeights: =>
+    this.maybeResetSort()
+    foo = @state.weight.slice()
+    foo.fill(0)
     this.setState
       weight: foo
 
@@ -195,17 +284,21 @@ class Jumbotron extends React.Component
     this.setState
       skill: value
 
-  # componentDidMount: ->
-  #   $('.ui.sticky').sticky
-  #     context: "#introduction"
+  componentDidMount: ->
+    $('#content').visibility
+      onUpdate: (calc) ->
+        if calc.width < 960 then $('#table-of-contents').hide()
+        else $('#table-of-contents').show()
 
   render: ->
-    fn = this.handleChange
-    fn2 = this.setAbbreviateFacet
-    fn3 = this.setCurrentSkill
+    parent = this
+    qs1 = (x) -> [RCPA_FACETS[x], parent.state.weight[x]].join('=')
+    weightQS = (qs1 x for x in [0..RCPA_FACETS.length-1] when @state.weight[x] isnt 0)
+    shareURL = [window.location.href.split('?')[0], weightQS.join('&')].join('?')
     div {},
       div
         className: "ui right rail"
+        id: "table-of-contents"
         style:
           position: "fixed"  # visibility is too confusing, force it
           left: "80%"
@@ -235,6 +328,10 @@ class Jumbotron extends React.Component
                 className: "item"
                 href: "#invitation"
                 "Invitation to Participate"
+              a
+                className: "item"
+                href: "#contact"
+                "Questions?"
       h1
         className: "ui header center aligned"
         "Relative characteristics of physical activities:"
@@ -273,26 +370,49 @@ class Jumbotron extends React.Component
         div
           className: "ui stackable two column grid"
           weightPanel
-            onClick: (index, value) ->
-              fn(index, value)
+            onClick: parent.handleChange
             abbreviateFacet: @state.abbreviateFacet
-            setAbbreviateFacet: fn2
+            setAbbreviateFacet: parent.setAbbreviateFacet
             weight: @state.weight
+            resetWeights: parent.resetWeights
+            facetOrder: @state.facetOrder
+            sortedBy: @state.sortedBy
+            sortAsc: @state.sortAsc
+            setFacetOrder: parent.setFacetOrder
           resultPanel
             weight: @state.weight
             skill: @state.skill
-            setSkill: (current) -> fn3(current)
+            setSkill: parent.setCurrentSkill
+        br()
+        div
+          className: "ui form"
+          div
+            className: "field"
+            label
+              "Share your weights (copy & paste the link)"
+            input
+              type: "text"
+              readOnly: true
+              value: shareURL
+              onMouseEnter: (ev) ->
+                ev.target.select()
+              onClick: (ev) ->
+                ev.target.select()
+              onFocus: (ev) ->
+                ev.target.select()
         h3
           className: "ui header"
           id: "data-connectivity"
           "Data Connectivity"
         "The graph below shows the responses from participants and how they fit together.
-        We can only analyze data that are connected.
-        Analysis is restricted to the largest connected group of activities.
-        World Sports Encyclopedia (2003) estimated that there are about 8,000 sports.
+        Although #{RCPA_nodes.length} activities have been named,
+        we can only analyze those that are connected.
+        World Sports Encyclopedia (2003) estimated that there are about eight thousand sports.
         Of course, physical activities are a superset of that.
         Even if we restrict our interest to, say, the 400 most popular physical activities,
-        there are still about eighty thousand pairs.
+        there are still about eighty thousand possible pairs.
+        So far, data is available for #{RCPA_edges.length} pairs
+        from #{RCPA_edges.map((v)->v.value).reduce((x,y)->x+y)} responses.
         Our statistical model can fill in the gaps, but the more data the better."
         React.createElement(Graph)
         h3
@@ -310,10 +430,37 @@ class Jumbotron extends React.Component
         I found it thought provoking and enjoyed going through it.
         You might enjoy it too. Take a look,
         """
-        " "
+        ' '
         a
           href: "http://tiny.cc/physical"
           "http://tiny.cc/physical"
+        '"'
+        h3
+          className: "ui header"
+          id: "contact"
+          "Questions?"
+        "Joshua Pritikin <"
+        a
+          href: "mailto:jpritikin@pobox.com"
+          "jpritikin@pobox.com"
+        ">"
+        br()
+        "Virginia Institute for Psychiatric and Behavioral Genetics"
+        br()
+        "Virginia Commonwealth University"
+        br()
+        "800 E Leigh St, Biotech One"
+        br()
+        "Suite 1-133"
+        br()
+        "Richmond, VA 23219"
+        br()
+        br()
+        br()
+        br()
+        br()
+        br()
+        br()
         br()
         br()
         br()

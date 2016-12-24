@@ -469,6 +469,3 @@ assignNodeId();
 outputGraph();
 
 outputData();
-
-# TODO:
-# What happens when the activities list gets too long? -- Only show beginning and end?

@@ -2,4 +2,6 @@
 
 # http://visjs.org/index.html#download_install
 
+# Need to substitute minified stuff and get our own copies TODO
+
 rsync --size-only -arv ./ ~/UVa/public_html/rcpa/

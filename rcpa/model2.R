@@ -77,8 +77,9 @@ estimator <- 'mean'
 facetNames <- colnames(rcd[-1:-4])
 
 df <- summary(sim_fit, pars=c("alpha"), probs=.5)$summary
-print(matrix(df[,estimator], nrow=1,
-             dimnames=list(NULL, facetNames)))
+alpha <- matrix(df[,estimator], nrow=1,
+                dimnames=list(NULL, facetNames))
+print(alpha)
 
 df <- summary(sim_fit, pars=c("theta"), probs=.5)$summary
 tar <- array(df[,estimator], dim=c(NFACETS, NPA, 3))
@@ -105,6 +106,8 @@ cat(paste("var RCPA_DATA1=",
           toJSON(tar[,,3], matrix="columnmajor", digits=3),
           ";\nvar RCPA_FACETS=",
           toJSON(facetNames),
+          ";\nvar RCPA_FACET_ALPHA=",
+          toJSON(alpha[1,]),
           ";\nvar RCPA_PA=",
           toJSON(palist),
           ";"),
