@@ -63,9 +63,12 @@ sim_fit <- stan(file = "model2.stan",
                             pa2=match(rcd$pa2, palist), l2=rcd$l2,
                             diff=rcd[-1:-4]),
                 chains = 6, 
-                iter = 200)
+                iter = 500)
 
 summary(summary(sim_fit)$summary[,c('Rhat', 'n_eff')])
+
+neOrder <- order(summary(sim_fit)$summary[,c('n_eff')])
+head(summary(sim_fit, probs=.5)$summary[neOrder,], n=20)
 
 #plot(sim_fit, pars=c("thetaScale"))
 plot(sim_fit, pars=c(paste0("threshold",1:2)))

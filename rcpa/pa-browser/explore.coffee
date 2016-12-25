@@ -49,7 +49,7 @@ RCPA_DATA=
   Expert: RCPA_DATA3
 
 weightLine = (props) ->
-  items = [-1,-.5,0,.5,1].map (val) ->
+  items = [-5..5].map (val) ->
     option
       key: val
       value: val
@@ -238,9 +238,9 @@ class Jumbotron extends React.Component
   constructor: (props) ->
     super(props)
     iw = RCPA_FACETS.map (facet) ->
-      val = Number(queryString[facet])
+      val = Math.round(Number(queryString[facet]))
       aval = Math.abs(val)
-      if aval is 1 or aval is 0.5 or aval is 0 then val
+      if aval <= 5 then val
       else 0
     @state =
       abbreviateFacet: false
@@ -405,7 +405,7 @@ class Jumbotron extends React.Component
           id: "data-connectivity"
           "Data Connectivity"
         "The graph below shows the responses from participants and how they fit together.
-        Although #{RCPA_nodes.length} activities have been named,
+        Although #{RCPA_nodes.length} activities have been mentioned,
         we can only analyze those that are connected.
         World Sports Encyclopedia (2003) estimated that there are about eight thousand sports.
         Of course, physical activities are a superset of that.

@@ -39,8 +39,8 @@ parameters {
   vector<lower=0>[NFACETS] alpha;
 }
 model {
-//  threshold1 ~ normal(0,5);
-//  threshold2 ~ normal(0,5);
+  threshold1 ~ normal(0,5);
+  threshold2 ~ normal(0,5);
 //  thetaScale ~ lognormal(1,1);
   for (lev in 1:2) {
     for (pa in 1:NPA) {
