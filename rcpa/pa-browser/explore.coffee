@@ -176,10 +176,11 @@ resultPanel = (props) ->
     div
       className: "item"
       key: index
+      "#{prettyName(RCPA_PA[index])} "
       a
         href: "https://en.wikipedia.org/wiki/#{encodeURI(part[0])}"
         target: "_blank"
-        prettyName(RCPA_PA[index])
+        "^"
   div
     className: "column"
     div
@@ -229,9 +230,11 @@ class Graph extends React.Component
         id: "graph"
       div
         className: "ui info message"
-        "Scroll or use keys '[' and ']' to zoom in and out.
+        "Scroll or use the square bracket keys '[' and ']' to zoom in and out.
         Drag background or use arrow keys to recenter.
-        Size of node and thickness of edge indicate sample size.
+        Size of node indicates the number of respondents who mentioned
+        that activity and thickness of the line indicate how many
+        respondents chose the pair.
         Activities with only one sample are excluded from the model."
 
 class Jumbotron extends React.Component
@@ -334,10 +337,10 @@ class Jumbotron extends React.Component
                 "Questions?"
       h1
         className: "ui header center aligned"
-        "Relative characteristics of physical activities:"
+        "Preliminary results"
       h2
         className: "ui header center aligned"
-        "Preliminary results"
+        "Relative characteristics of physical activities"
       h3
         className: "ui header center aligned"
         "updated #{RCPA_date}"
@@ -347,18 +350,31 @@ class Jumbotron extends React.Component
           className: "ui header"
           id: "introduction"
           "Introduction"
-        "Flow is a state in which an individual is completely immersed in
-        an activity without reflective self-consciousness but with a deep sense of control.
-        One goal of this study is figure out which physical activities are more or less conducive to flow.
-        However, in the short term, we invite you to select characteristics that are of interest to you.
-        Physical activities are ranked according to your criteria.
-        Which physical activities that you haven’t tried yet might be worth considering?"
+        "You just completed a survey.
+        Not all of the data is in, but we wanted to show you what can be gleened
+        from preliminary data. We also include a status update on the data collection effort."
         h3
           className: "ui header"
           id: "data-explorer"
           "Data Explorer"
-        "These results are obtained by fitting responses from participants with a statistical model.
-        This model considers each characteristic independently of other characteristics.
+        "On the left you'll see a list of the characteristics that you
+        considered for your pair of physical activities.
+        A weight that you can change is associated with each characteristic.
+        Initially, all weights are set to zero.
+        Choose one of the characteristics that you value, or are curious about,
+        and assign it a +1 weight.
+        When you assign a weight, the order of the list of activities on the right side
+        will update to reflect the preference that you have expressed, from high to low
+        (or low to high for negative weights).
+        You can play around with assigning more than one weight at a time and see
+        how the order changes.
+        You can also click on the buttons labelled Novice, Amateur, and Expert
+        to observe how the ordering changes depending on the level of mastery
+        a participant brings to the activities.
+        Are there physical activities that you haven’t tried that might be worth considering?"
+        br(),
+        br(),
+        "This statistical model considers each characteristic independently of other characteristics.
         For example, "
         i({}, "creativity")
         " is ranked independently of "
@@ -404,7 +420,7 @@ class Jumbotron extends React.Component
           className: "ui header"
           id: "data-connectivity"
           "Data Connectivity"
-        "The graph below shows the responses from participants and how they fit together.
+        "The graph below shows which pairs of activities were compared by participants.
         Although #{RCPA_nodes.length} activities have been mentioned,
         we can only analyze those that are connected.
         World Sports Encyclopedia (2003) estimated that there are about eight thousand sports.
@@ -420,26 +436,17 @@ class Jumbotron extends React.Component
           id: "invitation"
           "Invitation to Participate"
         "If you'd like to contribute more data,
-        you can take this survey again with a different pair of physical activities."
-        br()
-        br()
-        "If you enjoyed participating, you may want to invite others to participate. "
-        """
-        Suggested text for invitation: "I recently participated in a five minute
-        survey that examined the relative characteristics of physical activities.
-        I found it thought provoking and enjoyed going through it.
-        You might enjoy it too. Take a look,
-        """
-        ' '
+        you can take this survey again with a different pair of physical activities.
+        If you enjoyed participating, you may want to invite others to participate.
+        The survey is linked from "
         a
           href: "http://tiny.cc/physical"
           "http://tiny.cc/physical"
-        '"'
         h3
           className: "ui header"
           id: "contact"
           "Questions?"
-        "Joshua Pritikin <"
+        "Joshua Pritikin, Ph.D. <"
         a
           href: "mailto:jpritikin@pobox.com"
           "jpritikin@pobox.com"

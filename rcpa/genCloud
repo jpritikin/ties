@@ -5,9 +5,9 @@ use warnings;
 use Archive::Zip qw(AZ_OK);
 use Text::CSV_XS;
 use Fatal qw(open);
-use Time::localtime;
 use Graph;
 use Date::Manip;
+use POSIX qw(strftime);
 use Data::Dumper;
 
 my %ShortDict =
@@ -410,7 +410,7 @@ sub assignNodeId {
 }
 
 sub outputGraph {
-    my $stamp = sprintf "%04d-%02d-%02d", localtime->year() + 1900, 1+localtime->mon, localtime->mday;
+    my $stamp = strftime("%b %d, %Y", localtime());
     open my $fh, ">", "pa-browser/rcpa-graph.js";
     my $oldOut = select $fh;
 
