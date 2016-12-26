@@ -8,6 +8,7 @@ if (1) {
   rcd <- read.csv("rawData.csv")
   
   NCMP <- nrow(rcd)
+  if (NCMP < 1) { stop("No data?") }
   NFACETS <- ncol(rcd) - 4L
   
   palist <- unique(c(as.character(rcd$pa1), as.character(rcd$pa2)))
@@ -71,7 +72,9 @@ neOrder <- order(summary(sim_fit)$summary[,c('n_eff')])
 head(summary(sim_fit, probs=.5)$summary[neOrder,], n=20)
 
 #plot(sim_fit, pars=c("thetaScale"))
-plot(sim_fit, pars=c(paste0("threshold",1:2)))
+if (interactive()) {
+  plot(sim_fit, pars=c(paste0("threshold",1:2)))
+}
 
 df <- summary(sim_fit, pars=c("alpha","theta"), probs=.5)$summary
 summary(df[,'mean'] - df[,'50%'])

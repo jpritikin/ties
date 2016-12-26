@@ -7,6 +7,7 @@ use Text::CSV_XS;
 use Fatal qw(open);
 use Time::localtime;
 use Graph;
+use Date::Manip;
 use Data::Dumper;
 
 my %ShortDict =
@@ -99,11 +100,15 @@ my %LongDict =
    'springboard diving@1-meter and 3-meter springboard diving' => 'diving',
    'weight lifting@dumbbells' => 'weightlifting',
    'lifting@lifting weights in a gym setting' => 'weightlifting',
+   'weight lifting@i do a variation of hang cleans, barbell squats, dead lifts, over-head snatchs, and any type of olympic lifts in sets that range from 5x5, 4x10, 5x3.' => 'weightlifting',
+   'running@i run outside or on a treadmill usually 2 miles. or i elliptical for 30-45 min at moderate intensity.' => 'running',
+   'tennis@tennis competitive, singles and doubles' => 'tennis',
+   'basketball@social group with friends, not competitive' => 'basketball',
   );
 
 use constant PA1_START  => 15;
-use constant PA2_START  => 17;
-use constant RCPA_START => 19;
+use constant PA2_START  => 18;
+use constant RCPA_START => 21;
 
 ### BEGIN GLOBAL STATE
 
@@ -173,12 +178,12 @@ our @RC_SKILL_MAP =
    '{{Q6}} requires somewhat more skill than {{Q8}}.',
    '{{Q6}} requires much more skill than {{Q8}}.');
 
-our @RC_UNPREDICT_MAP =
-  ('{{Q6}} is much more unpredictable than {{Q8}}.',
-   '{{Q6}} is somewhat more unpredictable than {{Q8}}.',
+our @RC_PREDICT_MAP =
+  ('{{Q6}} is much more predictable than {{Q8}}.',
+   '{{Q6}} is somewhat more predictable than {{Q8}}.',
    'Both offer roughly equal predictability.',
-   '{{Q8}} is somewhat more unpredictable than {{Q6}}.',
-   '{{Q8}} is much more unpredictable than {{Q6}}.');
+   '{{Q8}} is somewhat more predictable than {{Q6}}.',
+   '{{Q8}} is much more predictable than {{Q6}}.');
 
 our @RC_NOVELTY_MAP =
   ('{{Q8}} offers a much more novelty than {{Q6}}.',
@@ -303,7 +308,7 @@ sub cmpToNum {
 	    return $sign * ($x - 2)
 	}
     }
-    die "'$cmp' no found";
+    die "'$cmp' not found";
 }
 
 our %SHORT_MASTERY =
@@ -319,7 +324,7 @@ sub shortenMastery {
 }
 
 sub edge {
-    my ($n1, $l1, $n2, $l2, $field) = @_;
+    my ($n1, $l1, $n2, $l2, $version, $field) = @_;
     return if (!defined $n1 or !defined $n2);
     my @k = ($n1,$n2);
     my @sk = sort @k;
@@ -334,7 +339,7 @@ sub edge {
     }
     $info->{l1} = shortenMastery($l1);
     $info->{l2} = shortenMastery($l2);
-    my @map = (\@RC_SKILL_MAP, \@RC_UNPREDICT_MAP, \@RC_NOVELTY_MAP, \@RC_CREATIVE_MAP,
+    my @map = (\@RC_SKILL_MAP, \@RC_PREDICT_MAP, \@RC_NOVELTY_MAP, \@RC_CREATIVE_MAP,
 	       \@RC_COMPLEX_MAP, \@RC_GOAL_MAP, \@RC_FEEDBACK_MAP, \@RC_GOAL_MAP, \@RC_FEEDBACK_MAP,
 	       \@RC_CHATTER_MAP, \@RC_WAITING_MAP, \@RC_BODY_MAP, \@RC_CONTROL_MAP, \@RC_PRESENT_MAP,
 	       \@RC_SPONT_MAP, \@RC_STAKES_MAP, \@RC_EVALUATED_MAP, \@RC_REWARD_MAP, \@RC_INJURY1_MAP,
@@ -342,7 +347,13 @@ sub edge {
     my $rating = [];
     for my $x (0..19) {
 	my $got = cmpToNum($map[$x], $field->[RCPA_START + 4 + $x]);
-	$got *= $sign if $got ne 'NA';
+	if ($got ne 'NA') {
+	    $got *= $sign;
+	    if ($x == 1 and Date_Cmp($version, "2016-12-25") < 0) {
+		# switched from unpredict to predict
+		$got *= -1;
+	    }
+	}
 	push @$rating, $got;
     }
     push @{ $info->{rating} }, $rating;
@@ -377,8 +388,8 @@ sub loadZip {
 
 	    my $n1 = node($field[PA1_START], $field[PA1_START + 1], $field[RCPA_START+0]);
 	    my $n2 = node($field[PA2_START], $field[PA2_START + 1], $field[RCPA_START+1]);
-	    next if $n1 eq $n2;
-	    edge($n1, $field[RCPA_START+2], $n2, $field[RCPA_START+3], \@field);
+	    next if (!defined $n1 or !defined $n2 or $n1 eq $n2);
+	    edge($n1, $field[RCPA_START+2], $n2, $field[RCPA_START+3], ParseDate($field[2]), \@field);
 	} else {
 	    print STDERR "parse () failed on argument: ",
 	      $csv->error_input, "\n";
@@ -446,7 +457,7 @@ sub simplifyName {
 sub outputData {
     my $csv = Text::CSV_XS->new ({ binary => 1, auto_diag => 1 });
     open my $fh, ">:encoding(utf8)", "rawData.csv";
-    $csv->say($fh, ['pa1', 'l1', 'pa2', 'l2', 'skill', 'unpredict', 'novelty', 'creative', 'complex',
+    $csv->say($fh, ['pa1', 'l1', 'pa2', 'l2', 'skill', 'predict', 'novelty', 'creative', 'complex',
 		    'goal1', 'feedback1', 'goal2', 'feedback2', 'chatter', 'waiting',
 		    'body', 'control', 'present', 'spont', 'stakes', 'evaluated', 'reward',
 		    'injury1', 'injury2']);

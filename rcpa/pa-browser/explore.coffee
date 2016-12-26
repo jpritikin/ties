@@ -21,7 +21,7 @@ descriptionIntro = "This box displays the item that was used to ask
 
 descriptionMap =
   skill: "How much skill is required?"
-  unpredict: "How unpredictable is the action?"
+  predict: "How predictable is the action?"
   novelty: "To what extent do you find new and fresh experiences during the activity?"
   creative: "To what extent are there opportunities to express creativity during the activity?"
   complex: "How complex is the action and the environment in which it takes place?"
