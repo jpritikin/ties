@@ -136,7 +136,6 @@ sub useNode {
     my $name = join(';', $pa, lc $solo);
     if (!exists $NodeInfo{$name}) {
 	$NodeInfo{$name} = { count => 0 };
-	$NodeGroupInfo{$pa} = {};
     }
     ++$NodeInfo{$name}{count};
     ++$NodeGroupInfo{$pa}{$solo};
@@ -332,20 +331,20 @@ sub edge {
     my $sign = $k[0] ne $sk[0]? -1 : 1;
     my $k = join ':', @sk;
     if (!exists $EdgeInfo{$k}) {
-	$EdgeInfo{$k} = { n1 => $n1, n2 => $n2, count => 0 };
+	$EdgeInfo{$k} = { n1 => $k[0], n2 => $k[1], count => 0 };
     }
     my $info = $EdgeInfo{$k};
     if (++$info->{count} == 2) { # increase to limit to a minimum sample size TODO
-	$Graph->add_edge($n1, $n2);
+	$Graph->add_edge($k[0], $k[1]);
     }
-    $info->{l1} = shortenMastery($l1);
-    $info->{l2} = shortenMastery($l2);
+    my @m = (shortenMastery($l1), shortenMastery($l2));
+    @m = reverse @m if $sign < 0;
     my @map = (\@RC_SKILL_MAP, \@RC_PREDICT_MAP, \@RC_NOVELTY_MAP, \@RC_CREATIVE_MAP,
 	       \@RC_COMPLEX_MAP, \@RC_GOAL_MAP, \@RC_FEEDBACK_MAP, \@RC_GOAL_MAP, \@RC_FEEDBACK_MAP,
 	       \@RC_CHATTER_MAP, \@RC_WAITING_MAP, \@RC_BODY_MAP, \@RC_CONTROL_MAP, \@RC_PRESENT_MAP,
 	       \@RC_SPONT_MAP, \@RC_STAKES_MAP, \@RC_EVALUATED_MAP, \@RC_REWARD_MAP, \@RC_INJURY1_MAP,
 	       \@RC_INJURY2_MAP);
-    my $rating = [];
+    my $rating = [@m];
     for my $x (0..19) {
 	my $got = cmpToNum($map[$x], $field->[RCPA_START + 4 + $x]);
 	if ($got ne 'NA') {
@@ -399,37 +398,71 @@ sub loadZip {
     }
 }
 
-sub assignNodeId {
-    my @k = sort keys %NodeInfo;
-    for my $id (1..@k) {
-	my $info = $NodeInfo{ $k[$id-1] };
-	$info->{id} = $id;
-	# May want to allow separate estimates for these? TODO
-	#warn $k[$id-1] if ($info->{Group} and $info->{Solo});
-    }
+sub nodeColor {
+    my ($code) = @_;
+    if ($code == 1) { '#99cc33' }
+    elsif ($code == 2) { '#cc9966' }
+    else { '#993333' }
+}
+
+sub outputNode {
+    my ($i, $id, $rate, $which) = @_;
+    my $nk = 'n'.($which+1);
+    my $name = simplifyName($i->{$nk});
+    my @part = split /;/, $name;
+    if (@part == 2) { $name = "$part[0] ($part[1])" }
+    my $color = nodeColor($rate->[$which]);
+    print "  {id: $id,  label: '$name', color: '$color' },\n";
 }
 
 sub outputGraph {
-    my $stamp = strftime("%b %d, %Y", localtime());
     open my $fh, ">", "pa-browser/rcpa-graph.js";
     my $oldOut = select $fh;
 
+    my $stamp = strftime("%b %d, %Y", localtime());
     print "var RCPA_date = '$stamp';\n";
+
+    my $NextId = 0;
+    my %GNodeId;
     print "var RCPA_nodes = [\n";
-    for my $k (sort keys %NodeInfo) {
-	my $name = simplifyName($k);
-	my @part = split /;/, $name;
-	if (@part == 2) { $name = "$part[0] ($part[1])" }
-	print "  {id: $NodeInfo{$k}{id},  value: $NodeInfo{$k}{count},  label: '$name' },\n";
+    for my $k (sort keys %EdgeInfo) {
+	my $i = $EdgeInfo{$k};
+	for my $rate (@{$i->{rating}}) {
+	    my $k1 = join ';', $i->{n1}, $rate->[0];
+	    if (!exists $GNodeId{$k1}) {
+		$GNodeId{$k1} = ++$NextId;
+		outputNode($i, $GNodeId{$k1}, $rate, 0);
+	    }
+	    my $k2 = join ';', $i->{n2}, $rate->[1];
+	    if (!exists $GNodeId{$k2}) {
+		$GNodeId{$k2} = ++$NextId;
+		outputNode($i, $GNodeId{$k2}, $rate, 1);
+	    }
+	}
     }
     print "];\n";
+
+    my %EdgeCount;
+    for my $k (sort keys %EdgeInfo) {
+	my $i = $EdgeInfo{$k};
+	for my $rate (@{$i->{rating}}) {
+	    my $k1 = join ';', $i->{n1}, $rate->[0];
+	    my $k2 = join ';', $i->{n2}, $rate->[1];
+	    ++$EdgeCount{"$k1--$k2"};
+	}
+    }
 
     print "var RCPA_edges = [\n";
     for my $k (sort keys %EdgeInfo) {
 	my $i = $EdgeInfo{$k};
-	my $n1 = $NodeInfo{ $i->{n1} };
-	my $n2 = $NodeInfo{ $i->{n2} };
-	print "  {from: $n1->{id}, to: $n2->{id}, value: $i->{count} },\n";
+	for my $rate (@{$i->{rating}}) {
+	    my $k1 = join ';', $i->{n1}, $rate->[0];
+	    my $k2 = join ';', $i->{n2}, $rate->[1];
+	    next if !exists $EdgeCount{"$k1--$k2"};
+	    my $count = $EdgeCount{"$k1--$k2"};
+	    print "  {from: $GNodeId{$k1}, to: $GNodeId{$k2}, value: $count },\n";
+	    delete $EdgeCount{"$k1--$k2"}
+	}
     }
     print "];\n";
     select $oldOut;
@@ -458,7 +491,7 @@ sub simplifyName {
 sub outputData {
     my $csv = Text::CSV_XS->new ({ binary => 1, auto_diag => 1 });
     open my $fh, ">:encoding(utf8)", "rawData.csv";
-    $csv->say($fh, ['pa1', 'l1', 'pa2', 'l2', 'skill', 'predict', 'novelty', 'creative', 'complex',
+    $csv->say($fh, ['pa1', 'pa2', 'l1', 'l2', 'skill', 'predict', 'novelty', 'creative', 'complex',
 		    'goal1', 'feedback1', 'goal2', 'feedback2', 'chatter', 'waiting',
 		    'body', 'control', 'present', 'spont', 'stakes', 'evaluated', 'reward',
 		    'injury1', 'injury2']);
@@ -468,15 +501,12 @@ sub outputData {
     for my $edge (values %EdgeInfo) {
 	next if (!$white{$edge->{n1}} or !$white{$edge->{n2}});
 	for my $rate (@{ $edge->{rating} }) {
-	    $csv->say($fh, [simplifyName($edge->{n1}), $edge->{l1},
-			    simplifyName($edge->{n2}), $edge->{l2}, @$rate]);
+	    $csv->say($fh, [simplifyName($edge->{n1}), simplifyName($edge->{n2}), @$rate]);
 	}
     }
 }
 
 loadZip(shift);
-
-assignNodeId();
 
 outputGraph();
 

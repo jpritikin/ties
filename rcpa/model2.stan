@@ -20,7 +20,7 @@ data {
   int<lower=1, upper=3> l1[NCMP];           // L1 for observation N
   int<lower=1, upper=NPA> pa2[NCMP];        // PA2 for observation N
   int<lower=1, upper=3> l2[NCMP];           // L2 for observation N
-  int<lower=-2, upper=2> diff[NCMP,NFACETS];   // comparisons
+  int<lower=-2, upper=10> diff[NCMP,NFACETS];   // comparisons
 }
 transformed data {
   int rcat[NCMP,NFACETS];
@@ -55,6 +55,7 @@ model {
   alpha ~ lognormal(1, 1);
   for (cmp in 1:NCMP) {
     for (ff in 1:NFACETS) {
+      if (rcat[cmp,ff] == 13) continue;  // missing
       rcat[cmp,ff] ~ categorical_logit(
         cmp_probs(alpha[ff],
           theta[l1[cmp],pa1[cmp],ff],

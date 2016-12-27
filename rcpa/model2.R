@@ -58,6 +58,8 @@ if (1) {
 
 # Nice to add a prior when the only difference is solo/group TODO
 
+rcd[is.na(rcd)] <- 10
+
 sim_fit <- stan(file = "model2.stan",
                 data = list(NPA=NPA, NFACETS=NFACETS, NCMP=NCMP,
                             pa1=match(rcd$pa1, palist), l1=rcd$l1,

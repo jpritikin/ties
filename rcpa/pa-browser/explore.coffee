@@ -234,10 +234,8 @@ class Graph extends React.Component
         className: "ui info message"
         "Scroll or use the square bracket keys '[' and ']' to zoom in and out.
         Drag background or use arrow keys to recenter.
-        Size of node indicates the number of respondents who mentioned
-        that activity and thickness of the line indicate how many
-        respondents chose the pair.
-        Activities with only one sample are excluded from the model."
+        Thickness of the line indicate how many respondents chose the pair.
+        Green, brown, and dark red correspond to novice, amateur, and expert, respectively."
 
 class Jumbotron extends React.Component
   constructor: (props) ->
@@ -425,7 +423,7 @@ class Jumbotron extends React.Component
           "Data Connectivity"
         "The graph below shows which pairs of activities were compared by participants.
         Although #{RCPA_nodes.length} activities have been mentioned,
-        we can only analyze those that are connected by lines.
+        we can only analyze those that are not home to isolated islands.
         World Sports Encyclopedia (2003) estimated that there are about eight thousand sports.
         Of course, physical activities are a superset of that.
         Even if we restrict our interest to, say, the 400 most popular physical activities,
@@ -440,7 +438,7 @@ class Jumbotron extends React.Component
           "Invitation to Participate"
         "If you'd like to contribute more data,
         you can take this survey again with a different pair of physical activities.
-        Or if you enjoyed participating, you may want to invite others to participate.
+        Or you may want to invite others to participate.
         The link to the survey is "
         a
           href: "http://tiny.cc/physical"
