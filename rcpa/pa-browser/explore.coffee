@@ -302,7 +302,7 @@ class Jumbotron extends React.Component
     shareURL = [window.location.href.split('?')[0], weightQS.join('&')].join('?')
     div {},
       div
-        className: "ui right rail"
+        className: "ui right rail screen-only"
         id: "table-of-contents"
         style:
           position: "fixed"  # visibility is too confusing, force it
@@ -352,8 +352,11 @@ class Jumbotron extends React.Component
           className: "ui header"
           id: "introduction"
           "Introduction"
-        "You just completed a survey.
-        Not all of the data is in, but we wanted to show you what can be gleened
+        "You just completed a "
+        a
+          href: "http://tiny.cc/physical"
+          "survey"
+        ". Not all of the data is in, but we wanted to show you what can be gleened
         from preliminary data. We also include a status update on the data collection effort."
         h3
           className: "ui header"
