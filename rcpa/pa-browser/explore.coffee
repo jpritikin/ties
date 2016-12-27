@@ -48,8 +48,10 @@ RCPA_DATA=
   Amateur: RCPA_DATA2
   Expert: RCPA_DATA3
 
+MAX_ABS_WEIGHT= 3
+
 weightLine = (props) ->
-  items = [-5..5].map (val) ->
+  items = [-MAX_ABS_WEIGHT..MAX_ABS_WEIGHT].map (val) ->
     option
       key: val
       value: val
@@ -243,7 +245,7 @@ class Jumbotron extends React.Component
     iw = RCPA_FACETS.map (facet) ->
       val = Math.round(Number(queryString[facet]))
       aval = Math.abs(val)
-      if aval <= 5 then val
+      if aval <= MAX_ABS_WEIGHT then val
       else 0
     @state =
       abbreviateFacet: false
@@ -359,10 +361,8 @@ class Jumbotron extends React.Component
           "Data Explorer"
         "On the left you'll see a list of the characteristics that you
         considered for your pair of physical activities.
-        A weight that you can change is associated with each characteristic.
-        Initially, all weights are set to zero.
         Choose one of the characteristics that you value, or are curious about,
-        and assign it a +1 weight.
+        and assign it a +1 or -1 weight.
         When you assign a weight, the order of the list of activities on the right side
         will update to reflect the preference that you have expressed, from high to low
         (or low to high for negative weights).
@@ -422,7 +422,7 @@ class Jumbotron extends React.Component
           "Data Connectivity"
         "The graph below shows which pairs of activities were compared by participants.
         Although #{RCPA_nodes.length} activities have been mentioned,
-        we can only analyze those that are connected.
+        we can only analyze those that are connected by lines.
         World Sports Encyclopedia (2003) estimated that there are about eight thousand sports.
         Of course, physical activities are a superset of that.
         Even if we restrict our interest to, say, the 400 most popular physical activities,
@@ -437,8 +437,8 @@ class Jumbotron extends React.Component
           "Invitation to Participate"
         "If you'd like to contribute more data,
         you can take this survey again with a different pair of physical activities.
-        If you enjoyed participating, you may want to invite others to participate.
-        The survey is linked from "
+        Or if you enjoyed participating, you may want to invite others to participate.
+        The link to the survey is "
         a
           href: "http://tiny.cc/physical"
           "http://tiny.cc/physical"
