@@ -422,21 +422,25 @@ sub outputGraph {
     my $stamp = strftime("%b %d, %Y", localtime());
     print "var RCPA_date = '$stamp';\n";
 
+    my %NodeSet;
+
     my $NextId = 0;
     my %GNodeId;
     print "var RCPA_nodes = [\n";
     for my $k (sort keys %EdgeInfo) {
 	my $i = $EdgeInfo{$k};
 	for my $rate (@{$i->{rating}}) {
-	    my $k1 = join ';', $i->{n1}, $rate->[0];
-	    if (!exists $GNodeId{$k1}) {
-		$GNodeId{$k1} = ++$NextId;
-		outputNode($i, $GNodeId{$k1}, $rate, 0);
-	    }
-	    my $k2 = join ';', $i->{n2}, $rate->[1];
-	    if (!exists $GNodeId{$k2}) {
-		$GNodeId{$k2} = ++$NextId;
-		outputNode($i, $GNodeId{$k2}, $rate, 1);
+	    for my $which (0..1) {
+		my $nk = 'n'.(1+$which);
+		my $k1 = join ';', $i->{$nk}, $rate->[$which];
+		if (!exists $GNodeId{$k1}) {
+		    $GNodeId{$k1} = ++$NextId;
+		    outputNode($i, $GNodeId{$k1}, $rate, $which);
+		    if (!exists $NodeSet{ $i->{$nk} }) {
+			$NodeSet{ $i->{$nk} } = [0,0,0];
+		    }
+		    $NodeSet{ $i->{$nk} }[ $rate->[2 + $which] ] = $GNodeId{$k1};
+		}
 	    }
 	}
     }
@@ -453,6 +457,14 @@ sub outputGraph {
     }
 
     print "var RCPA_edges = [\n";
+    for my $k (sort keys %NodeSet) {
+	my $set = $NodeSet{$k};
+	for my $st (0..1) {
+	    next if ($set->[$st] == 0 or $set->[$st+1] == 0);
+	    print "  {from: $set->[$st], to: $set->[$st+1], color: { opacity: .5 }, dashes: true },\n";
+	}
+    }
+
     for my $k (sort keys %EdgeInfo) {
 	my $i = $EdgeInfo{$k};
 	for my $rate (@{$i->{rating}}) {
