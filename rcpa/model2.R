@@ -64,7 +64,7 @@ sim_fit <- stan(file = "model2.stan",
                 data = list(NPA=NPA, NFACETS=NFACETS, NCMP=NCMP,
                             pa1=match(rcd$pa1, palist), l1=rcd$l1,
                             pa2=match(rcd$pa2, palist), l2=rcd$l2,
-                            diff=rcd[-1:-4]),
+                            diff=sapply(rcd[-1:-4], as.numeric)),
                 chains = 6, 
                 iter = 500)
 
@@ -120,3 +120,4 @@ cat(paste("var RCPA_DATA1=",
           toJSON(palist),
           ";"),
     file="pa-browser/rcpa-data.js", fill=TRUE)
+

@@ -1,12 +1,12 @@
 functions {
   vector cmp_probs(real alpha, real pa1, real pa2, real thr1, real thr2) {
     vector[5] unsummed;
-    real diff = pa1 - pa2;
+    real paDiff = pa1 - pa2;
     unsummed[1] = 0;
-    unsummed[2] = diff - thr2;
-    unsummed[3] = diff - thr1;
-    unsummed[4] = diff + thr1;
-    unsummed[5] = diff + thr2;
+    unsummed[2] = paDiff - thr2;
+    unsummed[3] = paDiff - thr1;
+    unsummed[4] = paDiff + thr1;
+    unsummed[5] = paDiff + thr2;
     return cumulative_sum(alpha * unsummed);
   }
 }
@@ -32,21 +32,25 @@ transformed data {
   }
 }
 parameters {
-//  real<lower=0.1> thetaScale;
   matrix[NPA,NFACETS]     theta[3];    // latent score of PA by facet
   real<lower=0> threshold1;
   real<lower=0> threshold2;
   vector<lower=0>[NFACETS] alpha;
+  real<lower=0> betweenLevelVariance;
 }
 model {
+  betweenLevelVariance ~ exponential(.01);
   threshold1 ~ normal(0,5);
   threshold2 ~ normal(0,5);
-//  thetaScale ~ lognormal(1,1);
   for (lev in 1:2) {
     for (pa in 1:NPA) {
-      theta[lev,pa,1:NFACETS] ~ normal(theta[lev+1,pa,1:NFACETS], 1);
+      // estimate a separate variance parameter for each pair of levels TODO
+      for (facet in 1:NFACETS) {
+        theta[lev,pa,facet] ~ normal(theta[lev+1,pa,facet], betweenLevelVariance);
+      }
     }
   }
+  // add prior linking solo/group activities, again with a variance parameter TODO
   for (lev in 1:3) {
     for (pa in 1:NPA) {
       theta[lev,pa,1:NFACETS] ~ normal(0, 1);  //sd=thetaScale?
@@ -55,7 +59,7 @@ model {
   alpha ~ lognormal(1, 1);
   for (cmp in 1:NCMP) {
     for (ff in 1:NFACETS) {
-      if (rcat[cmp,ff] == 13) continue;  // missing
+      if (rcat[cmp,ff] == 13) continue;  // special value to indicate missing
       rcat[cmp,ff] ~ categorical_logit(
         cmp_probs(alpha[ff],
           theta[l1[cmp],pa1[cmp],ff],
