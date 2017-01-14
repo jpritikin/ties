@@ -91,8 +91,8 @@ print(alpha)
 
 df <- summary(sim_fit, pars=c("theta"), probs=.5)$summary
 tar <- array(df[,estimator], dim=c(NFACETS, NPA, 3))
-cor(c(tar[,,1]), c(tar[,,2]))  #.7
-cor(c(tar[,,2]), c(tar[,,3]))  #.62
+cor(c(tar[,,1]), c(tar[,,2]))  #.99
+cor(c(tar[,,2]), c(tar[,,3]))  #.99
 
 if (0) {
   toJSON(array(1:8, dim=c(2,2,2)), matrix="columnmajor")

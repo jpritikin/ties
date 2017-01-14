@@ -36,7 +36,7 @@ parameters {
   real<lower=0> threshold1;
   real<lower=0> threshold2;
   vector<lower=0>[NFACETS] alpha;
-  real<lower=0> betweenLevelVariance;
+  real<lower=1e-15> betweenLevelVariance;
 }
 model {
   betweenLevelVariance ~ exponential(.01);
