@@ -47,7 +47,7 @@ model {
     for (pa in 1:NPA) {
       // estimate a separate variance parameter for each pair of levels TODO
       for (facet in 1:NFACETS) {
-        theta[lev,pa,facet] ~ normal(theta[lev+1,pa,facet], betweenLevelVariance);
+        theta[lev,pa,facet] ~ normal(theta[lev+1,pa,facet], sqrt(betweenLevelVariance));
       }
     }
   }
