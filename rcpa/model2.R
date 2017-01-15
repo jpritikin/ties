@@ -11,7 +11,7 @@ if (1) {
   if (NCMP < 1) { stop("No data?") }
   NFACETS <- ncol(rcd) - 4L
   
-  palist <- unique(c(as.character(rcd$pa1), as.character(rcd$pa2)))
+  palist <- sort(unique(c(as.character(rcd$pa1), as.character(rcd$pa2))))
   NPA <- length(palist)
 } else {
   softmax <- function(y) {
@@ -56,7 +56,7 @@ if (1) {
   rcd <- simData
 }
 
-# Nice to add a prior when the only difference is solo/group TODO
+soloGroupList <- which(duplicated(sub(";(solo|group)$", "", palist)))
 
 rcd[is.na(rcd)] <- 10
 
@@ -64,7 +64,9 @@ sim_fit <- stan(file = "model2.stan",
                 data = list(NPA=NPA, NFACETS=NFACETS, NCMP=NCMP,
                             pa1=match(rcd$pa1, palist), l1=rcd$l1,
                             pa2=match(rcd$pa2, palist), l2=rcd$l2,
-                            diff=sapply(rcd[-1:-4], as.numeric)),
+                            diff=sapply(rcd[-1:-4], as.numeric),
+                            NSGP=length(soloGroupList)),
+#                            soloGroupList=soloGroupList),
                 chains = 6, 
                 iter = 500)
 

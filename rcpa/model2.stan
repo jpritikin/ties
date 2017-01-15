@@ -21,6 +21,8 @@ data {
   int<lower=1, upper=NPA> pa2[NCMP];        // PA2 for observation N
   int<lower=1, upper=3> l2[NCMP];           // L2 for observation N
   int<lower=-2, upper=10> diff[NCMP,NFACETS];   // comparisons
+  int<lower=0> NSGP;
+//  int<lower=1> soloGroupList[NSGP];
 }
 transformed data {
   int rcat[NCMP,NFACETS];
@@ -36,12 +38,11 @@ parameters {
   real<lower=0> threshold1;
   real<lower=0> threshold2;
   vector<lower=0>[NFACETS] alpha;
-  real<lower=1e-15> betweenLevelVariance;
+  real<lower=1e-15>  betweenLevelVariance;
+//  real<lower=1e-15> betweenSoloGroupVariance;
 }
 model {
   betweenLevelVariance ~ exponential(.01);
-  threshold1 ~ normal(0,5);
-  threshold2 ~ normal(0,5);
   for (lev in 1:2) {
     for (pa in 1:NPA) {
       // estimate a separate variance parameter for each pair of levels TODO
@@ -50,12 +51,23 @@ model {
       }
     }
   }
-  // add prior linking solo/group activities, again with a variance parameter TODO
+  // betweenSoloGroupVariance ~ exponential(.01);
+  // for (lev in 1:3) {
+  //   for (px in 1:NSGP) {
+  //     int p1 = soloGroupList[px]-1;
+  //     int p2 = soloGroupList[px];
+  //     for (facet in 1:NFACETS) {
+  //       theta[lev,p1,facet] ~ normal(theta[lev,p2,facet], betweenSoloGroupVariance);
+  //     }
+  //   }
+  // }
   for (lev in 1:3) {
     for (pa in 1:NPA) {
       theta[lev,pa,1:NFACETS] ~ normal(0, 1);  //sd=thetaScale?
     }
   }
+  threshold1 ~ normal(0,5);
+  threshold2 ~ normal(0,5);
   alpha ~ lognormal(1, 1);
   for (cmp in 1:NCMP) {
     for (ff in 1:NFACETS) {

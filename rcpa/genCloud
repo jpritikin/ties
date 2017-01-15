@@ -15,7 +15,8 @@ my %ShortDict =
    'powerlifting' => 'weightlifting',
    'lifting' => 'weightlifting',
    'weight lifting' => 'weightlifting',
-   'softball' => 'baseball'
+   'softball' => 'baseball',
+   'biking' => 'cycling',
   );
 
 my %LongDict =
@@ -105,6 +106,20 @@ my %LongDict =
    'running@i run outside or on a treadmill usually 2 miles. or i elliptical for 30-45 min at moderate intensity.' => 'running',
    'tennis@tennis competitive, singles and doubles' => 'tennis',
    'basketball@social group with friends, not competitive' => 'basketball',
+   'ice skating@2 hours session oft skating, together with some friends' => 'ice skating',
+   'swimming@just swimming straight eines with a friend for 1.5 hours per week.' => 'swimming',
+   'biking@riding my e-bike beyond the city limits' => 'cycling',
+   'basketball@pickup basketball at the park' => 'basketball',
+   'swimming@competitive swimming' => 'swimming',
+   'basketball@varsity womens basketball' => 'basketball',
+   'walking@i take long walks' => 'walking',
+   'running@long distance running' => 'running',
+   'swimming@swimming for cardio' => 'swimming',
+   'gymnastics@medical gymnastics' => 'weightlifting',
+   'gym@legs, abs and arm exercises' => 'weightlifting',
+   'gym@i go to the gim to gain muscle mass. i train breast, legs, arms, neck and back.' => 'weightlifting',
+   'trail running@running mostly on single-trails in the forest, with much incline' => 'running',
+   'martial arts@wah lum kung fu' => 'Chinese martial arts',
   );
 
 use constant PA1_START  => 15;
@@ -172,136 +187,136 @@ sub node {
 }
 
 our @RC_SKILL_MAP =
-  ('{{Q8}} requires much more skill than {{Q6}}.',
-   '{{Q8}} requires somewhat more skill than {{Q6}}.',
+  ('{{Q9}} requires much more skill than {{Q6}}.',
+   '{{Q9}} requires somewhat more skill than {{Q6}}.',
    'Both require roughly equal skill.',
-   '{{Q6}} requires somewhat more skill than {{Q8}}.',
-   '{{Q6}} requires much more skill than {{Q8}}.');
+   '{{Q6}} requires somewhat more skill than {{Q9}}.',
+   '{{Q6}} requires much more skill than {{Q9}}.');
 
 our @RC_PREDICT_MAP =
-  ('{{Q6}} is much more predictable than {{Q8}}.',
-   '{{Q6}} is somewhat more predictable than {{Q8}}.',
+  ('{{Q6}} is much more predictable than {{Q9}}.',
+   '{{Q6}} is somewhat more predictable than {{Q9}}.',
    'Both offer roughly equal predictability.',
-   '{{Q8}} is somewhat more predictable than {{Q6}}.',
-   '{{Q8}} is much more predictable than {{Q6}}.');
+   '{{Q9}} is somewhat more predictable than {{Q6}}.',
+   '{{Q9}} is much more predictable than {{Q6}}.');
 
 our @RC_NOVELTY_MAP =
-  ('{{Q8}} offers a much more novelty than {{Q6}}.',
-   '{{Q8}} offers a somewhat more novelty than {{Q6}}.',
+  ('{{Q9}} offers a much more novelty than {{Q6}}.',
+   '{{Q9}} offers a somewhat more novelty than {{Q6}}.',
    'Both offer roughly equal novelty.',
-   '{{Q6}} offers a somewhat more novelty than {{Q8}}.',
-   '{{Q6}} offers a much more novelty than {{Q8}}.');
+   '{{Q6}} offers a somewhat more novelty than {{Q9}}.',
+   '{{Q6}} offers a much more novelty than {{Q9}}.');
 
 our @RC_CREATIVE_MAP =
-  ('{{Q6}} admits much more creativity than {{Q8}}.',
-   '{{Q6}} admits somewhat more creativity than {{Q8}}.',
+  ('{{Q6}} admits much more creativity than {{Q9}}.',
+   '{{Q6}} admits somewhat more creativity than {{Q9}}.',
    'Both admit roughly the same amount of creativity.',
-   '{{Q8}} admits somewhat more creativity than {{Q6}}.',
-   '{{Q8}} admits much more creativity than {{Q6}}.');
+   '{{Q9}} admits somewhat more creativity than {{Q6}}.',
+   '{{Q9}} admits much more creativity than {{Q6}}.');
 
 our @RC_COMPLEX_MAP =
-  ('{{Q8}} is much more complex than {{Q6}}.',
-   '{{Q8}} is somewhat more complex than {{Q6}}.',
+  ('{{Q9}} is much more complex than {{Q6}}.',
+   '{{Q9}} is somewhat more complex than {{Q6}}.',
    'Both are of roughly equal complexity.',
-   '{{Q6}} is somewhat more complex than {{Q8}}.',
-   '{{Q6}} is much more complex than {{Q8}}.');
+   '{{Q6}} is somewhat more complex than {{Q9}}.',
+   '{{Q6}} is much more complex than {{Q9}}.');
 
 our @RC_GOAL_MAP =
-  ('{{Q6}} has much more clear rules and goals than {{Q8}}.',
-   '{{Q6}} has somewhat more clear rules and goals than {{Q8}}.',
+  ('{{Q6}} has much more clear rules and goals than {{Q9}}.',
+   '{{Q6}} has somewhat more clear rules and goals than {{Q9}}.',
    'Both have equally clear rules and goals.',
-   '{{Q8}} has somewhat more clear rules and goals than {{Q6}}.',
-   '{{Q8}} has much more clear rules and goals than {{Q6}}.');
+   '{{Q9}} has somewhat more clear rules and goals than {{Q6}}.',
+   '{{Q9}} has much more clear rules and goals than {{Q6}}.');
 
 our @RC_FEEDBACK_MAP =
-  ('{{Q8}} has much more immediate feedback than {{Q6}}.',
-   '{{Q8}} has somewhat more immediate feedback than {{Q6}}.',
+  ('{{Q9}} has much more immediate feedback than {{Q6}}.',
+   '{{Q9}} has somewhat more immediate feedback than {{Q6}}.',
    'Both offer roughly equally immediate feedback.',
-   '{{Q6}} has somewhat more immediate feedback than {{Q8}}.',
-   '{{Q6}} has much more immediate feedback than {{Q8}}.');
+   '{{Q6}} has somewhat more immediate feedback than {{Q9}}.',
+   '{{Q6}} has much more immediate feedback than {{Q9}}.');
 
 our @RC_CHATTER_MAP =
-  ('{{Q6}} turns off my mental chatter much more than {{Q8}}.',
-   '{{Q6}} turns off my mental chatter somewhat more than {{Q8}}.',
+  ('{{Q6}} turns off my mental chatter much more than {{Q9}}.',
+   '{{Q6}} turns off my mental chatter somewhat more than {{Q9}}.',
    'Both turn off my mental chatter to a roughly equal extent.',
-   '{{Q8}} turns off my mental chatter somewhat more than {{Q6}}.',
-   '{{Q8}} turns off my mental chatter much more than {{Q6}}.');
+   '{{Q9}} turns off my mental chatter somewhat more than {{Q6}}.',
+   '{{Q9}} turns off my mental chatter much more than {{Q6}}.');
 
 our @RC_WAITING_MAP =
-  ('{{ Q8 }} involves a lot more waiting than {{ Q6 }}.',
-   '{{ Q8 }} involves a somewhat more waiting than {{ Q6}}.',
+  ('{{ Q9 }} involves a lot more waiting than {{ Q6 }}.',
+   '{{ Q9}} involves a somewhat more waiting than {{ Q6}}.',
    'Both involve about the same amount of waiting.',
-   '{{ Q6 }} involves a somewhat more waiting than {{ Q8}}.',
-   '{{ Q6 }} involves a lot more waiting than {{ Q8 }}.');
+   '{{ Q6 }} involves a somewhat more waiting than {{ Q9}}.',
+   '{{ Q6 }} involves a lot more waiting than {{ Q9}}.');
 
 our @RC_BODY_MAP =
-  ('{{Q6}} involves much more of my body than {{Q8}}.',
-   '{{Q6}} involves somewhat more of my body than {{Q8}}.',
+  ('{{Q6}} involves much more of my body than {{Q9}}.',
+   '{{Q6}} involves somewhat more of my body than {{Q9}}.',
    'Both involve my body to a roughly equal extent.',
-   '{{Q8}} involves somewhat more of my body than {{Q6}}.',
-   '{{Q8}} involves much more of my body than {{Q6}}.');
+   '{{Q9}} involves somewhat more of my body than {{Q6}}.',
+   '{{Q9}} involves much more of my body than {{Q6}}.');
 
 our @RC_CONTROL_MAP =
-  ('{{Q8}} permits much more control than {{Q6}}.',
-   '{{Q8}} permits somewhat more control than {{Q6}}.',
+  ('{{Q9}} permits much more control than {{Q6}}.',
+   '{{Q9}} permits somewhat more control than {{Q6}}.',
    'Both admit roughly equal control.',
-   '{{Q6}} permits somewhat more control than {{Q8}}.',
-   '{{Q6}} permits much more control than {{Q8}}.');
+   '{{Q6}} permits somewhat more control than {{Q9}}.',
+   '{{Q6}} permits much more control than {{Q9}}.');
 
 our @RC_PRESENT_MAP =
-  ('{{Q6}} brings me into the present much more than {{Q8}}.',
-   '{{Q6}} brings me into the present somewhat more than {{Q8}}.',
+  ('{{Q6}} brings me into the present much more than {{Q9}}.',
+   '{{Q6}} brings me into the present somewhat more than {{Q9}}.',
    'Both bring me into the present to a roughly equal extent.',
-   '{{Q8}} brings me into the present somewhat more than {{Q6}}.',
-   '{{Q8}} brings me into the present much more than {{Q6}}.');
+   '{{Q9}} brings me into the present somewhat more than {{Q6}}.',
+   '{{Q9}} brings me into the present much more than {{Q6}}.');
 
 our @RC_SPONT_MAP =
-  ('{{Q8}} feels effortless compare to {{Q6}} where I have to struggle and force myself.',
-   '{{Q8}} feels like less effort than {{Q6}}.',
+  ('{{Q9}} feels effortless compare to {{Q6}} where I have to struggle and force myself.',
+   '{{Q9}} feels like less effort than {{Q6}}.',
    'Both require about the same extent of effort (both either effortless or effortful).',
-   '{{Q6}} feels like less effort than {{Q8}}.',
-   '{{Q6}} feels effortless compare to {{Q8}} where I have to struggle and force myself.');
+   '{{Q6}} feels like less effort than {{Q9}}.',
+   '{{Q6}} feels effortless compare to {{Q9}} where I have to struggle and force myself.');
 
 our @RC_STAKES_MAP =
-  ('{{Q6}} has much higher stakes than {{Q8}}.',
-   '{{Q6}} has somewhat higher stakes than {{Q8}}.',
+  ('{{Q6}} has much higher stakes than {{Q9}}.',
+   '{{Q6}} has somewhat higher stakes than {{Q9}}.',
    'Both have roughly equal stakes.',
-   '{{Q8}} has somewhat higher stakes than {{Q6}}.',
-   '{{Q8}} has much higher stakes than {{Q6}}.');
+   '{{Q9}} has somewhat higher stakes than {{Q6}}.',
+   '{{Q9}} has much higher stakes than {{Q6}}.');
 
 our @RC_EVALUATED_MAP =
-  ("During {{Q8}}, I am much more concerned about others' evaluations than during {{Q6}}.",
-   "During {{Q8}}, I am somewhat more concerned about others' evaluations than during {{Q6}}.",
-   "During both {{Q8}} and {{Q6}}, I have roughly equal concern about others' evaluations.",
-   "During {{Q6}}, I am somewhat more concerned about others' evaluations than during {{Q8}}.",
-   "During {{Q6}}, I am much more concerned about others' evaluations than during {{Q8}}.");
+  ("During {{Q9}}, I am much more concerned about others' evaluations than during {{Q6}}.",
+   "During {{Q9}}, I am somewhat more concerned about others' evaluations than during {{Q6}}.",
+   "During both {{Q9}} and {{Q6}}, I have roughly equal concern about others' evaluations.",
+   "During {{Q6}}, I am somewhat more concerned about others' evaluations than during {{Q9}}.",
+   "During {{Q6}}, I am much more concerned about others' evaluations than during {{Q9}}.");
 
 our @RC_REWARD_MAP =
-  ('{{Q6}} is much more rewarding than {{Q8}}.',
-   '{{Q6}} is somewhat more rewarding than {{Q8}}.',
+  ('{{Q6}} is much more rewarding than {{Q9}}.',
+   '{{Q6}} is somewhat more rewarding than {{Q9}}.',
    'Both are roughly equally rewarding.',
-   '{{Q8}} is somewhat more rewarding than {{Q6}}.',
-   '{{Q8}} is much more rewarding than {{Q6}}.');
+   '{{Q9}} is somewhat more rewarding than {{Q6}}.',
+   '{{Q9}} is much more rewarding than {{Q6}}.');
 
 our @RC_INJURY1_MAP =
-  ('{{Q8}} has much more chance of physical injury compare to {{Q6}}.',
-   '{{Q8}} has somewhat more chance of physical injury compare to {{Q6}}.',
+  ('{{Q9}} has much more chance of physical injury compare to {{Q6}}.',
+   '{{Q9}} has somewhat more chance of physical injury compare to {{Q6}}.',
    'The chance of physical injury is roughly equal.',
-   '{{Q6}} has somewhat more chance of physical injury compare to {{Q8}}.',
-   '{{Q6}} has much more chance of physical injury compare to {{Q8}}.');
+   '{{Q6}} has somewhat more chance of physical injury compare to {{Q9}}.',
+   '{{Q6}} has much more chance of physical injury compare to {{Q9}}.');
 
 our @RC_INJURY2_MAP =
-  ('{{Q6}} has much more chance of serious physical injury compare to {{Q8}}.',
-   '{{Q6}} has somewhat more chance of serious physical injury compare to {{Q8}}.',
+  ('{{Q6}} has much more chance of serious physical injury compare to {{Q9}}.',
+   '{{Q6}} has somewhat more chance of serious physical injury compare to {{Q9}}.',
    'The chance of serious physical injury is roughly equal.',
-   '{{Q8}} has somewhat more chance of serious physical injury compare to {{Q6}}.',
-   '{{Q8}} has much more chance of serious physical injury compare to {{Q6}}.');
+   '{{Q9}} has somewhat more chance of serious physical injury compare to {{Q6}}.',
+   '{{Q9}} has much more chance of serious physical injury compare to {{Q6}}.');
 
 sub cmpToNum {
     my ($map, $cmp) = @_;
     return 'NA' if (!length $cmp);
     $map->[0] =~ m/\{\{\s*Q(\d)\s*\}\}/;
-    die $1 if ($1 != 6 and $1 != 8);
+    die $1 if ($1 != 6 and $1 != 9);
     my $sign = $1==8? 1 : -1;
     for my $x (0..4) {
 	if ($map->[$x] eq $cmp) {
@@ -389,7 +404,10 @@ sub loadZip {
 	    my $n1 = node($field[PA1_START], $field[PA1_START + 1], $field[RCPA_START+0]);
 	    my $n2 = node($field[PA2_START], $field[PA2_START + 1], $field[RCPA_START+1]);
 	    next if (!defined $n1 or !defined $n2 or $n1 eq $n2);
-	    edge($n1, $field[RCPA_START+2], $n2, $field[RCPA_START+3], ParseDate($field[2]), \@field);
+	    my $l1 = $field[RCPA_START+2];
+	    my $l2 = $field[RCPA_START+3];
+	    next if ($l1 eq '' or $l2 eq '');
+	    edge($n1, $l1, $n2, $l2, ParseDate($field[2]), \@field);
 	} else {
 	    print STDERR "parse () failed on argument: ",
 	      $csv->error_input, "\n";
