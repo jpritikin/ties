@@ -120,6 +120,13 @@ my %LongDict =
    'gym@i go to the gim to gain muscle mass. i train breast, legs, arms, neck and back.' => 'weightlifting',
    'trail running@running mostly on single-trails in the forest, with much incline' => 'running',
    'martial arts@wah lum kung fu' => 'Chinese martial arts',
+   'swimming@lap swimming (freestyle), twice a week for roughly an hour each session.' => 'swimming',
+   'ballet@i take beginner adult ballet classes, once a week' => 'ballet',
+   'swimming@taking my kids to the swimming pool, diving, racing with them, playing basketball in the water, pulling and pushing them on floatation devices' => 'swimming',
+   'walking@daily half hour walks outdoors in my town.' => 'walking',
+   'football@flag football, outdoors.' => 'flag football',
+   'marathon@walking a marathon, because of a drunken bet' => 'walking',
+   'working@gardening  logging (cuting, woodwork)  digging and builduing' => 'gardening',
   );
 
 use constant PA1_START  => 15;
@@ -457,7 +464,10 @@ sub outputGraph {
 		    if (!exists $NodeSet{ $i->{$nk} }) {
 			$NodeSet{ $i->{$nk} } = [0,0,0];
 		    }
-		    $NodeSet{ $i->{$nk} }[ $rate->[2 + $which] ] = $GNodeId{$k1};
+		    my $rate1 = $rate->[2 + $which];
+		    if ($rate1 ne 'NA') {
+			$NodeSet{ $i->{$nk} }[ $rate1 ] = $GNodeId{$k1};
+		    }
 		}
 	    }
 	}

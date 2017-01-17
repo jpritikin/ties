@@ -298,6 +298,10 @@ class Jumbotron extends React.Component
     qs1 = (x) -> [RCPA_FACETS[x], parent.state.weight[x]].join('=')
     weightQS = (qs1 x for x in [0..RCPA_FACETS.length-1] when @state.weight[x] isnt 0)
     shareURL = [window.location.href.split('?')[0], weightQS.join('&')].join('?')
+    responses = RCPA_edges.map (node) ->
+      val = node.value
+      if val then val
+      else 0
     div {},
       div
         className: "ui right rail screen-only"
@@ -429,7 +433,7 @@ class Jumbotron extends React.Component
         Even if we restrict our interest to, say, the 400 most popular physical activities,
         there are still about eighty thousand possible pairs.
         So far, data is available for #{RCPA_edges.length} pairs
-        from #{RCPA_edges.map((v)->v.value).reduce((x,y)->x+y)} responses.
+        from #{responses.reduce((x,y)->x+y)} responses.
         Our statistical model can fill in the gaps, but the more data the better."
         React.createElement(Graph)
         h3
