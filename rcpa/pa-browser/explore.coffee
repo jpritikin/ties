@@ -358,7 +358,7 @@ class Jumbotron extends React.Component
         a
           href: "http://tiny.cc/physical"
           "survey"
-        ". Not all of the data is in, but we wanted to show you what can be gleened
+        ". Not all of the data is in, but we wanted to show you what can be gleaned
         from preliminary data. We also include a status update on the data collection effort."
         h3
           className: "ui header"
@@ -369,8 +369,8 @@ class Jumbotron extends React.Component
         Choose one of the characteristics that you value, or are curious about,
         and assign it a +1 or -1 weight.
         When you assign a weight, the order of the list of activities on the right side
-        will update to reflect the preference that you have expressed, from high to low
-        (or low to high for negative weights).
+        will update to reflect the preference that you have expressed, from low to high
+        (or high to low for negative weights).
         You can play around with assigning more than one weight at a time and see
         how the order changes.
         You can also click on the buttons labelled Novice, Amateur, and Expert

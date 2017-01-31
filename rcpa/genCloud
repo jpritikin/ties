@@ -17,6 +17,7 @@ my %ShortDict =
    'weight lifting' => 'weightlifting',
    'softball' => 'baseball',
    'biking' => 'cycling',
+   'jogging' => 'running',
   );
 
 my %LongDict =
@@ -127,6 +128,45 @@ my %LongDict =
    'football@flag football, outdoors.' => 'flag football',
    'marathon@walking a marathon, because of a drunken bet' => 'walking',
    'working@gardening  logging (cuting, woodwork)  digging and builduing' => 'gardening',
+   'running@indoor running' => 'running',
+   'volleyball@indoor volleyball' => 'volleyball',
+   'zumba class@group exercise class' => 'cardio',
+   'swimming@lap swimming, all four strokes plus drills and flip turns  - both for exercise and competition.' => 'swimming',
+   'hiking@walking around, especially on natural trails' => 'hiking',
+   'free weights@lifting weights not attached to a machine' => 'weightlifting',
+   'skiing@resort skiing on trails, glades, and bowls in new england, va, and co.' => 'Cross-country skiing',
+   'grappling@brazilian jiu jitsu and judo. although these are martial arts, they are more similar to to wrestling than boxing, karate, or tae kwon do.' => 'brazilian jiu jitsu',
+   'swimming walking@i would walk in the gym and for swimming i would just hang out with my friend in the' => 'invalid',
+   'yuga@i would do stretch s' => 'yoga',
+   'strongman competition@strongman competitions include tests of strength and power including deadlift, clean and press, carrying, loading, pulling, and flipping. in contrast to powerlifting (squat, deadlift, bench press) or olympic weightlifting (snatch, clean and jerk) the events are not standardized across competitions.' => 'invalid',
+   'soccer@organized outdoor 11 v 11 soccer' => 'soccer',
+   'basketball@pick-up basketball' => 'basketball',
+   'mountain biking@cross country mountain biking on mixed use and dedicated trails in the eastern coast states.  trail ratings of mainly blue and black.' => 'mountain biking',
+   'treadmill@walking on a treadmill, at 3.7 speed, using rolling hills setting.' => 'walking',
+   'running@running on the elliptical machine' => 'running',
+   'elliptical@using an elliptical machine.' => 'running',
+   'weightlifting@weightlifting using gym machine equipment (not free weights)' => 'weightlifting',
+   'running@jogging and running daily' => 'running',
+   'cardio fitness@cardio training with online videos at home' => 'cardio',
+   'swimming@breaststroke' => 'swimming',
+   'walking@walking up and down the hills' => 'walking',
+   'cycling@cycling tours 50 to 80 miles' => 'cycling',
+   'volleyball@mixed team volleyball' => 'volleyball',
+   'jogging@outside' => 'running',
+   'climbing@toprope, indoor climining walls' => 'rock climbing',
+   'swimming@swimming while on holiday' => 'swimming',
+   'yoga@stretches' => 'yoga',
+   'weight training@doing 7 days of workout of intensive weight training. for each day i assign a certain muscle group to focus on to ensure a good overall strength.' => 'weightlifting',
+   'soccer@i played in a short 10 game season of recreational intramural soccer at my college.' => 'soccer',
+   'swimming@in the open sea with my husband and dog for 30-40 minutes' => 'swimming',
+   'walking@with my dog and often a friend in a variety of locations. usually for about 45 minutes.' => 'walking',
+   'eliptical@ussage of eliptical' => 'running',
+   'gym@lifting' => 'weightlifting',
+   'aerobic@dancing' => 'cardio',
+   'badminton@playing badminton with 3 others in a leisure center.' => 'badminton',
+   'circuit training@on my own, in a gym, with a week long planned routine' => 'weightlifting',
+   'kettle bell@work out with kettle bells' => 'weightlifting',
+   'crunches@ab crunches' => 'weightlifting',
   );
 
 use constant PA1_START  => 15;
@@ -155,6 +195,7 @@ sub trim {
 
 sub useNode {
     my ($pa,$solo) = @_;
+    return if $pa eq 'invalid';
     my $name = join(';', $pa, lc $solo);
     if (!exists $NodeInfo{$name}) {
 	$NodeInfo{$name} = { count => 0 };
@@ -228,12 +269,22 @@ our @RC_COMPLEX_MAP =
    '{{Q6}} is somewhat more complex than {{Q9}}.',
    '{{Q6}} is much more complex than {{Q9}}.');
 
+# Removed wording 'rules and' 2017 Jan 30 12:40pm
+#
+# Anonymous comment: The rules and goals question is double-barreled
+# and should be separated. I didn't think running or weightlifting had
+# "rules" and the goals can vary from strength to speed to weight
+# loss. However I read that statement as inherent rules/goals (like
+# football or other gaming sports) so I didn't answer that question
+# for long or short-term. You may consider something like 'best
+# practices' or techniques if that's what you're getting at.
+
 our @RC_GOAL_MAP =
-  ('{{Q6}} has much more clear rules and goals than {{Q9}}.',
-   '{{Q6}} has somewhat more clear rules and goals than {{Q9}}.',
-   'Both have equally clear rules and goals.',
-   '{{Q9}} has somewhat more clear rules and goals than {{Q6}}.',
-   '{{Q9}} has much more clear rules and goals than {{Q6}}.');
+  ('{{Q6}} has much more clear goals than {{Q9}}.',
+   '{{Q6}} has somewhat more clear goals than {{Q9}}.',
+   'Both have equally clear goals.',
+   '{{Q9}} has somewhat more clear goals than {{Q6}}.',
+   '{{Q9}} has much more clear goals than {{Q6}}.');
 
 our @RC_FEEDBACK_MAP =
   ('{{Q9}} has much more immediate feedback than {{Q6}}.',

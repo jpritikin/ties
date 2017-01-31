@@ -67,6 +67,10 @@ Factor \emph{ei} is a measure of emotional intelligence \parencite{schutte1998}.
 Factors \emph{rumination} and \emph{reflection} were measured with
 Reflection/Rumination scale \parencite{trapnell1999}.
 
+% consider:
+% decicco-stroink-2007.pdf metapersonal scale
+% wayment-bauer-sylaska-2015.pdf quiet ego scale
+
 \begin{figure}
 <<fig.height=3>>=
 origCdat <- read.csv("corr.csv", stringsAsFactors=FALSE)
