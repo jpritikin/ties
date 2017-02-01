@@ -70,6 +70,8 @@ sim_fit <- stan(file = "model2.stan",
                 chains = 6, 
                 iter = 500)
 
+save(sim_fit, file="simFit.rda")
+
 summary(summary(sim_fit)$summary[,c('Rhat', 'n_eff')])
 
 neOrder <- order(summary(sim_fit)$summary[,c('n_eff')])
