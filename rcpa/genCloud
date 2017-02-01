@@ -169,6 +169,20 @@ my %LongDict =
    'crunches@ab crunches' => 'weightlifting',
   );
 
+# Could remove some of these later when we have huge samples. TODO
+my %GroupSoloOverride =
+  (cardio => 'solo',
+   tennis => 'group',
+   yoga => 'solo',
+   walking => 'solo',
+   running => 'solo',
+   golf => 'group',
+   basketball => 'group',
+   weightlifting => 'solo',
+   swimming => 'solo',
+   cycling => 'solo',
+  );
+
 use constant PA1_START  => 15;
 use constant PA2_START  => 18;
 use constant RCPA_START => 21;
@@ -196,6 +210,9 @@ sub trim {
 sub useNode {
     my ($pa,$solo) = @_;
     return if $pa eq 'invalid';
+    if (exists $GroupSoloOverride{$pa}) {
+	$solo = $GroupSoloOverride{$pa};
+    }
     my $name = join(';', $pa, lc $solo);
     if (!exists $NodeInfo{$name}) {
 	$NodeInfo{$name} = { count => 0 };
@@ -598,6 +615,12 @@ sub outputData {
 }
 
 loadZip(shift);
+
+for my $k (keys %NodeGroupInfo) {
+    my $gi = $NodeGroupInfo{$k};
+    next if keys(%$gi) == 1;
+    warn $k;
+}
 
 outputGraph();
 
