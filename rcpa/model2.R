@@ -13,7 +13,8 @@ if (1) {
   
   palist <- sort(unique(c(as.character(rcd$pa1), as.character(rcd$pa2))))
   NPA <- length(palist)
-} else {
+}
+if (0) {
   softmax <- function(y) {
     exp(y) / sum(exp(y))
   }
@@ -56,6 +57,18 @@ if (1) {
   rcd <- simData
 }
 
+spokes <- rep(NA, length(palist))
+names(spokes) <- palist
+for (pa1 in palist) {
+    other <- c()
+    for (side in 1:2) {
+        col1 <- paste0('pa', side)
+        col2 <- paste0('pa', 3-side)
+        other <- c(other, as.character(rcd[rcd[[col1]] == pa1, col2]))
+    }
+    spokes[pa1] <- sum(!duplicated(other))
+}
+
 soloGroupList <- which(duplicated(sub(";(solo|group)$", "", palist)))
 
 rcd[is.na(rcd)] <- 10
@@ -71,6 +84,9 @@ sim_fit <- stan(file = "model2.stan",
                 iter = 500)
 
 save(sim_fit, file="simFit.rda")
+if (0) {
+    load("simFit.rda")
+}
 
 summary(summary(sim_fit)$summary[,c('Rhat', 'n_eff')])
 
@@ -79,7 +95,8 @@ head(summary(sim_fit, probs=.5)$summary[neOrder,], n=20)
 
 #plot(sim_fit, pars=c("thetaScale"))
 if (interactive()) {
-  plot(sim_fit, pars=c(paste0("threshold",1:2)))
+    summary(sim_fit, pars=c(paste0("threshold",1:2)))$summary
+  plot(sim_fit, pars=c(paste0("threshold",1:2))) #?broken?
 }
 
 df <- summary(sim_fit, pars=c("alpha","theta"), probs=.5)$summary
@@ -110,18 +127,20 @@ if (0) {
   launch_shinystan(sim_fit)
 }
 
+mask <- spokes>3    # increase this TODO
+
 cat(paste("var RCPA_DATA1=",
-          toJSON(tar[,,1], matrix="columnmajor", digits=3),
+          toJSON(tar[,mask,1], matrix="columnmajor", digits=3),
           ";\nvar RCPA_DATA2=",
-          toJSON(tar[,,2], matrix="columnmajor", digits=3),
+          toJSON(tar[,mask,2], matrix="columnmajor", digits=3),
           ";\nvar RCPA_DATA3=",
-          toJSON(tar[,,3], matrix="columnmajor", digits=3),
+          toJSON(tar[,mask,3], matrix="columnmajor", digits=3),
           ";\nvar RCPA_FACETS=",
           toJSON(facetNames),
           ";\nvar RCPA_FACET_ALPHA=",
           toJSON(alpha[1,]),
           ";\nvar RCPA_PA=",
-          toJSON(palist),
+          toJSON(palist[mask]),
           ";"),
     file="pa-browser/rcpa-data.js", fill=TRUE)
 

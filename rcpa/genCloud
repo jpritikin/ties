@@ -15,10 +15,20 @@ my %ShortDict =
    'powerlifting' => 'weightlifting',
    'lifting' => 'weightlifting',
    'weight lifting' => 'weightlifting',
+   'resistance training' => 'weightlifting',
    'softball' => 'baseball',
    'biking' => 'cycling',
    'jogging' => 'running',
+   'zumba' => 'cardio',
+   'playing soccer' => 'soccer',
+   'horseback riding' => 'horseback riding',
+   'refereeing high school basketball' => 'invalid',  # too many variations TODO
+   'karate' => 'karate',
+   'boxing' => 'boxing',
+   'squash' => 'squash'
   );
+
+# 'Elliptical trainer' could be used for running or walking TODO
 
 my %LongDict =
   (
@@ -167,6 +177,39 @@ my %LongDict =
    'circuit training@on my own, in a gym, with a week long planned routine' => 'weightlifting',
    'kettle bell@work out with kettle bells' => 'weightlifting',
    'crunches@ab crunches' => 'weightlifting',
+   'yoga@at home practice, primarily vinyasa style' => 'yoga',
+   'hiking@walking on trails in nature' => 'hiking',
+   'field hockey@ncaa division i field hockey' => 'field hockey',
+   'running@recreational running to keep in shape for sports, socialize with friends, and explore the area' => 'running',
+   'weight lifting@lifting weights in a gym' => 'weightlifting',
+   'hiking@hiking on nature trails/mountains' => 'hiking',
+   'weight lifting@lifting weights' => 'weightlifting',
+   'basketball@i played basketball on a outside court' => 'basketball',
+   '5k running@running in one continuous interval a total of 5 kilometers or equivalently 3.1 miles.' => 'running',
+   'resistance training@free weights lifting and core exercise.' => 'weightlifting',
+   'running@casual jogging around city' => 'running',
+   'playing soccer@playing soccer recreationally at university' => 'soccer',
+   'roller derby@womens flat track roller derby' => 'roller derby',
+   'martial arts@primarily jiu-jitsu, but also judo, kick boxing, wing chun, and wrestling' => 'brazilian jiu jitsu',
+   'soccer@outdoor field soccer' => 'soccer',
+   'weightlifting@lifting weights at a gym, not for competitive purposes' => 'weightlifting',
+   'cycling@road biking on paved trails' => 'cycling',
+   'golf@classic golf' => 'golf',
+   'running@long distance' => 'running',
+   'football@gaa' => 'football',
+   'ultimate frisbee@pick-up ultimate frisbee, 6 on 6' => 'ultimate frisbee',
+   'cycling@cycling to and from work (approximately 5 miles on regular roads, includes traffic signals and stop/start events 5-6 times in that distance)' => 'cycling',
+   'swimming@lap swimming' => 'swimming',
+   'elliptical@machine at the gym' => 'running',
+   'speed walking@on high incline on treadmill' => 'running',
+   'running@i run outside and enjoy participating in road races. i ran the richmond half marathon in november 2016.' => 'running',
+   'swimming@i swim in an indoor pool for exercise.' => 'swimming',
+   'recumbent elliptical@elliptical-style cardio machine with recumbent/semi-seated position. provides upper and lower body workout.' => 'running',
+   'strength training@crunches and physical therapy exercises (lower body) with elastic band; upper body with kettlebells.' => 'weightlifting',
+   'swimming@just recreational swimming' => 'swimming',
+   'jogging@jogging for fun' => 'running',
+   'swing dancing@lindy hop' => 'dancing',
+   'zumba@salsa and bachata' => 'cardio',
   );
 
 # Could remove some of these later when we have huge samples. TODO
@@ -181,6 +224,7 @@ my %GroupSoloOverride =
    weightlifting => 'solo',
    swimming => 'solo',
    cycling => 'solo',
+   'brazilian jiu jitsu' => 'group',
   );
 
 use constant PA1_START  => 15;
@@ -195,6 +239,7 @@ my %NodeGroupInfo;
 my %EdgeInfo;
 my $Graph = Graph::Undirected->new();
 
+for my $k (values %LongDict) { $ShortDict{$k} = $k }
 for my $k (values %ShortDict) { $VettedName{$k} = 1 }
 for my $k (values %LongDict)  { $VettedName{$k} = 1 }
 
@@ -230,8 +275,10 @@ sub node {
     if ($long eq '' or $short eq $long) {
 	if (exists $ShortDict{$short}) {
 	    $short = $ShortDict{$short};
+	    return useNode($short,$solo);
+	} else {
+	    print("   '$short' => '',\n");
 	}
-	return useNode($short,$solo);
     } else {
 	$long =~ s/\'//g;
 	my $full = $short . '@' . $long;
@@ -424,9 +471,7 @@ sub edge {
 	$EdgeInfo{$k} = { n1 => $k[0], n2 => $k[1], count => 0 };
     }
     my $info = $EdgeInfo{$k};
-    if (++$info->{count} == 2) { # increase to limit to a minimum sample size TODO
-	$Graph->add_edge($k[0], $k[1]);
-    }
+    $Graph->add_edge($k[0], $k[1]);
     my @m = (shortenMastery($l1), shortenMastery($l2));
     @m = reverse @m if $sign < 0;
     my @map = (\@RC_SKILL_MAP, \@RC_PREDICT_MAP, \@RC_NOVELTY_MAP, \@RC_CREATIVE_MAP,
@@ -619,7 +664,7 @@ loadZip(shift);
 for my $k (keys %NodeGroupInfo) {
     my $gi = $NodeGroupInfo{$k};
     next if keys(%$gi) == 1;
-    warn $k;
+    warn $k;  # to decide whether solo or group
 }
 
 outputGraph();
