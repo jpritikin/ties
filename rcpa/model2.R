@@ -96,7 +96,7 @@ head(summary(sim_fit, probs=.5)$summary[neOrder,], n=20)
 #plot(sim_fit, pars=c("thetaScale"))
 if (interactive()) {
     summary(sim_fit, pars=c(paste0("threshold",1:2)))$summary
-  plot(sim_fit, pars=c(paste0("threshold",1:2))) #?broken?
+#  plot(sim_fit, pars=c(paste0("threshold",1:2))) #?broken?
 }
 
 df <- summary(sim_fit, pars=c("alpha","theta"), probs=.5)$summary
@@ -116,16 +116,26 @@ cor(c(tar[,,1]), c(tar[,,2]))  #.99
 cor(c(tar[,,2]), c(tar[,,3]))  #.99
 
 if (0) {
-  toJSON(array(1:8, dim=c(2,2,2)), matrix="columnmajor")
-  
-  # compared with the simple BradleyTerry2 model
-  cor(c(result), c(sresult), use="pairwise.complete.obs")  # about .6
-  
-  sort(result[,'waiting'])
-
   library(shinystan)
   launch_shinystan(sim_fit)
 }
+
+if (0) {
+  char <- tar[,,2]
+  rownames(char) <- facetNames
+  colnames(char) <- palist
+  pc <- prcomp(t(char), retx=TRUE)
+  df <- as.data.frame(pc$x[,1:2])
+  df$name <- rownames(pc$x)
+  ggplot(df) + geom_point(aes(x=PC1,y=PC2)) +
+    geom_text(aes(x=PC1,y=PC2,label=name), nudge_y=-.05)
+  
+  sort(abs(pc$rotation[,1] - pc$rotation[,2]))
+  
+  library(rgl)
+  plot3d(pc$x[,1:3], col = rainbow(nrow(pc$x)))
+}
+
 
 mask <- spokes>3    # increase this TODO
 
