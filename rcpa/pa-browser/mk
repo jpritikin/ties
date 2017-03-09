@@ -2,5 +2,5 @@
 
 set -x
 
-coffeelint explore.coffee
+#coffeelint explore.coffee
 coffee -c explore.coffee

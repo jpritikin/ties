@@ -21,6 +21,7 @@ my %ShortDict =
    'softball' => 'baseball',
    'biking' => 'cycling',
    'bicycling' => 'cycling',
+   'bike riding' => 'cycling',
    'jogging' => 'running',
    'zumba' => 'aerobic exercise',
    'playing soccer' => 'soccer',
@@ -34,6 +35,10 @@ my %ShortDict =
    'gymnastics' => 'invalid',  # not specific enough
    'lacrosse' => 'lacrosse',
    'gym' => 'invalid',        # probably weights or running, but which?
+   'circuit training' => 'weightlifting',
+   'dodgeball' => 'dodgeball',
+   'rugby' => 'rugby',
+   'quidditch' => 'quidditch (sport)'
   );
 
 # 'Elliptical trainer' could be used for running or walking TODO
@@ -270,6 +275,45 @@ my %LongDict =
    'football@americans call it soccer but it should be called "football".' => 'soccer',
    'gymnastics@i compete in womens gymnastics' => 'invalid',
    'gymnastics@i compete in womens gymnastics.' => 'invalid',
+   'running@5k-10k runs' => 'running',
+   'circuit training' => 'weightlifting',
+   'run@run on distance of approx. 10 km with a 5km per minute pace' => 'running',
+   'football@playing outdoor football every sunday with buddies' => 'football',
+   'walking@see above' => 'walking',
+   'tibetian rites@see above' => 'invalid',  # too vague
+   'bodyfit@muscle-building training' => 'weightlifting',
+   'hockey@field' => 'field hockey',
+   'walking@walking out in the woods.' => 'hiking',
+   'cycling@ride my bycicle' => 'cycling',
+   'circuit training' => 'weightlifting',
+   '"running"' => 'running',
+   'running@distance running' => 'running',
+   'weight training@using weight machines in a gym' => 'weightlifting',
+   'swimming@swimming laps and treading water' => 'swimming',
+   'tai chi@beginner tai chi classes' => 'tai chi',
+   'swimming@recreational lap swimming' => 'swimming',
+   'dodgeball@national collegiate dodgeball association version of dodgeball.  1 hour long games.' => 'dodgeball',
+   'running@regular jogging through streets.' => 'running',
+   'baseball@american baseball' => 'baseball',
+   'jumping@leaping up and down' => 'skipping rope',  # similar
+   'running@jogging' => 'running',
+   'rock climbing@mostly indoor, some outdoor, mostly bouldering, some top-rope, some competitions' => 'rock climbing',
+   'volleyball@sand volleyball, non competitive' => 'volleyball',
+   'kayaking@recreational solo kayaking on a sit on top kayak in a channel on the fraser river, and sometimes on the fraser river itself.' => 'kayaking',
+   'walking@walking a trail in a treed area with a stream near my house.' => 'hiking',
+   'swimming@swim laps of all 4 strokes' => 'swimming',
+   'running@2-3 mile run' => 'running',
+   'quidditch@we train twice a week.' => 'quidditch (sport)',
+   'swimming@i train swimming about 3-4 times a week. we train for about 1.5h, swimming between 3.8 and 4.2km.' => 'swimming',
+   'quidditch@collegiate quidditch is a club level sport at uva. it has been described as a combination of handball, dodgeball, and rugby.' => 'quidditch (sport)',
+   'running@solo running, typically on a treadmill' => 'running',
+   'ultimate frisbee@club ultimate frisbee team at uva' => 'ultimate frisbee',
+   'gym@upper body workouts at a gym on uva grounds, usually with one or more other people' => 'weightlifting',
+   'hiking@hiking on paths' => 'hiking',
+   'rugby@rugby union - played with 15 players per team and 40 minute halves.' => 'rugby',
+   'elliptical@using an elliptical at a gym' => 'running',
+   'football@americans call it soccer but it should be called football.' => 'soccer',
+   'body balance@it is mixture of yoga and pilates, but more dynamic and the exercises  have choreographies that fit with specific songs' => 'invalid',  # is this a thing?
   );
 
 # Could remove some of these later when we have huge samples. TODO
@@ -288,7 +332,8 @@ my %GroupSoloOverride =
    'horseback riding' => 'solo',  # the horse doesn't count
    'rock climbing' => 'solo',
    'hiking' => 'solo',
-   'dance' => 'group'
+   'dance' => 'group',
+   'soccer' => 'group'
   );
 
 use constant PA1_START  => 15;
@@ -336,7 +381,9 @@ sub useNode {
 sub node {
     my ($short, $long, $solo) = @_;
     $long = lc trim($long);
+    $long =~ s/\"//g;
     $short = lc trim($short);
+    $short =~ s/\"//g;
     $short =~ s/\@//g;
     if ($long eq '' or $short eq $long) {
 	if (exists $ShortDict{$short}) {

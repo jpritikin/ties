@@ -359,7 +359,13 @@ class Jumbotron extends React.Component
           href: "http://tiny.cc/physical"
           "survey"
         ". Not all of the data is in, but we wanted to show you what can be gleaned
-        from preliminary data. We also include a status update on the data collection effort."
+        from preliminary data. We also include a status update on the data collection effort.
+        You may prefer to start with a video introduction."
+        br(),
+        br(),
+        div
+          dangerouslySetInnerHTML:
+            __html: '<iframe width="560" height="315" src="https://www.youtube.com/embed/_r4Z_2f1YmU?rel=0" frameborder="0" allowfullscreen></iframe>'
         h3
           className: "ui header"
           id: "data-explorer"
