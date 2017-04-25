@@ -37,6 +37,31 @@
 \usepackage{wrapfig} % Allows wrapping text around tables and figures
 \usepackage[hidelinks=true]{hyperref}
 
+<<echo=FALSE, results='hide', warning=FALSE, cache=FALSE>>=
+set.seed(1)
+library(knitr)
+#knit("rsem.Rnw", tangle=TRUE)  # to extract only the R chunks
+opts_knit$set(error=TRUE)
+opts_chunk$set(echo=FALSE, cache=FALSE, fig.path="")
+loadlib <- function () {
+library(ggplot2)
+library(rstan)
+library(xtable)
+}
+suppressPackageStartupMessages(loadlib())
+theme_set(theme_bw(base_size=18))
+options("xtable.floating"=FALSE)
+options("xtable.math.style.negative"=TRUE)
+options("xtable.booktabs"=TRUE)
+options(digits=2)
+
+# hack around https://github.com/yihui/knitr/issues/1085
+print.xtable <- function(x, ...) {
+    out <- capture.output(xtable::print.xtable(x, ...))
+    cat(gsub('\\s+$', '', paste(out, collapse = '\n')))
+}
+@ 
+
 \begin{document}
 
 %----------------------------------------------------------------------------------------
@@ -49,14 +74,14 @@
 % The third is 19% wide and houses a logo for your university/organization or a photo of you
 % The widths of these boxes can be easily edited to accommodate your content as you see fit
 
-\begin{minipage}[b]{0.55\linewidth}
-\veryHuge \color{NavyBlue} \textbf{Relative Characteristics of Physical Activities} \color{Black}\\ % Title
+\begin{minipage}[b]{0.56\linewidth}
+\veryHuge \color{NavyBlue} \textbf{Bayesian Model for Characteristics of Physical Activities} \color{Black}\\ % Title
 \Huge\textit{Which Activities are Most Conducive to Flow?}\\[1cm] % Subtitle
 \huge \textbf{Joshua N.\ Pritikin}\\ % Author(s)
 \huge Virginia Commonwealth University\\ % University/organization
 \end{minipage}
 %
-\begin{minipage}[b]{0.3\linewidth}
+\begin{minipage}[b]{0.29\linewidth}
 \color{DarkSlateGray}\Large \textbf{Contact Information:}\\
 Virginia Institute for Psychiatric and Behavioral Genetics\\ % Address
 800 E Leigh St, Biotech One, Suite 1-133\\
@@ -98,7 +123,7 @@ Sed fringilla tempus hendrerit. Vestibulum ante ipsum primis in faucibus orci lu
 Flow is a state in which an individual is completely immersed in an
 activity without reflective self-consciousness but with a deep sense
 of control. Preconditions of the flow state are thought to include
-skills-demands compatibility, clear goals, and immediate feedback.
+skills-demands compatibility, clear goals, and immediate feedback \cite{keller2012}.
 Previous work has often assumed an idiosyncratic relationship between
 a person and the activities that that person is intrinsically
 motivated to engage in. Here the focus is on the structural
@@ -143,12 +168,29 @@ with response choices: (a) ``Golf is much more predictable than running.''
 (d) ``Running is somewhat more predictable than golf.''
 or (e) ``Running is much more predictable than golf.''
 
+<<>>=
+load("../simFit.rda")
+df <- summary(sim_fit, pars=c("alpha"), probs=c())$summary
+alpha <- df[,"mean"]
+names(alpha) <- facetNames
+
+df <- summary(sim_fit, pars=c("theta"), probs=c())$summary
+tar <- array(df[,"mean"], dim=c(NFACETS, NPA, 3))
+mask <- spokes > 2
+tar2 <- tar[,mask,2]
+colnames(tar2) <- names(mask)[mask]
+rownames(tar2) <- facetNames
+
+@ 
+
+% detail all of the flow triggers TODO
+
 A variety of strategies are implemented to encourage participation.
 Subjects are invited to take the survey more than once
 with different pairs of activities.
 At the end of the survey,
 participants are redirected to a web page with preliminary results
-available for exploration.
+available for exploration, \url{http://exuberant-island.surge.sh/rcpa/}.
 Participants may choose weights to describe which
 characteristics are of personal interest to produce a linear composite
 score. This linear composite may assist participants in the selection of
@@ -160,8 +202,8 @@ waiting (a preference for continuous action) and the greatest possible
 feeling of personal control.
 Participants are encouraged to share the weights they develop
 and invite friends to participate in the survey.
-As of April, 93 distinct activities were mentioned in 148 comparisons
-from 173 participants.
+As of April, \Sexpr{length(mask)} distinct activities were
+mentioned in 148 comparisons from 173 participants.
 
 %------------------------------------------------
 
@@ -175,20 +217,20 @@ Latent absolute rankings $\theta$ are obtained for each
 combination of activity and characteristic.
 Each characteristic $c$ has its own
 discrimination parameter~$\alpha$.
-Given thresholds $\tau_1>0$ and $\tau_2>0$,
-the probability of activities $x$ and $y$ receiving
+Given thresholds $\tau_1$ and $\tau_2$,
+the probability of activities $x \in a$ and $y \in a$ receiving
 relative rating $r$ is,
 %
 \begin{align}
 \theta_{(a,c)} \sim \textrm{normal}(0.0, 1.0)\\
 \tau_1, \tau_2 \sim \textrm{normal}(0.0, 5.0)\\
 \alpha_c \sim \textrm{lognormal}(1.0, 1.0)\\
-g \equiv \alpha_c \begin{pmatrix}
+g \equiv \begin{pmatrix}
     &0.0 \\
-    (\theta_x - \theta_y) &- \tau_1 - \tau_2 \\
- (\theta_x - \theta_y) &- \tau_1 \\
- (\theta_x - \theta_y) &+ \tau_1 \\
- (\theta_x - \theta_y) &+ \tau_1 + \tau_2
+ \alpha_c (\theta_x - \theta_y) &-(\tau_1 + \tau_2) \\
+ \alpha_c (\theta_x - \theta_y) &- \tau_1 \\
+ \alpha_c (\theta_x - \theta_y) &+ \tau_1 \\
+ \alpha_c (\theta_x - \theta_y) &+ \tau_1 + \tau_2
 \end{pmatrix} \\
 h_n = \sum_{k=1}^n g_k \\
 r \sim \mathrm{CategoricalLogit}(h).
@@ -201,6 +243,70 @@ r \sim \mathrm{CategoricalLogit}(h).
 %----------------------------------------------------------------------------------------
 
 \section*{Results}
+
+\begin{center}\vspace{1ex}
+<<fig.height=4, fig.width=10>>=
+softmax <- function(v) {
+    exp(v) / sum(exp(v))
+}
+th <- summary(sim_fit, pars=c(paste0("threshold",1:2)))$summary[,'mean']
+tdiff <- seq(-2,2,.1)
+gr <- expand.grid(tdiff=tdiff, category=c("much more","somewhat more", 'equal',
+                  "somewhat less", "much less"), p=NA)
+gg <- matrix(c(0,
+               -(th[1] + th[2]),
+               -th[1],
+               th[1],
+               th[1] + th[2]), ncol=5, nrow=length(tdiff), byrow=TRUE)
+gg[,2:5] <- gg[,2:5] + mean(alpha) * tdiff
+gg <- t(apply(gg, 1, cumsum))
+gg <- t(apply(gg, 1, softmax))
+for (lev in 1:length(levels(gr$category))) {
+    gr[gr$category == levels(gr$category)[lev],'p'] <- gg[,lev]
+}
+ggplot(gr) + geom_line(aes(x=tdiff,y=p,color=category,linetype=category)) +
+    xlab("difference in latent absolute ranking (logits)") + ylab("probability")
+
+@ 
+\captionof{figure}{Category response curve conditional on difference in
+  latent absolute ranking ($\theta_x-\theta_y$) for $\alpha=\Sexpr{mean(alpha)}$.
+  The \emph{somewhat} response options were endorsed infrequently.\label{fig:crc}}
+\end{center}\vspace{1ex}
+
+The posterior was summarized by mean point estimates.
+Thresholds 1 and 2 were estimated at \Sexpr{th[1]} and \Sexpr{th[2]},
+respectively.
+This resulted in a response curve exhibited in Figure~\ref{fig:crc}.
+Actual $\alpha$ values ranged from $\Sexpr{min(alpha)}$ to \Sexpr{max(alpha)}.
+Of \Sexpr{length(mask)} activities, \Sexpr{table(mask)[1]} were excluded
+to due low connectivity leaving \Sexpr{table(mask)[2]} activities.
+Overall, latent absolute rankings ($\theta$) ranged from $\Sexpr{min(tar2)}$ to \Sexpr{max(tar2)}.
+Rankings can be explored by listing the activities at the extremes in each facet (Table~\ref{tab:extremes}).
+
+\begin{center}\vspace{1ex}
+<<results="asis">>=
+result <- NULL
+for (ax in order(-alpha)[1:10]) {
+    rank <- tar2[ax,]
+    result <- rbind(result,
+          c(rownames(tar2)[ax],
+            names(rank[order(-rank)][1]),
+            names(rank[order(-rank)][2]),
+            names(rank[order(rank)][2]),
+            names(rank[order(rank)][1])))
+}
+colnames(result) <- c("facet", "least", "2nd least", "2nd most", "most")
+print(xtable(result, NULL, NULL, "lccccc"),
+      include.rownames=FALSE)
+
+@ 
+\captionof{table}{Most and least ranking activities on the 10 more
+  discriminating facets. Caution: Sign may be flipped in some facets.\label{tab:extremes}}
+\end{center}\vspace{1ex}
+
+Currently, sample size is limited and absolute
+rankings may not match intuition well.
+Model estimates should improve with additional data.
 
 Donec faucibus purus at tortor egestas eu fermentum dolor facilisis. Maecenas tempor dui eu neque fringilla rutrum. Mauris \emph{lobortis} nisl accumsan. Aenean vitae risus ante. Pellentesque condimentum dui. Etiam sagittis purus non tellus tempor volutpat. Donec et dui non massa tristique adipiscing.
 %
@@ -221,36 +327,12 @@ Phasellus imperdiet, tortor vitae congue bibendum, felis enim sagittis lorem, et
 
 Nulla ut porttitor enim. Suspendisse venenatis dui eget eros gravida tempor. Mauris feugiat elit et augue placerat ultrices. Morbi accumsan enim nec tortor consectetur non commodo. Pellentesque condimentum dui. Etiam sagittis purus non tellus tempor volutpat. Donec et dui non massa tristique adipiscing. Quisque vestibulum eros eu. Phasellus imperdiet, tortor vitae congue bibendum, felis enim sagittis lorem, et volutpat ante orci sagittis mi. Morbi rutrum laoreet semper. Morbi accumsan enim nec tortor consectetur non commodo nisi sollicitudin.
 
-\begin{center}\vspace{1cm}
-\includegraphics[width=0.8\linewidth]{placeholder}
-\captionof{figure}{\color{Green} Figure caption}
-\end{center}\vspace{1cm}
-
-In hac habitasse platea dictumst. Etiam placerat, risus ac.
-
-Adipiscing lectus in magna blandit:
-
-\begin{center}\vspace{1cm}
-\begin{tabular}{l l l l}
-\toprule
-\textbf{Treatments} & \textbf{Response 1} & \textbf{Response 2} \\
-\midrule
-Treatment 1 & 0.0003262 & 0.562 \\
-Treatment 2 & 0.0015681 & 0.910 \\
-Treatment 3 & 0.0009271 & 0.296 \\
-\bottomrule
-\end{tabular}
-\captionof{table}{\color{Green} Table caption}
-\end{center}\vspace{1cm}
-
 Vivamus sed nibh ac metus tristique tristique a vitae ante. Sed lobortis mi ut arcu fringilla et adipiscing ligula rutrum. Aenean turpis velit, placerat eget tincidunt nec, ornare in nisl. In placerat.
 
 \begin{center}\vspace{1cm}
 \includegraphics[width=0.8\linewidth]{placeholder}
 \captionof{figure}{\color{Green} Figure caption}
 \end{center}\vspace{1cm}
-
-\url{http://exuberant-island.surge.sh/rcpa/}
 
 %----------------------------------------------------------------------------------------
 %	CONCLUSIONS
@@ -261,7 +343,7 @@ Vivamus sed nibh ac metus tristique tristique a vitae ante. Sed lobortis mi ut a
 \section*{Conclusions}
 
 \begin{itemize}
-\item Much more data is needed. How to get it without compromising on quality? Collaborators sought.
+\item Much more data is needed. How to get it without compromising quality? Collaborators sought.
 \item Vestibulum sem ante, hendrerit a gravida ac, blandit quis magna.
 \item Donec sem metus, facilisis at condimentum eget, vehicula ut massa. Morbi consequat, diam sed convallis tincidunt, arcu nunc.
 \item Once data collection is complete, anonymized data and data analysis scripts will be placed in the public domain.
