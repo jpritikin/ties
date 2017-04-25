@@ -80,30 +80,33 @@ sim_fit <- stan(file = "model2.stan",
                             diff=sapply(rcd[-1:-4], as.numeric),
                             NSGP=length(soloGroupList)),
 #                            soloGroupList=soloGroupList),
-                chains = 6, 
+                chains = 7,
                 iter = 500)
 
-save(sim_fit, file="simFit.rda")
+facetNames <- colnames(rcd[-1:-4])
+
+save(sim_fit, facetNames, spokes, NPA, NFACETS, file="simFit.rda")
 if (0) {
     load("simFit.rda")
 }
 
 summary(summary(sim_fit)$summary[,c('Rhat', 'n_eff')])
 
+divergent <- get_sampler_params(sim_fit, inc_warmup=FALSE)[[1]][,'divergent__']
+print(sum(divergent))
+
 neOrder <- order(summary(sim_fit)$summary[,c('n_eff')])
 head(summary(sim_fit, probs=.5)$summary[neOrder,], n=20)
 
 #plot(sim_fit, pars=c("thetaScale"))
 if (interactive()) {
-    summary(sim_fit, pars=c(paste0("threshold",1:2)))$summary
-#  plot(sim_fit, pars=c(paste0("threshold",1:2))) #?broken?
+  summary(sim_fit, pars=c(paste0("threshold",1:2)))$summary
+  plot(sim_fit, pars=c(paste0("threshold",1:2)))
 }
 
 df <- summary(sim_fit, pars=c("alpha","theta"), probs=.5)$summary
 summary(df[,'mean'] - df[,'50%'])
 estimator <- 'mean'
-
-facetNames <- colnames(rcd[-1:-4])
 
 df <- summary(sim_fit, pars=c("alpha"), probs=.5)$summary
 alpha <- matrix(df[,estimator], nrow=1,

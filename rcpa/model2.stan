@@ -1,13 +1,13 @@
 functions {
   vector cmp_probs(real alpha, real pa1, real pa2, real thr1, real thr2) {
     vector[5] unsummed;
-    real paDiff = pa1 - pa2;
+    real paDiff = alpha * (pa1 - pa2);
     unsummed[1] = 0;
-    unsummed[2] = paDiff - thr1 - thr2;
+    unsummed[2] = paDiff - (thr1 + thr2);
     unsummed[3] = paDiff - thr1;
     unsummed[4] = paDiff + thr1;
     unsummed[5] = paDiff + thr1 + thr2;
-    return cumulative_sum(alpha * unsummed);
+    return cumulative_sum(unsummed);
   }
 }
 data {
@@ -35,8 +35,8 @@ transformed data {
 }
 parameters {
   matrix[NPA,NFACETS]     theta[3];    // latent score of PA by facet
-  real<lower=0> threshold1;
-  real<lower=0> threshold2;
+  real threshold1;
+  real threshold2;
   vector<lower=0>[NFACETS] alpha;
   real<lower=1e-15>  betweenLevelVariance;
 //  real<lower=1e-15> betweenSoloGroupVariance;
