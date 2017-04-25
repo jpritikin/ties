@@ -1,0 +1,292 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% a0poster Landscape Poster
+% LaTeX Template
+% Version 1.0 (22/06/13)
+%
+% The a0poster class was created by:
+% Gerlinde Kettl and Matthias Weiser (tex@kettl.de)
+% 
+% This template has been downloaded from:
+% http://www.LaTeXTemplates.com
+%
+% License:
+% CC BY-NC-SA 3.0 (http://creativecommons.org/licenses/by-nc-sa/3.0/)
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%----------------------------------------------------------------------------------------
+%	PACKAGES AND OTHER DOCUMENT CONFIGURATIONS
+%----------------------------------------------------------------------------------------
+
+\documentclass[a0,landscape]{a0poster}
+
+\usepackage{multicol} % This is so we can have multiple columns of text side-by-side
+\columnsep=100pt % This is the amount of white space between the columns in the poster
+\columnseprule=3pt % This is the thickness of the black line between the columns in the poster
+
+\usepackage[svgnames]{xcolor} % Specify colors by their 'svgnames', for a full list of all colors available see here: http://www.latextemplates.com/svgnames-colors
+
+\usepackage{times} % Use the times font
+%\usepackage{palatino} % Uncomment to use the Palatino font
+
+\usepackage{graphicx} % Required for including images
+\graphicspath{{figures/}} % Location of the graphics files
+\usepackage{booktabs} % Top and bottom rules for table
+\usepackage[font=small,labelfont=bf]{caption} % Required for specifying captions to tables and figures
+\usepackage{amsfonts, amsmath, amsthm, amssymb} % For math fonts, symbols and environments
+\usepackage{wrapfig} % Allows wrapping text around tables and figures
+\usepackage[hidelinks=true]{hyperref}
+
+\begin{document}
+
+%----------------------------------------------------------------------------------------
+%	POSTER HEADER 
+%----------------------------------------------------------------------------------------
+
+% The header is divided into three boxes:
+% The first is 55% wide and houses the title, subtitle, names and university/organization
+% The second is 25% wide and houses contact information
+% The third is 19% wide and houses a logo for your university/organization or a photo of you
+% The widths of these boxes can be easily edited to accommodate your content as you see fit
+
+\begin{minipage}[b]{0.55\linewidth}
+\veryHuge \color{NavyBlue} \textbf{Relative Characteristics of Physical Activities} \color{Black}\\ % Title
+\Huge\textit{Which Activities are Most Conducive to Flow?}\\[1cm] % Subtitle
+\huge \textbf{Joshua N.\ Pritikin}\\ % Author(s)
+\huge Virginia Commonwealth University\\ % University/organization
+\end{minipage}
+%
+\begin{minipage}[b]{0.3\linewidth}
+\color{DarkSlateGray}\Large \textbf{Contact Information:}\\
+Virginia Institute for Psychiatric and Behavioral Genetics\\ % Address
+800 E Leigh St, Biotech One, Suite 1-133\\
+Richmond, VA 23219 USA\\\\
+Phone: +1 (804) 601 6384\\ % Phone number
+Email: \href{mailto:jpritikin@pobox.com}{jpritikin@pobox.com}\\ % Email address
+\end{minipage}
+%
+\begin{minipage}[b]{0.15\linewidth}
+\includegraphics[width=16cm]{vcu-logo} % Logo or a photo of you, adjust its dimensions here
+\end{minipage}
+
+\vspace{1cm} % A bit of extra whitespace between the header and poster content
+
+%----------------------------------------------------------------------------------------
+
+\begin{multicols}{4} % This is how many columns your poster will be broken into, a poster with many figures may benefit from less columns whereas a text-heavy poster benefits from more
+
+%----------------------------------------------------------------------------------------
+%	ABSTRACT
+%----------------------------------------------------------------------------------------
+
+\color{Navy} % Navy color for the abstract
+
+\begin{abstract}
+
+Sed fringilla tempus hendrerit. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Etiam ut elit sit amet metus lobortis consequat sit amet in libero. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus vel sem magna. Nunc at convallis urna. isus ante. Pellentesque condimentum dui. Etiam sagittis purus non tellus tempor volutpat. Donec et dui non massa tristique adipiscing. Quisque vestibulum eros eu. Phasellus imperdiet, tortor vitae congue bibendum, felis enim sagittis lorem, et volutpat ante orci sagittis mi. Morbi rutrum laoreet semper. Morbi accumsan enim nec tortor consectetur non commodo nisi sollicitudin. Proin sollicitudin. Pellentesque eget orci eros. Fusce ultricies, tellus et pellentesque fringilla, ante massa luctus libero, quis tristique purus urna nec nibh.
+
+\end{abstract}
+
+%----------------------------------------------------------------------------------------
+%	INTRODUCTION
+%----------------------------------------------------------------------------------------
+
+\color{SaddleBrown} % SaddleBrown color for the introduction
+
+\section*{Introduction}
+
+Flow is a state in which an individual is completely immersed in an
+activity without reflective self-consciousness but with a deep sense
+of control. Preconditions of the flow state are thought to include
+skills-demands compatibility, clear goals, and immediate feedback.
+Previous work has often assumed an idiosyncratic relationship between
+a person and the activities that that person is intrinsically
+motivated to engage in. Here the focus is on the structural
+characteristics of the activities themselves. Certainly personal
+preferences play some role, but it seems plausible that some
+activities may be more conducive to flow than other activities after
+controlling for personal preference.
+
+%----------------------------------------------------------------------------------------
+%	OBJECTIVES
+%----------------------------------------------------------------------------------------
+
+\color{DarkSlateGray} % DarkSlateGray color for the rest of the content
+
+\section*{Main Objectives}
+
+\begin{enumerate}
+\item Explore characteristics of physical activities thought to be related to flow
+\item Provide a data exploration tool to facilitate custom activity rankings according to personal preference
+\item Develop an exploratory factor model for flow
+\item Generate testable hypotheses
+\item Develop new manipulations to induce the flow state
+\end{enumerate}
+
+%----------------------------------------------------------------------------------------
+%	MATERIALS AND METHODS
+%----------------------------------------------------------------------------------------
+
+\section*{Method}
+
+Cross-sectional data are collected online via a brief survey.
+The public at large is invited to participate.
+A participant is asked to identify two physical activities.
+Twenty items ask for a relative ranking on
+particular characteristics.
+For example, suppose a participant chose \emph{running} and \emph{golf}.
+To assess the \emph{predictability} characteristic,
+an item asks ``How predictable is the action?''
+with response choices: (a) ``Golf is much more predictable than running.''
+(b) ``Golf is somewhat more predictable than running.''
+(c) ``Both offer roughly equal predictability.''
+(d) ``Running is somewhat more predictable than golf.''
+or (e) ``Running is much more predictable than golf.''
+
+A variety of strategies are implemented to encourage participation.
+Subjects are invited to take the survey more than once
+with different pairs of activities.
+At the end of the survey,
+participants are redirected to a web page with preliminary results
+available for exploration.
+Participants may choose weights to describe which
+characteristics are of personal interest to produce a linear composite
+score. This linear composite may assist participants in the selection of
+new physical activities.
+For example, one person may wish to give positive weights
+to unpredictability, opportunities to express creativity, and
+environmental complexity. Someone else may give priority to a lack of
+waiting (a preference for continuous action) and the greatest possible
+feeling of personal control.
+Participants are encouraged to share the weights they develop
+and invite friends to participate in the survey.
+As of April, 93 distinct activities were mentioned in 148 comparisons
+from 173 participants.
+
+%------------------------------------------------
+
+\subsection*{Relative to Absolute Rankings}
+
+Since the set of physical activities $a$ is open-ended,
+there will always be some activities with insufficient data.
+Bayesian priors are used to stabilize parameter estimates \cite{carpenter2016}.
+An initial model treats each characteristic as independent.
+Latent absolute rankings $\theta$ are obtained for each
+combination of activity and characteristic.
+Each characteristic $c$ has its own
+discrimination parameter~$\alpha$.
+Given thresholds $\tau_1>0$ and $\tau_2>0$,
+the probability of activities $x$ and $y$ receiving
+relative rating $r$ is,
+%
+\begin{align}
+\theta_{(a,c)} \sim \textrm{normal}(0.0, 1.0)\\
+\tau_1, \tau_2 \sim \textrm{normal}(0.0, 5.0)\\
+\alpha_c \sim \textrm{lognormal}(1.0, 1.0)\\
+g \equiv \alpha_c \begin{pmatrix}
+    &0.0 \\
+    (\theta_x - \theta_y) &- \tau_1 - \tau_2 \\
+ (\theta_x - \theta_y) &- \tau_1 \\
+ (\theta_x - \theta_y) &+ \tau_1 \\
+ (\theta_x - \theta_y) &+ \tau_1 + \tau_2
+\end{pmatrix} \\
+h_n = \sum_{k=1}^n g_k \\
+r \sim \mathrm{CategoricalLogit}(h).
+\end{align}
+
+% add plot here TODO
+
+%----------------------------------------------------------------------------------------
+%	RESULTS 
+%----------------------------------------------------------------------------------------
+
+\section*{Results}
+
+Donec faucibus purus at tortor egestas eu fermentum dolor facilisis. Maecenas tempor dui eu neque fringilla rutrum. Mauris \emph{lobortis} nisl accumsan. Aenean vitae risus ante. Pellentesque condimentum dui. Etiam sagittis purus non tellus tempor volutpat. Donec et dui non massa tristique adipiscing.
+%
+\begin{wraptable}{l}{12cm} % Left or right alignment is specified in the first bracket, the width of the table is in the second
+\begin{tabular}{l l l}
+\toprule
+\textbf{Treatments} & \textbf{Response 1} & \textbf{Response 2}\\
+\midrule
+Treatment 1 & 0.0003262 & 0.562 \\
+Treatment 2 & 0.0015681 & 0.910 \\
+Treatment 3 & 0.0009271 & 0.296 \\
+\bottomrule
+\end{tabular}
+\captionof{table}{\color{Green} Table caption}
+\end{wraptable}
+%
+Phasellus imperdiet, tortor vitae congue bibendum, felis enim sagittis lorem, et volutpat ante orci sagittis mi. Morbi rutrum laoreet semper. Morbi accumsan enim nec tortor consectetur non commodo nisi sollicitudin. Proin sollicitudin. Pellentesque eget orci eros. Fusce ultricies, tellus et pellentesque fringilla, ante massa luctus libero, quis tristique purus urna nec nibh.
+
+Nulla ut porttitor enim. Suspendisse venenatis dui eget eros gravida tempor. Mauris feugiat elit et augue placerat ultrices. Morbi accumsan enim nec tortor consectetur non commodo. Pellentesque condimentum dui. Etiam sagittis purus non tellus tempor volutpat. Donec et dui non massa tristique adipiscing. Quisque vestibulum eros eu. Phasellus imperdiet, tortor vitae congue bibendum, felis enim sagittis lorem, et volutpat ante orci sagittis mi. Morbi rutrum laoreet semper. Morbi accumsan enim nec tortor consectetur non commodo nisi sollicitudin.
+
+\begin{center}\vspace{1cm}
+\includegraphics[width=0.8\linewidth]{placeholder}
+\captionof{figure}{\color{Green} Figure caption}
+\end{center}\vspace{1cm}
+
+In hac habitasse platea dictumst. Etiam placerat, risus ac.
+
+Adipiscing lectus in magna blandit:
+
+\begin{center}\vspace{1cm}
+\begin{tabular}{l l l l}
+\toprule
+\textbf{Treatments} & \textbf{Response 1} & \textbf{Response 2} \\
+\midrule
+Treatment 1 & 0.0003262 & 0.562 \\
+Treatment 2 & 0.0015681 & 0.910 \\
+Treatment 3 & 0.0009271 & 0.296 \\
+\bottomrule
+\end{tabular}
+\captionof{table}{\color{Green} Table caption}
+\end{center}\vspace{1cm}
+
+Vivamus sed nibh ac metus tristique tristique a vitae ante. Sed lobortis mi ut arcu fringilla et adipiscing ligula rutrum. Aenean turpis velit, placerat eget tincidunt nec, ornare in nisl. In placerat.
+
+\begin{center}\vspace{1cm}
+\includegraphics[width=0.8\linewidth]{placeholder}
+\captionof{figure}{\color{Green} Figure caption}
+\end{center}\vspace{1cm}
+
+\url{http://exuberant-island.surge.sh/rcpa/}
+
+%----------------------------------------------------------------------------------------
+%	CONCLUSIONS
+%----------------------------------------------------------------------------------------
+
+\color{SaddleBrown} % SaddleBrown color for the conclusions to make them stand out
+
+\section*{Conclusions}
+
+\begin{itemize}
+\item Much more data is needed. How to get it without compromising on quality? Collaborators sought.
+\item Vestibulum sem ante, hendrerit a gravida ac, blandit quis magna.
+\item Donec sem metus, facilisis at condimentum eget, vehicula ut massa. Morbi consequat, diam sed convallis tincidunt, arcu nunc.
+\item Once data collection is complete, anonymized data and data analysis scripts will be placed in the public domain.
+\end{itemize}
+
+\color{DarkSlateGray} % Set the color back to DarkSlateGray for the rest of the content
+
+%----------------------------------------------------------------------------------------
+%	FORTHCOMING RESEARCH
+%----------------------------------------------------------------------------------------
+
+\section*{Future Work}
+
+Guided by flow theory,
+a exploratory factor model will be developed to rank activities with respect to
+how conducive the activity is to flow, treating personal preference as noise.
+External validity can be examined by comparing rankings with the actual
+measured prevalence of flow.
+
+ %----------------------------------------------------------------------------------------
+%	REFERENCES
+%----------------------------------------------------------------------------------------
+
+\bibliographystyle{plain} % Plain referencing style
+\bibliography{jpritikin.bib} % Use the example bibliography file sample.bib
+
+\end{multicols}
+\end{document}
