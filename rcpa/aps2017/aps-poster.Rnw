@@ -36,6 +36,7 @@
 \usepackage{amsfonts, amsmath, amsthm, amssymb} % For math fonts, symbols and environments
 \usepackage{wrapfig} % Allows wrapping text around tables and figures
 \usepackage[hidelinks=true]{hyperref}
+\usepackage{enumitem}
 
 <<echo=FALSE, results='hide', warning=FALSE, cache=FALSE>>=
 set.seed(1)
@@ -154,20 +155,6 @@ controlling for personal preference.
 
 \section*{Method}
 
-Cross-sectional data are collected online via a brief survey.
-The public at large is invited to participate.
-A participant is asked to identify two physical activities.
-Twenty items ask for a relative ranking on
-particular characteristics.
-For example, suppose a participant chose \emph{running} and \emph{golf}.
-To assess the \emph{predictability} characteristic,
-an item asks ``How predictable is the action?''
-with response choices: (a) ``Golf is much more predictable than running.''
-(b) ``Golf is somewhat more predictable than running.''
-(c) ``Both offer roughly equal predictability.''
-(d) ``Running is somewhat more predictable than golf.''
-or (e) ``Running is much more predictable than golf.''
-
 <<>>=
 load("../simFit.rda")
 df <- summary(sim_fit, pars=c("alpha"), probs=c())$summary
@@ -183,14 +170,56 @@ rownames(tar2) <- facetNames
 
 @ 
 
-% detail all of the flow triggers TODO
+Cross-sectional data are collected online via a brief survey.
+The public at large is invited to participate.
+A participant is asked to identify two physical activities.
+Twenty items ask for a relative ranking on
+particular characteristics.
+For example, suppose a participant chose \emph{running} and \emph{golf}.
+To assess the \emph{predictability} characteristic,
+an item asks ``How predictable is the action?''
+with response choices: (a) ``Golf is much more predictable than running.''
+(b) ``Golf is somewhat more predictable than running.''
+(c) ``Both offer roughly equal predictability.''
+(d) ``Running is somewhat more predictable than golf.''
+or (e) ``Running is much more predictable than golf.''
+In addition to skills-demands compatibility, clear goals, and
+immediate feedback,
+an assortment of other likely flow triggers were included \cite{kotler2014,sawyer2007,wegner2002}.
+Item prompts follow:
+%
+\begin{itemize}[noitemsep]
+\item   How much skill is required?
+\item   How predictable is the action?
+\item   To what extent do you find new and fresh experiences during the activity?
+\item   To what extent are there opportunities to express creativity during the activity?
+\item   How complex is the action and the environment in which it takes place?
+\item   How clear and straightforward are the short-term rules and goals?
+\item   How quickly do you know whether what you wanted to accomplish in the short term was successful?
+\item   How clear and straightforward are the long-term rules and goals?
+\item   How quickly do you know whether what you wanted to accomplish in the long term was successful?
+\item   Does your extraneous mental chatter temporarily shut down during the activity?
+\item   How much time do you feel like is spent waiting for the next step in the activity?
+\item   How much of your body is involved in the activity? Is it full-body or only part of your body?
+\item   How much control do you feel like you can exert over your performance?
+\item   During the activity, to what extent do you feel like you are in the present moment?
+\item   How spontaneous is your action?
+\item   During the activity, how important does the activity feel?
+\item   To what extent do you care about how others judge your performance?
+\item   After engaging in the physical activity, to what extent do you feel great?
+\item   What is the risk of minor physical injury (more than just muscle soreness)?
+\item   What is the risk of serious physical injury?
+\end{itemize}
+
+\subsection*{Subjects}
 
 A variety of strategies are implemented to encourage participation.
 Subjects are invited to take the survey more than once
 with different pairs of activities.
-At the end of the survey,
+In addition, at the end of the survey,
 participants are redirected to a web page with preliminary results
 available for exploration, \url{http://exuberant-island.surge.sh/rcpa/}.
+The preliminary results page is interactive.
 Participants may choose weights to describe which
 characteristics are of personal interest to produce a linear composite
 score. This linear composite may assist participants in the selection of
@@ -200,10 +229,28 @@ to unpredictability, opportunities to express creativity, and
 environmental complexity. Someone else may give priority to a lack of
 waiting (a preference for continuous action) and the greatest possible
 feeling of personal control.
-Participants are encouraged to share the weights they develop
+Participants are encouraged to share the weights they develop via social networks
 and invite friends to participate in the survey.
+
+<<>>=
+demogr <- read.csv('../demogr.csv')
+demogr1 <- subset(demogr, again == '')
+country <- table(demogr1$country)
+country <- country[order(-country)]
+sex <- table(demogr1$sex)
+age <- table(2017-demogr$birthyear <= 25)
+
+@ 
+
 As of April, \Sexpr{length(mask)} distinct activities were
-mentioned in 148 comparisons from 173 participants.
+mentioned by \Sexpr{sum(demogr[['again']]=='')} participants.
+An additional \Sexpr{sum(demogr[['again']]=='Yes')} comparisons
+were contributed by repeated participation.
+Participants were mostly from USA (\Sexpr{round(100*country[1]/nrow(demogr1))}\%),
+Germany (\Sexpr{round(100*country[2]/nrow(demogr1))}\%),
+and United Kingdom (\Sexpr{round(100*country[3]/nrow(demogr1))}\%).
+Most reported being female (\Sexpr{round(100*sex['Female']/nrow(demogr1))}\%).
+Most were 25 or fewer years old (\Sexpr{round(100*age[2]/nrow(demogr1))}\%).
 
 %------------------------------------------------
 
@@ -235,8 +282,26 @@ g \equiv \begin{pmatrix}
 h_n = \sum_{k=1}^n g_k \\
 r \sim \mathrm{CategoricalLogit}(h).
 \end{align}
-
-% add plot here TODO
+%
+To account for a participant's expertise,
+the actual model used was a bit more complex.
+Some activities like \emph{walking}
+involve little skill.
+However, some physical activities
+take many years to master.
+For example, Brazilian Jiu-Jitsu often takes
+seven years of practice (or more) to reach black belt.
+It seems plausible that Jiu-Jitsu beginners
+may experience the characteristics of the sport
+differently than a black belt.
+To take this into account,
+participants were asked to describe themselves
+as a \emph{beginner}, \emph{competent amateur},
+or \emph{expert or professional} for each of the two activities.
+Separate $\theta$ parameters were estimated
+for each skill level,
+but insufficient data were available to find
+any differences.
 
 %----------------------------------------------------------------------------------------
 %	RESULTS 
@@ -268,7 +333,7 @@ ggplot(gr) + geom_line(aes(x=tdiff,y=p,color=category,linetype=category)) +
     xlab("difference in latent absolute ranking (logits)") + ylab("probability")
 
 @ 
-\captionof{figure}{Category response curve conditional on difference in
+\captionof{figure}{Category response curves conditional on difference in
   latent absolute ranking ($\theta_x-\theta_y$) for $\alpha=\Sexpr{mean(alpha)}$.
   The \emph{somewhat} response options were endorsed infrequently.\label{fig:crc}}
 \end{center}\vspace{1ex}
@@ -279,7 +344,7 @@ respectively.
 This resulted in a response curve exhibited in Figure~\ref{fig:crc}.
 Actual $\alpha$ values ranged from $\Sexpr{min(alpha)}$ to \Sexpr{max(alpha)}.
 Of \Sexpr{length(mask)} activities, \Sexpr{table(mask)[1]} were excluded
-to due low connectivity leaving \Sexpr{table(mask)[2]} activities.
+to due low connectivity leaving \Sexpr{table(mask)[2]} well-connected activities.
 Overall, latent absolute rankings ($\theta$) ranged from $\Sexpr{min(tar2)}$ to \Sexpr{max(tar2)}.
 Rankings can be explored by listing the activities at the extremes in each facet (Table~\ref{tab:extremes}).
 
@@ -308,60 +373,24 @@ Currently, sample size is limited and absolute
 rankings may not match intuition well.
 Model estimates should improve with additional data.
 
-Donec faucibus purus at tortor egestas eu fermentum dolor facilisis. Maecenas tempor dui eu neque fringilla rutrum. Mauris \emph{lobortis} nisl accumsan. Aenean vitae risus ante. Pellentesque condimentum dui. Etiam sagittis purus non tellus tempor volutpat. Donec et dui non massa tristique adipiscing.
-%
-\begin{wraptable}{l}{12cm} % Left or right alignment is specified in the first bracket, the width of the table is in the second
-\begin{tabular}{l l l}
-\toprule
-\textbf{Treatments} & \textbf{Response 1} & \textbf{Response 2}\\
-\midrule
-Treatment 1 & 0.0003262 & 0.562 \\
-Treatment 2 & 0.0015681 & 0.910 \\
-Treatment 3 & 0.0009271 & 0.296 \\
-\bottomrule
-\end{tabular}
-\captionof{table}{\color{Green} Table caption}
-\end{wraptable}
-%
-Phasellus imperdiet, tortor vitae congue bibendum, felis enim sagittis lorem, et volutpat ante orci sagittis mi. Morbi rutrum laoreet semper. Morbi accumsan enim nec tortor consectetur non commodo nisi sollicitudin. Proin sollicitudin. Pellentesque eget orci eros. Fusce ultricies, tellus et pellentesque fringilla, ante massa luctus libero, quis tristique purus urna nec nibh.
-
-Nulla ut porttitor enim. Suspendisse venenatis dui eget eros gravida tempor. Mauris feugiat elit et augue placerat ultrices. Morbi accumsan enim nec tortor consectetur non commodo. Pellentesque condimentum dui. Etiam sagittis purus non tellus tempor volutpat. Donec et dui non massa tristique adipiscing. Quisque vestibulum eros eu. Phasellus imperdiet, tortor vitae congue bibendum, felis enim sagittis lorem, et volutpat ante orci sagittis mi. Morbi rutrum laoreet semper. Morbi accumsan enim nec tortor consectetur non commodo nisi sollicitudin.
-
-Vivamus sed nibh ac metus tristique tristique a vitae ante. Sed lobortis mi ut arcu fringilla et adipiscing ligula rutrum. Aenean turpis velit, placerat eget tincidunt nec, ornare in nisl. In placerat.
-
-\begin{center}\vspace{1cm}
-\includegraphics[width=0.8\linewidth]{placeholder}
-\captionof{figure}{\color{Green} Figure caption}
-\end{center}\vspace{1cm}
-
-%----------------------------------------------------------------------------------------
-%	CONCLUSIONS
-%----------------------------------------------------------------------------------------
-
 \color{SaddleBrown} % SaddleBrown color for the conclusions to make them stand out
 
-\section*{Conclusions}
+\section*{Discussion}
 
 \begin{itemize}
+\item Using cross-sectional data,
+  physical activities can be ranked against each other on a variety of flow-related characteristics.
+\item Personal preference for activities can be treated as noise.
 \item Much more data is needed. How to get it without compromising quality? Collaborators sought.
-\item Vestibulum sem ante, hendrerit a gravida ac, blandit quis magna.
-\item Donec sem metus, facilisis at condimentum eget, vehicula ut massa. Morbi consequat, diam sed convallis tincidunt, arcu nunc.
 \item Once data collection is complete, anonymized data and data analysis scripts will be placed in the public domain.
+\item Guided by flow theory, a exploratory factor model will be developed to
+rank activities with respect to how conducive the activity is to flow.
+\item External validity can be examined by comparing rankings with the actual
+measured prevalence of flow while involved in activities.
 \end{itemize}
 
+
 \color{DarkSlateGray} % Set the color back to DarkSlateGray for the rest of the content
-
-%----------------------------------------------------------------------------------------
-%	FORTHCOMING RESEARCH
-%----------------------------------------------------------------------------------------
-
-\section*{Future Work}
-
-Guided by flow theory,
-a exploratory factor model will be developed to rank activities with respect to
-how conducive the activity is to flow, treating personal preference as noise.
-External validity can be examined by comparing rankings with the actual
-measured prevalence of flow.
 
  %----------------------------------------------------------------------------------------
 %	REFERENCES

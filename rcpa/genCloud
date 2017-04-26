@@ -385,6 +385,28 @@ my %GroupSoloOverride =
    'soccer' => 'group'
   );
 
+my %CountryMap =
+  (
+   'united states' => 'usa',
+   'usa' => 'usa',
+   'u.s.' => 'usa',
+   'virginia' => 'usa',
+   'canada' => 'canada',
+   'germany' => 'germany',
+   'uk' => 'united kingdom',
+   'united kingdom' => 'united kingdom',
+   'england' => 'united kingdom',
+   'india' => 'india',
+   'austria' => 'austria',
+   'wales' => 'wales',
+   'ireland' => 'ireland',
+   'israel' => 'israel',
+   'switzerland' => 'switzerland',
+   'swiss' => 'switzerland',
+   'australia' => 'australia',
+  );
+
+use constant RCPA_DEMOGRAPHICS => 9;
 use constant PA1_START  => 15;
 use constant PA2_START  => 18;
 use constant RCPA_START => 21;
@@ -656,6 +678,19 @@ sub edge {
     push @{ $info->{rating} }, $rating;
 }
 
+sub recordDemogr {
+    my ($dfh, $csv, $di) = @_;
+    my $country = lc(trim($di->[2]));
+    if (length $country) {
+	if (!exists $CountryMap{$country}) {
+	    print "   '$country' => '$country',\n";
+	} else {
+	    $di->[2] = $CountryMap{$country};
+	}
+    }
+    $csv->say($dfh, $di);
+}
+
 sub loadZip {
     my ($zip) = @_;
     my $somezip = Archive::Zip->new();
@@ -667,6 +702,8 @@ sub loadZip {
     my @line = split /[\r\n]+/, $rawData;
 
     my $csv = Text::CSV_XS->new ({ keep_meta_info => 1, binary => 1 });
+    open my $dfh, ">:encoding(utf8)", "demogr.csv";
+    $csv->say($dfh, ['again', 'location', 'country', 'birthyear', 'edu', 'sex']);
 
     for my $lx (1..$#line) {
 	if ($csv->parse($line[$lx])) {
@@ -690,6 +727,7 @@ sub loadZip {
 	    my $l2 = $field[RCPA_START+3];
 	    next if ($l1 eq '' or $l2 eq '');
 	    edge($n1, $l1, $n2, $l2, ParseDate($field[2]), \@field);
+	    recordDemogr($dfh, $csv, [ @field[RCPA_DEMOGRAPHICS .. (RCPA_DEMOGRAPHICS+5)] ]);
 	} else {
 	    print STDERR "parse () failed on argument: ",
 	      $csv->error_input, "\n";
