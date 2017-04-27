@@ -1,0 +1,50 @@
+Flow is a state in which an individual is completely immersed in an
+activity without reflective self-consciousness but with a deep sense
+of control. Preconditions of the flow state are thought to include
+skills-demands compatibility, clear goals, and immediate feedback.
+Previous work has often assumed an idiosyncratic relationship between
+a given person and the activities that that person is intrinsically
+motivated to engage in. Here the focus is on the structural
+characteristics of the activities themselves. Certainly personal
+preference plays some role, but it seems plausible that some
+activities may be more conducive to flow than other activities after
+controlling for personal preference.
+
+❡ In an exploratory approach, we ask participants to select two physical
+activities that are familiar and assign relative rankings on 20
+characteristics. For example, "How clear and straightforward are the
+short-term rules and goals?" with response options such as "PA1 has
+much more clear rules and goals than PA2." or "Both have equally clear
+rules and goals." or "PA2 has somewhat more clear rules and goals than
+PA1."
+
+❡ These data are fed into a logistic model specified in the Stan
+Bayesian programming language. Each activity is considered to have 20
+standard normally distributed latent parameters (1 for each
+characteristic). Each characteristic is separately modeled as a
+categorical response determine by the difference in latent score PA1 -
+PA2 on that characteristics with a characteristic-specific slope and
+dataset-wide category thresholds. A univariate Gaussian prior is used
+to gently link together novice, amateur, and expert sets of
+parameters.
+
+❡ As an incentive to recruit participants, preliminary model output is
+available for exploration. Each activity is ranked on each
+characteristic. Participants may choose weights to describe which
+characteristics are of personal interest to produce a linear composite
+score. This linear composite may assist participants in selection of
+new physical activities to explore from our large, crowd-sourced
+collection. For example, one person may wish to give positive weights
+to unpredictability, opportunities to express creativity, and
+environmental complexity. Someone else may give priority to a lack of
+waiting (a preference for continuous action) and the greatest possible
+feeling of personal control.
+
+❡ For the subset of activities with sufficient sample size, we present a
+theory-driven factor analysis to connect activity characteristics with
+the experience of flow. With disclaimers for the cross-sectional
+nature of the data collection, an exploratory factor analysis
+indicates which activities characteristics are more structural facets
+of the activities and which are more a function of idiosyncratic
+personal preference. More tightly controlled experiments are suggested
+to examine the indicated hypotheses with more confirmatory methods.

@@ -43,11 +43,6 @@ descriptionMap =
 
 Skills=["Novice", "Amateur", "Expert"]
 
-RCPA_DATA=
-  Novice: RCPA_DATA1
-  Amateur: RCPA_DATA2
-  Expert: RCPA_DATA3
-
 MAX_ABS_WEIGHT= 3
 
 weightLine = (props) ->
@@ -163,7 +158,7 @@ prettyName = (name) ->
 resultPanel = (props) ->
   maxPA = RCPA_PA.length - 1
   score = new Array(RCPA_PA.length)
-  score[x] = dotprod(props.weight, RCPA_DATA[props.skill][x]) for x in [0..maxPA]
+  score[x] = dotprod(props.weight, RCPA_DATA[x]) for x in [0..maxPA]
   order = [0..maxPA]
   order.sort (a,b) ->
     cmp = score[a] - score[b]
@@ -185,17 +180,17 @@ resultPanel = (props) ->
         "^"
   div
     className: "column"
-    div
-      className: "ui buttons"
-      Skills.map (text) ->
-        isActive = ""
-        isActive = "active" if text is props.skill
-        div
-          className: "ui button #{isActive}"
-          key: text
-          onClick: () ->
-            props.setSkill(text)
-          text
+    # div
+    #   className: "ui buttons"
+    #   Skills.map (text) ->
+    #     isActive = ""
+    #     isActive = "active" if text is props.skill
+    #     div
+    #       className: "ui button #{isActive}"
+    #       key: text
+    #       onClick: () ->
+    #         props.setSkill(text)
+    #       text
     div
       className: "ui list"
       lis
@@ -379,9 +374,6 @@ class Jumbotron extends React.Component
         (or high to low for negative weights).
         You can play around with assigning more than one weight at a time and see
         how the order changes.
-        You can also click on the buttons labelled Novice, Amateur, and Expert
-        to observe how the ordering changes depending on the level of mastery
-        a participant brings to the activities.
         Are there physical activities that you haven’t tried that might be worth considering?"
         br(),
         br(),

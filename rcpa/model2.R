@@ -114,9 +114,7 @@ alpha <- matrix(df[,estimator], nrow=1,
 print(alpha)
 
 df <- summary(sim_fit, pars=c("theta"), probs=.5)$summary
-tar <- array(df[,estimator], dim=c(NFACETS, NPA, 3))
-cor(c(tar[,,1]), c(tar[,,2]))  #.99
-cor(c(tar[,,2]), c(tar[,,3]))  #.99
+tar <- array(df[,estimator], dim=c(NFACETS, NPA))
 
 if (0) {
   library(shinystan)
@@ -124,7 +122,7 @@ if (0) {
 }
 
 if (0) {
-  char <- tar[,,2]
+  char <- tar
   rownames(char) <- facetNames
   colnames(char) <- palist
   pc <- prcomp(t(char), retx=TRUE)
@@ -139,15 +137,10 @@ if (0) {
   plot3d(pc$x[,1:3], col = rainbow(nrow(pc$x)))
 }
 
-
 mask <- spokes>3    # increase this TODO
 
-cat(paste("var RCPA_DATA1=",
-          toJSON(tar[,mask,1], matrix="columnmajor", digits=3),
-          ";\nvar RCPA_DATA2=",
-          toJSON(tar[,mask,2], matrix="columnmajor", digits=3),
-          ";\nvar RCPA_DATA3=",
-          toJSON(tar[,mask,3], matrix="columnmajor", digits=3),
+cat(paste("var RCPA_DATA=",
+          toJSON(tar[,mask], matrix="columnmajor", digits=3),
           ";\nvar RCPA_FACETS=",
           toJSON(facetNames),
           ";\nvar RCPA_FACET_ALPHA=",

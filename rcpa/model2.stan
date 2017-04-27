@@ -34,37 +34,16 @@ transformed data {
   }
 }
 parameters {
-  matrix[NPA,NFACETS]     theta[3];    // latent score of PA by facet
+  matrix[NPA,NFACETS]     theta;    // latent score of PA by facet
   real threshold1;
   real threshold2;
   vector<lower=0>[NFACETS] alpha;
-  real<lower=1e-15>  betweenLevelVariance;
-//  real<lower=1e-15> betweenSoloGroupVariance;
+  cholesky_factor_corr[NFACETS] thetaCorChol;
 }
 model {
-  betweenLevelVariance ~ exponential(.01);
-  for (lev in 1:2) {
-    for (pa in 1:NPA) {
-      // estimate a separate variance parameter for each pair of levels TODO
-      for (facet in 1:NFACETS) {
-        theta[lev,pa,facet] ~ normal(theta[lev+1,pa,facet], sqrt(betweenLevelVariance));
-      }
-    }
-  }
-  // betweenSoloGroupVariance ~ exponential(.01);
-  // for (lev in 1:3) {
-  //   for (px in 1:NSGP) {
-  //     int p1 = soloGroupList[px]-1;
-  //     int p2 = soloGroupList[px];
-  //     for (facet in 1:NFACETS) {
-  //       theta[lev,p1,facet] ~ normal(theta[lev,p2,facet], betweenSoloGroupVariance);
-  //     }
-  //   }
-  // }
-  for (lev in 1:3) {
-    for (pa in 1:NPA) {
-      theta[lev,pa,1:NFACETS] ~ normal(0, 1);  //sd=thetaScale?
-    }
+  thetaCorChol ~ lkj_corr_cholesky(2.0);
+  for (pa in 1:NPA) {
+    theta[pa,] ~ multi_normal_cholesky(rep_vector(0, NFACETS), thetaCorChol);
   }
   threshold1 ~ normal(0,5);
   threshold2 ~ normal(0,5);
@@ -74,9 +53,13 @@ model {
       if (rcat[cmp,ff] == 13) continue;  // special value to indicate missing
       rcat[cmp,ff] ~ categorical_logit(
         cmp_probs(alpha[ff],
-          theta[l1[cmp],pa1[cmp],ff],
-          theta[l2[cmp],pa2[cmp],ff],
+          theta[pa1[cmp],ff],
+          theta[pa2[cmp],ff],
           threshold1, threshold2));
     }
   }
+}
+generated quantities {
+	  corr_matrix[NFACETS] thetaCor;
+	  thetaCor = thetaCorChol * thetaCorChol';
 }

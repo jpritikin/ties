@@ -34,6 +34,7 @@
 \usepackage{booktabs} % Top and bottom rules for table
 \usepackage[font=small,labelfont=bf]{caption} % Required for specifying captions to tables and figures
 \usepackage{amsfonts, amsmath, amsthm, amssymb} % For math fonts, symbols and environments
+\allowdisplaybreaks[4]
 \usepackage{wrapfig} % Allows wrapping text around tables and figures
 \usepackage[hidelinks=true]{hyperref}
 \usepackage{enumitem}
@@ -50,7 +51,7 @@ library(rstan)
 library(xtable)
 }
 suppressPackageStartupMessages(loadlib())
-theme_set(theme_bw(base_size=18))
+theme_set(theme_bw(base_size=22))
 options("xtable.floating"=FALSE)
 options("xtable.math.style.negative"=TRUE)
 options("xtable.booktabs"=TRUE)
@@ -107,12 +108,6 @@ Email: \href{mailto:jpritikin@pobox.com}{jpritikin@pobox.com}\\ % Email address
 
 \color{Navy} % Navy color for the abstract
 
-\begin{abstract}
-
-Sed fringilla tempus hendrerit. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Etiam ut elit sit amet metus lobortis consequat sit amet in libero. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus vel sem magna. Nunc at convallis urna. isus ante. Pellentesque condimentum dui. Etiam sagittis purus non tellus tempor volutpat. Donec et dui non massa tristique adipiscing. Quisque vestibulum eros eu. Phasellus imperdiet, tortor vitae congue bibendum, felis enim sagittis lorem, et volutpat ante orci sagittis mi. Morbi rutrum laoreet semper. Morbi accumsan enim nec tortor consectetur non commodo nisi sollicitudin. Proin sollicitudin. Pellentesque eget orci eros. Fusce ultricies, tellus et pellentesque fringilla, ante massa luctus libero, quis tristique purus urna nec nibh.
-
-\end{abstract}
-
 %----------------------------------------------------------------------------------------
 %	INTRODUCTION
 %----------------------------------------------------------------------------------------
@@ -128,7 +123,7 @@ skills-demands compatibility, clear goals, and immediate feedback \cite{keller20
 Previous work has often assumed an idiosyncratic relationship between
 a person and the activities that that person is intrinsically
 motivated to engage in. Here the focus is on the structural
-characteristics of the activities themselves. Certainly personal
+characteristics (facets) of the activities themselves. Certainly personal
 preferences play some role, but it seems plausible that some
 activities may be more conducive to flow than other activities after
 controlling for personal preference.
@@ -162,9 +157,9 @@ alpha <- df[,"mean"]
 names(alpha) <- facetNames
 
 df <- summary(sim_fit, pars=c("theta"), probs=c())$summary
-tar <- array(df[,"mean"], dim=c(NFACETS, NPA, 3))
+tar <- array(df[,"mean"], dim=c(NFACETS, NPA))
 mask <- spokes > 2
-tar2 <- tar[,mask,2]
+tar2 <- tar[,mask]
 colnames(tar2) <- names(mask)[mask]
 rownames(tar2) <- facetNames
 
@@ -183,33 +178,33 @@ with response choices: (a) ``Golf is much more predictable than running.''
 (c) ``Both offer roughly equal predictability.''
 (d) ``Running is somewhat more predictable than golf.''
 or (e) ``Running is much more predictable than golf.''
-In addition to skills-demands compatibility, clear goals, and
+In addition to clear goals and
 immediate feedback,
-an assortment of other likely flow triggers were included \cite{kotler2014,sawyer2007,wegner2002}.
-Item prompts follow:
+an assortment of other likely flow preconditions were included \cite{kotler2014,sawyer2007,wegner2002}.
+A complete list of prompts follow with the facet name in parentheses:
 %
-\begin{itemize}[noitemsep]
-\item   How much skill is required?
-\item   How predictable is the action?
-\item   To what extent do you find new and fresh experiences during the activity?
-\item   To what extent are there opportunities to express creativity during the activity?
-\item   How complex is the action and the environment in which it takes place?
-\item   How clear and straightforward are the short-term rules and goals?
-\item   How quickly do you know whether what you wanted to accomplish in the short term was successful?
-\item   How clear and straightforward are the long-term rules and goals?
-\item   How quickly do you know whether what you wanted to accomplish in the long term was successful?
-\item   Does your extraneous mental chatter temporarily shut down during the activity?
-\item   How much time do you feel like is spent waiting for the next step in the activity?
-\item   How much of your body is involved in the activity? Is it full-body or only part of your body?
-\item   How much control do you feel like you can exert over your performance?
-\item   During the activity, to what extent do you feel like you are in the present moment?
-\item   How spontaneous is your action?
-\item   During the activity, how important does the activity feel?
-\item   To what extent do you care about how others judge your performance?
-\item   After engaging in the physical activity, to what extent do you feel great?
-\item   What is the risk of minor physical injury (more than just muscle soreness)?
-\item   What is the risk of serious physical injury?
-\end{itemize}
+\begin{enumerate}[noitemsep]
+\item   How much skill is required?\quad\textcolor{gray}{(skill)}
+\item   How predictable is the action?\quad\textcolor{gray}{(predict)}
+\item   To what extent do you find new and fresh experiences during the activity?\quad\textcolor{gray}{(novelty)}
+\item   To what extent are there opportunities to express creativity during the activity?\quad\textcolor{gray}{(creative)}
+\item   How complex is the action and the environment in which it takes place?\quad\textcolor{gray}{(complex)}
+\item   How clear and straightforward are the short-term rules and goals?\quad\textcolor{gray}{(goal1)}
+\item   How quickly do you know whether what you wanted to accomplish in the short term was successful?\quad\textcolor{gray}{(feedback1)}
+\item   How clear and straightforward are the long-term rules and goals?\quad\textcolor{gray}{(goal2)}
+\item   How quickly do you know whether what you wanted to accomplish in the long term was successful?\quad\textcolor{gray}{(feedback2)}
+\item   Does your extraneous mental chatter temporarily shut down during the activity?\quad\textcolor{gray}{(chatter)}
+\item   How much time do you feel like is spent waiting for the next step in the activity?\quad\textcolor{gray}{(waiting)}
+\item   How much of your body is involved in the activity? Is it full-body or only part of your body?\quad\textcolor{gray}{(body)}
+\item   How much control do you feel like you can exert over your performance?\quad\textcolor{gray}{(control)}
+\item   During the activity, to what extent do you feel like you are in the present moment?\quad\textcolor{gray}{(present)}
+\item   How spontaneous is your action?\quad\textcolor{gray}{(spont)}
+\item   During the activity, how important does the activity feel?\quad\textcolor{gray}{(stakes)}
+\item   To what extent do you care about how others judge your performance?\quad\textcolor{gray}{(evaluated)}
+\item   After engaging in the physical activity, to what extent do you feel great?\quad\textcolor{gray}{(reward)}
+\item   What is the risk of minor physical injury (more than just muscle soreness)?\quad\textcolor{gray}{(injury1)}
+\item   What is the risk of serious physical injury?\quad\textcolor{gray}{(injury2)}
+\end{enumerate}
 
 \subsection*{Subjects}
 
@@ -219,6 +214,7 @@ with different pairs of activities.
 In addition, at the end of the survey,
 participants are redirected to a web page with preliminary results
 available for exploration, \url{http://exuberant-island.surge.sh/rcpa/}.
+These results are updated periodically once newly collected data are available.
 The preliminary results page is interactive.
 Participants may choose weights to describe which
 characteristics are of personal interest to produce a linear composite
@@ -230,7 +226,7 @@ environmental complexity. Someone else may give priority to a lack of
 waiting (a preference for continuous action) and the greatest possible
 feeling of personal control.
 Participants are encouraged to share the weights they develop via social networks
-and invite friends to participate in the survey.
+and to invite friends to participate in the survey.
 
 <<>>=
 demogr <- read.csv('../demogr.csv')
@@ -242,8 +238,8 @@ age <- table(2017-demogr$birthyear <= 25)
 
 @ 
 
-As of April, \Sexpr{length(mask)} distinct activities were
-mentioned by \Sexpr{sum(demogr[['again']]=='')} participants.
+As of April, \Sexpr{length(mask)} distinct activities were named
+in comparisons by \Sexpr{sum(demogr[['again']]=='')} participants.
 An additional \Sexpr{sum(demogr[['again']]=='Yes')} comparisons
 were contributed by repeated participation.
 Participants were mostly from USA (\Sexpr{round(100*country[1]/nrow(demogr1))}\%),
@@ -257,21 +253,22 @@ Most were 25 or fewer years old (\Sexpr{round(100*age[2]/nrow(demogr1))}\%).
 \subsection*{Relative to Absolute Rankings}
 
 Since the set of physical activities $a$ is open-ended,
-there will always be some activities with insufficient data.
+there will always be some activities with insufficient information.
 Bayesian priors are used to stabilize parameter estimates \cite{carpenter2016}.
-An initial model treats each characteristic as independent.
+We describe an initial model that treats each characteristic as mostly independent.
 Latent absolute rankings $\theta$ are obtained for each
 combination of activity and characteristic.
 Each characteristic $c$ has its own
 discrimination parameter~$\alpha$.
 Given thresholds $\tau_1$ and $\tau_2$,
 the probability of activities $x \in a$ and $y \in a$ receiving
-relative rating $r$ is,
+relative rating $r$ is modeled as,
 %
 \begin{align}
-\theta_{(a,c)} \sim \textrm{normal}(0.0, 1.0)\\
-\tau_1, \tau_2 \sim \textrm{normal}(0.0, 5.0)\\
-\alpha_c \sim \textrm{lognormal}(1.0, 1.0)\\
+\Sigma_\theta \sim \mathrm{lkj\_corr\_cholesky}(2.0)\\
+\theta_a \sim \mathrm{multi\_normal\_cholesky}(0, \Sigma_\theta)\\
+\tau_1, \tau_2 \sim \mathrm{normal}(0.0, 5.0)\\
+\alpha_c \sim \mathrm{lognormal}(1.0, 1.0)\\
 g \equiv \begin{pmatrix}
     &0.0 \\
  \alpha_c (\theta_x - \theta_y) &-(\tau_1 + \tau_2) \\
@@ -282,26 +279,6 @@ g \equiv \begin{pmatrix}
 h_n = \sum_{k=1}^n g_k \\
 r \sim \mathrm{CategoricalLogit}(h).
 \end{align}
-%
-To account for a participant's expertise,
-the actual model used was a bit more complex.
-Some activities like \emph{walking}
-involve little skill.
-However, some physical activities
-take many years to master.
-For example, Brazilian Jiu-Jitsu often takes
-seven years of practice (or more) to reach black belt.
-It seems plausible that Jiu-Jitsu beginners
-may experience the characteristics of the sport
-differently than a black belt.
-To take this into account,
-participants were asked to describe themselves
-as a \emph{beginner}, \emph{competent amateur},
-or \emph{expert or professional} for each of the two activities.
-Separate $\theta$ parameters were estimated
-for each skill level,
-but insufficient data were available to find
-any differences.
 
 %----------------------------------------------------------------------------------------
 %	RESULTS 
@@ -339,13 +316,14 @@ ggplot(gr) + geom_line(aes(x=tdiff,y=p,color=category,linetype=category)) +
 \end{center}\vspace{1ex}
 
 The posterior was summarized by mean point estimates.
-Thresholds 1 and 2 were estimated at \Sexpr{th[1]} and \Sexpr{th[2]},
+Thresholds 1 and 2 were estimated at $\Sexpr{th[1]}$ and $\Sexpr{th[2]}$,
 respectively.
 This resulted in a response curve exhibited in Figure~\ref{fig:crc}.
-Actual $\alpha$ values ranged from $\Sexpr{min(alpha)}$ to \Sexpr{max(alpha)}.
+Actual $\alpha$ values ranged from $\Sexpr{min(alpha)}$ to $\Sexpr{max(alpha)}$.
 Of \Sexpr{length(mask)} activities, \Sexpr{table(mask)[1]} were excluded
-to due low connectivity leaving \Sexpr{table(mask)[2]} well-connected activities.
-Overall, latent absolute rankings ($\theta$) ranged from $\Sexpr{min(tar2)}$ to \Sexpr{max(tar2)}.
+to due low connectivity (activities compared with less than 3 other activities)
+leaving \Sexpr{table(mask)[2]} well-connected activities.
+Overall, latent absolute rankings ($\theta$) ranged from $\Sexpr{min(tar2)}$ to $\Sexpr{max(tar2)}$.
 Rankings can be explored by listing the activities at the extremes in each facet (Table~\ref{tab:extremes}).
 
 \begin{center}\vspace{1ex}
@@ -366,12 +344,40 @@ print(xtable(result, NULL, NULL, "lccccc"),
 
 @ 
 \captionof{table}{Most and least ranking activities on the 10 more
-  discriminating facets. Caution: Sign may be flipped in some facets.\label{tab:extremes}}
+  discriminating facets.\label{tab:extremes}}
 \end{center}\vspace{1ex}
 
-Currently, sample size is limited and absolute
-rankings may not match intuition well.
+<<>>=
+df <- summary(sim_fit, pars=c("thetaCor"), probs=.5)$summary
+# eigen(matrix(df[,'mean'], NFACETS, NFACETS))$val  probably junk
+sigt <- matrix(df[,'mean'], NFACETS, NFACETS, dimnames=list(facetNames,facetNames))
+diag(sigt) <- NA
+largest <- matrix(match(-abs(sigt),sort(-abs(sigt))), NFACETS, NFACETS)
+@ 
+
+As can be seen from the Table~\ref{tab:extremes},
+rankings do not well reflect intuition and it is
+too early to make any interpretations.
 Model estimates should improve with additional data.
+However, we exhibit the facet correlation matrix
+in Figure~\ref{fig:correlation} and can point out
+a few tentative conclusions.
+Skill and complexity are correlated $\Sexpr{sigt['skill','complex']}$.
+Predictability is correlated $\Sexpr{sigt['predict','injury2']}$ with the risk of serious injury.
+
+\begin{center}\vspace{1ex}
+<<fig.height=8, fig.width=8>>=
+gr <- expand.grid(x=1:NFACETS, y=1:NFACETS)
+gr[['cor']] <- df[,'mean']
+gr <- gr[gr$x!=gr$y,]
+ggplot(gr) + geom_raster(aes(x,y,fill=cor)) +
+    scale_fill_gradient2(low = "red", mid = "white",
+  high = "blue", midpoint = 0, space = "Lab",
+  guide = "colourbar") + coord_fixed() + xlab("facet") + ylab("facet")
+
+@ 
+\captionof{figure}{Correlation between facets ($\Sigma_\theta\Sigma_\theta^T$).\label{fig:correlation}}
+\end{center}\vspace{1ex}
 
 \color{SaddleBrown} % SaddleBrown color for the conclusions to make them stand out
 
@@ -386,7 +392,7 @@ Model estimates should improve with additional data.
 \item Guided by flow theory, a exploratory factor model will be developed to
 rank activities with respect to how conducive the activity is to flow.
 \item External validity can be examined by comparing rankings with the actual
-measured prevalence of flow while involved in activities.
+measured prevalence of flow experienced by participants while involved in activities.
 \end{itemize}
 
 
