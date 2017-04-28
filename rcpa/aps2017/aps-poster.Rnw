@@ -208,26 +208,6 @@ A complete list of prompts follow with the facet name in parentheses:
 
 \subsection*{Subjects}
 
-A variety of strategies are implemented to encourage participation.
-Subjects are invited to take the survey more than once
-with different pairs of activities.
-In addition, at the end of the survey,
-participants are redirected to a web page with preliminary results
-available for exploration, \url{http://exuberant-island.surge.sh/rcpa/}.
-These results are updated periodically once newly collected data are available.
-The preliminary results page is interactive.
-Participants may choose weights to describe which
-characteristics are of personal interest to produce a linear composite
-score. This linear composite may assist participants in the selection of
-new physical activities.
-For example, one person may wish to give positive weights
-to unpredictability, opportunities to express creativity, and
-environmental complexity. Someone else may give priority to a lack of
-waiting (a preference for continuous action) and the greatest possible
-feeling of personal control.
-Participants are encouraged to share the weights they develop via social networks
-and to invite friends to participate in the survey.
-
 <<>>=
 demogr <- read.csv('../demogr.csv')
 demogr1 <- subset(demogr, again == '')
@@ -284,6 +264,7 @@ r \sim \mathrm{CategoricalLogit}(h).
 %	RESULTS 
 %----------------------------------------------------------------------------------------
 
+\columnbreak
 \section*{Results}
 
 \begin{center}\vspace{1ex}
@@ -323,13 +304,12 @@ Actual $\alpha$ values ranged from $\Sexpr{min(alpha)}$ to $\Sexpr{max(alpha)}$.
 Of \Sexpr{length(mask)} activities, \Sexpr{table(mask)[1]} were excluded
 to due low connectivity (activities compared with less than 3 other activities)
 leaving \Sexpr{table(mask)[2]} well-connected activities.
-Overall, latent absolute rankings ($\theta$) ranged from $\Sexpr{min(tar2)}$ to $\Sexpr{max(tar2)}$.
 Rankings can be explored by listing the activities at the extremes in each facet (Table~\ref{tab:extremes}).
 
 \begin{center}\vspace{1ex}
 <<results="asis">>=
 result <- NULL
-for (ax in order(-alpha)[1:10]) {
+for (ax in order(-alpha)) {
     rank <- tar2[ax,]
     result <- rbind(result,
           c(rownames(tar2)[ax],
@@ -343,8 +323,8 @@ print(xtable(result, NULL, NULL, "lccccc"),
       include.rownames=FALSE)
 
 @ 
-\captionof{table}{Most and least ranking activities on the 10 more
-  discriminating facets.\label{tab:extremes}}
+\captionof{table}{Most and least ranking activities
+by facet ordered from most to least discriminating.\label{tab:extremes}}
 \end{center}\vspace{1ex}
 
 <<>>=
@@ -358,7 +338,6 @@ largest <- matrix(match(-abs(sigt),sort(-abs(sigt))), NFACETS, NFACETS)
 As can be seen from the Table~\ref{tab:extremes},
 rankings do not well reflect intuition and it is
 too early to make any interpretations.
-Model estimates should improve with additional data.
 However, we exhibit the facet correlation matrix
 in Figure~\ref{fig:correlation} and can point out
 a few tentative conclusions.
@@ -386,7 +365,7 @@ ggplot(gr) + geom_raster(aes(x,y,fill=cor)) +
 \begin{itemize}
 \item Using cross-sectional data,
   physical activities can be ranked against each other on a variety of flow-related characteristics.
-\item Personal preference for activities can be treated as noise.
+\item Preliminary results available for exploration,\\\url{http://exuberant-island.surge.sh/rcpa/}
 \item Much more data is needed. How to get it without compromising quality? Collaborators sought.
 \item Once data collection is complete, anonymized data and data analysis scripts will be placed in the public domain.
 \item Guided by flow theory, a exploratory factor model will be developed to
