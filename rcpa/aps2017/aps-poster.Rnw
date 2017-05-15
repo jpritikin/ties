@@ -116,17 +116,18 @@ Email: \href{mailto:jpritikin@pobox.com}{jpritikin@pobox.com}\\ % Email address
 
 \section*{Introduction}
 
-Flow is a state in which an individual is completely immersed in an
+\begin{itemize}
+  \item \emph{Flow} is a state in which an individual is completely immersed in an
 activity without reflective self-consciousness but with a deep sense
-of control. Preconditions of the flow state are thought to include
+of control.
+\item Preconditions of the flow state are thought to include
 skills-demands compatibility, clear goals, and immediate feedback \cite{keller2012}.
-Previous work has often assumed an idiosyncratic relationship between
+\item Previous work has often assumed an idiosyncratic relationship between
 a person and the activities that that person is intrinsically
-motivated to engage in. Here the focus is on the structural
-characteristics (facets) of the activities themselves. Certainly personal
-preferences play some role, but it seems plausible that some
-activities may be more conducive to flow than other activities after
-controlling for personal preference.
+motivated to engage in.
+\item Some activities may be more conducive to flow than other activities
+if we regard personal preference as error.
+\end{itemize}
 
 %----------------------------------------------------------------------------------------
 %	OBJECTIVES
@@ -134,7 +135,7 @@ controlling for personal preference.
 
 \color{DarkSlateGray} % DarkSlateGray color for the rest of the content
 
-\section*{Main Objectives}
+\section*{Objectives}
 
 \begin{enumerate}
 \item Explore characteristics of physical activities thought to be related to flow
@@ -218,15 +219,15 @@ age <- table(2017-demogr$birthyear <= 25)
 
 @ 
 
-As of April, \Sexpr{length(mask)} distinct activities were named
-in comparisons by \Sexpr{sum(demogr[['again']]=='')} participants.
-An additional \Sexpr{sum(demogr[['again']]=='Yes')} comparisons
-were contributed by repeated participation.
-Participants were mostly from USA (\Sexpr{round(100*country[1]/nrow(demogr1))}\%),
+\Sexpr{length(mask)} distinct activities.
+$N=\Sexpr{sum(demogr[['again']]=='')}$,
+but $\Sexpr{sum(demogr[['again']]=='Yes')}$ comparisons
+contributed by repeated participation.
+USA (\Sexpr{round(100*country[1]/nrow(demogr1))}\%),
 Germany (\Sexpr{round(100*country[2]/nrow(demogr1))}\%),
 and United Kingdom (\Sexpr{round(100*country[3]/nrow(demogr1))}\%).
-Most reported being female (\Sexpr{round(100*sex['Female']/nrow(demogr1))}\%).
-Most were 25 or fewer years old (\Sexpr{round(100*age[2]/nrow(demogr1))}\%).
+\Sexpr{round(100*sex['Female']/nrow(demogr1))}\% female.
+\Sexpr{round(100*age[2]/nrow(demogr1))}\% 25 or fewer years old.
 
 %------------------------------------------------
 
@@ -273,7 +274,7 @@ softmax <- function(v) {
     exp(v) / sum(exp(v))
 }
 th <- summary(sim_fit, pars=c(paste0("threshold",1:2)))$summary[,'mean']
-tdiff <- seq(-2,2,.1)
+tdiff <- seq(-3,3,.1)
 gr <- expand.grid(tdiff=tdiff, category=c("much more","somewhat more", 'equal',
                   "somewhat less", "much less"), p=NA)
 gg <- matrix(c(0,
