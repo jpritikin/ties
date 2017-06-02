@@ -7,8 +7,7 @@ options(mc.cores = parallel::detectCores())
 if (1) {
   rcd <- read.csv("rawData.csv")
   
-  NCMP <- nrow(rcd)
-  if (NCMP < 1) { stop("No data?") }
+  if (nrow(rcd) < 1) { stop("No data?") }
   NFACETS <- ncol(rcd) - 4L
   
   palist <- sort(unique(c(as.character(rcd$pa1), as.character(rcd$pa2))))
@@ -69,12 +68,16 @@ for (pa1 in palist) {
     spokes[pa1] <- sum(!duplicated(other))
 }
 
+# Otherwise the priors are given too much influence
+whitelist <- names(spokes)[spokes > 1]
+rcd <- rcd[rcd$pa1 %in% whitelist & rcd$pa2 %in% whitelist,]
+
 soloGroupList <- which(duplicated(sub(";(solo|group)$", "", palist)))
 
 rcd[is.na(rcd)] <- 10
 
 sim_fit <- stan(file = "model2.stan",
-                data = list(NPA=NPA, NFACETS=NFACETS, NCMP=NCMP,
+                data = list(NPA=NPA, NFACETS=NFACETS, NCMP=nrow(rcd),
                             pa1=match(rcd$pa1, palist), l1=rcd$l1,
                             pa2=match(rcd$pa2, palist), l2=rcd$l2,
                             diff=sapply(rcd[-1:-4], as.numeric),

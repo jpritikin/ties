@@ -41,6 +41,9 @@ my %ShortDict =
    'rugby' => 'rugby',
    'quidditch' => 'quidditch (sport)',
    'gym, jogging' => 'invalid',
+   'run' => 'running',
+   'swim' => 'swimming',
+   'training' => 'invalid',
   );
 
 # 'Elliptical trainer' could be used for running or walking TODO
@@ -363,6 +366,51 @@ my %LongDict =
    'working out@working out such as lifting weights or cross fitting' => 'weightlifting',
    'softball@womens fastpitch softball' => 'baseball',
    'running@sprints' => 'running',
+   'muay thai@muay thai is a thailand marcial art' => 'muay thai',
+   'running@i usually run around 10 km at least three times a week, mainly on mornings. depending on the purpuse, i could run on streets or mountain roads (trail)' => 'running',
+   'yoga@i do hatha yoga with an instructor once a week, at night.' => 'hatha yoga',
+   'run@i run half marathons and i completed a full marathon on past october' => 'running',
+   'swim@pool swimming' => 'swimming',
+   'running@recreational running' => 'running',
+   'training@weightlifting and cardio routines' => 'invalid',
+   'karate@karate kyokushin and goju ryu' => 'karate',
+   'strength training@lifting weights or using fitness machines' => 'weightlifting',
+   'skiing@skiing down a mountain on alpine skis' => 'skiing',
+   'strength training@intense workout in the gym, bodybuilding' => 'weightlifting',
+   'hockey@field hockey' => 'field hockey',
+   'gym@using weights, cardio' => 'invalid',
+   'tennis@indoor tennis' => 'tennis',
+   'hockey@ice hockey' => 'ice hockey',
+   'gym@lifting weights, running, spinning, yoga' => 'invalid',
+   'running@running in linger distances (marathon)' => 'running',
+   'cycling@indoor spin class, road bikes' => 'cycling',
+   'running@daily 5k' => 'running',
+   'rock climbing@indoor and outdoor, bouldering, top rope, and sport climbing' => 'rock climbing',
+   'ice skating@skating around on ice' => 'ice skating',
+   'weight lifting@lifting weights and getting a pump' => 'weightlifting',
+   'kayaking@long-distance river and open water >3 hrs at a time' => 'kayaking',
+   'running@jogging in a park' => 'running',
+   'tennis@singles and doubles at a moderate intensity' => 'tennis',
+   'bike@mountain bike' => 'cycling',  # split into cycling and mountain biking? TODO
+   'running@jogging 2-3 miles at a steady pace' => 'running',
+   'basketball@playing 3 on 3 basketball on a half-court' => 'basketball',
+   'cheerleading@competitive cheerleading' => 'cheerleading',
+   'swimming@swimming in a pool, not outside' => 'swimming',
+   'hiking@hiking with my dog, walking through the countryside .' => 'hiking',
+   'football@gridiron football' => 'football',
+   'weight lifting@lifting weights for all muscle areas of the body ,including squats, hammer curls, deadlifts, shoulder press, and so on.' => 'weightlifting',
+   'running@running outside on the road/sidewalk' => 'running',
+   'swimming@swimming in a regulation size pool indoors.' => 'swimming',
+   'running@running as a form of cardio workout (mostly 12- 15km), sometimes i participate in half-marathons' => 'running',
+   'running@ran distances between 1-4 miles at quick pace and sprints' => 'running',
+   'tae bo@tae bo is a full body workout, combining martial arts, boxing, and elements of dance, set to fast pace music to form this intense cardio workout,' => 'aerobic exercise',
+   'running@cross-country running' => 'running',
+   'gym@running' => 'running',
+   'rpm@classes at the gym' => 'aerobic exercise',  # or cycling? TODO
+   'aerials (trapeze)@static trapeze and lyra' => 'trapeze',
+   'inline skate@otherwise known as rollerblading  distance rollerblading' => 'inline skating',
+   'tennis@i played tennis with my partner - we did not use a real court but we rallied the ball back and forth outside near our house on the concrete' => 'tennis',
+   'football@it was not an official game but again more of a kick about outside with two of us' => 'soccer',
   );
 
 # Could remove some of these later when we have huge samples. TODO
@@ -382,7 +430,8 @@ my %GroupSoloOverride =
    'rock climbing' => 'solo',
    'hiking' => 'solo',
    'dance' => 'group',
-   'soccer' => 'group'
+   'soccer' => 'group',
+   'dancing' => 'group',
   );
 
 my %CountryMap =
@@ -404,6 +453,10 @@ my %CountryMap =
    'switzerland' => 'switzerland',
    'swiss' => 'switzerland',
    'australia' => 'australia',
+   'costa rica' => 'costa rica',
+   'brazil' => 'brazil',
+   'portugal' => 'portugal',
+   'sweden' => 'sweden',
   );
 
 use constant RCPA_DEMOGRAPHICS => 9;
@@ -683,7 +736,7 @@ sub recordDemogr {
     my $country = lc(trim($di->[2]));
     if (length $country) {
 	if (!exists $CountryMap{$country}) {
-	    print "   '$country' => '$country',\n";
+	    print "   '$country' => '$country',  # country\n";
 	} else {
 	    $di->[2] = $CountryMap{$country};
 	}
