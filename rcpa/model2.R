@@ -84,7 +84,8 @@ sim_fit <- stan(file = "model2.stan",
                             NSGP=length(soloGroupList)),
 #                            soloGroupList=soloGroupList),
                 chains = 7,
-                iter = 500)
+                iter = 500,
+                control = list(max_treedepth = 15))
 
 facetNames <- colnames(rcd[-1:-4])
 
@@ -105,6 +106,10 @@ head(summary(sim_fit, probs=.5)$summary[neOrder,], n=20)
 if (interactive()) {
   summary(sim_fit, pars=c(paste0("threshold",1:2)))$summary
   plot(sim_fit, pars=c(paste0("threshold",1:2)))
+}
+if (0){
+  library(shinystan)
+  shinystan::launch_shinystan(sim_fit)
 }
 
 df <- summary(sim_fit, pars=c("alpha","theta"), probs=.5)$summary
