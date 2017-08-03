@@ -756,7 +756,7 @@ sub shortenMastery {
 }
 
 sub edge {
-    my ($n1, $l1, $n2, $l2, $version, $field) = @_;
+    my ($n1, $l1, $n2, $l2, $version, $field, $recno) = @_;
     return if (!defined $n1 or !defined $n2);
     my @k = ($n1,$n2);
     my @sk = sort @k;
@@ -786,6 +786,7 @@ sub edge {
 	}
 	push @$rating, $got;
     }
+    push @$rating, $recno;
     push @{ $info->{rating} }, $rating;
 }
 
@@ -837,7 +838,7 @@ sub loadZip {
 	my $l1 = $field[RCPA_START+2];
 	my $l2 = $field[RCPA_START+3];
 	next if ($l1 eq '' or $l2 eq '');
-	edge($n1, $l1, $n2, $l2, ParseDate($field[2]), \@field);
+	edge($n1, $l1, $n2, $l2, ParseDate($field[2]), \@field, $csv->record_number());
 	recordDemogr($dfh, $csv, [ @field[RCPA_DEMOGRAPHICS .. (RCPA_DEMOGRAPHICS+5)] ]);
     }
 }
@@ -953,7 +954,7 @@ sub outputData {
     $csv->say($fh, ['pa1', 'pa2', 'l1', 'l2', 'skill', 'predict', 'novelty', 'creative', 'complex',
 		    'goal1', 'feedback1', 'goal2', 'feedback2', 'chatter', 'waiting',
 		    'body', 'control', 'present', 'spont', 'stakes', 'evaluated', 'reward',
-		    'injury1', 'injury2']);
+		    'injury1', 'injury2', 'recno']);
     my @cc = sort { $#$b <=> $#$a  } $Graph->connected_components();
     my %white;
     $white{$_}=1 for @{ $cc[0] };

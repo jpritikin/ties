@@ -4,57 +4,14 @@ library(jsonlite)
 rstan_options(auto_write = TRUE)
 options(mc.cores = parallel::detectCores())
 
-if (1) {
-  rcd <- read.csv("rawData.csv")
+rcd <- read.csv("rawData.csv")
+rcd <- rcd[,-match(c('recno'), colnames(rcd))]
   
-  if (nrow(rcd) < 1) { stop("No data?") }
-  NFACETS <- ncol(rcd) - 4L
-  
-  palist <- sort(unique(c(as.character(rcd$pa1), as.character(rcd$pa2))))
-  NPA <- length(palist)
-}
-if (0) {
-  softmax <- function(y) {
-    exp(y) / sum(exp(y))
-  }
-  NCMP <- 100
-  NFACETS <- 2
-  fnames <- c('waiting', 'injury')
-  
-  palist <- c('skydiving', 'surfing', 'running', 'walking')
-  NPA <- length(palist)
-  
-  theta <- matrix(0, nrow=NPA, ncol=NFACETS,
-                   dimnames=list(palist, fnames))
-  theta[,'waiting'] <- c(-1, 1, -.75, -.75)
-  theta[,'injury'] <- c(1, .5, -.1, -1)
-  
-  alpha <- .2
-  threshold1 <- .5
-  threshold2 <- 1
-  
-  cmp_probs <- function(pa1, pa2, thr1, thr2) {
-    diff = pa1 - pa2;
-    unsummed <- c(0, diff - thr2, diff - thr1, diff + thr1, diff + thr2) * alpha
-    cumsum(unsummed);
-  }
-  
-  simData <- NULL
-  for (rep in 1:NCMP) {
-    pa <- sample(palist, 2)
-    pa1 <- pa[1]
-    pa2 <- pa[2]
-    row <- data.frame(pa1=factor(pa1, levels=palist),
-                      pa2=factor(pa2, levels=palist))
-    for (cur in fnames) {
-      prob <- cmp_probs(theta[pa1,cur], theta[pa2,cur], threshold1, threshold2)
-      pick <- sample(c(-2,-1,0,1,2), 1, prob=softmax(prob))
-      row[,cur] <- pick
-    }
-    simData <- rbind(simData, row)
-  }
-  rcd <- simData
-}
+if (nrow(rcd) < 1) { stop("No data?") }
+NFACETS <- ncol(rcd) - 4L
+
+palist <- sort(unique(c(as.character(rcd$pa1), as.character(rcd$pa2))))
+NPA <- length(palist)
 
 spokes <- rep(NA, length(palist))
 names(spokes) <- palist

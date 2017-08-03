@@ -6,7 +6,7 @@ rstan_options(auto_write = TRUE)
 options(mc.cores = parallel::detectCores())
 
 rcd <- read.csv("rawData.csv")
-rcd <- rcd[,-match(paste0('injury',1:2), colnames(rcd))]
+rcd <- rcd[,-match(c('recno', paste0('injury',1:2)), colnames(rcd))]
 
 if (nrow(rcd) < 1) { stop("No data?") }
 facetNames <- colnames(rcd[-1:-4])
