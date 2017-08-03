@@ -9,6 +9,7 @@ use Graph;
 use Date::Manip;
 use POSIX qw(strftime);
 use Data::Dumper;
+use IO::String;
 
 my %ShortDict =
   ('mountainbiking' => 'mountain biking',
@@ -47,6 +48,8 @@ my %ShortDict =
    'rugby union' => 'rugby',
    'lawn tennis' => 'tennis',
    'cross-fit' => 'invalid',
+   'jiijoiojjio' => 'invalid',
+   'inline skate' => 'inline skating',
   );
 
 # 'Elliptical trainer' could be used for running or walking TODO
@@ -156,7 +159,6 @@ my %LongDict =
    'walking@daily half hour walks outdoors in my town.' => 'walking',
    'football@flag football, outdoors.' => 'flag football',
    'marathon@walking a marathon, because of a drunken bet' => 'walking',
-   'working@gardening  logging (cuting, woodwork)  digging and builduing' => 'gardening',
    'running@indoor running' => 'running',
    'volleyball@indoor volleyball' => 'volleyball',
    'zumba class@group exercise class' => 'aerobic exercise',
@@ -277,7 +279,6 @@ my %LongDict =
    'soccer@american rules' => 'soccer',
    'yoga@heated power vinyasa' => 'hatha yoga',
    'weight lifting@lifting in a gym with both body weight and light weights' => 'weightlifting',
-   'martial arts@taekwondo - mostly kicking  brazilian jiu jitsu - ground based grappling/submission wrestling  mixed martial arts - mix of striking and grappling' => 'invalid',  # not specific enough
    'swimming@solo swimming - freestyle, breastroke' => 'swimming',
    'gym workout@rowing machine and free weights.' => 'invalid',
    'football@americans call it soccer but it should be called "football".' => 'soccer',
@@ -454,6 +455,17 @@ my %LongDict =
    'martial arts@karate' => 'karate',
    'poi@it is a juggling equipment, that involves 2 balls in the end of a string that you waving around yourself.' => 'poi (performance art)',
    'crosstraining@crosstrainer at home' => 'running',  # like eliptical
+   'yoga@hatha yoga' => 'hatha yoga',
+   'gymnastics@aerial silks' => 'aerial silk',
+   'yoga@in class with a teacher, using yoga mats' => 'hatha yoga',
+   'hiking@outside, with backpacks' => 'hiking',
+   'yoga@hatha, nidra, balancing, breathing. piyo' => 'hatha yoga',
+   'swimming@swimming pool: brass, back stroke' => 'swimming',
+   'jijp@jjpjjojo' => 'invalid',
+   'inline skate@otherwise known as rollerblading distance rollerblading' => 'inline skating',
+   'rock climbing@outdoor top roping, bouldering, and sport leading indoor bouldering' => 'rock climbing',
+   'working@gardening logging (cuting, woodwork) digging and builduing' => 'gardening',
+   'martial arts@taekwondo - mostly kicking brazilian jiu jitsu - ground based grappling/submission wrestling mixed martial arts - mix of striking and grappling' => 'mixed martial arts',
   );
 
 # Could remove some of these later when we have huge samples. TODO
@@ -551,6 +563,7 @@ sub node {
     my ($short, $long, $solo) = @_;
     $long = lc trim($long);
     $long =~ s/\"//g;
+    $long =~ s/[\r\n]+/ /g;
     $short = lc trim($short);
     $short =~ s/\"//g;
     $short =~ s/\@//g;
@@ -793,44 +806,39 @@ sub loadZip {
     my ($zip) = @_;
     my $somezip = Archive::Zip->new();
     $somezip->read( $zip ) == AZ_OK or die $!;
-    my $rawData = $somezip->contents('CSV/Sheet_1.csv');
+    my $rawData = $somezip->contents('CSV/Relative characteristics of physical activities.csv');
     $rawData =~ tr/\xa0/ /;	# nonbreaking space
     $rawData =~ s/\xc2//gs;	# garbage?
-
-    my @line = split /[\r\n]+/, $rawData;
 
     my $csv = Text::CSV_XS->new ({ keep_meta_info => 1, binary => 1 });
     open my $dfh, ">:encoding(utf8)", "demogr.csv";
     $csv->say($dfh, ['again', 'location', 'country', 'birthyear', 'edu', 'sex']);
 
-    for my $lx (1..$#line) {
-	if ($csv->parse($line[$lx])) {
-	    my @field = $csv->fields;
-	    if (0) {
-		foreach my $col (0 .. $#field) {
-		    printf "%2d: %s\n", $col, $field[$col];
-		}
+    my $fh = IO::String->new($rawData);
+    my $ignore_header1 = $csv->getline($fh);
+    my $ignore_header2 = $csv->getline($fh);
+    while (my $row = $csv->getline($fh)) {
+	my @field = @$row;
+	if (0) {
+	    foreach my $col (0 .. $#field) {
+		printf "%2d: %s\n", $col, $field[$col];
 	    }
-	    next if ($field[PA1_START] =~ m/^\s*$/ or $field[PA2_START] =~ m/^\s*$/);
-	    my $skipped = 0;
-	    for my $col (RCPA_START .. 42) {
-		++$skipped if $field[$col] =~ /^\s*$/;
-	    }
-	    next if $skipped > 10;
-
-	    my $n1 = node($field[PA1_START], $field[PA1_START + 1], $field[RCPA_START+0]);
-	    my $n2 = node($field[PA2_START], $field[PA2_START + 1], $field[RCPA_START+1]);
-	    next if (!defined $n1 or !defined $n2 or $n1 eq $n2);
-	    my $l1 = $field[RCPA_START+2];
-	    my $l2 = $field[RCPA_START+3];
-	    next if ($l1 eq '' or $l2 eq '');
-	    edge($n1, $l1, $n2, $l2, ParseDate($field[2]), \@field);
-	    recordDemogr($dfh, $csv, [ @field[RCPA_DEMOGRAPHICS .. (RCPA_DEMOGRAPHICS+5)] ]);
-	} else {
-	    print STDERR "parse () failed on argument: ",
-	      $csv->error_input, "\n";
-	    $csv->error_diag ();
 	}
+	next if ($field[PA1_START] =~ m/^\s*$/ or $field[PA2_START] =~ m/^\s*$/);
+	my $skipped = 0;
+	for my $col (RCPA_START .. 42) {
+	    ++$skipped if $field[$col] =~ /^\s*$/;
+	}
+	next if $skipped > 10;
+
+	my $n1 = node($field[PA1_START], $field[PA1_START + 1], $field[RCPA_START+0]);
+	my $n2 = node($field[PA2_START], $field[PA2_START + 1], $field[RCPA_START+1]);
+	next if (!defined $n1 or !defined $n2 or $n1 eq $n2);
+	my $l1 = $field[RCPA_START+2];
+	my $l2 = $field[RCPA_START+3];
+	next if ($l1 eq '' or $l2 eq '');
+	edge($n1, $l1, $n2, $l2, ParseDate($field[2]), \@field);
+	recordDemogr($dfh, $csv, [ @field[RCPA_DEMOGRAPHICS .. (RCPA_DEMOGRAPHICS+5)] ]);
     }
 }
 

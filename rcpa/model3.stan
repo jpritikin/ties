@@ -1,3 +1,4 @@
+// http://mc-stan.org/users/documentation/case-studies/rstan_workflow.html
 functions {
   vector cmp_probs(real alpha, real pa1, real pa2, real thr1, real thr2) {
     vector[5] unsummed;
@@ -12,16 +13,15 @@ functions {
 }
 data {
   // dimensions
-  int<lower=1> NPA;             // # physical activites
-  int<lower=1> NFACETS;         // # facets (i.e. characteristics)
-  int<lower=1> NCMP;            // # comparisons (sample size)
+  int<lower=1> NPA;             // number of physical activites
+  int<lower=1> NFACETS;         // number of facets (i.e. characteristics)
+  int<lower=1> NCMP;            // number of comparisons (sample size)
   // actual data follows
   int<lower=1, upper=NPA> pa1[NCMP];        // PA1 for observation N
-  int<lower=1, upper=3> l1[NCMP];           // L1 for observation N
   int<lower=1, upper=NPA> pa2[NCMP];        // PA2 for observation N
-  int<lower=1, upper=3> l2[NCMP];           // L2 for observation N
   int<lower=-2, upper=10> diff[NCMP,NFACETS];   // comparisons
-  int<lower=0> NSGP;
+  vector[NFACETS] loadingSign;
+  //  int<lower=0> NSGP;
 //  int<lower=1> soloGroupList[NSGP];
 }
 transformed data {
@@ -38,12 +38,14 @@ parameters {
   real threshold1;
   real threshold2;
   vector<lower=0>[NFACETS] alpha;
-  cholesky_factor_corr[NFACETS] thetaCorChol;
+  real flow[NPA];
+  vector<lower=0>[NFACETS] flowLoading;
 }
 model {
-  thetaCorChol ~ lkj_corr_cholesky(2.0);
+  flow ~ normal(0, 1);
+  flowLoading ~ normal(0,5);
   for (pa in 1:NPA) {
-    theta[pa,] ~ multi_normal_cholesky(rep_vector(0, NFACETS), thetaCorChol);
+    theta[pa,] ~ normal(flow[pa] * (loadingSign .* flowLoading), 1);
   }
   threshold1 ~ normal(0,5);
   threshold2 ~ normal(0,5);
@@ -59,7 +61,16 @@ model {
     }
   }
 }
+// add posterior predictive check TODO
 generated quantities {
-          corr_matrix[NFACETS] thetaCor;
-          thetaCor = thetaCorChol * thetaCorChol'; // multiply_lower_tri_self_transpose(L);
+  /*int rcat_sim[NCMP,NFACETS];
+  for (cmp in 1:NCMP) {
+    for (ff in 1:NFACETS) {
+      rcat_sim[cmp,ff] = categorical_logit_rng(
+        cmp_probs(alpha,
+          theta[pa1[cmp],ff],
+          theta[pa2[cmp],ff],
+          threshold1, threshold2));
+    }
+    }*/
 }

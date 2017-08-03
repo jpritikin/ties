@@ -40,6 +40,7 @@ descriptionMap =
   reward: "After engaging in the physical activity, to what extent do you feel great?"
   injury1: "What is the risk of minor physical injury (more than just muscle soreness)?"
   injury2: "What is the risk of serious physical injury?"
+  flow: "Approximate flow score"
 
 Skills=["Novice", "Amateur", "Expert"]
 
@@ -169,10 +170,16 @@ resultPanel = (props) ->
   # when list gets too long, only show beginning and end TODO
   lis = order.map (index) ->
     rawName = RCPA_PA[index]
+    if RCPA_PA_SAMPLESIZE[index] < 10
+      color = "#999"
+    else
+      color = "#000"
     part = rawName.split(';')
     div
       className: "item"
       key: index
+      style:
+        color: color
       "#{prettyName(RCPA_PA[index])} "
       a
         href: "https://en.wikipedia.org/wiki/#{encodeURI(part[0])}"
@@ -382,8 +389,9 @@ class Jumbotron extends React.Component
         i({}, "creativity")
         " is ranked independently of "
         i({}, "novelty.")
-        " Currently, sample size is limited and rankings may not match intuition very well.
-        Model estimates should improve with additional data."
+        " Currently, sample size is limited. Activities with fewer than 10 comparisons are
+        shown in gray. Rankings may not match intuition very well.
+        Simulations suggest that 50-100 comparisons are required for stable estimates."
         br()
         br()
         div
