@@ -37,9 +37,10 @@ rcd[is.na(rcd)] <- 10
 
 loadingSign <- rep(1,NFACETS)
 names(loadingSign) <- facetNames
+#loadingSign['predict'] <- -1  # suggested by data, re-evaluate later TODO
 loadingSign['waiting'] <- -1
 loadingSign['evaluated'] <- -1
-loadingSign['injury2'] <- -1
+#loadingSign['injury2'] <- -1   # higher stakes? ugh
 
 sim_fit <- stan(
   file = "model3.stan",

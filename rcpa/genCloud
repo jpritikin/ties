@@ -774,7 +774,7 @@ sub edge {
     my $sign = $k[0] ne $sk[0]? -1 : 1;
     my $k = join ':', @sk;
     if (!exists $EdgeInfo{$k}) {
-	$EdgeInfo{$k} = { n1 => $k[0], n2 => $k[1], count => 0 };
+	$EdgeInfo{$k} = { n1 => $sk[0], n2 => $sk[1], count => 0 };
     }
     my $info = $EdgeInfo{$k};
     $Graph->add_edge($k[0], $k[1]);
@@ -789,12 +789,17 @@ sub edge {
     my $rating = [@m];
     for my $x (0..19) {
 	my $got = cmpToNum($map[$x], $field->[RCPA_START + 4 + $x]);
+#	if ($x == 1 and $recno == 174) { warn $got }
 	if ($got ne 'NA') {
+#	    if ($x == 1 and $recno == 174) { warn "$k order ".$sign }
+#	    if ($x == 1 and $recno == 174) { warn "map ". $RC_MAP_SIGN[$x] }
 	    $got *= $sign * $RC_MAP_SIGN[$x];
 	    if ($x == 1 and Date_Cmp($version, "2016-12-25") < 0) {
 		# switched from unpredict to predict
 		$got *= -1;
+#		if ($x == 1 and $recno == 174) { warn "flip old version" }
 	    }
+#	    if ($x == 1 and $recno == 174) { warn "-> $got" }
 	}
 	push @$rating, $got;
     }
