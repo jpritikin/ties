@@ -6,7 +6,7 @@ rstan_options(auto_write = TRUE)
 options(mc.cores = parallel::detectCores())
 
 rcd <- read.csv("rawData.csv")
-rcd <- rcd[,-match(c('recno', paste0('injury',1:2)), colnames(rcd))]
+rcd <- rcd[,-match(c('recno'), colnames(rcd))] #, paste0('injury',1:2)
 
 if (nrow(rcd) < 1) { stop("No data?") }
 facetNames <- colnames(rcd[-1:-4])
@@ -39,6 +39,7 @@ loadingSign <- rep(1,NFACETS)
 names(loadingSign) <- facetNames
 loadingSign['waiting'] <- -1
 loadingSign['evaluated'] <- -1
+loadingSign['injury2'] <- -1
 
 sim_fit <- stan(
   file = "model3.stan",
@@ -48,7 +49,7 @@ sim_fit <- stan(
               diff=sapply(rcd[-1:-4], as.numeric),
               loadingSign=loadingSign),
   chains = 6,
-  iter = 800,
+  iter = 1000,
 #  verbose=TRUE,
   control = list(max_treedepth = 15))
 
@@ -76,6 +77,12 @@ if (0){
   library(shinystan)
   shinystan::launch_shinystan(sim_fit)
 }
+
+# check whether to flip loading sign
+fl <- as.data.frame(summary(sim_fit, pars=c("flowLoading"), probs=.5)$summary)
+fl$index <- 1:nrow(fl)
+rownames(fl) <- facetNames
+fl[order(fl[,'mean']),]
 
 df <- summary(sim_fit, pars=c("alpha","theta"), probs=.5)$summary
 summary(df[,'mean'] - df[,'50%'])

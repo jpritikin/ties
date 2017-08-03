@@ -729,15 +729,26 @@ our @RC_INJURY2_MAP =
    '{{Q9}} has somewhat more chance of serious physical injury compare to {{Q6}}.',
    '{{Q9}} has much more chance of serious physical injury compare to {{Q6}}.');
 
+our @RC_MAP_SIGN;
+
+sub cacheMapSign {
+    my ($maps) = @_;
+    return if scalar(@RC_MAP_SIGN);
+    for my $map (@$maps) {
+	$map->[0] =~ m/\{\{\s*Q(\d)\s*\}\}/;
+	die $1 if ($1 != 6 and $1 != 9);
+	my $sign = ($1 == 9)? -1 : 1;
+	push @RC_MAP_SIGN, $sign;
+    }
+    die join('', @RC_MAP_SIGN) if join('', @RC_MAP_SIGN) ne '-11-11-11-11-11-11-11-11-11-11';
+}
+
 sub cmpToNum {
     my ($map, $cmp) = @_;
     return 'NA' if (!length $cmp);
-    $map->[0] =~ m/\{\{\s*Q(\d)\s*\}\}/;
-    die $1 if ($1 != 6 and $1 != 9);
-    my $sign = $1==8? 1 : -1;
     for my $x (0..4) {
 	if ($map->[$x] eq $cmp) {
-	    return $sign * ($x - 2)
+	    return ($x - 2)
 	}
     }
     die "'$cmp' not found";
@@ -774,11 +785,12 @@ sub edge {
 	       \@RC_CHATTER_MAP, \@RC_WAITING_MAP, \@RC_BODY_MAP, \@RC_CONTROL_MAP, \@RC_PRESENT_MAP,
 	       \@RC_SPONT_MAP, \@RC_STAKES_MAP, \@RC_EVALUATED_MAP, \@RC_REWARD_MAP, \@RC_INJURY1_MAP,
 	       \@RC_INJURY2_MAP);
+    cacheMapSign(\@map);
     my $rating = [@m];
     for my $x (0..19) {
 	my $got = cmpToNum($map[$x], $field->[RCPA_START + 4 + $x]);
 	if ($got ne 'NA') {
-	    $got *= $sign;
+	    $got *= $sign * $RC_MAP_SIGN[$x];
 	    if ($x == 1 and Date_Cmp($version, "2016-12-25") < 0) {
 		# switched from unpredict to predict
 		$got *= -1;
