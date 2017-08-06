@@ -35,26 +35,20 @@ rcd <- rcd[rcd$pa1 %in% whitelist & rcd$pa2 %in% whitelist,]
 
 rcd[is.na(rcd)] <- 10
 
-loadingSign <- rep(1,NFACETS)
-names(loadingSign) <- facetNames
-loadingSign['predict'] <- -1  # suggested by data, re-evaluate later TODO
-loadingSign['waiting'] <- -1
-loadingSign['evaluated'] <- -1
-#loadingSign['injury2'] <- -1   # higher stakes? ugh
-
 sim_fit <- stan(
   file = "model3.stan",
   data = list(NPA=length(whitelist), NFACETS=NFACETS, NCMP=nrow(rcd),
               pa1=match(rcd$pa1, whitelist),
               pa2=match(rcd$pa2, whitelist),
-              diff=sapply(rcd[-1:-4], as.numeric),
-              loadingSign=loadingSign),
+              diff=sapply(rcd[-1:-4], as.numeric)),
+  pars=c('rawFlow', 'rawTheta', 'rawLoadings'),
+  include=FALSE,
   chains = 6,
   iter = 1000,
 #  verbose=TRUE,
   control = list(max_treedepth = 15))
 
-save(sim_fit, facetNames, spokes, NPA, NFACETS, file="simFit3.rda")
+save(sim_fit, facetNames, spokes, NPA, NFACETS, whitelist, file="simFit3.rda")
 if (0) {
     load("simFit3.rda")
 }
@@ -72,7 +66,7 @@ if (interactive()) {
   summary(sim_fit, pars=c(paste0("threshold",1:2)))$summary
   plot(sim_fit, pars=c(paste0("threshold",1:2)))
   plot(sim_fit, pars=c(paste0("alpha[",1:NFACETS,"]")))
-  plot(sim_fit, pars=c(paste0("flowLoading[",1:NFACETS,"]")))
+  plot(sim_fit, pars=c(paste0("flowLoadings[",1:NFACETS,"]")))
 }
 if (0){
   library(shinystan)
@@ -80,7 +74,7 @@ if (0){
 }
 
 # check whether to flip loading sign
-fl <- as.data.frame(summary(sim_fit, pars=c("flowLoading"), probs=.5)$summary)
+fl <- as.data.frame(summary(sim_fit, pars=c("flowLoadings"), probs=.5)$summary)
 fl$index <- 1:nrow(fl)
 rownames(fl) <- facetNames
 fl[order(fl[,'mean']),]

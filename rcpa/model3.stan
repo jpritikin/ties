@@ -20,7 +20,6 @@ data {
   int<lower=1, upper=NPA> pa1[NCMP];        // PA1 for observation N
   int<lower=1, upper=NPA> pa2[NCMP];        // PA2 for observation N
   int<lower=-2, upper=10> diff[NCMP,NFACETS];   // comparisons
-  vector[NFACETS] loadingSign;
   //  int<lower=0> NSGP;
 //  int<lower=1> soloGroupList[NSGP];
 }
@@ -34,18 +33,18 @@ transformed data {
   }
 }
 parameters {
-  matrix[NPA,NFACETS]     theta;    // latent score of PA by facet
+  matrix[NPA,NFACETS]     rawTheta;    // latent score of PA by facet
   real threshold1;
   real threshold2;
   vector<lower=0>[NFACETS] alpha;
-  real flow[NPA];
-  vector<lower=0>[NFACETS] flowLoading;
+  vector[NPA] rawFlow;
+  vector[NFACETS] rawLoadings;
 }
 model {
-  flow ~ normal(0, 1);
-  flowLoading ~ normal(0,5);
+  rawFlow ~ normal(0, 1);
+  rawLoadings ~ normal(0,5);
   for (pa in 1:NPA) {
-    theta[pa,] ~ normal(flow[pa] * (loadingSign .* flowLoading), 1);
+    rawTheta[pa,] ~ normal(rawFlow[pa] * rawLoadings, 1);
   }
   threshold1 ~ normal(0,5);
   threshold2 ~ normal(0,5);
@@ -55,14 +54,23 @@ model {
       if (rcat[cmp,ff] == 13) continue;  // special value to indicate missing
       rcat[cmp,ff] ~ categorical_logit(
         cmp_probs(alpha[ff],
-          theta[pa1[cmp],ff],
-          theta[pa2[cmp],ff],
+          rawTheta[pa1[cmp],ff],
+          rawTheta[pa2[cmp],ff],
           threshold1, threshold2));
     }
   }
 }
 // add posterior predictive check TODO
 generated quantities {
+  vector[NFACETS] flowLoadings = rawLoadings;
+  vector[NPA] flow = rawFlow;
+  matrix[NPA,NFACETS] theta = rawTheta;
+
+  if (flowLoadings[1] < 0) {
+    flowLoadings = -flowLoadings;
+    flow = -flow;
+  }
+
   /*int rcat_sim[NCMP,NFACETS];
   for (cmp in 1:NCMP) {
     for (ff in 1:NFACETS) {

@@ -5,38 +5,33 @@ data {
 }
 parameters {
   vector[MANIFESTS] means;
-  real latent[NROW];
-  real<lower=0> loadings1;
-  vector[MANIFESTS-1] loadingsX;
+  real rawLatent[NROW];
+  vector[MANIFESTS] rawLoadings;
   vector<lower=0>[MANIFESTS] rload;
 }
 transformed parameters {
   vector[MANIFESTS] perRowMean[NROW];
   cov_matrix[MANIFESTS] cov1;
   cholesky_factor_cov[MANIFESTS] cf;
-  vector[MANIFESTS] loadings;
   
-  loadings[1] = loadings1;
-  for (lx in 2:MANIFESTS) {
-    loadings[lx] = loadingsX[lx-1];
-  }
-
   for (rx in 1:NROW) {
-    perRowMean[rx] = means + latent[rx] * loadings;
+    perRowMean[rx] = means + rawLatent[rx] * rawLoadings;
   }
-  // only need to add loadings * loadings' for a marginal likelihood
+  // only need to add rawLoadings * rawLoadings' to cov1 for a marginal likelihood
   cov1 = diag_matrix(rload .* rload);
   cf = cholesky_decompose(cov1);
 }
 model {
-  loadings1 ~ normal(0,10);
-  loadingsX ~ normal(0,10);
+  rawLoadings ~ normal(0,10);
   rload ~ normal(0,1);
   means ~ normal(0,10);
-  latent ~ normal(0,1);
+  rawLatent ~ normal(0,1);
   DATA ~ multi_normal_cholesky(perRowMean, cf);
 }
 generated quantities {
+  vector[MANIFESTS] loadings = rawLoadings;
   vector[MANIFESTS] resid;
   resid = rload .* rload;
+
+  if (loadings[1] < 0) loadings = -loadings;
 }

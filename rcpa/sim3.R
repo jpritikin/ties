@@ -12,17 +12,17 @@ if (nrow(rcd) < 1) { stop("No data?") }
 NFACETS <- length(facetNames)
 
 palist <- sort(unique(c(as.character(rcd$pa1), as.character(rcd$pa2))))
-palist <- palist[sample.int(length(palist),6)]
+palist <- palist[sample.int(length(palist),5)]
 NPA <- length(palist)
 
 softmax <- function(y) {
   exp(y) / sum(exp(y))
 }
 
-NCMP <- 100 * NPA * (NPA-1)/2  # figure out good size
+NCMP <- 50 * NPA * (NPA-1)/2  # figure out good size
 
 flowScore <- rnorm(NPA)
-flowLoading <- runif(NFACETS, 0.5, 1.5)
+flowLoading <- runif(NFACETS, -1.5, 1.5)
 print(flowLoading)
 
 theta <- matrix(t(flowLoading %*% t(flowScore)),
@@ -86,7 +86,7 @@ sim_fit <- stan(
   #        'alpha',
   #        paste0('flow[',1:NPA,']'),
   #        paste0('flowLoading[',1:NFACETS,']')),
-  pars=c('theta', paste0('flowLoading', c('1','X'))),
+  pars=c('theta', 'rawFlow', 'rawTheta', 'rawLoadings'),
   include=FALSE,
   chains = 4,
   iter = 300,
@@ -110,7 +110,7 @@ if (interactive()) {
   summary(sim_fit, pars=c(paste0("threshold",1:2)))$summary
   plot(sim_fit, pars=c(paste0("threshold",1:2)))
   plot(sim_fit, pars=c(paste0("alpha[",1:NFACETS,"]")))
-  plot(sim_fit, pars=c(paste0("flowLoading[",1:NFACETS,"]")))
+  plot(sim_fit, pars=c(paste0("flowLoadings[",1:NFACETS,"]")))
 }
 if (0){
   library(shinystan)
@@ -118,7 +118,7 @@ if (0){
 }
 
 df1 <- summary(sim_fit, pars=c(paste0('flow[',1:NPA,']'),
-                               paste0('flowLoading[',1:NFACETS,"]")), probs=.5)$summary
+                               paste0('flowLoadings[',1:NFACETS,"]")), probs=.5)$summary
 cor(c(flowScore, flowLoading), df1[,'mean'])
 
 df1 <- summary(sim_fit, pars=c(paste0('flow[',1:NPA,']')), probs=.5)$summary
