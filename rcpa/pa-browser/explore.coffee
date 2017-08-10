@@ -46,6 +46,15 @@ Skills=["Novice", "Amateur", "Expert"]
 
 MAX_ABS_WEIGHT= 3
 
+String.prototype.trunc =
+     `function( n, useWordBoundary ){
+         if (this.length <= n) { return this; }
+         var subString = this.substr(0, n-1);
+         return (useWordBoundary 
+            ? subString.substr(0, subString.lastIndexOf(' ')) 
+            : subString) + "...";
+      };`
+
 weightLine = (props) ->
   items = [-MAX_ABS_WEIGHT..MAX_ABS_WEIGHT].map (val) ->
     option
@@ -64,7 +73,7 @@ weightLine = (props) ->
           props.onClick(RCPA_FACETS.indexOf(props.facet), event.target.value)
         items
 
-weightPanel = (props) ->
+advancedPanel = (props) ->
   lis = (RCPA_FACETS[x] for x in props.facetOrder).map (text) ->
     weightLine
       facet: text
@@ -76,64 +85,57 @@ weightPanel = (props) ->
   sortDir = if props.sortAsc then 'ascending' else 'descending'
   if props.sortedBy is 'characteristic' then sortIndicatorC = sortDir
   if props.sortedBy is 'weight'         then sortIndicatorW = sortDir
-  div
-    className: "column"
-    div
-      className: "ui message"
-      div
-        className: "header"
-        "Which characteristics do you value?"
-      table
-        className: "ui very compact table sortable"
-        thead {},
-          tr {},
-            th
-              className: "sorted #{sortIndicatorC}"
+  table
+    className: "ui very compact table sortable"
+    thead {},
+      tr {},
+        th
+          className: "sorted #{sortIndicatorC}"
+          onClick: ->
+            if sortIndicatorC is "descending"
+              props.setFacetOrder null, null, [0..RCPA_FACETS.length-1]
+              return
+            props.sortAsc = true if sortIndicatorC is ""
+            props.sortAsc = false if sortIndicatorC is "ascending"
+            newOrder = props.facetOrder.slice()
+            newOrder.sort (a,b) ->
+              [a,b]=[b,a] if not props.sortAsc
+              RCPA_FACET_ALPHA[a] - RCPA_FACET_ALPHA[b]
+            props.setFacetOrder "characteristic", props.sortAsc, newOrder
+          "Characteristic"
+        th
+          className: "sorted #{sortIndicatorW}"
+          onClick: ->
+            if sortIndicatorW is "descending"
+              props.setFacetOrder null, null, [0..RCPA_FACETS.length-1]
+              return
+            props.sortAsc = true if sortIndicatorW is ""
+            props.sortAsc = false if sortIndicatorW is "ascending"
+            newOrder = props.facetOrder.slice()
+            newOrder.sort (a,b) ->
+              [c,d]=[a,b]
+              [c,d]=[b,a] if not props.sortAsc
+              cmp = props.weight[c] - props.weight[d]
+              cmp = a - b if cmp is 0
+              cmp
+            props.setFacetOrder "weight", props.sortAsc, newOrder
+          "Weight"
+    tbody {},
+      lis
+    tfoot {},
+      tr {},
+        th {},
+          div
+            className: "ui toggle checkbox"
+            input
+              className: "hidden"
+              type: "checkbox"
+              checked: props.abbreviateFacet
+            label
               onClick: ->
-                if sortIndicatorC is "descending"
-                  props.setFacetOrder null, null, [0..RCPA_FACETS.length-1]
-                  return
-                props.sortAsc = true if sortIndicatorC is ""
-                props.sortAsc = false if sortIndicatorC is "ascending"
-                newOrder = props.facetOrder.slice()
-                newOrder.sort (a,b) ->
-                  [a,b]=[b,a] if not props.sortAsc
-                  RCPA_FACET_ALPHA[a] - RCPA_FACET_ALPHA[b]
-                props.setFacetOrder "characteristic", props.sortAsc, newOrder
-              "Characteristic"
-            th
-              className: "sorted #{sortIndicatorW}"
-              onClick: ->
-                if sortIndicatorW is "descending"
-                  props.setFacetOrder null, null, [0..RCPA_FACETS.length-1]
-                  return
-                props.sortAsc = true if sortIndicatorW is ""
-                props.sortAsc = false if sortIndicatorW is "ascending"
-                newOrder = props.facetOrder.slice()
-                newOrder.sort (a,b) ->
-                  [c,d]=[a,b]
-                  [c,d]=[b,a] if not props.sortAsc
-                  cmp = props.weight[c] - props.weight[d]
-                  cmp = a - b if cmp is 0
-                  cmp
-                props.setFacetOrder "weight", props.sortAsc, newOrder
-              "Weight"
-        tbody {},
-          lis
-        tfoot {},
-          tr {},
-            th {},
-              div
-                className: "ui toggle checkbox"
-                input
-                  className: "hidden"
-                  type: "checkbox"
-                  checked: props.abbreviateFacet
-                label
-                  onClick: ->
-                    props.setAbbreviateFacet(!props.abbreviateFacet)
-                  "Abbreviate"
-            th {},
+                props.setAbbreviateFacet(!props.abbreviateFacet)
+              "Abbreviate"
+        th {},
               button
                 className: "negative ui button"
                 onClick: ->
@@ -142,6 +144,56 @@ weightPanel = (props) ->
                       props.resetWeights()
                   .modal("show")
                 "Reset"
+
+countNonzero = (vec) ->
+  nonzero = 0
+  nonzero += 1 for w in vec when w isnt 0
+  nonzero
+
+weightPanel = (props) ->
+  panel = if props.advancedSort
+    advancedPanel(props)
+  else
+    curWeight = props.weight.findIndex (w) -> w != 0
+    div {},
+      br(),
+      select
+        value: RCPA_FACETS[curWeight]
+        onChange: (event) ->
+          index = RCPA_FACETS.indexOf event.target.value
+          props.setSingleWeight(index)
+        (RCPA_FACETS[x] for x in props.facetOrder).map (text) ->
+          option
+            value: text
+            descriptionMap[text].trunc(80,1)
+      br(),
+      br()
+  div
+    className: "column"
+    div
+      className: "ui message"
+      div
+        className: "header"
+        "Which characteristic#{if props.advancedSort then 's' else ''} do you value?"
+      panel,
+      div
+        className: "ui toggle checkbox"
+        input
+          className: "hidden"
+          type: "checkbox"
+          checked: props.advancedSort
+        label
+          onClick: ->
+            nonzero = 0
+            nonzero += 1 for w in props.weight when w isnt 0
+            if props.advancedSort and nonzero > 1
+              $("#reset-weights-modal").modal
+                    onApprove: ->
+                      props.setAdvancedSort(!props.advancedSort)
+              .modal("show")
+            else
+              props.setAdvancedSort(!props.advancedSort)
+          "Show advanced controls"
 
 dotprod = (v1, v2) ->
   throw new Error("dotprod: #{v1.length} != #{v2.length}") if v1.length isnt v2.length
@@ -247,8 +299,12 @@ class Jumbotron extends React.Component
       aval = Math.abs(val)
       if aval <= MAX_ABS_WEIGHT then val
       else 0
+    advancedSort = countNonzero(iw) > 1
+    if not advancedSort and countNonzero(iw) == 0
+      iw[RCPA_FACETS.length-1] = 1.0
     @state =
       abbreviateFacet: false
+      advancedSort: advancedSort
       weight: iw
       skill: Skills[1]
       facetOrder: [0..RCPA_FACETS.length-1]
@@ -281,9 +337,31 @@ class Jumbotron extends React.Component
     this.setState
       weight: foo
 
+  setSingleWeight: (index) =>
+    this.maybeResetSort()
+    foo = @state.weight.slice()
+    foo.fill(0)
+    foo[index] = 1
+    this.setState
+      weight: foo
+
   setAbbreviateFacet: (current) =>
     this.setState
       abbreviateFacet: current
+
+  setAdvancedSort: (current) =>
+    if not current
+      foo = @state.weight.slice()
+      if countNonzero(foo) != 1
+        foo.fill(0)
+        foo[RCPA_FACETS.length-1] = 1
+      console.log(foo)
+      this.setState
+        advancedSort: current
+        weight: foo
+    else
+      this.setState
+        advancedSort: current
 
   setCurrentSkill: (value) =>
     this.setState
@@ -372,7 +450,16 @@ class Jumbotron extends React.Component
           className: "ui header"
           id: "data-explorer"
           "Data Explorer"
-        "On the left you'll see a list of the characteristics that you
+        "Below is a drop-down menu of the characteristics that you
+        considered for your pair of physical activities.
+        When you choose one of the characteristics,
+        the order of the list of activities below will update.
+        For example, if you choose 'How much of your body is involved...'
+        then one of the first activities will be hatha yoga and one of
+        last activities will be walking."
+        br(),
+        br(),
+        "Advanced controls: On the left you'll see a list of the characteristics that you
         considered for your pair of physical activities.
         Choose one of the characteristics that you value, or are curious about,
         and assign it a +1 or -1 weight.
@@ -384,24 +471,22 @@ class Jumbotron extends React.Component
         Are there physical activities that you haven’t tried that might be worth considering?"
         br(),
         br(),
-        "This statistical model considers each characteristic independently of other characteristics.
-        For example, "
-        i({}, "creativity")
-        " is ranked independently of "
-        i({}, "novelty.")
-        " Currently, sample size is limited. Activities with fewer than 10 comparisons are
+        "Currently, sample size is limited. Activities with fewer than 10 comparisons are
         shown in gray. Rankings may not match intuition very well.
         Simulations suggest that 50-100 comparisons are required for stable estimates."
         br()
         br()
         div
-          className: "ui stackable two column grid"
+          className: if @state.advancedSort then "ui stackable two column grid" else ""
           weightPanel
             onClick: parent.handleChange
             abbreviateFacet: @state.abbreviateFacet
             setAbbreviateFacet: parent.setAbbreviateFacet
+            advancedSort: @state.advancedSort
+            setAdvancedSort: parent.setAdvancedSort
             weight: @state.weight
             resetWeights: parent.resetWeights
+            setSingleWeight: parent.setSingleWeight
             facetOrder: @state.facetOrder
             sortedBy: @state.sortedBy
             sortAsc: @state.sortAsc
