@@ -2,13 +2,13 @@
 functions {
   vector cmp_probs(real alpha, real pa1, real pa2, real thr1, real thr2) {
     vector[5] unsummed;
-    real paDiff = alpha * (pa1 - pa2);
+    real paDiff = pa1 - pa2;
     unsummed[1] = 0;
     unsummed[2] = paDiff - (thr1 + thr2);
     unsummed[3] = paDiff - thr1;
     unsummed[4] = paDiff + thr1;
     unsummed[5] = paDiff + thr1 + thr2;
-    return cumulative_sum(unsummed);
+    return cumulative_sum(alpha * unsummed);
   }
 }
 data {
