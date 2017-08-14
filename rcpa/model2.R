@@ -39,9 +39,10 @@ sim_fit <- stan(file = "model2.stan",
                             pa2=match(rcd$pa2, palist), l2=rcd$l2,
                             diff=sapply(rcd[-1:-4], as.numeric),
                             NSGP=length(soloGroupList)),
-#                            soloGroupList=soloGroupList),
-                chains = 7,
+                chains = 6,
                 iter = 500,
+                include=FALSE,
+                pars=c('thetaCorChol'),
                 control = list(max_treedepth = 15))
 
 facetNames <- colnames(rcd[-1:-4])
@@ -51,7 +52,12 @@ if (0) {
     load("simFit.rda")
 }
 
-summary(summary(sim_fit)$summary[,c('Rhat', 'n_eff')])
+ex_summary <- as.data.frame(summary(sim_fit, probs=c())$summary)
+ex_summary$Parameter <- as.factor(gsub("\\[.*]", "", rownames(ex_summary)))
+ggplot(ex_summary) + aes(x = Parameter, y = Rhat, color = Parameter) +
+  geom_jitter(height = 0, width = 0.45, show.legend = FALSE) +
+  ylab(expression(hat(italic(R)))) +
+  geom_hline(yintercept=1.1, color='yellow')
 
 divergent <- get_sampler_params(sim_fit, inc_warmup=FALSE)[[1]][,'divergent__']
 print(sum(divergent))

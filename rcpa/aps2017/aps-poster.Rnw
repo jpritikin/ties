@@ -274,7 +274,7 @@ softmax <- function(v) {
     exp(v) / sum(exp(v))
 }
 th <- summary(sim_fit, pars=c(paste0("threshold",1:2)))$summary[,'mean']
-tdiff <- seq(-3,3,.1)
+tdiff <- seq(-4,4,.1)
 gr <- expand.grid(tdiff=tdiff, category=c("much more","somewhat more", 'equal',
                   "somewhat less", "much less"), p=NA)
 gg <- matrix(c(0,
@@ -289,7 +289,7 @@ for (lev in 1:length(levels(gr$category))) {
     gr[gr$category == levels(gr$category)[lev],'p'] <- gg[,lev]
 }
 ggplot(gr) + geom_line(aes(x=tdiff,y=p,color=category,linetype=category)) +
-    xlab("difference in latent absolute ranking (logits)") + ylab("probability")
+    xlab("difference in latent ranking (logits)") + ylab("probability")
 
 @ 
 \captionof{figure}{Category response curves conditional on difference in

@@ -1,13 +1,13 @@
 functions {
   vector cmp_probs(real alpha, real pa1, real pa2, real thr1, real thr2) {
     vector[5] unsummed;
-    real paDiff = alpha * (pa1 - pa2);
+    real paDiff = (pa1 - pa2);
     unsummed[1] = 0;
     unsummed[2] = paDiff - (thr1 + thr2);
     unsummed[3] = paDiff - thr1;
     unsummed[4] = paDiff + thr1;
     unsummed[5] = paDiff + thr1 + thr2;
-    return cumulative_sum(unsummed);
+    return cumulative_sum(alpha * unsummed);
   }
 }
 data {
@@ -47,7 +47,7 @@ model {
   }
   threshold1 ~ normal(0,5);
   threshold2 ~ normal(0,5);
-  alpha ~ lognormal(1, 1);
+  alpha ~ lognormal(0, 1);
   for (cmp in 1:NCMP) {
     for (ff in 1:NFACETS) {
       if (rcat[cmp,ff] == 13) continue;  // special value to indicate missing

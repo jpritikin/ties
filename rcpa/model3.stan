@@ -48,7 +48,7 @@ model {
   }
   threshold1 ~ normal(0,5);
   threshold2 ~ normal(0,5);
-  alpha ~ lognormal(1, 1);
+  alpha ~ lognormal(0, 1);
   for (cmp in 1:NCMP) {
     for (ff in 1:NFACETS) {
       if (rcat[cmp,ff] == 13) continue;  // special value to indicate missing

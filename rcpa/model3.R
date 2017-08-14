@@ -53,7 +53,12 @@ if (0) {
     load("simFit3.rda")
 }
 
-summary(summary(sim_fit)$summary[,c('Rhat', 'n_eff')])
+ex_summary <- as.data.frame(summary(sim_fit, probs=c())$summary)
+ex_summary$Parameter <- as.factor(gsub("\\[.*]", "", rownames(ex_summary)))
+ggplot(ex_summary) + aes(x = Parameter, y = Rhat, color = Parameter) +
+  geom_jitter(height = 0, width = 0.45, show.legend = FALSE) +
+  ylab(expression(hat(italic(R)))) +
+  geom_hline(yintercept=1.1, color='yellow')
 
 divergent <- get_sampler_params(sim_fit, inc_warmup=FALSE)[[1]][,'divergent__']
 print(sum(divergent))
