@@ -969,7 +969,7 @@ sub outputData {
     my $csv = Text::CSV_XS->new ({ binary => 1, auto_diag => 1 });
     open my $fh, ">:encoding(utf8)", "rawData.csv";
     $csv->say($fh, ['pa1', 'pa2', 'l1', 'l2', 'skill', 'predict', 'novelty', 'creative', 'complex',
-		    'goal1', 'feedback1', 'goal2', 'feedback2', 'chatter', 'waiting',
+		    'goal2', 'feedback2', 'goal1', 'feedback1', 'chatter', 'waiting',
 		    'body', 'control', 'present', 'spont', 'stakes', 'evaluated', 'reward',
 		    'injury1', 'injury2', 'recno']);
     my @cc = sort { $#$b <=> $#$a  } $Graph->connected_components();
