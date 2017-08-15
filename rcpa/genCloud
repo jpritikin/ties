@@ -53,6 +53,7 @@ my %ShortDict =
   );
 
 # 'Elliptical trainer' could be used for running or walking TODO
+# split wrestling & jiu jitsu?
 
 my %LongDict =
   (
@@ -166,7 +167,7 @@ my %LongDict =
    'hiking@walking around, especially on natural trails' => 'hiking',
    'free weights@lifting weights not attached to a machine' => 'weightlifting',
    'skiing@resort skiing on trails, glades, and bowls in new england, va, and co.' => 'snow skiing',  # split from downhill? TODO
-   'grappling@brazilian jiu jitsu and judo. although these are martial arts, they are more similar to to wrestling than boxing, karate, or tae kwon do.' => 'brazilian jiu jitsu',
+   'grappling@brazilian jiu jitsu and judo. although these are martial arts, they are more similar to to wrestling than boxing, karate, or tae kwon do.' => 'wrestling',
    'swimming walking@i would walk in the gym and for swimming i would just hang out with my friend in the' => 'invalid',
    'yuga@i would do stretch s' => 'hatha yoga',
    'strongman competition@strongman competitions include tests of strength and power including deadlift, clean and press, carrying, loading, pulling, and flipping. in contrast to powerlifting (squat, deadlift, bench press) or olympic weightlifting (snatch, clean and jerk) the events are not standardized across competitions.' => 'invalid',
@@ -211,7 +212,7 @@ my %LongDict =
    'running@casual jogging around city' => 'running',
    'playing soccer@playing soccer recreationally at university' => 'soccer',
    'roller derby@womens flat track roller derby' => 'roller derby',
-   'martial arts@primarily jiu-jitsu, but also judo, kick boxing, wing chun, and wrestling' => 'brazilian jiu jitsu',
+   'martial arts@primarily jiu-jitsu, but also judo, kick boxing, wing chun, and wrestling' => 'mixed martial arts',
    'soccer@outdoor field soccer' => 'soccer',
    'weightlifting@lifting weights at a gym, not for competitive purposes' => 'weightlifting',
    'cycling@road biking on paved trails' => 'cycling',
@@ -466,6 +467,8 @@ my %LongDict =
    'rock climbing@outdoor top roping, bouldering, and sport leading indoor bouldering' => 'rock climbing',
    'working@gardening logging (cuting, woodwork) digging and builduing' => 'gardening',
    'martial arts@taekwondo - mostly kicking brazilian jiu jitsu - ground based grappling/submission wrestling mixed martial arts - mix of striking and grappling' => 'mixed martial arts',
+   'wrestling@freestyle wrestling' => 'wrestling',
+   'road hockey@road hockey is a variation on ice hockey during which an asphalt surface is used instead of ice. a hockey ball is used instead of a puck and running shoes are used instead of skates.' => 'road hockey',
   );
 
 # Could remove some of these later when we have huge samples. TODO
@@ -488,6 +491,7 @@ my %GroupSoloOverride =
    'soccer' => 'group',
    'dancing' => 'group',
    'snow skiing' => 'solo',
+   'wrestling' => 'group',
   );
 
 my %CountryMap =
