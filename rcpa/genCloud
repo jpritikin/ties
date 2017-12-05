@@ -78,6 +78,8 @@ my %LongDict =
    'golf@college golf' => 'golf',
    'baseball@college baseball' => 'baseball',
    'mma@mixed martial arts' => 'mixed martial arts',
+   'martial arts@brazilian jiu jitsu' => 'wrestling',
+   'martial arts@taekwondo - mostly kicking  brazilian jiu jitsu - ground based grappling/submission wrestling  mixed martial arts - mix of striking and grappling' => 'mixed martial arts',
    'football@american football' => 'football',
    'basketball@american basketball' => 'basketball',
    'walking@walking at a brisk pace through the neighborhood' => 'walking',
@@ -469,6 +471,23 @@ my %LongDict =
    'martial arts@taekwondo - mostly kicking brazilian jiu jitsu - ground based grappling/submission wrestling mixed martial arts - mix of striking and grappling' => 'mixed martial arts',
    'wrestling@freestyle wrestling' => 'wrestling',
    'road hockey@road hockey is a variation on ice hockey during which an asphalt surface is used instead of ice. a hockey ball is used instead of a puck and running shoes are used instead of skates.' => 'road hockey',
+   'working@gardening  logging (cuting, woodwork)  digging and builduing' => 'gardening',
+   'tennis@singles and doubles tennis' => 'tennis',
+   'running@running on some kilometres' => 'running',
+   'football@play for school team' => 'football',
+   'volleyball@recreational, not competitive, volleyball' => 'volleyball',
+   'martials arts@i practice taekwondo. it is a type of martial arts that involves shouting a lot for stimulating the player. it is accompanied with different forms of risk and body could be damaged atimes.' => 'mixed martial arts',
+   'swimming@it is a style of swimming that you do on your front, moving your arms and legs away from your body.' => 'swimming',
+   'track@mile runner' => 'running',
+   'tennis@playing a tennis match. ncaa d1 rules' => 'tennis',
+   'running@cross country distance running' => 'running',
+   'gym@lifting and running' => 'invalid',
+   'swimming@pool swimming' => 'swimming',
+   'basketball@the game of basektball played with 5 players on your team against another 5 players in the gym.' => 'basketball',
+   'volleyball@canadian indoor volleyball' => 'volleyball',
+   'netball@played netball for a 1.5h duration, weekly activity.' => 'netball',
+   'aikido@did aikido for a 1.5h duration, weekly activity.' => 'mixed martial arts',
+   'gymnastics@vault, floor, balance beam, and bars' => 'artistic gymnastics',
   );
 
 # Could remove some of these later when we have huge samples. TODO
@@ -492,7 +511,11 @@ my %GroupSoloOverride =
    'dancing' => 'group',
    'snow skiing' => 'solo',
    'wrestling' => 'group',
+   'mixed martial arts' => 'group',
   );
+
+my %LocationMap =
+  ("new jersey;use" => 'usa');
 
 my %CountryMap =
   (
@@ -518,6 +541,8 @@ my %CountryMap =
    'brazil' => 'brazil',
    'portugal' => 'portugal',
    'sweden' => 'sweden',
+   'singapore' => 'singapore',
+   'nigeria' => 'nigeria',
   );
 
 use constant RCPA_DEMOGRAPHICS => 9;
@@ -815,10 +840,14 @@ sub recordDemogr {
     my ($dfh, $csv, $di) = @_;
     my $country = lc(trim($di->[2]));
     if (length $country) {
-	if (!exists $CountryMap{$country}) {
-	    print "   '$country' => '$country',  # country\n";
-	} else {
+	my $lmk = lc trim(join(';', $di->[1], $di->[2]));
+	if (exists $LocationMap{$lmk}) {
+	    $di->[2] = $LocationMap{$lmk};
+	} elsif (exists $CountryMap{$country}) {
 	    $di->[2] = $CountryMap{$country};
+	} else {
+	    print "   # ".join(' ', @$di)." # '$lmk'\n";
+	    print "   '$country' => '$country',  # country\n";
 	}
     }
     $csv->say($dfh, $di);
