@@ -310,6 +310,7 @@ class Jumbotron extends React.Component
       facetOrder: [0..RCPA_FACETS.length-1]
       sortedBy: null
       sortAsc: null
+      graphLoaded: false
 
   maybeResetSort: ->
     return if @state.sortedBy isnt "weight"
@@ -366,6 +367,10 @@ class Jumbotron extends React.Component
   setCurrentSkill: (value) =>
     this.setState
       skill: value
+
+  setGraphLoaded: () =>
+    this.setState
+      graphLoaded: true
 
   componentDidMount: ->
     $('#content').visibility
@@ -526,7 +531,20 @@ class Jumbotron extends React.Component
         So far, data is available for #{RCPA_edges.length} pairs
         from #{responses.reduce((x,y)->x+y)} responses.
         Our statistical model can fill in the gaps, but the more data the better."
-        React.createElement(Graph)
+        if !@state.graphLoaded
+          div
+            className: "ui info message"
+            "Enough data are collected that loading the graph takes a long time.
+            To load the graph, click the button below and be prepared to wait."
+            br()
+            br()
+            button
+              className: "ui button"
+              onClick: ->
+                parent.setGraphLoaded()
+              "Load"
+        else
+          React.createElement(Graph)
         h3
           className: "ui header"
           id: "invitation"
