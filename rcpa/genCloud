@@ -4,12 +4,14 @@ use strict;
 use warnings;
 use Archive::Zip qw(AZ_OK);
 use Text::CSV_XS;
+use Text::Unidecode;
 use Fatal qw(open);
 use Graph;
 use Date::Manip;
 use POSIX qw(strftime);
 use Data::Dumper;
 use IO::String;
+use utf8 'all';
 
 my %ShortDict =
   ('mountainbiking' => 'mountain biking',
@@ -50,9 +52,12 @@ my %ShortDict =
    'cross-fit' => 'invalid',
    'jiijoiojjio' => 'invalid',
    'inline skate' => 'inline skating',
+   'magic,singing' => 'invalid',
+   stretching => 'stretching',
+   'frisbee golf' => 'disc golf',
   );
 
-# 'Elliptical trainer' could be used for running or walking TODO
+# split elliptical from running or walking
 # split wrestling & jiu jitsu?
 
 my %LongDict =
@@ -488,6 +493,155 @@ my %LongDict =
    'netball@played netball for a 1.5h duration, weekly activity.' => 'netball',
    'aikido@did aikido for a 1.5h duration, weekly activity.' => 'mixed martial arts',
    'gymnastics@vault, floor, balance beam, and bars' => 'artistic gymnastics',
+   'basketball@team basketball' => 'basketball',
+   'golf@18 hole golf' => 'golf',
+   'running@trail running in the foothills of the rockey mountains' => 'running',
+   'soccer@soccer at an indoor soccer facility' => 'soccer',
+   'running@i ran a couple laps around the park.' => 'running',
+   'swimming@i took a swam in the lake after running.' => 'swimming',
+   'weight lifting@i lift weights in a gym' => 'weightlifting',
+   'isometrics@bodyweight exercises at home' => 'isometric exercise',
+   'dancing@hip hop dancing' => 'dancing',
+   'walking@i went out for a walk in the woods on a natural trail.' => 'walking',
+   'ice skating@i walked to the lake and went ice skating on the frozen lake with my kids.' => 'ice skating',
+   'basketball@5v5 basketball' => 'basketball',
+   'hiking@i go on mountain hiking trips' => 'hiking',
+   'football@tag football' => 'flag football', #probably
+   'running@its really useful to maintain our body fit' => 'running',
+   'swimming@i swim daily on morning time to maintain my body healthy' => 'swimming',
+   'elliptical@elliptical machine' => 'running',
+   'cricket@i like that gym workouting in carefully' => 'invalid',
+   'foodball@foodball is very energytic play' => 'football',
+   'foot ball@football mean soccer is always move and running in players, player is physical activity is very healthy' => 'soccer',
+   'swimming@this is swimming activity is very strong my body condition' => 'swimming',
+   'jimnastic@exercise on bar' => 'artistic gymnastics',
+   'running@running on play ground' => 'running',
+   'running@football' => 'running',
+   'running@i ran the treadmill at gym.' => 'running',
+   'weight lift@i lift weights at gym' => 'weightlifting',
+   'yoga@meditative yoga' => 'meditation',
+   'push up@.' => 'calisthenics',
+   'softball@softball, played on a competitive team in a local league' => 'baseball',
+   'gym@gym, lifting weights, squats, deadlifts, curls' => 'weightlifting',
+   'swimming@hockey' => 'swimming',
+   'running@hockey' => 'running',
+   'softball@softball, mens league outside on a regular field' => 'baseball',
+   'basketball@in a full-sized gym, pickup games' => 'basketball',
+   'basketball@five on five basketball in the gym where i work out.' => 'basketball',
+   'tennis@one on one tennis at the tennis court inside my local gym.' => 'tennis',
+   'tennis@my wife and i play weekly for exercise, both as singles and doubles with each other and sometimes against each other' => 'tennis',
+   'volleyball@when we go to the beach here in  florida i get involved with pickup games of volleyball on the beach' => 'volleyball',
+   'drawing,singing@chess' => 'invalid',
+   'reading,swimming@cricket' => 'invalid',
+   'drawing,running@cricket,chess' => 'invalid',
+   'writing@cricket,chess' => 'invalid',
+   'swimming, football@front crawl for swimming  push kick for football' => 'invalid',
+   'gym and cricket@lifting weights for gym  strategy of batting for cricket' => 'invalid',
+   'running,reading books@watching tv' => 'invalid',
+   'magic,singing' => 'invalid',
+   'running & jocking@ground & gym' => 'invalid',
+   'swimming & physical excercice@football & throuhball' => 'invalid',
+   'basketball@i went to a court with my friend in which we shot the ball around for a little bit. then we played a couple quick games of one on one.' => 'basketball',
+   'tennis@met up with another friend of mine and played tennis for like two hours.' => 'tennis',
+   'jogging@i went jogging a few times a week with my cousin or alone. most times i went outside, but a few times i used a treadmill inside.' => 'running',
+   'swimming@i went swimming.' => 'swimming',
+   'cycling@cycling race' => 'cycling',
+   'running@marathon run' => 'running',
+   'jogging@jogging outside' => 'running',
+   'swimming@swimming in the ocean' => 'swimming',
+   'running@park' => 'running',
+   'walking@baseball' => 'invalid',
+   'walking with a partner@i engaged in a walking activity with a friend-we had challenged each other to walk at least 30 minutes a day.  we succeeded in getting our time in.  we walked for 30 minutes around a park area in a shopping area.' => 'walking',
+   'running@i took a run with the same friend.  we did our running activity in the same park area as the shopping center.' => 'running',
+   'magic,singing' => 'invalid',
+   '100 mile bicycle ride@charity ride of 100 mile ride in cuyahoga national park' => 'cycling',
+   '2 mile walk@during summer i do a fast walk that averages two miles' => 'walking',
+   'swimming@gym' => 'swimming',
+   'gym@hocky' => 'invalid',
+   'running@food ball' => 'invalid',
+   'swimming@food ball' => 'invalid',
+   'cricket@played in a  cricket match arranged by my community.' => 'cricket',
+   'tennis@played tennis match at my club.' => 'tennis',
+   'walking@walking at a brisk pace in a park' => 'walking',
+   'hiking@hiking in woods' => 'hiking',
+   'cricket@played game of cricket.' => 'cricket',
+   'football@football here means soccer.' => 'soccer',
+   'running@running and exercises during my morning walk. i run 3 kms and walk 3 kms. i also do different exercises and yoga related to different body parts.' => 'invalid',
+   'yoga@i also do yoga for smooth functioning of my body.' => 'hatha yoga',
+   'push up@push the ground so your body goes up' => 'calisthenics',
+   'stretching@move your body around slowly' => 'stretching',
+   'singing@swimming' => 'invalid',
+   'singing@chess' => 'invalid',
+   'running,swimming@tennis' => 'invalid',
+   'football,vollet ball@soccer' => 'invalid',
+   'boxing@sparring' => 'boxing',
+   'basketball@rec league' => 'basketball',
+   'jogging@jogging around the neighborhood' => 'running',
+   'basketball@basketball with a hoop' => 'basketball',
+   'yoga@yoga is a physical and mental activity to release stress and improve our health' => 'hatha yoga',
+   'badminton@badminton is a sport played using racquets to hit a shuttlecock across a net.' => 'badminton',
+   'golf@i play 18 holes of golf about 20 times a year' => 'golf',
+   'running@i run 3-6 miles 1-3 times/ week' => 'running',
+   'cricket@playground' => 'cricket',
+   'exercise@gym' => 'invalid',
+   'walking@i walk to the store and walk my dog always.' => 'walking',
+   'cleaning@i take the weekend to clean my house' => 'cleaning',
+   'hiking@hiking in the woods and through a waterfall.' => 'hiking',
+   'running@road running for exercise' => 'running',
+   'soccer@i play soccer outside. we play on the grass instead of in a gym.' => 'soccer',
+   'tae kwon doe@i participate in tae kwon doe in a dojo with others. its a type of martial art.' => 'taekwondo',
+   'gym@running & walking' => 'invalid',
+   'yoga@sun salutations & low lunge' => 'hatha yoga',
+   'bowling@i belong to a bowling league, 10 pin.' => 'bowling',
+   'swimming@i swim twice a week at the local ymca' => 'swimming',
+   'golf@i played a full 18 holes of golf walking the course.' => 'golf',
+   'walleyball@its similar to volleyball but played on a racquetball court with a smaller ball.' => 'walleyball',
+   'tennis@hitting a ball with a tennis racket.' => 'tennis',
+   'basketball@street basketball.' => 'basketball',
+   'frisbee golf@park/wooden terrain play' => 'disc golf',
+   'swimming (indoor)@laps and recreational fun' => 'swimming',
+   'swimming@indoor swimming' => 'swimming',
+   'mark@hard workout ,and wait lifting' => 'invalid',
+   'running@long run' => 'running',
+   'sports@volley ball' => 'volleyball',
+   'walking@gym' => 'walking',
+   'sports@basketball' => 'basketball',
+   'golf@playing golf on the golf course (usually walking instead of riding in a cart) and hitting thousands of balls at the driving range.' => 'golf',
+   'martial arts@i have a black belt in shotokan karate and practice and spar regularly.' => 'Shotokan',
+   'mud games competition@obstacle course through rough terrain and mud.' => 'obstacle course',
+   'horse back riding@riding horses in a structured and professional manner.' => 'horseback riding',
+   'running@outside for a mile' => 'running',
+   'gym@using the eleptical' => 'running',
+   'tennis@i played tennis at my local tennis court with a friend. i actually played numerous times last summer and fall.' => 'tennis',
+   'running@i run every morning before i go to work usually.' => 'running',
+   'jogging@hold your head high, centered between your shoulders, and your back straight. imagine your body is hanging from a string that is attached to the top of your head. do not lean your head too far forward; this can lead to fatigue and tightness in the neck, as well as the shoulders, back and even your hamstrings. while a backward lean is not as common, doing so puts greater tension on your back and legs, so avoid that, too.  focus your gaze approximately 30-40 yards in front of you. looking down when running can lead to greater strain on the neck muscles and spine, which can lead to fatigue especially in the latter part of your run' => 'running',
+   'running@running for a fixed distance within a fixed time in a park or on a jogging track can effectively improve your specific run-endurance and your control of the running pace. run rhythmically in a relaxed but energetic manner. the intensity of a run should be set according to your physical ability and objectives of training. the duration, distance and intensity of your training may gradually increase depending on your physical conditions.' => 'running',
+   'swimming@i like swimming' => 'swimming',
+   'running@i like running' => 'running',
+   'golfing@every weekend i try and get out to play a round of 18 holes of golf with some friends at the local golf course' => 'golf',
+   'working out in gym@a few times a week i go to my condos gym and work out on the machines' => 'invalid',
+   'gym@riding a stationary bike' => 'stationary bicycle',
+   'gymnasium@gym' => 'invalid',
+   'work out@to fit the muscles' => 'invalid',
+   'weight lifting@recreational weight lifting in order to reach physique and strength goals.' => 'weightlifting',
+   'running.@endurance training by running. i want to build my cardiovascular health.' => 'running',
+   'disc golf@disc golf aka frisbee golf on an outdoor course' => 'disc golf',
+   'basketball@basketball on a court with one side' => 'basketball',
+   'cycling@i ride my bicycle' => 'cycling',
+   'fishing@i like going to river and fishing' => 'fishing',
+   'basketball@including drills that each individual player compete with one another, 5 vs 5 exhibition' => 'basketball',
+   'soccer@regular soccer game with 11 players on each team' => 'soccer',
+   'basketball@pick-up basketball games (5 on 5)' => 'basketball',
+   'running@long distance jogging (3-10 miles)' => 'running',
+   'baseball@i play infield for my baseball team.' => 'baseball',
+   'gym@i participate in a weightlifting program every week day.' => 'weightlifting',
+   'running@i ran through a suburban neighborhood/commercial area' => 'running',
+   'swimming@i swam laps at a gym lap pool' => 'swimming',
+   'cross country@running outside' => 'running',
+   'cycling@a good quality bicycle can be expensive, although i dont have to spend a lot of money on one if i just starting out. i need to regularly check my bicycle for signs of wear and tear and fix it if necessary.' => 'cycling',
+   'running@running is a weight-bearing activity so it helps to build strong bones. its one of the best ways to increase your cardiovascular fitness and burns lots of kilojoules. the need for equipment is minimal, although it is recommended i buy a good pair of running shoes.' => 'running',
+   'rock a %0a ++a sa a fa !@i participated in indoor rock climbing in my high school a >a 1/2a a 2' => 'rock climbing',
+   'a 1/2a *a >a@more of a pilates or exercise a 1/2a *a >a' => 'pilates',
   );
 
 # Could remove some of these later when we have huge samples. TODO
@@ -512,6 +666,9 @@ my %GroupSoloOverride =
    'snow skiing' => 'solo',
    'wrestling' => 'group',
    'mixed martial arts' => 'group',
+   calisthenics => 'solo',
+   boxing => 'group',
+   'disc golf' => 'group'  # probably doesn't matter
   );
 
 my %LocationMap =
@@ -529,6 +686,7 @@ my %CountryMap =
    'united kingdom' => 'united kingdom',
    'england' => 'united kingdom',
    'india' => 'india',
+   'ind' => 'india',
    'netherlands' => 'netherlands',
    'austria' => 'austria',
    'wales' => 'wales',
@@ -543,14 +701,19 @@ my %CountryMap =
    'sweden' => 'sweden',
    'singapore' => 'singapore',
    'nigeria' => 'nigeria',
+   'trinidad and tobago' => 'trinidad and tobago',
+   'jamaica' => 'jamaica',
+   'a  a  a y=a za' => 'usa',  # braille transliteration?
   );
 
-use constant RCPA_DEMOGRAPHICS => 9;
-use constant PA1_START  => 15;
-use constant PA2_START  => 18;
-use constant RCPA_START => 21;
-
 ### BEGIN GLOBAL STATE
+
+our $RCPA_DEMOGRAPHICS;
+our $PA1_START;
+our $PA2_START;
+our $RCPA_START;
+our $PAID_START;
+our @EndNote;
 
 my %VettedName;
 my %NodeInfo;
@@ -774,6 +937,10 @@ sub cacheMapSign {
 
 sub cmpToNum {
     my ($map, $cmp) = @_;
+    my $q6 = $PA1_START - 9;
+    my $q9 = $PA2_START - 9;
+    $cmp =~ s/Q$q6/Q6/g;
+    $cmp =~ s/Q$q9/Q9/g;
     return 'NA' if (!length $cmp);
     for my $x (0..4) {
 	if ($map->[$x] eq $cmp) {
@@ -817,7 +984,7 @@ sub edge {
     cacheMapSign(\@map);
     my $rating = [@m];
     for my $x (0..19) {
-	my $got = cmpToNum($map[$x], $field->[RCPA_START + 4 + $x]);
+	my $got = cmpToNum($map[$x], $field->[$RCPA_START + 4 + $x]);
 #	if ($x == 1 and $recno == 174) { warn $got }
 	if ($got ne 'NA') {
 #	    if ($x == 1 and $recno == 174) { warn "$k order ".$sign }
@@ -839,6 +1006,7 @@ sub edge {
 sub recordDemogr {
     my ($dfh, $csv, $di) = @_;
     my $country = lc(trim($di->[2]));
+#    warn join(' ', @$di)."\n";
     if (length $country) {
 	my $lmk = lc trim(join(';', $di->[1], $di->[2]));
 	if (exists $LocationMap{$lmk}) {
@@ -857,7 +1025,40 @@ sub loadZip {
     my ($zip) = @_;
     my $somezip = Archive::Zip->new();
     $somezip->read( $zip ) == AZ_OK or die $!;
-    my $rawData = $somezip->contents('CSV/Relative characteristics of physical activities.csv');
+    for my $m ($somezip->membersMatching( '.*\.csv' )) {
+	my $fn = $m->fileName();
+	if ($fn =~ /(PageOrder|CollectorList)\.csv$/) {
+	    # IGNORE
+	} elsif ($fn eq 'CSV/Relative characteristics of physical activities.csv') {
+	    $RCPA_DEMOGRAPHICS = 9;
+	    $PA1_START  = 15;
+	    $PA2_START  = 18;
+	    $RCPA_START = 21;
+	    $PAID_START = undef;
+	    my $got = loadRawData($m->contents());
+	    print "$got\t$fn\n";
+	} elsif ($fn eq 'CSV/RCPAMTurk.csv') {
+	    $RCPA_DEMOGRAPHICS = 8;
+	    $PA1_START  = 14;
+	    $PA2_START  = 17;
+	    $RCPA_START = 20;
+	    $PAID_START = 44;
+	    my $got = loadRawData($m->contents());
+	    print "$got\t$fn\n";
+	} else {
+	    die $fn;
+	}
+    }
+}
+
+sub complain {
+    my ($why, $csv, $cxt) = @_;
+    return if $cxt eq '?';
+    push @EndNote, join(' ', $why, 'in record', $csv->record_number, "($cxt)");
+}
+
+sub loadRawData {
+    my ($rawData) = @_;
     $rawData =~ tr/\xa0/ /;	# nonbreaking space
     $rawData =~ s/\xc2//gs;	# garbage?
 
@@ -868,29 +1069,66 @@ sub loadZip {
     my $fh = IO::String->new($rawData);
     my $ignore_header1 = $csv->getline($fh);
     my $ignore_header2 = $csv->getline($fh);
+    my $goodCount = 0;
     while (my $row = $csv->getline($fh)) {
 	my @field = @$row;
+	@field = map { unidecode($_) } @field;
 	if (0) {
 	    foreach my $col (0 .. $#field) {
 		printf "%2d: %s\n", $col, $field[$col];
 	    }
 	}
-	next if ($field[PA1_START] =~ m/^\s*$/ or $field[PA2_START] =~ m/^\s*$/);
+	my $recDate = ParseDate($field[2]);
+	my $completion_context = '?';
+	if (defined $PAID_START) {
+	    my $elapsed = DateCalc($recDate, "now");
+	    #warn $elapsed;
+	    my $code = join '', @field[map { $PAID_START+$_ } 1..3];
+	    if (Date_Cmp($elapsed, "3 days") < 0 && length($code) == 6) {
+		$completion_context = "$field[2] $code";
+	    }
+	}
+	if ($field[$PA1_START] =~ m/^\s*$/ or $field[$PA2_START] =~ m/^\s*$/) {
+	    complain("One or both activities blank", $csv, $completion_context);
+	    next
+	}
+	if (lc(trim($field[$PA1_START])) eq lc(trim($field[$PA2_START]))) {
+	    complain("Same short name '$field[$PA1_START]' for both activities", $csv, $completion_context);
+	    next
+	}
 	my $skipped = 0;
-	for my $col (RCPA_START .. 42) {
+	for my $col ($RCPA_START .. ($RCPA_START+21)) {
 	    ++$skipped if $field[$col] =~ /^\s*$/;
 	}
-	next if $skipped > 10;
+	if ($skipped > 10) {
+	    complain("Too much missing data", $csv, $completion_context);
+	    next
+	}
 
-	my $n1 = node($field[PA1_START], $field[PA1_START + 1], $field[RCPA_START+0]);
-	my $n2 = node($field[PA2_START], $field[PA2_START + 1], $field[RCPA_START+1]);
-	next if (!defined $n1 or !defined $n2 or $n1 eq $n2);
-	my $l1 = $field[RCPA_START+2];
-	my $l2 = $field[RCPA_START+3];
-	next if ($l1 eq '' or $l2 eq '');
-	edge($n1, $l1, $n2, $l2, ParseDate($field[2]), \@field, $csv->record_number());
-	recordDemogr($dfh, $csv, [ @field[RCPA_DEMOGRAPHICS .. (RCPA_DEMOGRAPHICS+5)] ]);
+	my $n1 = node($field[$PA1_START], $field[$PA1_START + 1], $field[$RCPA_START+0]);
+	my $n2 = node($field[$PA2_START], $field[$PA2_START + 1], $field[$RCPA_START+1]);
+	if (!defined $n1 or !defined $n2 or $n1 eq $n2) {
+	    complain("Invalid activity pair $field[$PA1_START]@ $field[$PA1_START + 1] and $field[$PA2_START]@ $field[$PA2_START+1]", $csv, $completion_context);
+	    next
+	}
+	my $l1 = $field[$RCPA_START+2];
+	my $l2 = $field[$RCPA_START+3];
+	if ($l1 eq '' or $l2 eq '') {
+	    complain("Missing mastery levels", $csv, $completion_context);
+	    next;
+	}
+	if (defined($PAID_START) and $field[$PAID_START] ne 'Yes') {
+	    complain("Opted out", $csv, $completion_context);
+	    next
+	}
+	edge($n1, $l1, $n2, $l2, $recDate, \@field, $csv->record_number());
+	recordDemogr($dfh, $csv, [ @field[$RCPA_DEMOGRAPHICS .. ($RCPA_DEMOGRAPHICS+5)] ]);
+	if ($completion_context ne '?') {
+	    push @EndNote, "GOOD $completion_context";
+	}
+	++$goodCount
     }
+    $goodCount
 }
 
 sub nodeColor {
@@ -1016,7 +1254,11 @@ sub outputData {
     }
 }
 
-loadZip(shift);
+loadZip(shift) while @ARGV;
+
+for my $en (@EndNote) {
+    warn "$en\n";
+}
 
 for my $k (keys %NodeGroupInfo) {
     my $gi = $NodeGroupInfo{$k};
