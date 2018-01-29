@@ -64,20 +64,19 @@ model {
 generated quantities {
   vector[NFACETS] flowLoadings = rawLoadings;
   vector[NPA] flow = rawFlow;
+  int rcat_sim[NCMP,NFACETS];
 
   if (flowLoadings[1] < 0) {
     flowLoadings = -flowLoadings;
     flow = -flow;
   }
 
-  /*int rcat_sim[NCMP,NFACETS];
   for (cmp in 1:NCMP) {
     for (ff in 1:NFACETS) {
-      rcat_sim[cmp,ff] = categorical_logit_rng(
-        cmp_probs(alpha,
-          theta[pa1[cmp],ff],
-          theta[pa2[cmp],ff],
-          threshold1, threshold2));
+      rcat_sim[cmp,ff] = categorical_logit_rng(cmp_probs(alpha[ff],
+                                                         theta[pa1[cmp],ff],
+                                                         theta[pa2[cmp],ff],
+                                                         threshold1, threshold2)) - 3;
     }
-    }*/
+  }
 }

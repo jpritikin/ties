@@ -48,9 +48,9 @@ sim_fit <- stan(
 #  verbose=TRUE,
   control = list(max_treedepth = 15))
 
-save(sim_fit, facetNames, spokes, NPA, NFACETS, whitelist, file="simFit3.rda")
+save(sim_fit, facetNames, rcd, spokes, NPA, NFACETS, whitelist, file="/tmp/simFit3.rda")
 if (0) {
-    load("simFit3.rda")
+    load("/tmp/simFit3.rda")
 }
 
 ex_summary <- as.data.frame(summary(sim_fit, probs=c())$summary)
@@ -97,6 +97,11 @@ flow <- summary(sim_fit, pars=c("flow"), probs=.5)$summary
 
 df <- summary(sim_fit, pars=c("theta"), probs=.5)$summary
 tar <- array(df[,estimator], dim=c(NFACETS, length(whitelist)))
+
+span <- apply(tar, 1, function(x) diff(range(x)))
+names(span) <- facetNames
+print(span)
+
 if (nrow(df) != prod(dim(tar))) stop("mismatch")
 tar <- rbind(tar, flow[, estimator])
 
