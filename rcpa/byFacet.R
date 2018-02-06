@@ -11,7 +11,7 @@ df <- summary(sim_fit, pars=c("theta"), probs=.5)$summary
 tar <- array(df[,'mean'], dim=c(NFACETS, length(whitelist)))
 dimnames(tar) <- list(facetNames, whitelist)
 
-span <- apply(tar, 1, function(x) diff(range(x)))
+span <- max(abs(tar))
 
 spokes <- spokes[whitelist]
 
@@ -26,8 +26,8 @@ for (fx in order(alpha)) {
     sampleSize=spokes, sampleSizeM=-spokes, activity=whitelist, y=0.47)) +
     geom_point(aes(x=x,size=sampleSize, alpha=sampleSize),y=0) +
     geom_text(aes(label=activity, x=x, color=sampleSizeM, y=y),
-      angle=90, hjust=0, size=2, position = position_jitter(width = 0, height = 0.4)) +
-    xlim(-max(span)/2, max(span)/2) +
+      angle=85, hjust=0, size=2, position = position_jitter(width = 0, height = 0.4)) +
+    xlim(-span, span) +
     ggtitle(paste(facetNames[fx], round(alpha[fx],2), "loading", round(flowLoading,2))) + ylim(0,1) +
     theme(legend.position="none", axis.title.x=element_blank(),
       axis.title.y=element_blank(),
