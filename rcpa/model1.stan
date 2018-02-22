@@ -1,3 +1,4 @@
+// Independence model
 functions {
   vector cmp_probs(real alpha, real pa1, real pa2, real thr1, real thr2) {
     vector[5] unsummed;
@@ -15,6 +16,7 @@ data {
   int<lower=1> NPA;             // # physical activites
   int<lower=1> NFACETS;         // # facets (i.e. characteristics)
   int<lower=1> NCMP;            // # comparisons (sample size)
+  int<lower=1> N;               // number of non-missing data
   // actual data follows
   int<lower=1, upper=NPA> pa1[NCMP];        // PA1 for observation N
   int<lower=1, upper=NPA> pa2[NCMP];        // PA2 for observation N
@@ -50,6 +52,21 @@ model {
           theta[pa1[cmp],ff],
           theta[pa2[cmp],ff],
           threshold1, threshold2));
+    }
+  }
+}
+generated quantities {
+  vector[N] log_lik;
+  int cur = 1;
+  for (cmp in 1:NCMP) {
+    for (ff in 1:NFACETS) {
+      if (rcat[cmp,ff] == 13) continue;  // special value to indicate missing
+        log_lik[cur] = categorical_logit_lpmf(rcat[cmp,ff] |
+                                              cmp_probs(alpha[ff],
+                                                        theta[pa1[cmp],ff],
+                                                        theta[pa2[cmp],ff],
+                                                        threshold1, threshold2));
+        cur = cur + 1;
     }
   }
 }

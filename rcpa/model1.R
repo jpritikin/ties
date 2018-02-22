@@ -32,10 +32,13 @@ rcd <- rcd[rcd$pa1 %in% whitelist & rcd$pa2 %in% whitelist,]
 
 #soloGroupList <- which(duplicated(sub(";(solo|group)$", "", palist)))
 
+N <- sum(!is.na(rcd[-1:-4]))
+colSums(is.na(rcd[-1:-4]))  # seems fairly uniform
+
 rcd[is.na(rcd)] <- 10
 
 sim_fit <- stan(file = "model1.stan",
-                data = list(NPA=NPA, NFACETS=NFACETS, NCMP=nrow(rcd),
+                data = list(NPA=NPA, NFACETS=NFACETS, NCMP=nrow(rcd), N=N,
                             pa1=match(rcd$pa1, palist),
                             pa2=match(rcd$pa2, palist),
                             diff=sapply(rcd[-1:-4], as.numeric)),
