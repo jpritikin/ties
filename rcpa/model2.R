@@ -5,10 +5,11 @@ rstan_options(auto_write = TRUE)
 options(mc.cores = parallel::detectCores())
 
 rcd <- read.csv("rawData.csv")
-rcd <- rcd[,-match(c('recno'), colnames(rcd))]
-  
+rcd <- rcd[,-match(c('recno', paste0('injury', 1:2), paste0(c('goal','feedback'),2)), colnames(rcd))]
+
 if (nrow(rcd) < 1) { stop("No data?") }
-NFACETS <- ncol(rcd) - 4L
+facetNames <- colnames(rcd[-1:-4])
+NFACETS <- length(facetNames)
 
 palist <- sort(unique(c(as.character(rcd$pa1), as.character(rcd$pa2))))
 NPA <- length(palist)
@@ -26,19 +27,18 @@ for (pa1 in palist) {
 }
 
 # Otherwise the priors are given too much influence
-whitelist <- names(spokes)[spokes > 1]
+whitelist <- names(spokes)[spokes >= 3]
 rcd <- rcd[rcd$pa1 %in% whitelist & rcd$pa2 %in% whitelist,]
 
-soloGroupList <- which(duplicated(sub(";(solo|group)$", "", palist)))
+#soloGroupList <- which(duplicated(sub(";(solo|group)$", "", palist)))
 
 rcd[is.na(rcd)] <- 10
 
 sim_fit <- stan(file = "model2.stan",
                 data = list(NPA=NPA, NFACETS=NFACETS, NCMP=nrow(rcd),
-                            pa1=match(rcd$pa1, palist), l1=rcd$l1,
-                            pa2=match(rcd$pa2, palist), l2=rcd$l2,
-                            diff=sapply(rcd[-1:-4], as.numeric),
-                            NSGP=length(soloGroupList)),
+                            pa1=match(rcd$pa1, palist),
+                            pa2=match(rcd$pa2, palist),
+                            diff=sapply(rcd[-1:-4], as.numeric)),
                 chains = 6,
                 iter = 500,
                 include=FALSE,
@@ -47,17 +47,10 @@ sim_fit <- stan(file = "model2.stan",
 
 facetNames <- colnames(rcd[-1:-4])
 
-save(sim_fit, facetNames, spokes, NPA, NFACETS, file="simFit.rda")
+save(sim_fit, facetNames, rcd, spokes, NPA, NFACETS, whitelist, file="/tmp/simFit2.rda")
 if (0) {
-    load("simFit.rda")
+    load("/tmp/simFit2.rda")
 }
-
-ex_summary <- as.data.frame(summary(sim_fit, probs=c())$summary)
-ex_summary$Parameter <- as.factor(gsub("\\[.*]", "", rownames(ex_summary)))
-ggplot(ex_summary) + aes(x = Parameter, y = Rhat, color = Parameter) +
-  geom_jitter(height = 0, width = 0.45, show.legend = FALSE) +
-  ylab(expression(hat(italic(R)))) +
-  geom_hline(yintercept=1.1, color='yellow')
 
 divergent <- get_sampler_params(sim_fit, inc_warmup=FALSE)[[1]][,'divergent__']
 print(sum(divergent))
@@ -75,8 +68,8 @@ if (0){
   shinystan::launch_shinystan(sim_fit)
 }
 
-df <- summary(sim_fit, pars=c("alpha","theta"), probs=.5)$summary
-summary(df[,'mean'] - df[,'50%'])
+#df <- summary(sim_fit, pars=c("alpha","theta"), probs=.5)$summary
+#summary(df[,'mean'] - df[,'50%'])
 estimator <- 'mean'
 
 df <- summary(sim_fit, pars=c("alpha"), probs=.5)$summary
@@ -84,8 +77,51 @@ alpha <- matrix(df[,estimator], nrow=1,
                 dimnames=list(NULL, facetNames))
 print(alpha)
 
-df <- summary(sim_fit, pars=c("theta"), probs=.5)$summary
-tar <- array(df[,estimator], dim=c(NFACETS, NPA))
+df <- summary(sim_fit, pars=c("thetaCor"), probs=c(.95,.05))$summary
+#df[sign(df[,'95%']) != sign(df[,'5%']), estimator] <- 0
+tc <- matrix(df[,estimator], NFACETS, NFACETS)
+dimnames(tc) <- list(facetNames, facetNames)
+
+stop("here")
+
+library(qgraph)
+corGraph <- qgraph(tc, layout = "spring", graph = "cor",
+                   legend.cex = 0.3,
+                   cut = 0.3, maximum = 1, minimum = 0, esize = 20,
+                   vsize = 5, repulsion = 0.8)
+
+pcorGraph <- qgraph(tc, layout = corGraph$layout, graph = "pcor",
+                    legend.cex = 0.3, 
+                    cut = 0.1, maximum = 1, minimum = 0, esize = 20,
+                    vsize = 5)
+
+optGraph <- findGraph(tc, nrow(rcd), type = "pcor")
+optimalGraph <- qgraph(optGraph, layout = corGraph$layout,
+                       legend.cex = 0.3, 
+                       cut = 0.1, maximum = 1, minimum = 0, esize = 20,
+                       vsize = 5)
+
+glassoGraph <- qgraph(tc, layout = corGraph$layout, 
+                      graph = "glasso", sampleSize = nrow(rcd),
+                      legend.cex = 0.3, 
+                      cut = 0.1, maximum = 1, minimum = 0, esize = 20,
+                      vsize = 5)
+
+centralityPlot(
+  list(saturated = corGraph,
+       modelSearch = optimalGraph,
+       glasso = glassoGraph)
+)
+clusteringPlot(
+  list(saturated = corGraph,
+       modelSearch = optimalGraph,
+       glasso = glassoGraph)
+)
+
+factanal(covmat=tc, factors=1)
+
+#df <- summary(sim_fit, pars=c("theta"), probs=.5)$summary
+#tar <- array(df[,estimator], dim=c(NFACETS, NPA))
 
 if (0) {
   library(shinystan)
@@ -107,17 +143,4 @@ if (0) {
   library(rgl)
   plot3d(pc$x[,1:3], col = rainbow(nrow(pc$x)))
 }
-
-mask <- spokes>3    # increase this TODO
-
-cat(paste("var RCPA_DATA=",
-          toJSON(tar[,mask], matrix="columnmajor", digits=3),
-          ";\nvar RCPA_FACETS=",
-          toJSON(facetNames),
-          ";\nvar RCPA_FACET_ALPHA=",
-          toJSON(alpha[1,]),
-          ";\nvar RCPA_PA=",
-          toJSON(palist[mask]),
-          ";"),
-    file="pa-browser/rcpa-data.js", fill=TRUE)
 

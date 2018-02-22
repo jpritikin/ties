@@ -17,12 +17,8 @@ data {
   int<lower=1> NCMP;            // # comparisons (sample size)
   // actual data follows
   int<lower=1, upper=NPA> pa1[NCMP];        // PA1 for observation N
-  int<lower=1, upper=3> l1[NCMP];           // L1 for observation N
   int<lower=1, upper=NPA> pa2[NCMP];        // PA2 for observation N
-  int<lower=1, upper=3> l2[NCMP];           // L2 for observation N
   int<lower=-2, upper=10> diff[NCMP,NFACETS];   // comparisons
-  int<lower=0> NSGP;
-//  int<lower=1> soloGroupList[NSGP];
 }
 transformed data {
   int rcat[NCMP,NFACETS];
@@ -60,6 +56,17 @@ model {
   }
 }
 generated quantities {
-          corr_matrix[NFACETS] thetaCor;
-          thetaCor = thetaCorChol * thetaCorChol'; // multiply_lower_tri_self_transpose(L);
+  int rcat_sim[NCMP,NFACETS];
+  corr_matrix[NFACETS] thetaCor;
+
+  thetaCor = multiply_lower_tri_self_transpose(thetaCorChol);
+
+  for (cmp in 1:NCMP) {
+    for (ff in 1:NFACETS) {
+      rcat_sim[cmp,ff] = categorical_logit_rng(cmp_probs(alpha[ff],
+                                                         theta[pa1[cmp],ff],
+                                                         theta[pa2[cmp],ff],
+                                                         threshold1, threshold2)) - 3;
+    }
+  }
 }

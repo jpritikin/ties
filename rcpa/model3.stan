@@ -60,7 +60,6 @@ model {
     }
   }
 }
-// add posterior predictive check TODO
 generated quantities {
   vector[NFACETS] flowLoadings = rawLoadings;
   vector[NPA] flow = rawFlow;
