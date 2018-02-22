@@ -18,3 +18,6 @@ https://blog.mturk.com/tutorial-getting-great-survey-results-from-mturk-and-surv
 
 https://turkopticon.ucsd.edu/
 http://turkernation.com/showthread.php?21352-The-Myth-of-Low-Cost-High-Quality-on-Amazon-s-Mechanical-Turk
+
+remove injury[12] from factor model
+probably should discard injury[12] items from survey
