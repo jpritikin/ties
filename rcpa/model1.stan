@@ -13,9 +13,9 @@ functions {
 }
 data {
   // dimensions
-  int<lower=1> NPA;             // # physical activites
-  int<lower=1> NFACETS;         // # facets (i.e. characteristics)
-  int<lower=1> NCMP;            // # comparisons (sample size)
+  int<lower=1> NPA;             // physical activites
+  int<lower=1> NFACETS;         // facets (i.e. characteristics)
+  int<lower=1> NCMP;            // comparisons (sample size)
   int<lower=1> N;               // number of non-missing data
   // actual data follows
   int<lower=1, upper=NPA> pa1[NCMP];        // PA1 for observation N
