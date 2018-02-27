@@ -58,6 +58,17 @@ model {
 generated quantities {
   vector[N] log_lik;
   int cur = 1;
+  int rcat_sim[NCMP,NFACETS];
+
+  for (cmp in 1:NCMP) {
+    for (ff in 1:NFACETS) {
+      rcat_sim[cmp,ff] = categorical_logit_rng(cmp_probs(alpha[ff],
+                                                         theta[pa1[cmp],ff],
+                                                         theta[pa2[cmp],ff],
+                                                         threshold1, threshold2)) - 3;
+    }
+  }
+
   for (cmp in 1:NCMP) {
     for (ff in 1:NFACETS) {
       if (rcat[cmp,ff] == 13) continue;  // special value to indicate missing
