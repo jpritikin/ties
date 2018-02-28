@@ -5,7 +5,7 @@ rcd <- loadSingleFactorData()
 fit2t3 <- stan(file = "model4.stan",
                data = prepDataForStan(rcd),
                chains = 6,
-               iter = 500,
+               iter = stanIter,
                include=FALSE,
                pars=c('thetaCorChol'),
                control = list(max_treedepth = 15))

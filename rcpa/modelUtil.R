@@ -6,6 +6,8 @@ options(mc.cores = parallel::detectCores())
 
 outputDir <- function() '/scratch/rcpa/'
 
+stanIter <- 500
+
 loadRawData <- function() {
   rcd <- read.csv("rawData-snap.csv")  # switch back to current data TODO
   ignCol <- c('recno', paste0('injury', 1:2), paste0(c('goal','feedback'),2))
@@ -22,7 +24,7 @@ loadWhitelistRawData <- function() {
 
 loadSingleFactorData <- function() {
   rcd <- loadWhitelistRawData()
-  exclude <- c("spont", "goal1", "feedback1", "chatter", "control", "waiting")
+  exclude <- c("spont", "goal1", "feedback1", "chatter", "control", "waiting", 'evaluated')
   rcd <- rcd[,-match(exclude, colnames(rcd))]
   rcd
 }
