@@ -9,7 +9,7 @@ outputDir <- function() '/scratch/rcpa/'
 stanChains <- 6  # should be less than parallel::detectCores()
 
 loadRawData <- function() {
-  rcd <- read.csv("rawData-snap.csv")  # switch back to current data TODO
+  rcd <- read.csv("rawData.csv")
   ignCol <- c('recno', paste0('injury', 1:2), paste0(c('goal','feedback'),2))
   rcd <- rcd[,-match(ignCol, colnames(rcd))]
   if (nrow(rcd) < 1) { stop("No data?") }
@@ -27,6 +27,10 @@ loadSingleFactorData <- function() {
   exclude <- c("spont", "goal1", "feedback1", "chatter", "control", "waiting", 'evaluated')
   rcd <- rcd[,-match(exclude, colnames(rcd))]
   rcd
+}
+
+loadSimData <- function() {
+  read.csv("simData.csv")
 }
 
 extractFacetNames <- function(rcd) {
@@ -202,3 +206,6 @@ ppc <- function(sim_fit, rcd) {
   }
   pval
 }
+
+softmax <- function(y) exp(y) / sum(exp(y))
+

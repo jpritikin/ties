@@ -5,9 +5,6 @@ library(ggplot2)
 load(paste0(outputDir(), "fit2t5.rda"))  # factor model
 fit <- fit2t5
 
-softmax <- function(v) {
-    exp(v) / sum(exp(v))
-}
 draw <- function(alpha, th) {
   tdiff <- seq(-5,5,.1)
   gr <- expand.grid(tdiff=tdiff, category=c("much more","somewhat more", 'equal',

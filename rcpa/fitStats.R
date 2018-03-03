@@ -36,3 +36,7 @@ rm(fit2t4)
 load(paste0(outputDir(), "fit2t5.rda"))
 head(worstRhat(fit2t5, model3Par), n=20)
 rm(fit2t5)
+
+load(paste0(outputDir(), "fit2t6.rda"))
+head(worstRhat(fit2t6, model2Par), n=20)
+rm(fit2t6)

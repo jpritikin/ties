@@ -5,8 +5,18 @@ set -o nounset
 
 exec &> >(tee -a runStan.log)
 
+date
+
 for n in $(seq 7); do
   R --no-save -f f$n.R
 done
 
+# simulate data based on fit2t2
+R --no-save -f sim5.R
+R --no-save -f f8.R
+
 R --no-save -f fitStats.R
+
+R --no-save -f checkSim.R
+
+date
