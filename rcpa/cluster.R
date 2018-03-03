@@ -6,9 +6,6 @@ source("modelUtil.R")
 
 load(paste0(outputDir(), "fit2t1.rda"))
 
-regPar <- c('lp__', 'alpha', 'theta', paste0('threshold',1:2), 'thetaCor')
-head(worstNeff(fit2t1, regPar), n=20)
-
 if (0){
   library(shinystan)
   shinystan::launch_shinystan(fit2t1)
@@ -17,7 +14,7 @@ if (0){
 estimator <- 'mean'
 facetNames <- extractFacetNames(rcd)
 
-df <- summary(fit2t1, pars=c("thetaCor"), probs=c(.95,.05))$summary
+df <- summary(fit2t1, pars=c("thetaCor"), probs=c(.975,.025))$summary
 #df[sign(df[,'95%']) != sign(df[,'5%']), estimator] <- 0
 tc <- matrix(df[,estimator], length(facetNames), length(facetNames))
 dimnames(tc) <- list(facetNames, facetNames)
@@ -29,7 +26,7 @@ corGraph <- qgraph(tc, layout = "spring", graph = "cor",
 
 # exclude: spont goal1 feedback1 chatter control waiting
 
-df[sign(df[,'95%']) != sign(df[,'5%']), estimator] <- 0
+df[sign(df[,'97.5%']) != sign(df[,'2.5%']), estimator] <- 0
 tc <- matrix(df[,estimator], length(facetNames), length(facetNames))
 dimnames(tc) <- list(facetNames, facetNames)
 

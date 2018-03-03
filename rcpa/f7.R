@@ -4,8 +4,8 @@ rcd <- loadSingleFactorData()
 
 fit2t5 <- stan(file = "model3.stan",
                data = prepDataForStan(rcd),
-               chains = 6,
-               iter = stanIter,
+               chains = stanChains,
+               iter = 1000,
                include=FALSE,
                pars=c('rawFlow', 'rawTheta', 'rawLoadings'),
                control = list(max_treedepth = 15))

@@ -3,6 +3,10 @@
 set -o errexit
 set -o nounset
 
+exec &> >(tee -a runStan.log)
+
 for n in $(seq 7); do
   R --no-save -f f$n.R
 done
+
+R --no-save -f fitStats.R

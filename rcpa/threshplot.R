@@ -1,7 +1,9 @@
-library(rstan)
+source("modelUtil.R")
+
 library(ggplot2)
 
-load("/tmp/simFit3.rda")
+load(paste0(outputDir(), "fit2t5.rda"))  # factor model
+fit <- fit2t5
 
 softmax <- function(v) {
     exp(v) / sum(exp(v))
@@ -21,28 +23,21 @@ draw <- function(alpha, th) {
   for (lev in 1:length(levels(gr$category))) {
     gr[gr$category == levels(gr$category)[lev],'p'] <- gg[,lev]
   }
-  ggplot(gr) + geom_line(aes(x=tdiff,y=p,color=category,linetype=category)) +
-    xlab("difference in latent ranking (logits)") + ylab("probability") + ylim(0,1)
+  geom_line(data=gr, aes(x=tdiff,y=p,color=category,linetype=category), alpha=.01)
 }
 
-al <- summary(sim_fit, pars=c(paste0("alpha[",1:NFACETS,']')), probs=.5)$summary
-if (0) {
-  th1 <- summary(sim_fit, pars=c(paste0("threshold1[",1:NFACETS,']')), probs=.5)$summary
-  th2 <- summary(sim_fit, pars=c(paste0("threshold2[",1:NFACETS,']')), probs=.5)$summary
-} else {
-  th1 <- summary(sim_fit, pars=c(paste0("threshold1")), probs=.5)$summary
-  th2 <- summary(sim_fit, pars=c(paste0("threshold2")), probs=.5)$summary
+al <- summary(fit, pars=c(paste0("alpha")), probs=c())$summary
+meanA <- mean(al[,'mean'])
+
+th1 <- unlist(extract(fit, pars="threshold1"), use.names=F)
+th2 <- unlist(extract(fit, pars="threshold2"), use.names=F)
+
+pl <- ggplot() + xlab("difference in latent ranking (logits)") + ylab("posterior density") + ylim(0,1)
+for (cx in sample.int(length(th1), 300)) {
+  pl <- pl + draw(meanA, c(th1[cx], th2[cx]))
 }
 
-cairo_pdf(file="crc.pdf", onefile=TRUE)
-for (fx in 1:NFACETS) {
-  if (0) {
-    th <- c(th1[fx,'mean'], th2[fx,'mean'])
-  } else {
-    th <- c(th1[1,'mean'], th2[1,'mean'])
-  }
-  pl <- draw(al[fx,'mean'], th) + ggtitle(facetNames[fx])
-  print(pl)
-}
+cairo_pdf(file="crc.pdf", onefile=TRUE, height=5)
+print(pl)
 dev.off()
 

@@ -6,7 +6,7 @@ options(mc.cores = parallel::detectCores())
 
 outputDir <- function() '/scratch/rcpa/'
 
-stanIter <- 500
+stanChains <- 6  # should be less than parallel::detectCores()
 
 loadRawData <- function() {
   rcd <- read.csv("rawData-snap.csv")  # switch back to current data TODO
@@ -96,8 +96,16 @@ prepDataForStan <- function(rcd) {
 }
 
 worstNeff <- function(fit, regPar) {
-  regParFit <- summary(fit, regPar, probs=.5)$summary
+  regParFit <- summary(fit, regPar, probs=c())$summary
   regParFit[order(regParFit[,'n_eff']),]
+}
+
+# https://groups.google.com/forum/#!topic/stan-users/5WG51xKNSbA
+# http://andrewgelman.com/2007/04/02/markov_chain_mo/
+
+worstRhat <- function(fit, regPar) {
+  regParFit <- summary(fit, regPar, probs=c())$summary
+  regParFit[order(-regParFit[,'Rhat']),]
 }
 
 plotByFacet <- function(fit, rcd, output="byFacet.pdf") {
