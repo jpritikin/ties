@@ -1,5 +1,4 @@
 library(rstan)
-library(jsonlite)
 
 rstan_options(auto_write = TRUE)
 options(mc.cores = parallel::detectCores())

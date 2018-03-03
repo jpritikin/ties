@@ -1,4 +1,9 @@
 #!/bin/bash
+#
+#PBS -q serial
+#PBS -N rcpa
+#PBS -l ncpus=6
+#
 
 set -o errexit
 set -o nounset
