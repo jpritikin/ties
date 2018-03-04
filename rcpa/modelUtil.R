@@ -3,7 +3,7 @@ library(rstan)
 rstan_options(auto_write = TRUE)
 options(mc.cores = parallel::detectCores())
 
-outputDir <- function() '/scratch/rcpa/'
+outputDir <- function() './data/'
 
 stanChains <- 6  # should be less than parallel::detectCores()
 
