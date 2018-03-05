@@ -39,7 +39,7 @@ parameters {
   cholesky_factor_corr[NFACETS] thetaCorChol;
 }
 model {
-  thetaCorChol ~ lkj_corr_cholesky(5);
+  thetaCorChol ~ lkj_corr_cholesky(6);
   for (pa in 1:NPA) {
     theta[pa,] ~ multi_normal_cholesky(rep_vector(0, NFACETS), thetaCorChol);
   }
