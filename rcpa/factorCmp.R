@@ -8,7 +8,11 @@ load(paste0(outputDir(), "fit2t5.rda"))  # factor model
 # rhat
 
 ind_ll <- extract_log_lik(fit2t4)
+rm(fit2t4)
+
 sat_ll <- extract_log_lik(fit2t2)
+rm(fit2t2)
+
 fac_ll <- extract_log_lik(fit2t5)
 
 ind_loo <- loo(ind_ll)
@@ -22,10 +26,7 @@ print(fac_loo)
 compare(ind_loo, fac_loo)
 compare(sat_loo, fac_loo)
 
-# is this sensible?
-(ind_loo$looic - fac_loo$looic)/(ind_loo$looic - sat_loo$looic)
-
-plotByFacet(fit2t5, rcd)
+#plotByFacet(fit2t5, rcd)
 
 pval <- ppc(fit2t5, rcd)
 

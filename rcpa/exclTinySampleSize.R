@@ -7,9 +7,6 @@ source("modelUtil.R")
 
 load(paste0(outputDir(), "fit1s1.rda"))
 
-regPar <- c('lp__', 'alpha', 'theta', paste0('threshold',1:2))
-head(worstNeff(fit1s1, regPar), n=20)
-
 facetNames <- extractFacetNames(rcd)
 palist <- extractPalist(rcd)
 
@@ -23,8 +20,6 @@ df <- summary(fit1s1, pars=c("theta"), probs=c(.5))$summary
 tar1 <- array(df[,estimator], dim=c(length(facetNames), length(palist)))
 
 load(paste0(outputDir(), "fit1s2.rda"))
-
-head(worstNeff(fit1s2, regPar), n=20)
 
 whitelist <- extractPalist(rcd)
 
