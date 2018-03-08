@@ -18,10 +18,10 @@ fl[order(fl[,'mean']),]
 
 estimator <- 'mean'
 
-df <- summary(sim_fit, pars=c(paste0("alpha[",1:NFACETS,']')), probs=.5)$summary
-alpha <- matrix(df[,estimator], nrow=1,
+df <- summary(sim_fit, pars='sigma', probs=.5)$summary
+sigma <- matrix(df[,estimator], nrow=1,
                 dimnames=list(NULL, facetNames))
-print(alpha)
+print(sigma)
 
 flow <- summary(sim_fit, pars=c("flow"), probs=.5)$summary
 
@@ -42,8 +42,8 @@ cat(paste("var RCPA_DATA=",
           toJSON(tar, matrix="columnmajor", digits=3),
           ";\nvar RCPA_FACETS=",
           toJSON(c(facetNames,'flow')),
-          ";\nvar RCPA_FACET_ALPHA=",
-          toJSON(c(alpha[1,],0)),
+          ";\nvar RCPA_FACET_ALPHA=",  # rename TODO
+          toJSON(c(sigma[1,],0)),
           ";\nvar RCPA_PA=",
           toJSON(whitelist),
           ";\nvar RCPA_PA_SAMPLESIZE=",

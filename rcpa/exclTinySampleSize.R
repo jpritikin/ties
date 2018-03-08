@@ -11,10 +11,6 @@ facetNames <- extractFacetNames(rcd)
 palist <- extractPalist(rcd)
 
 estimator <- 'mean'
-df <- summary(fit1s1, pars=c("alpha"), probs=.5)$summary
-alpha <- matrix(df[,estimator], nrow=1,
-                dimnames=list(NULL, facetNames))
-print(alpha)
 
 df <- summary(fit1s1, pars=c("theta"), probs=c(.5))$summary
 tar1 <- array(df[,estimator], dim=c(length(facetNames), length(palist)))

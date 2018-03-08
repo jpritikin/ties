@@ -4,10 +4,10 @@ options(width=200)
 
 source("modelUtil.R")
 
-model1Par <- c('lp__', 'alpha', 'theta', paste0('threshold',1:2))
-model2Par <- c('lp__', 'alpha', 'theta', paste0('threshold',1:2), 'thetaCor')
-model3Par <- c('lp__', 'alpha', 'theta', paste0('threshold',1:2), 'flowLoadings', 'flow')
-model4Par <- c('lp__', 'alpha', 'theta', paste0('threshold',1:2), 'thetaCor')
+model1Par <- c('lp__', 'sigma', 'theta', paste0('threshold',1:2))
+model2Par <- c('lp__', 'sigma', 'theta', paste0('threshold',1:2), 'thetaCor')
+model3Par <- c('lp__', 'sigma', 'theta', paste0('threshold',1:2), 'flowLoadings', 'flow')
+model4Par <- c('lp__', 'sigma', 'theta', paste0('threshold',1:2), 'thetaCor')
 
 load(paste0(outputDir(), "fit1s1.rda"))
 head(worstRhat(fit1s1, model1Par), n=20)

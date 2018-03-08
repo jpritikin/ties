@@ -117,10 +117,10 @@ plotByFacet <- function(fit, rcd, output="byFacet.pdf") {
   facetNames <- extractFacetNames(rcd)
   palist <- extractPalist(rcd)
   
-  df <- summary(fit, pars=c(paste0("alpha[",1:length(facetNames),']')), probs=.5)$summary
+  df <- summary(fit, pars='sigma', probs=.5)$summary
   info <- matrix(c(df[,'mean'], 1:nrow(df)), ncol=2,
-                 dimnames=list(facetNames, c('alpha','index')))
-  info <- info[order(-info[,'alpha']),]
+                 dimnames=list(facetNames, c('sigma','index')))
+  info <- info[order(-info[,'sigma']),]
   
   df <- summary(fit, pars=c("theta"), probs=.5)$summary
   tar <- array(df[,'mean'], dim=c(length(facetNames), length(palist)))
@@ -154,7 +154,7 @@ plotByFacet <- function(fit, rcd, output="byFacet.pdf") {
       geom_text(aes(label=activity, x=x, color=sampleSizeM, y=y),
                 angle=85, hjust=0, size=2, position = position_jitter(width = 0, height = 0.4)) +
       xlim(-span, span) +
-      ggtitle(paste(rownames(info)[ix], round(info[ix,'alpha'],2), "loading", round(flowLoading,2))) + ylim(0,1) +
+      ggtitle(paste(rownames(info)[ix], "var=", round(info[ix,'sigma'],2), "flow=", round(flowLoading,2))) + ylim(0,1) +
       theme(legend.position="none", axis.title.x=element_blank(),
             axis.title.y=element_blank(),
             axis.text.y=element_blank(),
@@ -199,7 +199,7 @@ ppc <- function(sim_fit, rcd) {
       ex <- (sum(obs) * ex) / sum(ex)
       stat <- sum((obs - ex)^2 / ex)
       # thresholds are common across all items so don't count for df?
-      df <- 3    # 5 (categories) - 1 - 1 (alpha)
+      df <- 3    # 5 (categories) - 1 - 1 (sigma)
       pval[cx,fx] <- pchisq(stat, df, lower.tail=FALSE)
     }
   }
