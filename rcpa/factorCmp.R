@@ -1,4 +1,6 @@
 library(loo)
+options(loo.cores = 2)
+
 source("modelUtil.R")
 
 load(paste0(outputDir(), "fit2t4.rda"))  # independent

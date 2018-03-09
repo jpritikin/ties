@@ -5,7 +5,7 @@ rcd <- loadRawData()
 fit1s1 <- stan(file = "model1.stan",
                 data = prepDataForStan(rcd),
                 chains = stanChains,
-                iter = 1000,
+                iter = 2000,
                 control = list(max_treedepth = 15))
 
 save(fit1s1, rcd, file=paste0(outputDir(), "fit1s1.rda"))

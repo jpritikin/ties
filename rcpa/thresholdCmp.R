@@ -2,6 +2,8 @@
 # 1 set of thresholds vs separate thresholds for every facet
 
 library(loo)
+options(loo.cores = 2)
+
 source("modelUtil.R")
 
 load(paste0(outputDir(), "fit2t2.rda"))

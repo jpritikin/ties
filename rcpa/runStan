@@ -22,6 +22,7 @@ R --no-save -f f8.R
 
 R --no-save -f fitStats.R
 
+R --no-save -f thresholdCmp.R
 R --no-save -f factorCmp.R
 R --no-save -f checkSim.R
 
