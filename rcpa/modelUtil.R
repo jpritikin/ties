@@ -23,7 +23,7 @@ loadWhitelistRawData <- function() {
 
 loadSingleFactorData <- function() {
   rcd <- loadWhitelistRawData()
-  exclude <- c("spont", "goal1", "feedback1", "chatter", "control", "waiting", 'evaluated')
+  exclude <- c("spont", "goal1", "feedback1", "control", "waiting", 'evaluated')
   rcd <- rcd[,-match(exclude, colnames(rcd))]
   rcd
 }

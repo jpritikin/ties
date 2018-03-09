@@ -24,7 +24,7 @@ corGraph <- qgraph(tc, layout = "spring", graph = "cor",
                    cut = 0.3, maximum = 1, minimum = 0, esize = 20,
                    vsize = 5, repulsion = 0.8)
 
-# exclude: spont goal1 feedback1 chatter control waiting
+# exclude: spont goal1 feedback1 control waiting
 
 df[sign(df[,'97.5%']) != sign(df[,'2.5%']), estimator] <- 0
 tc <- matrix(df[,estimator], length(facetNames), length(facetNames))
