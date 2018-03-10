@@ -29,9 +29,3 @@ compare(ind_loo, fac_loo)
 compare(sat_loo, fac_loo)
 
 #plotByFacet(fit2t5, rcd)
-
-pval <- ppc(fit2t5, rcd)
-
-print(sum(pval<.05) / length(pval))
-print(apply(pval, 1, function(x) sum(x<.05)))
-print(apply(pval, 2, function(x) sum(x<.05)))

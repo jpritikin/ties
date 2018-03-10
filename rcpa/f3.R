@@ -5,7 +5,7 @@ rcd <- loadWhitelistRawData()
 fit2t1 <- stan(file = "model2.stan",
                 data = prepDataForStan(rcd),
                 chains = stanChains,
-                iter = 1000,
+                iter = 2000,
                 include=FALSE,
                 pars=c('theta_raw', 'thetaCorChol'),
                 control = list(max_treedepth = 15))

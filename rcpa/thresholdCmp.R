@@ -16,3 +16,5 @@ loo1 <- loo(fit1_ll)
 loo2 <- loo(fit2_ll)
 
 compare(loo1, loo2)
+
+# But ppc looks about the same

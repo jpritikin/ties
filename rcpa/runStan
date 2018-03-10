@@ -12,6 +12,8 @@ exec &> >(tee -a runStan.log)
 
 date
 
+git log -1 --oneline
+
 for n in $(seq 7); do
   R --no-save -f f$n.R
 done
