@@ -6,20 +6,27 @@ estimator <- 'mean'
 facetNames <- extractFacetNames(rcd)
 palist <- extractPalist(rcd)
 
-df <- summary(fit2t2, pars=c("thetaCor"), probs=c(.975,.025))$summary
-#df[sign(df[,'97.5%']) != sign(df[,'2.5%']), estimator] <- 0
+df <- summary(fit2t2, pars=c("thetaCor"), probs=c())$summary
 tc <- matrix(df[,estimator], length(facetNames), length(facetNames),
   dimnames= list(facetNames, facetNames))
+
+df <- summary(fit2t2, pars=c("sigma"), probs=c())$summary
+sigma1 <- matrix(df[,estimator], length(facetNames), 1,
+  dimnames= list(facetNames, c()))
 
 rm(fit2t2)
 
 load(paste0(outputDir(), "fit2t6.rda"))
 
-df <- summary(fit2t6, pars=c("thetaCor"), probs=c(.975,.025))$summary
-#df[sign(df[,'97.5%']) != sign(df[,'2.5%']), estimator] <- 0
+df <- summary(fit2t6, pars=c("thetaCor"), probs=c())$summary
 sc <- matrix(df[,estimator], length(facetNames), length(facetNames),
   dimnames= list(facetNames, facetNames))
 
+df <- summary(fit2t6, pars=c("sigma"), probs=c())$summary
+sigma2 <- matrix(df[,estimator], length(facetNames), 1,
+  dimnames= list(facetNames, c()))
+
+print(cor(sigma1, sigma2))
 mask <- lower.tri(sc, F)
 print(cor(tc[mask], sc[mask]))
 

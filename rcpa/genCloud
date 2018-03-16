@@ -2753,6 +2753,9 @@ my %CountryMap =
 
 ### BEGIN GLOBAL STATE
 
+our $dfh;
+open $dfh, ">:encoding(utf8)", "demogr.csv";
+
 our $RCPA_DEMOGRAPHICS;
 our $PA1_START;
 our $PA2_START;
@@ -3131,8 +3134,6 @@ sub loadRawData {
     $rawData =~ s/\xc2//gs;	# garbage?
 
     my $csv = Text::CSV_XS->new ({ keep_meta_info => 1, binary => 1 });
-    open my $dfh, ">:encoding(utf8)", "demogr.csv";
-    $csv->say($dfh, ['again', 'location', 'country', 'birthyear', 'edu', 'sex']);
 
     my $fh = IO::String->new($rawData);
     my $ignore_header1 = $csv->getline($fh);
@@ -3208,7 +3209,8 @@ sub loadRawData {
 	    next;
 	}
 	edge($n1, $l1, $n2, $l2, $recDate, \@field, $seqno.':'.$csv->record_number());
-	recordDemogr($dfh, $csv, [ @field[$RCPA_DEMOGRAPHICS .. ($RCPA_DEMOGRAPHICS+5)] ]);
+	recordDemogr($dfh, $csv, [ @field[$RCPA_DEMOGRAPHICS .. ($RCPA_DEMOGRAPHICS+5)],
+				   UnixDate($recDate, "%Y"), $seqno ]);
 	if ($completion_context ne '?') {
 	    push @EndNote, "GOOD $completion_context";
 	}
@@ -3341,10 +3343,13 @@ sub outputData {
 }
 
 {
+    my $csv = Text::CSV_XS->new ({ keep_meta_info => 1, binary => 1 });
+    $csv->say($dfh, ['again', 'location', 'country', 'birthyear', 'edu', 'sex', 'recDate', 'source' ]);
+
     #my $seqno = 0;
     #loadZip(shift, ++$seqno) while @ARGV;
-    loadCsv('data-public.csv', 1);
-    loadCsv('data-mturk.csv', 2);
+    loadCsv('data-public.csv', 'public');
+    loadCsv('data-mturk.csv', 'mturk');
 }
 
 for my $en (@EndNote) {

@@ -1,5 +1,5 @@
 library(loo)
-options(loo.cores = 2)
+options(loo.cores = 1)
 
 source("modelUtil.R")
 
@@ -25,7 +25,9 @@ print(ind_loo)
 print(sat_loo)
 print(fac_loo)
 
-compare(ind_loo, fac_loo)
-compare(sat_loo, fac_loo)
+indVsFac <- compare(ind_loo, fac_loo)
+satVsFac <- compare(sat_loo, fac_loo)
+
+save(ind_loo, sat_loo, fac_loo, indVsFac, satVsFac, file="factorCmp.rda")
 
 #plotByFacet(fit2t5, rcd)

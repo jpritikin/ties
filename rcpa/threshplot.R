@@ -5,6 +5,17 @@ library(ggplot2)
 load(paste0(outputDir(), "fit2t5.rda"))  # factor model
 fit <- fit2t5
 
+th1 <- unlist(extract(fit, pars="threshold1"), use.names=F)
+th2 <- unlist(extract(fit, pars="threshold2"), use.names=F)
+
+s1 <- sample.int(length(th1), 25)
+
+th25 <- list(th1 = th1[s1], th2=th2[s1])
+
+save(th25, file="threshplot.rda")
+
+q()
+
 draw <- function(th) {
   tdiff <- seq(-5,5,.1)
   gr <- expand.grid(tdiff=tdiff, category=c("much more","somewhat more", 'equal',
@@ -20,14 +31,11 @@ draw <- function(th) {
   for (lev in 1:length(levels(gr$category))) {
     gr[gr$category == levels(gr$category)[lev],'p'] <- gg[,lev]
   }
-  geom_line(data=gr, aes(x=tdiff,y=p,color=category,linetype=category), alpha=.01)
+  geom_line(data=gr, aes(x=tdiff,y=p,color=category,linetype=category), alpha=.05)
 }
 
-th1 <- unlist(extract(fit, pars="threshold1"), use.names=F)
-th2 <- unlist(extract(fit, pars="threshold2"), use.names=F)
-
 pl <- ggplot() + xlab("difference in latent ranking (logits)") + ylab("posterior density") + ylim(0,1)
-for (cx in sample.int(length(th1), 300)) {
+for (cx in sample.int(length(th1), 25)) {
   pl <- pl + draw(c(th1[cx], th2[cx]))
 }
 

@@ -206,5 +206,23 @@ ppc <- function(sim_fit, rcd) {
   pval
 }
 
+ppc1 <- function(sim_fit, rcd, pair, facet) {
+  edges <- paste(rcd[,'pa1'], rcd[,'pa2'], sep=":")
+
+  facetNames <- extractFacetNames(rcd)
+  rcat_sim <- extract(sim_fit, pars=c("rcat_sim"), permuted=TRUE)$rcat_sim
+  dimnames(rcat_sim)[[3]] <- facetNames
+
+  obs <- makeSimplex5(rcd[edges == pair, facet])
+  ex <- makeSimplex5(rcat_sim[,edges == pair, facet])
+  ex[ex==0] <- 0.5
+  ex <- (sum(obs) * ex) / sum(ex)
+  stat <- sum((obs - ex)^2 / ex)
+  # thresholds are common across all items so don't count for df?
+  df <- 3    # 5 (categories) - 1 - 1 (sigma)
+  pval <- pchisq(stat, df, lower.tail=FALSE)
+  list(obs=obs, ex=ex, stat=stat, pval=pval)
+}
+
 softmax <- function(y) exp(y) / sum(exp(y))
 

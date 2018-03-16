@@ -19,23 +19,18 @@ df <- summary(fit2t1, pars=c("thetaCor"), probs=c(.975,.025))$summary
 tc <- matrix(df[,estimator], length(facetNames), length(facetNames))
 dimnames(tc) <- list(facetNames, facetNames)
 
-corGraph <- qgraph(tc, layout = "spring", graph = "cor",
-                   legend.cex = 0.3,
-                   cut = 0.3, maximum = 1, minimum = 0, esize = 20,
-                   vsize = 5, repulsion = 0.8)
+ss <- calcSampleSize(rcd)
+
+save(ss, tc, file="cluster.rda")
 
 # exclude: spont goal1 feedback1 control waiting
 
-df[sign(df[,'97.5%']) != sign(df[,'2.5%']), estimator] <- 0
-tc <- matrix(df[,estimator], length(facetNames), length(facetNames))
-dimnames(tc) <- list(facetNames, facetNames)
+q()
 
 corGraph <- qgraph(tc, layout = "spring", graph = "cor",
                    legend.cex = 0.3,
                    cut = 0.3, maximum = 1, minimum = 0, esize = 20,
                    vsize = 5, repulsion = 0.8)
-
-stop("here")
 
 pcorGraph <- qgraph(tc, layout = corGraph$layout, graph = "pcor",
                     legend.cex = 0.3, 
