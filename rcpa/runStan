@@ -14,6 +14,8 @@ date
 
 git log -1 --oneline
 
+R --no-save -f prepDemogr.R
+
 for n in $(seq 7); do
   R --no-save -f f$n.R
 done
