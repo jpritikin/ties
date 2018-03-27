@@ -89,7 +89,7 @@ my %ShortDict =
    'jet skiing' => 'personal water craft',  # TODO think of better name
    kickboxing => 'kickboxing',
    'kick boxing' => 'kickboxing',
-   treadmill => 'running',
+   treadmill => 'running on a treadmill',
    marathon => 'running',
    planche => 'planche',
    'jump rope' => 'skipping rope',
@@ -124,12 +124,39 @@ my %ShortDict =
    'none' => 'invalid',
    kayaking => 'kayaking',
    'dancing' => 'dance',
+
+   # ------------- collapse categories -------------
+   'tai chi' => 'martial arts',
+   'kickboxing' => 'martial arts',
+   'muay thai' => 'martial arts',
+   'wushu' => 'martial arts',
+   'karate' => 'martial arts',
+   'judo' => 'martial arts',
+   'taekwondo' => 'martial arts',
+   'brazilian jiu jitsu' => 'wrestling',
+   'wrestling' => 'martial arts',
+   'rock climbing' => 'climbing',
+   'ice climbing' => 'climbing',
+   snowboarding => 'snow skiing',
+   'canoeing' => 'kayaking',
+   'stationary bike' => 'elliptical',
+   'water aerobics' => 'aerobic exercise',
+   'walleyball' => 'volleyball',
+   'throwball' => 'volleyball',
+   'homemaking' => 'gardening',
+   'Canadian football' => 'football',
+   'street hockey' => 'hockey',
+   'ice hockey' => 'hockey',
+   'floor hockey' => 'hockey',
+   'roller hockey' => 'hockey',
+   'tower running' => 'running',
+   'snowshoe running' => 'running',
+   "touch football (American)" => 'football',
+   'isometric exercise' => 'weightlifting',
+   'kickball' => 'baseball',
   );
 
-# split stationary bicycle from elliptical TODO
 # split wrestling & jiu jitsu & mma?
-# split aerobic exercise and water aerobics TODO
-# combine canoeing and kayaking?
 
 my %LongDict =
   (
@@ -154,7 +181,7 @@ my %LongDict =
    'golf@college golf' => 'golf',
    'baseball@college baseball' => 'baseball',
    'mma@mixed martial arts' => 'mixed martial arts',
-   'martial arts@brazilian jiu jitsu' => 'wrestling',
+   'martial arts@brazilian jiu jitsu' => 'brazilian jiu jitsu',
    'martial arts@taekwondo - mostly kicking  brazilian jiu jitsu - ground based grappling/submission wrestling  mixed martial arts - mix of striking and grappling' => 'mixed martial arts',
    'football@american football' => 'football',
    'basketball@american basketball' => 'basketball',
@@ -165,8 +192,8 @@ my %LongDict =
    'football@running and chasing after the running back' => 'football',
    'running@free running outside' => 'running',
    'swimming@distance swimming' => 'swimming',
-   'running@running on treadmill' => 'running',
-   'running@running on a treadmill to burn fat' => 'running',
+   'running@running on treadmill' => 'running on a treadmill',
+   'running@running on a treadmill to burn fat' => 'running on a treadmill',
    'mma@mixed martial arts'=> 'mixed martial arts',
    'football@intramural flag football' => 'football',
    'running@ran 1 mile' => 'running',
@@ -301,7 +328,7 @@ my %LongDict =
    'cycling@cycling to and from work (approximately 5 miles on regular roads, includes traffic signals and stop/start events 5-6 times in that distance)' => 'cycling',
    'swimming@lap swimming' => 'swimming',
    'elliptical@machine at the gym' => 'elliptical',
-   'speed walking@on high incline on treadmill' => 'running',
+   'speed walking@on high incline on treadmill' => 'running on a treadmill',
    'running@i run outside and enjoy participating in road races i ran the richmond half marathon in november 2016' => 'running',
    'swimming@i swim in an indoor pool for exercise' => 'swimming',
    'recumbent elliptical@elliptical-style cardio machine with recumbent/semi-seated position provides upper and lower body workout' => 'elliptical',
@@ -325,7 +352,7 @@ my %LongDict =
    'running@i run ~11 minute miles for 1-3 miles at a time' => 'running',
    'running@running outside on the street' => 'running',
    'gymnastics@competitive gymnastics such as they do in the  olympics' => 'invalid',
-   'running@running on a treadmill at a constant speed for thirty minutes' => 'running',
+   'running@running on a treadmill at a constant speed for thirty minutes' => 'running on a treadmill',
    'hiking@walking on and off trails through the woods on small mountains' => 'hiking',
    'lacrosse@womens ncaa division 1 lacrosse' => 'lacrosse',
    'skateboarding@longboarding' => 'skateboarding',
@@ -344,7 +371,7 @@ my %LongDict =
    'yoga@vinyasa and ashtanga' => 'hatha yoga',
    'dance@lyrical' => 'dance',
    'stair stepper@stationary stair stepper machine at the gym' => 'elliptical',  # separate category? TODO
-   'running@running on a treadmill inside at the gym' => 'running',
+   'running@running on a treadmill inside at the gym' => 'running on a treadmill',
    'swimming@swimming laps' => 'swimming',
    'gymnastics@womens gymnastics' => 'invalid',
    'yoga@vinyasa yoga' => 'hatha yoga',
@@ -394,7 +421,7 @@ my %LongDict =
    'quidditch@we train twice a week' => 'quidditch (sport)',
    'swimming@i train swimming about 3-4 times a week we train for about 15h, swimming between 38 and 42km' => 'swimming',
    'quidditch@collegiate quidditch is a club level sport at uva it has been described as a combination of handball, dodgeball, and rugby' => 'quidditch (sport)',
-   'running@solo running, typically on a treadmill' => 'running',
+   'running@solo running, typically on a treadmill' => 'running on a treadmill',
    'ultimate frisbee@club ultimate frisbee team at uva' => 'ultimate frisbee',
    'gym@upper body workouts at a gym on uva grounds, usually with one or more other people' => 'weightlifting',
    'hiking@hiking on paths' => 'hiking',
@@ -430,7 +457,7 @@ my %LongDict =
    'basketball@5on5 full court basketball' => 'basketball',
    'weight training@-' => 'weightlifting',
    'snowboarding@-' => 'snowboarding',
-   'running@running on a treadmill' => 'running',
+   'running@running on a treadmill' => 'running on a treadmill',
    'soccer@soccer, the american kind' => 'soccer',
    'football@football, not american footbal' => 'soccer',
    'running@going for a run' => 'running',
@@ -588,7 +615,7 @@ my %LongDict =
    'jimnastic@exercise on bar' => 'artistic gymnastics',
    'running@running on play ground' => 'running',
    'running@football' => 'running',
-   'running@i ran the treadmill at gym' => 'running',
+   'running@i ran the treadmill at gym' => 'running on a treadmill',
    'weight lift@i lift weights at gym' => 'weightlifting',
    'yoga@meditative yoga' => 'meditation',
    'push up@' => 'calisthenics',
@@ -691,7 +718,7 @@ my %LongDict =
    'running@i like running' => 'running',
    'golfing@every weekend i try and get out to play a round of 18 holes of golf with some friends at the local golf course' => 'golf',
    'working out in gym@a few times a week i go to my condos gym and work out on the machines' => 'invalid',
-   'gym@riding a stationary bike' => 'elliptical',
+   'gym@riding a stationary bike' => 'stationary bike',
    'gymnasium@gym' => 'invalid',
    'work out@to fit the muscles' => 'invalid',
    'weight lifting@recreational weight lifting in order to reach physique and strength goals' => 'weightlifting',
@@ -766,7 +793,7 @@ my %LongDict =
    'hiking@going hiking for miles and miles in the woods' => 'hiking',
    'running@i like to go running anywhere' => 'running',
    'gym@weight lifiting' => 'weightlifting',
-   'running@treadmill running' => 'running',
+   'running@treadmill running' => 'running on a treadmill',
    'gym@i am working in gym in body building workout with daily routine' => 'invalid',
    'swimming@my daily morning activities foot ballit will help to improve body condition' => 'invalid',
    'hiking@i went hiking near the hollywood sign hiking trail in la, ca' => 'hiking',
@@ -781,7 +808,7 @@ my %LongDict =
    'weight lifting@free weight lifts at gym' => 'weightlifting',
    'medication@yoga and excercise' => 'hatha yoga',
    'excercise@running,jokking,long jump' => 'invalid',
-   'running@i run at the gym on a treadmill' => 'running',
+   'running@i run at the gym on a treadmill' => 'running on a treadmill',
    'lifting@i lift weights at the gym' => 'weightlifting',
    'weightlifting@i lifted free weights' => 'weightlifting',
    'football@threw an american football around a field to myself and i ran and caught it' => 'football',
@@ -830,7 +857,7 @@ my %LongDict =
    'biking@i ride my bike 3-5 miles 3 times a week' => 'cycling',
    'cycling, jogging,playing cricket@i go cycling everydayjogging probably 2-3 times per week' => 'invalid',
    'playing cricket@i play cricket at weekendsi dont play for team its kind like street sports' => 'cricket',
-   'jogging@i jog on a treadmill' => 'running',
+   'jogging@i jog on a treadmill' => 'running on a treadmill',
    'yoga@i do it in a classroom setting' => 'hatha yoga',
    'hocey@i belong to an adult hockey league' => 'invalid',
    'cycling@i ride bikes as an exercise and belong to a club' => 'cycling',
@@ -931,11 +958,11 @@ my %LongDict =
    'pushups@pushing yourself off the floor and repeating multiple times' => 'calisthenics',
    'walking@walking at a brisk pace for at least thirty minutes, or for a number of miles' => 'walking',
    'rowing@sweep rowing' => 'rowing',
-   'gym@treadmill' => 'running',
+   'gym@treadmill' => 'running on a treadmill',
    'martial arts@martial arts i use to practice karate every 3 or 4 times a week and run daily in the ground' => 'karate',
    'cricket@weekends i use to play cricket in cricket ball' => 'cricket',
    'basketball@playing basketball at the park' => 'basketball',
-   'running@at the gym, i would normally run 65 miles in one hour on the treadmill' => 'running',
+   'running@at the gym, i would normally run 65 miles in one hour on the treadmill' => 'running on a treadmill',
    'weighlifting@i would use the dumbells, the assisted lifting machine, and bench press to do deadlifts, and squats' => 'weightlifting',
    'yoga@spiritual  yoga with some stress to body' => 'hatha yoga',
    'gym@formal gym activites' => 'invalid',
@@ -949,7 +976,7 @@ my %LongDict =
    'swimming@weekly twice i was swimming' => 'swimming',
    'biking@riding a bicycle along trails through parks' => 'mountain biking',
    'jogging@jogging along trails in the park' => 'running',
-   'gym@went to gym at my apartment complex i went on the treadmill' => 'running',
+   'gym@went to gym at my apartment complex i went on the treadmill' => 'running on a treadmill',
    'hike@i went on a 5 mile walk' => 'walking',
    'walking@long distance' => 'walking',
    'running@i typically run one to two miles most days, outside if nice out or on  the treadmill' => 'running',
@@ -1087,7 +1114,7 @@ my %LongDict =
    'hiking@3-5 mile hikes up hilly portions of the appalachian trail near my house' => 'hiking',
    'hockey@i play hockey every week in a competitive ice hockey league' => 'ice hockey',
    'softball@in the spring i play in a work softball league' => 'baseball',
-   'treadmill@i work out on a treadmill three or four times a week for 40 minutes and walk 3 miles' => 'running',
+   'treadmill@i work out on a treadmill three or four times a week for 40 minutes and walk 3 miles' => 'walking',
    'paddle board@i play paddle board on an outside court with friend once a week when the weather is ok' => 'table tennis',
    'soccer@i kicked the soccer ball at the soccer game' => 'soccer',
    'running@i run on the track' => 'running',
@@ -1135,7 +1162,7 @@ my %LongDict =
    'zumba@dance to music with a group of people lead by an instructor' => 'aerobic exercise',
    'running@i run in various events around my area' => 'running',
    'tennis@i enjoy playing tennis with my group of friends we usually play every sat if possible' => 'tennis',
-   'running@went running on the treadmill at the gym for 6 miles every day' => 'running',
+   'running@went running on the treadmill at the gym for 6 miles every day' => 'running on a treadmill',
    'weightlifting@using free weights and assisted machines at the gym' => 'weightlifting',
    'softball@adult male softball' => 'baseball',
    'hockey@ice hockey american' => 'ice hockey',
@@ -1150,14 +1177,14 @@ my %LongDict =
    'yoga@i take yoga classes' => 'hatha yoga',
    'pilates@i take pilates classes' => 'pilates',
    'running@i ran against a group of friends' => 'running',
-   'canoeing@me and a group of friends canoed against each other' => 'kayaking', # split into canoeing TODO
+   'canoeing@me and a group of friends canoed against each other' => 'canoeing',
    'riding bike@ride exercise bike' => 'elliptical',
    'walking@walking outside' => 'walking',
    'running@every weekday i go for a run around my block to stay in shape' => 'running',
    'gym@i am a member of a local gym i usually do cardio, but also do some weight training from time to time' => 'invalid',
    'gym@lifting weights' => 'weightlifting',
    'soccer@7 on 7 indoor soccer' => 'soccer',
-   'running@i run on my treadmill 30 minutes a day' => 'running',
+   'running@i run on my treadmill 30 minutes a day' => 'running on a treadmill',
    'yoga@i do yoga 3 times a week for relaxation' => 'hatha yoga',
    'swimming@i go swim usually once or twice a week i have a yearly membership in our local gym' => 'swimming',
    'jogging@i try to jog at least once a week, mostly in a morning the last time i went to jog was yesterday' => 'running',
@@ -1183,7 +1210,7 @@ my %LongDict =
    '5k run@ran a 5k glow run' => 'running',
    'rec baseball@played fun games of baseball against other people around my age' => 'baseball',
    'badminton@hitting birdie with raquet over net' => 'badminton',
-   'gym@using the stationary bike' => 'elliptical',
+   'gym@using the stationary bike' => 'stationary bike',
    'swim@gym' => 'swimming',
    'soccer@played in pickup games regularly there is a mix of college players and highschool decently competitive' => 'soccer',
    'general exercise with my partner@we do 25 minutes alternating between various exercises including light weights, jumping jacks, running in place, situps, etc' => 'invalid',
@@ -1269,7 +1296,7 @@ my %LongDict =
    'softball@fast pitch, co-ed softball' => 'baseball',
    'snowboarding@individual, freestyle snowboarding' => 'snowboarding',
    'swimming@30 laps in ymca pool' => 'swimming',
-   'biking@riding stationary bike 30 minutes' => 'elliptical',
+   'biking@riding stationary bike 30 minutes' => 'stationary bike',
    'rock climbing@going to a rock climbing gym and climbing various courses' => 'rock climbing',
    'soccer@play soccer at the local park' => 'soccer',
    'tennis@i play tennis 2 to 3 times a week' => 'tennis',
@@ -1283,7 +1310,7 @@ my %LongDict =
    'running@the activity of running for either a short or long distance either on a track team, for leisure, or for exercise' => 'running',
    'yoga@a type of exercise involving stretching, holding poses, and regulated breathing to help center the mind and body, build stamina, and strengthen muscles' => 'hatha yoga',
    'tennis@outdoor tennis' => 'tennis',
-   'treadmill@walking/running on a treadmill at the gym' => 'running',
+   'treadmill@walking/running on a treadmill at the gym' => 'running on a treadmill',
    'softball@work softball team' => 'baseball',
    'mountain biking@group mountain biking' => 'mountain biking',
    'my physical activity is yoga, walking@yoga means calm aasana this is give mind relax action, reduce stress' => 'invalid',
@@ -1319,7 +1346,7 @@ my %LongDict =
    'cricket@bat man' => 'cricket',
    'football@defender in foot ball team' => 'football',
    'arhery@i shot arrows at multiple targets on an archery range' => 'archery',
-   'running on a treadmill@i ran on a treadmill, and did a 10 minute mile' => 'running',
+   'running on a treadmill@i ran on a treadmill, and did a 10 minute mile' => 'running on a treadmill',
    'sportsman@football' => 'football',
    'runner@100 mts' => 'running',
    'regardless of your shape or size, physical activity has been shown to add years to your life, and life to your years@what transpired was a 25-minute bootcamp style workout where we all did various things like burpees, box jumps, squats, dips, etc there was no break, and we moved from one exercise to the next as thu' => 'invalid',
@@ -1344,14 +1371,14 @@ my %LongDict =
    'bodily movement@imartial status' => 'invalid',
    'health@basket ball' => 'invalid',
    'played cricket@we played at a school ground and we were twenty four team mates and we won the game' => 'cricket',
-   'gym workout@i  have tried running on a treadmill at a gym that was really a good way to stay healthy and helps to build stamina' => 'running',
+   'gym workout@i  have tried running on a treadmill at a gym that was really a good way to stay healthy and helps to build stamina' => 'running on a treadmill',
    'running@running in the morning and evening in the surrounding of my living space' => 'running',
    'badminton@badminton in university cort' => 'badminton',
    'working out@went to the gym and performed some cardio workouts' => 'aerobic exercise',
    'snowshoeing@snowshoeing at a local ski area' => 'snowshoe running',
    'walking@i walk 3 miles everyday during lunch' => 'walking',
    'walking@i walk in the woods and mountains all around my farm with my dog and sometimes my 2 new puppies we are usually out walking for an hour' => 'walking',
-   'alexander technique excercises@i do specific body balancing exercises to realign my spine for pain control of lower back injuries' => 'alexander technique',
+   'alexander technique excercises@i do specific body balancing exercises to realign my spine for pain control of lower back injuries' => 'Alexander Technique',
    'running@i run for 30 minutes a time 3 days a week' => 'running',
    'weight lifting@i weight lift 6 times a week for about an hour' => 'weightlifting',
    'basketball@one-on-one basketball games' => 'basketball',
@@ -1499,7 +1526,7 @@ my %LongDict =
    'disc golf@disc golf involves throwing frisbees at targets and running after them' => 'disc golf',
    'hockey@i play hockey on ground' => 'field hockey',
    'running@i do cross country' => 'running',
-   'jujitsu class@jujitsu' => 'wrestling',
+   'jujitsu class@jujitsu' => 'brazilian jiu jitsu',
    'running@i run in the park regularly sometimes i run with other people in a group, but most times i prefer to run by myself' => 'running',
    'swimming@i am not a competitive swimmer, but i do swim by myself on a regular basis' => 'swimming',
    'hiking@hiking in park trails' => 'hiking',
@@ -1663,7 +1690,7 @@ my %LongDict =
    'basketball@usually play pickup games with several people playing games of basketball rotating through different teams, players' => 'basketball',
    'lifting weights@squats, deadlifts, bench press, shoulder press' => 'weightlifting',
    'running@running for distance, to burn calories' => 'running',
-   'jogging@jogging on the treadmill at my gym' => 'running',
+   'jogging@jogging on the treadmill at my gym' => 'running on a treadmill',
    'kayaking@kayaking at a nearby lake' => 'kayaking',
    'swimming@swimming in a pool' => 'swimming',
    'walking@walking my kids in a stroller' => 'walking',
@@ -1728,7 +1755,7 @@ my %LongDict =
    'jogging@i went jogging in the neighborhood with a friend' => 'running',
    'karate training@muay thai taekwondo' => 'muay thai', # maybe TODO
    'extreme stretching to limner up for my karatye exercises@stretching like van damme  does' => 'stretching',
-   'jogging@went jogging on my treadmill' => 'running',
+   'jogging@went jogging on my treadmill' => 'running on a treadmill',
    'biking@bike riding on my bicycle' => 'cycling',
    'spinning@i rode the spinning machine at the gym' => 'elliptical',
    'weightlifting@i practiced weightlifting in a lifting room with my daughter' => 'weightlifting',
@@ -1798,7 +1825,7 @@ my %LongDict =
    'power walking@walked 1 mile 2x a week' => 'walking',
    'pushups@get abs' => 'calisthenics',
    'nfl@fun' => 'invalid',
-   'gym@i run on the treadmill at my local gym' => 'running',
+   'gym@i run on the treadmill at my local gym' => 'running on a treadmill',
    'american football@i play american football with my friends at the park' => 'football',
    'tennis@cement court tennis, both singles and doubles' => 'tennis',
    'running@around the neighborhood (suburban)' => 'running',
@@ -1907,8 +1934,8 @@ my %LongDict =
    'swimming@swimming laps at the pool' => 'swimming',
    'hiking@hiking through a nature trail' => 'hiking',
    'tennis@2 player tennis' => 'tennis',
-   'swimming@water aerobics' => 'swimming',
-   'gym@treadmill for cardio' => 'running',
+   'swimming@water aerobics' => 'water aerobics',
+   'gym@treadmill for cardio' => 'running on a treadmill',
    'powerlifting@bench press, squat, and deadlift for maximum weight possible to lift' => 'weightlifting',
    'soccer@american soccer' => 'soccer',
    'volleyball@i played volleyball at my friends house with a group of guys' => 'volleyball',
@@ -1922,7 +1949,7 @@ my %LongDict =
    'squatting@bend at the knees keep back straight lower butt past knees and then come back up fully and repeat' => 'calisthenics',
    'bench@weight on a bar that you pick up and lower down to your check and then push back up and repeat' => 'weightlifting',
    'basketball@5 on 5 basketball' => 'basketball',
-   'cardio@riding a stationary bike' => 'elliptical',
+   'cardio@riding a stationary bike' => 'stationary bike',
    'jogging@i jog outside in the sun' => 'running',
    'tennis@outside american tennis' => 'tennis',
    'running@i go to ground everyday in yearly morningi practise regularly' => 'running',
@@ -1990,7 +2017,7 @@ my %LongDict =
    'tennis@i played doubles tennis with my friend' => 'tennis',
    'marathon@i ran a half marathon' => 'running',
    'working out@i do shoulder work outs mondays, tuesdays i do back, wednesdays i do shoulders, and thursdays do legs' => 'weightlifting',
-   'running@going on the treadmill' => 'running',
+   'running@going on the treadmill' => 'running on a treadmill',
    'softball@i played second base for a softball team in a city league with several of my coworkers' => 'baseball',
    'tennis@i regularly play tennis at my local country club at which i am a member  i play against friends and other members both casually and in club tournaments' => 'tennis',
    'basketball@i shoot basketball everyday other' => 'basketball',
@@ -2055,10 +2082,10 @@ my %LongDict =
    'hiking@hiked a portion of the appalachian trail over multiple days' => 'hiking',
    'softball@played on a group softball league near my home' => 'baseball',
    'walking briskly@morning time we need take walking briskly, it will give best health control for full day' => 'walking',
-   'water aerobics@water aerobics activity is very good for all ages people  it will gain good health for kids and adults' => 'aerobic exercise',
+   'water aerobics@water aerobics activity is very good for all ages people  it will gain good health for kids and adults' => 'water aerobics',
    'biking@im going to ride my bicycle every sunday just for pleasure' => 'cycling',
    'gym@three times a week i go to the gymnasium and i do cardio and aerobic physical activities' => 'aerobic exercise',
-   'bicycling@riding a stationary bike' => 'cycling',
+   'bicycling@riding a stationary bike' => 'stationary bike',
    'walking@walking on a treadmill' => 'walking',
    'gym@i did a special exercise in gym in order to increase my muscle strength' => 'weightlifting',
    'marathon@i have participated in a marathon which was up to 10 miles' => 'running',
@@ -2213,7 +2240,7 @@ my %LongDict =
    'basketball@we played basketball as a group at the park across the street from our apartments' => 'basketball',
    'gym@i lifted weights and did the elliptical machine while i was at the gym' => 'invalid',
    'yoga@vinyasa flow yoga' => 'hatha yoga',
-   'water aerobics@like regular aerobics, but in the pool group class that focuses on endurance/cardio fitness with light strength exercises built in' => 'aerobic exercise',
+   'water aerobics@like regular aerobics, but in the pool group class that focuses on endurance/cardio fitness with light strength exercises built in' => 'water aerobics',
    'walking@walking with my dogs' => 'walking',
    'badminton@i played badminton in my back yard with my family' => 'badminton',
    'walking@i walk a mile every day' => 'walking',
@@ -2221,7 +2248,7 @@ my %LongDict =
    'running@started to run in the morning to loose weight' => 'running',
    'soccer match@i play on a soccer team with a group of people in my city' => 'soccer',
    'taekwondo@i take taekwondo 3 nights a week as a way of learning some self defense' => 'taekwondo',
-   'running@on a treadmill' => 'running',
+   'running@on a treadmill' => 'running on a treadmill',
    'pushups@on the floor, doing pushups' => 'calisthenics',
    'golf@i played 18 holes of golf' => 'golf',
    'basketball@i played 5 on 5 basketball at a local gym' => 'basketball',
@@ -2346,7 +2373,7 @@ my %LongDict =
    'cycling@cycle race' => 'cycling',
    'swimming@play game' => 'swimming',
    'swimming@swim in different styles' => 'swimming',
-   'football@australian football' => 'australian football',
+   'football@australian football' => 'Australian football',
    'horseback riding@english horseback riding' => 'horseback riding',
    'running@running with dog' => 'running',
    'jump rope@jumping rope in my driveway' => 'skipping rope',
@@ -2362,7 +2389,7 @@ my %LongDict =
    'hiking@hiked the smokey mountains' => 'hiking',
    'run@run the track with my daughter to get her prepared for her competition season' => 'running',
    'jogging@outdoor jogging near a river' => 'running',
-   'aerobic@running on the treadmill at my house' => 'running',
+   'aerobic@running on the treadmill at my house' => 'running on a treadmill',
    'gym@i went to the gym to lift weights for strength and size training i did a full body workout, so i hit each major muscle group' => 'weightlifting',
    'basketball@i like to play basketball against others after lifting at the gym because it is my favorite sport' => 'basketball',
    'downhill skiing@downhill skiing, skiing down slopes, going over jumps (not too big), and tucking to go really fast on flat parts of the mountain' => 'snow skiing',
@@ -2382,7 +2409,7 @@ my %LongDict =
    'kayaking@kayaking,  kayaking in the allegany lakes, long distance' => 'kayaking',
    'mountain biking@mountain biking, through dirt paths in pre- made trails' => 'mountain biking',
    'wallking@walking in the neighborhood and around the local park' => 'walking',
-   'biking@stationary desk bike that i use at work' => 'elliptical',
+   'biking@stationary desk bike that i use at work' => 'stationary bike',
    'running@ran in a 5k' => 'running',
    'softball@played in a tournament game' => 'baseball',
    'hiking@vigorous walking in and around city i live in, that include forests, farmlands etc' => 'hiking',
@@ -2411,13 +2438,13 @@ my %LongDict =
    'tennis@tennis with friends' => 'tennis',
    'cycling@i took part in a cycling contest of 75 miles between duluth and minneapolis' => 'cycling',
    'soccer@i frequently play soccer with the local soccer group in my neighborhood' => 'soccer',
-   'running@i run on my treadmill' => 'running',
+   'running@i run on my treadmill' => 'running on a treadmill',
    'walking@i walk during breaks and lunch at work, and at home with my family weather permitting' => 'walking',
    'yoga practice@at-home yoga practice most days, following a 10-25 minute video demonstration/narration of yoga vinyasa flows with varying degrees of vigor and/or yin-style stretching' => 'hatha yoga',
    'pilates and other conditioning exercises@a few times a week, following a series of several 10-30 minute videos with demonstration/narration, doing sequences of light calisthenics and pilates-style conditioning exercises meant to build streng' => 'pilates',
    'running@running for brief periods of time then fast walking with friends' => 'running',
    'volleyball@plans for volleyball with church' => 'volleyball',
-   'running@i run on a treadmill' => 'running',
+   'running@i run on a treadmill' => 'running on a treadmill',
    'swim@i go swimming at the ymca' => 'swimming',
    'skiing@downhill skiing' => 'snow skiing',
    'climbing@rock climbing/boundering' => 'rock climbing',
@@ -2432,7 +2459,7 @@ my %LongDict =
    'running@recreational running for health and fitness purposes on a regular basis' => 'running',
    'basketball@playing basketball with a church group' => 'basketball',
    'swimming@i swim all four strokes butterfly, backstroke, freestyle and breastroke' => 'swimming',
-   'running@usually run on the treadmill for about 20 minutes on monday, wednesday, and friday' => 'running',
+   'running@usually run on the treadmill for about 20 minutes on monday, wednesday, and friday' => 'running on a treadmill',
    'basketball@basketball in a gym' => 'basketball',
    'running@running outsidde' => 'running',
    'tennis@singles game of tennis' => 'tennis',
@@ -2465,9 +2492,9 @@ my %LongDict =
    'lifting weights@lifting weights at the gym' => 'weightlifting',
    'soccer@played in a 3 day soccer tournament in santa barbara' => 'soccer',
    'gym@worked on legs the exercises i did are the following: leg press, barbell squats, calf raises, leg curls, and dumbbell lunges' => 'weightlifting',
-   'jiu-jitsu@brazilian jiu jitsu' => 'wrestling',
+   'jiu-jitsu@brazilian jiu jitsu' => 'brazilian jiu jitsu',
    'yoga@participated in yoga classes at a studio' => 'hatha yoga',
-   'running@i go running on the treadmill at the gym' => 'running',
+   'running@i go running on the treadmill at the gym' => 'running on a treadmill',
    'running@running in a 5k' => 'running',
    'basketball@playing a pickup game' => 'basketball',
    'i went for a walk with my work group@i walked around a park' => 'walking',
@@ -2527,7 +2554,7 @@ my %LongDict =
    'swimming@moving through the water' => 'swimming',
    'basketball@recreational league basketball in my city i am on a team that plays two times a week against other teams in our league' => 'basketball',
    'running@running club established by runners in my community we run 4 times a week and once on weekends' => 'running',
-   'running@i ran 2 miles on the gym treadmill with an occasional incline' => 'running',
+   'running@i ran 2 miles on the gym treadmill with an occasional incline' => 'running on a treadmill',
    'mk@gym' => 'invalid',
    'swimming@went swimming atthe gym' => 'swimming',
    'running@usually run everyday' => 'running',
@@ -2551,14 +2578,14 @@ my %LongDict =
    'gym@lifting weights and using treadmill' => 'invalid',
    'running@running a mini marathan' => 'running',
    'martial arts@taichi' => 'tai chi',
-   'gym@run on the treadmill' => 'running',
+   'gym@run on the treadmill' => 'running on a treadmill',
    'basketball@i usually play basketball on a weekly basis at the local indoor gym i play competitively with those folks who show up to play' => 'basketball',
-   'working out at the gym@i run on the treadmill every time i go to the gym this helps me to lose weight and keep me fit' => 'running',
-   'running@i have engaged in running on the treadmill for 15-45 minutes spans of time at a fairly quick rate' => 'running',
+   'working out at the gym@i run on the treadmill every time i go to the gym this helps me to lose weight and keep me fit' => 'running on a treadmill',
+   'running@i have engaged in running on the treadmill for 15-45 minutes spans of time at a fairly quick rate' => 'running on a treadmill',
    'bench press@i have engaged in flat bench press free-weight exercises at the gym' => 'weightlifting',
    'swimming@i do a competitive swimming workout twice a week' => 'swimming',
    'i play co-ed softball during the summer@social drinking league, mostly home-runs and drinking' => 'baseball',
-   'water aerobics@aerobics performed in the pool at my local gym' => 'aerobic exercise',
+   'water aerobics@aerobics performed in the pool at my local gym' => 'water aerobics',
    'yoga@yoga class for core training' => 'hatha yoga',
    'gym@elliptical' => 'elliptical',
    'swimming@yoga, gym' => 'invalid',
@@ -2569,7 +2596,7 @@ my %LongDict =
    'swimming@tennis indoor tennis' => 'invalid',
    'running@cricket indian cricket' => 'invalid',
    'running@martial arts' => 'invalid',
-   'runnning@gymi do treadmill running' => 'running',
+   'runnning@gymi do treadmill running' => 'running on a treadmill',
    'running  and relay running@tennis play with well played players better than me' => 'invalid',
    'skating@gym, joking in thread mill' => 'invalid',
    'cycling@good health' => 'cycling',
@@ -2658,13 +2685,14 @@ my %GroupSoloOverride =
    snowboarding => 'solo',
    cricket => 'group',
    'ice hockey' => 'group',
+   'hockey' => 'group',
    'kabaddi in India' => 'group',
    'skipping rope' => 'solo',
    'pilates' => 'solo',
    'baseball' => 'group',
    'snow skiing' => 'solo',
    'kickboxing' => 'group',
-   'stationary bicycle' => 'solo',
+   'stationary bike' => 'solo',
    homemaking => 'solo',
    fishing => 'solo',
    sex => 'group',
@@ -2675,6 +2703,9 @@ my %GroupSoloOverride =
    'water skiing' => 'solo',
    'shopping' => 'solo',
    meditation => 'solo',
+   'martial arts' => 'group',
+   'climbing' => 'solo',
+   'running on a treadmill' => 'solo',
   );
 
 my %LocationMap =
@@ -2769,7 +2800,11 @@ my %NodeGroupInfo;
 my %EdgeInfo;
 my $Graph = Graph::Undirected->new();
 
-for my $k (values %LongDict) { $ShortDict{$k} = $k }
+for my $k (values %LongDict) {
+    if (!exists $ShortDict{$k}) {
+	$ShortDict{$k} = $k
+    }
+}
 for my $k (values %ShortDict, values %LongDict) {
     die "Activity mapped to the empty string" if $k eq '';
     $VettedName{$k} = 1
@@ -2808,8 +2843,12 @@ sub node {
     $short =~ s/\"//g;
     $short =~ s/\@//g;
     if ($long eq '' or $short eq $long) {
-	if (exists $ShortDict{$short}) {
+	my $ok= exists $ShortDict{$short};
+	while (exists $ShortDict{$short} and $short ne $ShortDict{$short}) {
 	    $short = $ShortDict{$short};
+	    $ok=1;
+	}
+	if ($ok) {
 	    return useNode($short,$solo);
 	} else {
 	    print("   '$short' => '',   # short\n");
@@ -2817,14 +2856,17 @@ sub node {
     } else {
 	$long =~ s/\'//g;
 	my $full = $short . '@' . $long;
+	my $ok=0;
 	if (exists $LongDict{$full}) {
 	    $short = $LongDict{$full};
-	    return useNode($short,$solo);
+	    $ok=1;
 	}
-	if (exists $ShortDict{$short}) {
+	while (exists $ShortDict{$short} and $short ne $ShortDict{$short}) {
 	    $short = $ShortDict{$short};
 	}
-	if (exists $VettedName{$short}) {
+	if ($ok) {
+	    return useNode($short,$solo);
+	} elsif (exists $VettedName{$short}) {
 	    print "   '$full' => '$short',\n";
 	} else {
 	    print("   '$full' => '',\n");
@@ -3005,6 +3047,7 @@ our %SHORT_MASTERY =
 
 sub shortenMastery {
     my ($mastery) = @_;
+    return if $mastery eq '';  # allow unset
     my $sm = $SHORT_MASTERY{$mastery};
     die $mastery if !defined $sm;
     $sm;
@@ -3122,8 +3165,11 @@ sub loadZip {
     }
 }
 
+our %ComplainCount = ();
+
 sub complain {
-    my ($why, $csv, $cxt) = @_;
+    my ($seqno, $code, $why, $csv, $cxt) = @_;
+    ++$ComplainCount{$seqno}{$code};
     return if $cxt eq '?';
     push @EndNote, join(' ', " BAD $cxt:", $why, 'in record', $csv->record_number);
 }
@@ -3139,8 +3185,10 @@ sub loadRawData {
     my $ignore_header1 = $csv->getline($fh);
     my $ignore_header2 = $csv->getline($fh);
     my $goodCount = 0;
+    my $totalCount = 0;
     while (my $row = $csv->getline($fh)) {
 	my @field = unidecode(@$row);
+	++$totalCount;
 	if (0) {
 	    foreach my $col (0 .. $#field) {
 		printf "%2d: %s\n", $col, $field[$col];
@@ -3164,11 +3212,11 @@ sub loadRawData {
 	    $field[$x] =~ tr/'"\.//d;
 	}
 	if ($field[$PA1_START] =~ m/^\s*$/ or $field[$PA2_START] =~ m/^\s*$/) {
-	    complain("One or both activities blank", $csv, $completion_context);
+	    complain($seqno, 'blank', "One or both activities blank", $csv, $completion_context);
 	    next
 	}
 	if ($field[$PA1_START] eq $field[$PA2_START]) {
-	    complain("Same short name '$field[$PA1_START]' for both activities ($field[$PA1_START + 1] vs $field[$PA2_START + 1]))", $csv, $completion_context);
+	    complain($seqno, 'same activity', "Same short name '$field[$PA1_START]' for both activities ($field[$PA1_START + 1] vs $field[$PA2_START + 1]))", $csv, $completion_context);
 	    next
 	}
 	my $skipped = 0;
@@ -3176,46 +3224,48 @@ sub loadRawData {
 	    ++$skipped if $field[$col] =~ /^\s*$/;
 	}
 	if ($skipped > 10) {
-	    complain("Too much missing data", $csv, $completion_context);
+	    complain($seqno, 'mostly missing', "Too much missing data", $csv, $completion_context);
 	    next
 	}
 
 	my $n1 = node($field[$PA1_START], $field[$PA1_START + 1], $field[$RCPA_START+0]);
 	my $n2 = node($field[$PA2_START], $field[$PA2_START + 1], $field[$RCPA_START+1]);
 	if (!defined $n1 or !defined $n2) {
-	    complain("Invalid activity pair $field[$PA1_START]@ $field[$PA1_START + 1] and $field[$PA2_START]@ $field[$PA2_START+1]", $csv, $completion_context);
+	    complain($seqno, 'invalid', "Invalid activity pair $field[$PA1_START]@ $field[$PA1_START + 1] and $field[$PA2_START]@ $field[$PA2_START+1]", $csv, $completion_context);
 	    next
 	}
 	if ($n1 eq $n2) {
-	    complain("Same activities in pair $field[$PA1_START]@ $field[$PA1_START + 1] and $field[$PA2_START]@ $field[$PA2_START+1]", $csv, $completion_context);
+	    complain($seqno, 'same activity', "Same activities in pair $field[$PA1_START]@ $field[$PA1_START + 1] and $field[$PA2_START]@ $field[$PA2_START+1]", $csv, $completion_context);
 	    next
 	}
 	my $l1 = $field[$RCPA_START+2];
 	my $l2 = $field[$RCPA_START+3];
 	if ($l1 eq '' or $l2 eq '') {
-	    complain("Missing mastery levels", $csv, $completion_context);
-	    next;
+	    #complain($seqno, 'missing mastery', "Missing mastery levels", $csv, $completion_context);
+	    #next;
 	}
 	if (defined($PAID_START) and $field[$PAID_START] ne 'Yes') {
-	    complain("Opted out", $csv, $completion_context);
+	    complain($seqno, 'opted out', "Opted out", $csv, $completion_context);
 	    next
 	}
 	if ($field[$PA1_START + 2] eq 'I am more than slightly hindered.') {
-	    complain("Disabled $field[$PA1_START]@ $field[$PA1_START + 1]", $csv, $completion_context);
+	    complain($seqno, 'disabled', "Disabled $field[$PA1_START]@ $field[$PA1_START + 1]", $csv, $completion_context);
 	    next;
 	}
 	if ($field[$PA2_START + 2] eq 'I am more than slightly hindered.') {
-	    complain("Disabled $field[$PA2_START]@ $field[$PA2_START + 1]", $csv, $completion_context);
+	    complain($seqno, 'disabled', "Disabled $field[$PA2_START]@ $field[$PA2_START + 1]", $csv, $completion_context);
 	    next;
 	}
 	edge($n1, $l1, $n2, $l2, $recDate, \@field, $seqno.':'.$csv->record_number());
 	recordDemogr($dfh, $csv, [ @field[$RCPA_DEMOGRAPHICS .. ($RCPA_DEMOGRAPHICS+5)],
-				   UnixDate($recDate, "%Y"), $seqno ]);
+				   UnixDate($recDate, "%Y"), $seqno, $csv->record_number() ]);
 	if ($completion_context ne '?') {
 	    push @EndNote, "GOOD $completion_context";
 	}
 	++$goodCount
     }
+    $ComplainCount{$seqno}{good} = $goodCount;
+    $ComplainCount{$seqno}{total} = $totalCount;
     $goodCount
 }
 
@@ -3340,11 +3390,33 @@ sub outputData {
 	    $csv->say($fh, [simplifyName($edge->{n1}), simplifyName($edge->{n2}), @$rate]);
 	}
     }
+    open $fh, ">:encoding(utf8)", "disconnected.csv";
+    for my $x (1..$#cc) {
+	for my $ag (@{ $cc[$x] }) {
+	    my @part = split /;/, $ag;
+	    print $fh "$part[0]\n";
+	}
+    }
+}
+
+sub outputComplainData {
+    my %cc;
+    for my $v (values %ComplainCount) {
+	for my $k (keys %$v) { $cc{$k} = 1 }
+    }
+    my @cc = sort keys %cc;
+    my $csv = Text::CSV_XS->new ({ binary => 1, auto_diag => 1 });
+    open my $fh, ">:encoding(utf8)", "complain.csv";
+    $csv->say($fh, ['group', @cc]);
+    while (my ($g,$v) = each %ComplainCount) {
+	my @v = map { $v->{$_} } @cc;
+	$csv->say($fh, [$g, @v]);
+    }
 }
 
 {
     my $csv = Text::CSV_XS->new ({ keep_meta_info => 1, binary => 1 });
-    $csv->say($dfh, ['again', 'location', 'country', 'birthyear', 'edu', 'sex', 'recDate', 'source' ]);
+    $csv->say($dfh, ['again', 'location', 'country', 'birthyear', 'edu', 'sex', 'recDate', 'source', 'recno' ]);
 
     #my $seqno = 0;
     #loadZip(shift, ++$seqno) while @ARGV;
@@ -3361,6 +3433,8 @@ for my $k (keys %NodeGroupInfo) {
     next if keys(%$gi) == 1;
     warn $k;  # to decide whether solo or group
 }
+
+outputComplainData();
 
 outputGraph();
 
