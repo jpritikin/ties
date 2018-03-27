@@ -22,8 +22,11 @@ sat_loo <- loo(sat_ll)
 fac_loo <- loo(fac_ll)
 
 print(ind_loo)
+print(lookupContextByDatumIndex(rcd, pareto_k_ids(ind_loo)))
 print(sat_loo)
+print(lookupContextByDatumIndex(rcd, pareto_k_ids(sat_loo)))
 print(fac_loo)
+print(lookupContextByDatumIndex(rcd, pareto_k_ids(fac_loo)))
 
 indVsFac <- compare(ind_loo, fac_loo)
 satVsFac <- compare(sat_loo, fac_loo)

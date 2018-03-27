@@ -27,8 +27,11 @@ sigma2 <- matrix(df[,estimator], length(facetNames), 1,
   dimnames= list(facetNames, c()))
 
 print(cor(sigma1, sigma2))
+print(max(abs(sigma1 - sigma2)))
+
 mask <- lower.tri(sc, F)
 print(cor(tc[mask], sc[mask]))
+print(max(abs(tc[mask] - sc[mask])))
 
 df <- summary(fit2t6, pars=c("theta"), probs=c())$summary
 tar <- t(array(df[,estimator], dim=c(length(facetNames), length(palist))))
@@ -36,6 +39,7 @@ dimnames(tar) <- list(palist, facetNames)
 
 simTheta <- as.matrix(read.csv("simTheta.csv", row.names=1))
 print(cor(c(tar), c(simTheta)))
+print(max(abs(c(tar) - c(simTheta))))
 
 pval <- ppc(fit2t6, rcd)
 print(sum(pval<.05) / length(pval))

@@ -5,31 +5,35 @@ options(mc.cores = parallel::detectCores())
 
 outputDir <- function() './data/'
 
-stanChains <- 6  # should be less than parallel::detectCores()
+stanChains <- 6
 
-loadRawData <- function() {
-  rcd <- read.csv("rawData.csv")
+if (stanChains > parallel::detectCores()) {
+  stop(paste("Reduce stanChains to less than or equal to", parallel::detectCores()))
+}
+
+loadRawData <- function(dir='.') {
+  rcd <- read.csv(paste0(dir,"/rawData.csv"), stringsAsFactors=FALSE)
   ignCol <- c('recno', paste0('injury', 1:2), paste0(c('goal','feedback'),2))
   rcd <- rcd[,-match(ignCol, colnames(rcd))]
   if (nrow(rcd) < 1) { stop("No data?") }
   rcd
 }
 
-loadWhitelistRawData <- function() {
-  rcd <- loadRawData()
+loadWhitelistRawData <- function(dir='.') {
+  rcd <- loadRawData(dir)
   whitelist <- getWhiteList(rcd)
   rcd[rcd$pa1 %in% whitelist & rcd$pa2 %in% whitelist,]
 }
 
-loadSingleFactorData <- function() {
-  rcd <- loadWhitelistRawData()
+loadSingleFactorData <- function(dir='.') {
+  rcd <- loadWhitelistRawData(dir)
   exclude <- c("spont", "goal1", "feedback1", "control", "waiting", 'evaluated')
   rcd <- rcd[,-match(exclude, colnames(rcd))]
   rcd
 }
 
-loadSimData <- function() {
-  read.csv("simData.csv")
+loadSimData <- function(dir='.') {
+  read.csv(paste0(dir,"/simData.csv"), stringsAsFactors=FALSE)
 }
 
 extractFacetNames <- function(rcd) {
@@ -98,6 +102,35 @@ prepDataForStan <- function(rcd) {
        diff=sapply(rcd[excludeCols], as.numeric))
 }
 
+lookupContextByDatumIndex <- function(rcd, index) {
+  got <- NULL
+  if (length(index)) for (xx in 1:length(index)) {
+    got <- rbind(got, lookupContextByDatumIndex1(rcd, index[xx]))
+  }
+  got
+}
+
+lookupContextByDatumIndex1 <- function(rcd, index) {
+  excludeCols <- -match(c(paste0('pa', 1:2), paste0('l', 1:2)), colnames(rcd))
+  for (rx in 1:nrow(rcd)) {
+    rowData <- rcd[rx,excludeCols]
+    rowDataCount <- sum(!is.na(rowData))
+    if (index < rowDataCount) {
+      naMap <- rep(NA, length(rowData))
+      naMap[!is.na(rowData)] <- 1:rowDataCount
+      pick <- match(1+index, naMap)
+      pa1 <- as.character(rcd[rx,'pa1'])
+      pa2 <- as.character(rcd[rx,'pa2'])
+      ss <- calcSampleSize(rcd)
+      return(data.frame(row.names=rownames(rcd)[rx], row=rx,
+        pa1=pa1, pa1ss=ss[pa1], pa2=pa2, pa2ss=ss[pa2],
+        facet=colnames(rowData)[pick]))
+    } else {
+      index <- index - rowDataCount
+    }
+  }
+}
+
 worstNeff <- function(fit, regPar) {
   regParFit <- summary(fit, regPar, probs=c())$summary
   regParFit[order(regParFit[,'n_eff']),]
@@ -154,7 +187,7 @@ plotByFacet <- function(fit, rcd, output="byFacet.pdf") {
       geom_text(aes(label=activity, x=x, color=sampleSizeM, y=y),
                 angle=85, hjust=0, size=2, position = position_jitter(width = 0, height = 0.4)) +
       xlim(-span, span) +
-      ggtitle(paste(rownames(info)[ix], "var=", round(info[ix,'sigma'],2), "flow=", round(flowLoading,2))) + ylim(0,1) +
+      ggtitle(paste(rownames(info)[ix], "sd=", round(info[ix,'sigma'],2), "flow=", round(flowLoading,2))) + ylim(0,1) +
       theme(legend.position="none", axis.title.x=element_blank(),
             axis.title.y=element_blank(),
             axis.text.y=element_blank(),
