@@ -1,6 +1,6 @@
 // Saturated covariance + per-facet thresholds
 functions {
-  vector cmp_probs(real pa1, real pa2, real thr1, real thr2) {
+  vector cmp_probs(real alpha, real pa1, real pa2, real thr1, real thr2) {
     vector[5] unsummed;
     real paDiff = (pa1 - pa2);
     unsummed[1] = 0;
@@ -8,7 +8,7 @@ functions {
     unsummed[3] = paDiff - thr1;
     unsummed[4] = paDiff + thr1;
     unsummed[5] = paDiff + thr1 + thr2;
-    return cumulative_sum(unsummed);
+    return cumulative_sum(alpha * unsummed);
   }
 }
 data {
@@ -39,6 +39,7 @@ parameters {
   cholesky_factor_corr[NFACETS] thetaCorChol;
 }
 transformed parameters {
+  real alpha = mean(sigma)/1.4;
   // non-centered parameterization due to thin data
   matrix[NPA,NFACETS]     theta;    // latent score of PA by facet
   for (pa in 1:NPA) {
@@ -56,10 +57,9 @@ model {
   for (cmp in 1:NCMP) {
     for (ff in 1:NFACETS) {
       if (rcat[cmp,ff] == 13) continue;  // special value to indicate missing
-      rcat[cmp,ff] ~ categorical_logit(
-        cmp_probs(theta[pa1[cmp],ff],
-                  theta[pa2[cmp],ff],
-                  threshold1[ff], threshold2[ff]));
+      rcat[cmp,ff] ~ categorical_logit(cmp_probs(alpha, theta[pa1[cmp],ff],
+                                                 theta[pa2[cmp],ff],
+                                                 threshold1[ff], threshold2[ff]));
     }
   }
 }
@@ -73,7 +73,7 @@ generated quantities {
     for (ff in 1:NFACETS) {
       if (rcat[cmp,ff] == 13) continue;  // special value to indicate missing
       log_lik[cur] = categorical_logit_lpmf(rcat[cmp,ff] |
-                                            cmp_probs(theta[pa1[cmp],ff],
+                                            cmp_probs(alpha, theta[pa1[cmp],ff],
                                                       theta[pa2[cmp],ff],
                                                       threshold1[ff], threshold2[ff]));
       cur = cur + 1;
@@ -84,7 +84,7 @@ generated quantities {
 
   for (cmp in 1:NCMP) {
     for (ff in 1:NFACETS) {
-      rcat_sim[cmp,ff] = categorical_logit_rng(cmp_probs(theta[pa1[cmp],ff],
+      rcat_sim[cmp,ff] = categorical_logit_rng(cmp_probs(alpha, theta[pa1[cmp],ff],
                                                          theta[pa2[cmp],ff],
                                                          threshold1[ff], threshold2[ff])) - 3;
     }

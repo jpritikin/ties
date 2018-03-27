@@ -1,6 +1,6 @@
 // Independence model
 functions {
-  vector cmp_probs(real pa1, real pa2, real thr1, real thr2) {
+  vector cmp_probs(real alpha, real pa1, real pa2, real thr1, real thr2) {
     vector[5] unsummed;
     real paDiff = (pa1 - pa2);
     unsummed[1] = 0;
@@ -8,7 +8,7 @@ functions {
     unsummed[3] = paDiff - thr1;
     unsummed[4] = paDiff + thr1;
     unsummed[5] = paDiff + thr1 + thr2;
-    return cumulative_sum(unsummed);
+    return cumulative_sum(alpha * unsummed);
   }
 }
 data {
@@ -37,6 +37,9 @@ parameters {
   real threshold2;
   vector<lower=0>[NFACETS] sigma;
 }
+transformed parameters {
+  real alpha = mean(sigma)/1.4;
+}
 model {
   for (pa in 1:NPA) {
     theta[pa,] ~ normal(0,sigma);
@@ -48,7 +51,7 @@ model {
     for (ff in 1:NFACETS) {
       if (rcat[cmp,ff] == 13) continue;  // special value to indicate missing
       rcat[cmp,ff] ~ categorical_logit(
-        cmp_probs(
+          cmp_probs(alpha,
           theta[pa1[cmp],ff],
           theta[pa2[cmp],ff],
           threshold1, threshold2));
@@ -62,7 +65,7 @@ generated quantities {
 
   for (cmp in 1:NCMP) {
     for (ff in 1:NFACETS) {
-      rcat_sim[cmp,ff] = categorical_logit_rng(cmp_probs(theta[pa1[cmp],ff],
+      rcat_sim[cmp,ff] = categorical_logit_rng(cmp_probs(alpha, theta[pa1[cmp],ff],
                                                          theta[pa2[cmp],ff],
                                                          threshold1, threshold2)) - 3;
     }
@@ -72,7 +75,7 @@ generated quantities {
     for (ff in 1:NFACETS) {
       if (rcat[cmp,ff] == 13) continue;  // special value to indicate missing
         log_lik[cur] = categorical_logit_lpmf(rcat[cmp,ff] |
-                                              cmp_probs(theta[pa1[cmp],ff],
+                                              cmp_probs(alpha, theta[pa1[cmp],ff],
                                                         theta[pa2[cmp],ff],
                                                         threshold1, threshold2));
         cur = cur + 1;
