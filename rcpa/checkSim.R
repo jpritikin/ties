@@ -14,6 +14,9 @@ df <- summary(fit2t2, pars=c("sigma"), probs=c())$summary
 sigma1 <- matrix(df[,estimator], length(facetNames), 1,
   dimnames= list(facetNames, c()))
 
+df <- summary(fit2t2, pars=c("alpha"), probs=c())$summary
+alpha1 <- df[,estimator]
+
 rm(fit2t2)
 
 load(paste0(outputDir(), "fit2t6.rda"))
@@ -26,8 +29,12 @@ df <- summary(fit2t6, pars=c("sigma"), probs=c())$summary
 sigma2 <- matrix(df[,estimator], length(facetNames), 1,
   dimnames= list(facetNames, c()))
 
-print(cor(sigma1, sigma2))
+df <- summary(fit2t6, pars=c("alpha"), probs=c())$summary
+alpha2 <- df[,estimator]
+
+print(max(abs(alpha1 - alpha2)))
 print(max(abs(sigma1 - sigma2)))
+print(cor(sigma1, sigma2))
 
 mask <- lower.tri(sc, F)
 print(cor(tc[mask], sc[mask]))
