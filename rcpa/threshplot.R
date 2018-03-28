@@ -5,14 +5,16 @@ library(ggplot2)
 load(paste0(outputDir(), "fit2t5.rda"))  # factor model
 fit <- fit2t5
 
+th.summary <- summary(fit, pars=paste0("threshold",1:2), probs=c(.025,.975))$summary
+
 th1 <- unlist(extract(fit, pars="threshold1"), use.names=F)
 th2 <- unlist(extract(fit, pars="threshold2"), use.names=F)
 
-s1 <- sample.int(length(th1), 25)
+s1 <- 1:25
 
 th25 <- list(th1 = th1[s1], th2=th2[s1])
 
-save(th25, file="threshplot.rda")
+save(th.summary, th25, file="threshplot.rda")
 
 q()
 

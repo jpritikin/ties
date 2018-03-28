@@ -13,6 +13,7 @@ if (0){
 
 estimator <- 'mean'
 facetNames <- extractFacetNames(rcd)
+facetNames <- sub('\\d', '', facetNames, perl=TRUE)
 
 df <- summary(fit2t1, pars=c("thetaCor"), probs=c(.975,.025))$summary
 #df[sign(df[,'95%']) != sign(df[,'5%']), estimator] <- 0
@@ -30,7 +31,7 @@ q()
 corGraph <- qgraph(tc, layout = "spring", graph = "cor",
                    legend.cex = 0.3,
                    cut = 0.3, maximum = 1, minimum = 0, esize = 20,
-                   vsize = 5, repulsion = 0.8)
+                   vsize = 5, repulsion = 0.8, negDashed=TRUE)
 
 pcorGraph <- qgraph(tc, layout = corGraph$layout, graph = "pcor",
                     legend.cex = 0.3, 

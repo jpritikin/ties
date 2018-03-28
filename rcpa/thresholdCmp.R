@@ -36,7 +36,7 @@ pval3 <- ppc(fit2t6, rcd)
 
 df <- rbind(
   data.frame(pvalue=c(pval1), model="common"),
-  data.frame(pvalue=c(pval2), model="per-facet"),
+  data.frame(pvalue=c(pval2), model="per-item"),
   data.frame(pvalue=c(pval3), model="simulated"))
 
 save(looCmp, df, ppcDemoPair, ppcDemoFacet, ppcDemoData, ppcDemoSim, file="thresholdCmp.rda")

@@ -6,6 +6,7 @@ options(mc.cores = parallel::detectCores())
 outputDir <- function() './data/'
 
 stanChains <- 6
+ppcSampleSizeThreshold <- 10
 
 if (stanChains > parallel::detectCores()) {
   stop(paste("Reduce stanChains to less than or equal to", parallel::detectCores()))
@@ -209,12 +210,26 @@ makeSimplex5 <- function(v) {
   got
 }
 
+numPpcTests <- function(rcd)
+{
+  edges <- paste(rcd[,'pa1'], rcd[,'pa2'], sep=":")
+  edgeTable <- table(edges)
+  length(edgeTable[edgeTable >= ppcSampleSizeThreshold])
+}
+
+totalNumPairs <- function(rcd)
+{
+  edges <- paste(rcd[,'pa1'], rcd[,'pa2'], sep=":")
+  edgeTable <- table(edges)
+  length(edgeTable)
+}
+
 ppc <- function(sim_fit, rcd) {
   edges <- paste(rcd[,'pa1'], rcd[,'pa2'], sep=":")
   edgeTable <- table(edges)
 
   #print(edgeTable[edgeTable >= 5])
-  checkList <- names(edgeTable[edgeTable >= 5])
+  checkList <- names(edgeTable[edgeTable >= ppcSampleSizeThreshold])
 
   facetNames <- extractFacetNames(rcd)
   NFACETS <- length(facetNames)

@@ -7,6 +7,7 @@
 
 set -o errexit
 set -o nounset
+set -x
 
 exec &> >(tee -a runStan.log)
 
