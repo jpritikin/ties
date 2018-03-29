@@ -1,0 +1,1184 @@
+\documentclass[man,12pt]{apa6}
+% Declare some greek characters commonly used in statistics:
+\usepackage[utf8]{inputenc}
+\DeclareUnicodeCharacter{03BC}{\mu}
+\DeclareUnicodeCharacter{03C3}{\sigma}
+\usepackage[american]{babel}
+\usepackage{csquotes}
+\usepackage[style=apa,sortcites=true,sorting=nyt,apabackref=false,backend=biber]{biblatex}
+\DeclareLanguageMapping{american}{american-apa}
+\addbibresource{jpritikin.bib}
+% \documentclass[man]{apa6} % APA Manuscript-style
+% \documentclass[man, mask]{apa6} % APA Manuscript-style, authorship hidden
+
+\newtoggle{draft}
+%\toggletrue{draft} % Show notes and draft watermark
+\togglefalse{draft}  % Hide Notes and draft watermark
+
+\renewcommand{\cite}{\parencite}        % biblatex, apa style: use \parencite and \textcite
+\renewcommand{\Cite}{\Parencite}        % biblatex, apa style: use \parencite and \textcite
+\newcommand{\citep}{\parencite}        % biblatex, apa style: use \parencite and \textcite
+\newcommand{\Citep}{\Parencite}        % biblatex, apa style: use \parencite and \textcite
+\newcommand{\citet}{\textcite}        % biblatex, apa style: use \parencite and \textcite
+\newcommand{\Citet}{\Textcite}        % biblatex, apa style: use \parencite and \textcite
+
+\usepackage[hidelinks]{hyperref}
+\usepackage{mathtools}
+\usepackage{amsfonts}
+\usepackage{booktabs}
+\usepackage{setspace}
+\usepackage{xspace}
+\usepackage{listings}
+\lstset{escapeinside={\#\#}{\^^M}, language=R, basicstyle=\footnotesize, numbers=left,
+  numberstyle=\tiny, xleftmargin=3ex, keywordstyle=}
+
+\usepackage{marginnote}
+\renewcommand*{\marginfont}{\tiny\color{red}\singlespacing}
+
+\DeclareMathOperator*{\argmin}{arg\,min}
+
+% http://tex.stackexchange.com/questions/29834/closed-square-root-symbol
+% New definition of square root:
+% it renames \sqrt as \oldsqrt
+\let\oldsqrt\sqrt
+% it defines the new \sqrt in terms of the old one
+\def\sqrt{\mathpalette\DHLhksqrt}
+\def\DHLhksqrt#1#2{%
+\setbox0=\hbox{$#1\oldsqrt{#2\,}$}\dimen0=\ht0
+\advance\dimen0-0.2\ht0
+\setbox2=\hbox{\vrule height\ht0 depth -\dimen0}%
+{\box0\lower0.4pt\box2}}
+
+\newcommand{\proglang}[1] {\texttt{#1}\xspace}
+\newcommand{\pkg}[1] {\texttt{#1}\xspace}
+
+\newcommand{\N} {\mathcal{N}\xspace}
+\newcommand{\logit} {\mathrm{logit}\xspace}
+
+\lstnewenvironment{code}[1][]{\lstset{language={R},nolol=true,basicstyle=\footnotesize\ttfamily,morecomment=[l]{\#},lineskip=-1pt,numbers=left,numberstyle=\tiny,firstnumber=auto,float,captionpos=b,extendedchars=false, #1}}{}
+ 
+\usepackage{caption} %remove TODO
+\usepackage{subcaption}
+\captionsetup{subrefformat=parens}
+
+% Comment out if you don't like the draft stuff.
+\iftoggle{draft}{
+    \usepackage{draftwatermark} 
+    \SetWatermarkText{\shortstack{DRAFT \\ {\LARGE \today} \\ {\LARGE Do not cite or quote}}}
+}
+
+\usepackage[usenames,dvipsnames,svgnames,table]{xcolor}
+
+\usepackage{tikz}
+%\usetikzlibrary{shapes.geometric}
+%\usetikzlibrary{calc}
+\usetikzlibrary{positioning}
+
+
+\iftoggle{draft}{
+    \newcommand{\nb}[1]{\textbf{ \Large \scshape {#1}} \marginnote{\Large $\star$}}
+}{
+    \newcommand{\nb}[1]{\typeout{FOUND NOTE #1}}
+}
+
+\newlength{\figurewidth} \ifapamode{\figurewidth .8\textwidth}{\figurewidth .3\textwidth}{\figurewidth .6\textwidth}
+
+\newcommand{\E} {\mathbb{E}}
+
+\title{Situational factors in optimal experience: Which physical activities are conducive to flow?}
+
+\twoauthors{Joshua N.~Pritikin}{Karen M.~Schmidt}
+\twoaffiliations{Virginia Commonwealth University}{University of Virginia}
+
+\iftoggle{draft}{\note{Draft \today \\ Please do not cite or quote }}
+
+\shorttitle{RCPA}
+
+\authornote{Joshua N.~Pritikin, Department of Psychiatry and Virginia Institute
+for Psychiatric and Behavior Genetics, Virginia Commonwealth University;
+Karen M. Schmidt, Department of Psychology, University of Virginia.
+
+Correspondence concerning this article should be addressed to Joshua N.~Pritikin,
+Department of Psychiatry and Virginia Institute
+for Psychiatric and Behavior Genetics, Virginia Commonwealth University,
+800 E. Leigh St., Richmond, VA 23219. E-mail: jpritikin@pobox.com}
+
+\keywords{}
+
+\abstract{Not written yet.}
+
+<<echo=FALSE, results='hide', warning=FALSE, cache=FALSE>>=
+library(knitr)
+#knit("joint.Rnw", tangle=TRUE)  # to extract only the R chunks
+opts_knit$set(error=TRUE)
+opts_chunk$set(echo=FALSE, cache=FALSE, highlight=FALSE,
+               size="footnotesize", background='#ffffff', fig.path="")
+loadlib <- function () {
+library(ggplot2)
+library(xtable)
+library(OpenMx)
+library(gridExtra)
+library(kableExtra)
+library(furniture)
+library(qgraph)
+library(rstan)
+library(loo)
+library(reshape2)
+}
+
+suppressPackageStartupMessages(loadlib())
+
+RCPA_DIR <- '~/rcpa/'
+source(paste0(RCPA_DIR, "modelUtil.R"))
+
+theme_set(theme_bw())
+options("xtable.caption.placement"="top")
+options("xtable.table.placement"="tbp")
+options("xtable.booktabs"=TRUE)
+options("xtable.math.style.negative"=TRUE)
+options(knitr.table.format = "latex")
+options(knitr.kable.NA = '')
+options(digits=2)
+options(scipen=2)
+set.seed(1)
+
+# hack around https://github.com/yihui/knitr/issues/1085
+print.xtable <- function(x, ...) {
+    out <- capture.output(xtable::print.xtable(x, ...))
+    cat(gsub('\\s+$', '', paste(out, collapse = '\n')))
+}
+
+printLatexMatrix <- function(mat) {
+    cat("\\begin{bmatrix}")
+    mat <- as.matrix(mat)
+    mat[abs(mat - 0.0) < 1e-6] <- NA
+    foo <- xtable::print.xtable(xtable(mat), only.contents=TRUE, include.colnames=FALSE,
+                 include.rownames=FALSE, hline.after=c(), print.results=FALSE)
+    lines <- strsplit(foo, "\n", fixed=TRUE)[[1]]
+    cols <- strsplit(lines[3], "&", fixed=TRUE)[[1]]
+    blank <- !grepl("[0-9]", cols)
+    cols[blank] <- paste0("\\phantom{0.00} ", cols[blank])
+    lines[3] <- paste0(cols, collapse="&")
+    cat(paste0(lines, collapse="\n"))
+    cat("\\end{bmatrix}")
+}
+
+formatCharVector <- function(name) {  # based on omxQuotes
+	if (length(name) == 0) return('NULL')
+	if (typeof(name) == "S4") return(omxQuotes(list(name)))
+	listTerms <- sapply(name, function(x) {
+		if (typeof(x) == "S4") {
+			return(class(x))
+		} else if (is.na(x)) {
+			return(as.character(x))
+		} else {
+			x
+		}
+	} )
+	if (length(listTerms) == 2) {
+		return(paste(listTerms[1], ' and ', listTerms[2], sep = ''))
+	} else if (length(listTerms) > 2) {
+		return(paste(paste(listTerms[1:length(listTerms) - 1], collapse=', '),
+			', and ', listTerms[[length(listTerms)]], sep = ''))
+	} else {
+		return(listTerms)
+	}
+}
+
+@ 
+
+\begin{document}
+
+\maketitle
+
+\section{Introduction}
+
+Optimal experience is a state in which an individual is completely
+immersed in an activity without reflective self-consciousness but with
+a deep sense of control \parencite{csikszentmihaly1975}. % TODO better cite? is this a verbatim quote?
+Optimal experience
+has been vigorously studied from psychological, physiological,
+and neuroimaging standpoints \parencite[personal factors; e.g.,][]{jackson1998,demanzano2010,limb2008}.
+In contrast, situation factors have received comparatively little attention.
+For example, one ecological momentary assessment study recoded hundreds
+of colorful activity descriptions into
+only six general categories \parencite{schmidt2014}.
+We do not challenge the importance of personal factors.
+However, it seems doubtful that situational factors are of importance
+commensurate with the modest amount of research that has examined them.
+Growing interest in flow training
+\parencite[e.g.,][]{csikszentmihalyi2017,kotler2017}, a type of training that promises
+to increase the frequency and depth of flow experience, reinforces
+the need for research on situational factors.
+For people who already have a favorite activity,
+such as piano performance or figure skating,
+flow training necessarily must emphasize personal factors.
+The activity is a given;
+we can hardly advise an elite figure skater to abandon her
+skates for piano performance if
+that activity is slightly more conducive to flow
+than figure skating (or vice versa).
+However, not everybody has already chosen an activity.
+For people at the beginning of their pursuit of flow,
+information to guide their choice of an activity
+or some data about which activities are particularly conducive to flow,
+could be of interest.
+
+free-form input -- lots of missing data -- Bayesian
+
+flow triggers, hypothesized antecedents of flow (can omit?)
+
+Additional flow antecedents associated with a group context
+have been proposed \parencite{sawyer2007}.
+Items based on these triggers were not included
+because they would only be applicable to some physical activities.
+
+Complete source code for data preprocessing and analysis is
+available from TODO.
+
+\parencite{bradley1952} exploratory factor model -- novel, unaware of prior work
+
+growth mindset applied to self control
+
+Flow Scales-2 \parencite{jackson2002}
+
+Survey of measurement instruments \parencite{moneta2012}
+
+\section{Method}
+
+\subsection{Questionnaire}
+
+Items must be easy to understand, especially on a brief survey.
+Since optimal experience is not yet a widely understood notion,
+detailed measures that ask about it are obliged to include
+a definition \parencite[c.f.,][p.~195]{csikszentmihalyi1992}.  %TODO check reference
+To avoid this methodological complication,
+we decided to focus on hypothesized antecedents, phenomenology, and consequents.
+As far as possible,
+we tried to adapt items that had been validated in prior studies.
+As the derivation of our items are discussed,
+refer to Appendix~\ref{app:questionnaire} for the exact wording.
+
+One important antecedent of flow is the perceived
+fit of a subject's skill to activity demands \parencite{csikszentmihaly1975,keller2012}.
+For example, anxiety may result when activity demands exceed skills
+and boredom may result when skills exceed demands.
+However, perceived fit cannot be assessed in the present study
+because subjects' skills are averaged.
+Hence, we assume roughly satisfactory perceived fit because
+the experience of anxiety or boredom is generally uncomfortable
+and subjects were asked to report on voluntarily chosen activities.
+We do not, however, assume that all activities offer
+equal potential for perceived fit.
+
+Four items assessed potential activity demands.
+Item \emph{skill} assessed the relative amount of
+skill that a participant would need to acquire
+to achieve some degree of competence.
+Items \emph{predict} and \emph{novelty} assessed the relative first
+and second order predictability of activities.
+Finally, Item \emph{creative} assessed the relative opportunities
+to express creativity.
+Activities with many skills to acquire,
+unpredictable activities, and
+activities that admit more creativity should offer
+more opportunities for perceived fit.
+
+Another important antecedent of flow is the subjective value of the
+activity \parencite{keller2012}.
+Item \emph{stakes} assessed this construct
+in a straightforward way.
+Item \emph{evaluated} assessed the relative type of motivation,
+whether extrinsic or autotelic \parencite{csikszentmihalyi1999}.
+Note that this construct was labeled as ``loss of self consciousness''
+in Flow Scales-2 \parencite{jackson2002}.
+Recently, some environmental correlates of flow have been proposed \parencite{kotler2014}.
+Items \emph{complex} and \emph{body} assessed relative complexity of
+the activity and environment, and the extent of bodily involvement, respectively.
+These items likely feed into both the subjective value antecedent,
+by making an activity more engrossing, and also admit more opportunities for
+perceived fit.
+
+Items \emph{goal}, \emph{feedback}, and \emph{control} assessed
+the relative clarity of goals, immediacy of feedback,
+and degree of control over performance, respectively.
+These facets can be regarded as supplementary antecedents
+of flow \parencite{jackson2002}.
+Our attempt to clarify the time scale of goals and feedback
+is detailed in Appendix~\ref{app:bad-items}.
+We next consider items designed to assess the phenomenology of flow.
+
+Someone in flow should experience a reduction in
+extraneous mental chatter, feel more in the present moment,
+and have a sense of effortless regardless of the amount
+of physical effort \parencite{dietrich2004}.
+Items \emph{chatter}, \emph{present}, and \emph{spont}
+assessed these aspects of phenomenology, respectively.
+Our phenomenology items correspond with the ``merging'' 
+factor in Flow Scales-2 \parencite{jackson2002}.
+
+Although loading weakly in a factor analysis \parencite{jackson2002},
+time distortion is another putative phenomenological aspect of flow.
+In theory, time slows down or passes more rapidly than usual.
+However, we imagine activity $\times$ time interactions.
+Consider that a time clock can be an integral part of the game (e.g.,
+competitive swimming), whereas there are other activities
+where time plays at most a minor role (e.g., rock climbing).
+However, we actually want to ask whether the subject
+feels time passing in a periodic and regular way.
+Should the effect size of time distortion in rock climbing
+be on the same scale with the effect size in competitive swimming?
+Rather that confront such vexing questions,
+we decided to include a simpler item related to time.
+Item \emph{waiting} assessed the relative amount of
+time spent waiting.
+For example, in baseball, most batters wait on the bench.
+This item is more objective than time distortion.
+We expected that waiting would negatively correlate with flow.
+
+Item \emph{reward} assessed the relative degree of positive
+affect after engaging in an activity.
+This item corresponds to the ``autotelic'' factor in Flow Scales-2
+\parencite{jackson2002}.
+Other potential consequents of flow, such as cognitive capacity
+or processing styles, have not received much empirical
+study \parencite{landhausser2012}.
+Hence, we did not include additional items since validated items
+from prior research were not available.
+For the sake of completeness,
+we describe our unused and discarded items in Appendix~\ref{app:bad-items}.
+
+\subsection{Participants}
+
+<<excluded, results="asis">>=
+
+cdata <- read.csv(paste0(RCPA_DIR, 'complain.csv'), check.names=FALSE)
+totalGood <- sum(cdata$good)
+cdata[['mostly missing']] <- cdata[['mostly missing']] + cdata$blank
+cdata$blank <- NULL
+cdata$group <- mxFactor(cdata$group, levels=c('public','mturk'), labels=c('public','MTurk'))
+corder <- match(c('group', 'total', 'mostly missing',
+  'invalid', 'same activity', 'disabled', 'opted out', 'good'), colnames(cdata))
+if (any(is.na(corder))) stop('here')
+cdata <- cdata[,corder]
+if (any(rowSums(cdata[,c(-1,-2)], na.rm=T) != cdata$total)) die("here")
+
+str <- kable(cdata,  booktabs=T, escape=FALSE, linesep = "",
+  caption="Excluded Responses",
+  row.names=FALSE) %>% kable_styling() %>%
+    add_footnote(escape=FALSE, threeparttable=TRUE,
+                 paste(
+        "\\emph{Note.}",
+        "Responses excluded as \\emph{mostly missing} had more than 10 skipped items.",
+        "Those excluded as \\emph{invalid} could not be coded.",
+        "For example, ``gym'' was judged too ambiguous because it",
+        "could refer to aerobic exercise or weightlifting or something else.",
+        "Also, some participants did not read the instructions carefully and submitted",
+        "two activities (like ``swimming; tennis indoor tennis'') where they were suppose",
+        "to provide a short name and extended description of the same single activity.",
+        "Responses excluded as \\emph{same activity} literally input the",
+        "same activity twice or input two similar activities like ``running''",
+        "and ``jogging.'' This latter case required a coding judgment call (see Coding).",
+        "The \\emph{disabled} column reflects those participants who self",
+        "reported that their physical disability more than slightly hindered their ability to perform the activity."))
+
+gsub('\\item [a]','', str, fixed=TRUE)
+
+@ 
+
+<<results="asis">>=
+load(paste0(RCPA_DIR, 'demogr.rda'))
+
+# add booktabs support TODO
+table1(demogr, country, sex, education, splitby=~channel,
+                    rounding_perc=0, output='latex2',na.rm=FALSE,
+  caption="Demographics by Channel\\label{tab:demogr1}")
+
+@ 
+
+\begin{figure}
+<<age, fig.height=3>>=
+ggplot(subset(demogr, !is.na(age))) +
+  geom_histogram(aes(x=age, fill=channel), binwidth=5, position = "dodge")
+@
+\caption{Distribution of participant age by recruitment channel.}
+\label{fig:age}
+\end{figure}
+
+<<>>=
+
+discon <- read.csv(paste0(RCPA_DIR, 'disconnected.csv'), header=FALSE, stringsAsFactors=FALSE)
+
+@ 
+
+Participants were recruited from two channels.
+The \emph{public} channel consisted of
+online invitations posted at
+Psychological Research on the Net
+\url{https://psych.hanover.edu/research/exponnet.html},
+Social Psychology Network
+\url{http://www.socialpsychology.org/expts.htm},
+Inquisitive Mind
+\url{http://www.in-mind.org/content/online-research},
+and
+Survey Circle \url{https://www.surveycircle.com/}.
+In addition,
+students were recruited online from Virginia Commonwealth University and
+University of Virginia.
+The survey ended with an invitation to respond again with a different pair
+of activities ($n=\Sexpr{sum(demogr$again=='Yes', na.rm=T)}$)
+and encouraged subjects to invite their friends to participant.
+Public channel subjects did not receive any monetary compensation,
+but were invited to visit a page showing preliminary results.
+
+Our \emph{MTurk} recruitment channel used Amazon's Mechanical Turk.
+A compensation of 0.60 USD per response was offered.
+Amazon qualifications were used to prevent repeated
+participation.
+Furthermore, a slightly different version of the survey was used that
+did not mention the possibility of responding again.
+
+Responses that failed basic checks of well-formedness were excluded
+(Table~\ref{tab:excluded}).
+Of the good responses,
+we formed an undirected graph by
+regarding activities as vertices and comparisons as edges.
+An algorithm was used to compute all connected components.
+The largest connected component was included and the
+remaining connected components were excluded.
+This resulted in the exclusion of
+\Sexpr{formatCharVector(sort(discon$V1))}.
+
+<<>>=
+rcd1 <- loadRawData(RCPA_DIR)
+rcd2 <- loadWhitelistRawData(RCPA_DIR)
+
+excl <- rcd1[which(is.na(match(rownames(rcd1), rownames(rcd2)))),]
+rej <- unique(sort(c(excl$pa1, excl$pa2)))
+rej <- rej[which(is.na(match(rej, extractPalist(rcd2))))]
+
+@
+
+Some activities received few mentions.
+However, if activity $A$ was compared to at least
+two other activities, $B$ and $C$, then $A$ was retained.
+Although little may be learned about $A$ in this case,
+there may be a transitive relationship,
+such as $B < A < C$, by which the model can infer that $B < C$.
+Therefore, per-activity sample size is less of a concern
+when the graph is densely connected.
+When activity $A$ was compared with only one other
+activity then it was excluded unless there were more than
+10 comparisons.
+This resulted in the exclusion of
+\Sexpr{formatCharVector(rej)}.
+Demographics for included
+participants are exhibited in Table~\ref{tab:demogr1}
+and Figure~\ref{fig:age}.
+
+\subsection{Preliminary Results}
+
+To help entice participation, we assembled a web page to exhibit
+preliminary results,
+\url{http://exuberant-island.surge.sh/rcpa/}.
+Initially we only exhibited the undirected graph formed by
+regarding activities as vertices and comparisons as edges.
+By Jan 2017, a report was added to show
+the order of activities by facet.
+By Mar 2017, a user could input her own linear combination of
+facets to produce a unique activity ranking.
+A brief instructional video was added to walk through
+the process of creating a custom linear combination
+and sharing it with friends.
+This website was and remains client-side only.
+There is no server component.
+No data were stored and
+we do not have access to the traffic logs.
+
+\subsection{Coding}
+
+\begin{figure}
+<<fig.height=4>>=
+load(paste0(RCPA_DIR, 'cluster.rda'))
+
+toLabel <- ss[ss >= 41]
+ldf <- data.frame(activity=names(toLabel), x=toLabel)
+ldf <- ldf[order(ldf$x),]
+ldf$y <- rev(seq(from=0,by=2,length.out = nrow(ldf)))
+ldf$y <- 5 + ldf$y - 10 * (ldf$y %/% 10)
+
+mdf <- NULL
+for (rx in 1:nrow(ldf)) {
+  x <- ldf[rx,'x']
+  y <- ldf[rx,'y']
+  mdf <- rbind(mdf, data.frame(x=c(x-3, x+3,x),
+                               y=c(y-.25,y-.25,y-.75),
+                               group=rx))
+}
+mdf$group <- factor(mdf$group)
+
+pdf <- NULL
+for (rx in 1:nrow(ldf)) {
+  x <- ldf[rx,'x']
+  y <- ldf[rx,'y']
+  pdf <- rbind(pdf, data.frame(x=x,xend=x,
+                               y=y-.75,yend=y-1))
+}
+
+ggplot(data.frame(ss=ss)) +
+  geom_histogram(aes(ss), binwidth=5) + xlab("sample size") +
+  geom_text(aes(x=x,y=y,label=activity), data=ldf, hjust='left', angle=60) +
+  geom_polygon(aes(x=x,y=y,group=group), data=mdf,
+               color="blue", fill='white', alpha=.5, size=.5) +
+  geom_segment(aes(x=x,y=y,xend=xend,yend=yend), data=pdf, size=.5,color="blue")
+
+@
+\caption{Sample size by activity.}
+\label{fig:activity-ss}
+\end{figure}
+
+<<>>=
+rcd <- loadWhitelistRawData(RCPA_DIR)
+ss <- calcSampleSize(rcd)
+
+martialArts <- sort(c('Tai chi',
+   'kickboxing',
+   'Muay Thai',
+   'Wushu',
+   'Karate',
+   'Judo',
+   'Taekwondo',
+   'Brazilian jiu-jitsu',
+   'wrestling'))
+@
+
+Participants submitted two activities using free-form input.
+This input was coded by the primary investigator
+mostly to match corresponding Wikipedia page titles.
+Specificity of activities were adjusted according to
+data availability.
+For example, ``swimming; butterfly'' could be coded
+as the more general category \emph{swimming} or as
+the more specific category \emph{butterfly stroke}.
+Since there was only one instance of ``butterfly,''
+this activity was coded as \emph{swimming}.
+Another example was ``running'' which was
+mentioned in \Sexpr{ss['running'] + ss['running on a treadmill']}
+comparisons.
+Due to ample data, \emph{running} was subdivided
+into \emph{running} ($n=\Sexpr{ss['running']}$)
+and \emph{running on a treadmill} ($n=\Sexpr{ss['running on a treadmill']}$).
+In some cases, we chose a more general
+category instead of discarding data.
+For example, a variety of martial arts were mentioned:
+\Sexpr{formatCharVector(martialArts)}.
+Unfortunately, none were mentioned more than a handful of times.
+Hence, all were coded as the more general
+category \emph{martial arts} ($n=\Sexpr{ss['martial arts']}$).
+While we suspect that there are important
+differences between these styles,
+sufficient data were not available to distinguish them.
+We do not claim that our coding choices were optimal.
+Alternate compromises seem plausible.
+Reanalysis and replication are welcome.
+The distribution of sample sizes is exhibited
+in Figure~\ref{fig:activity-ss}.
+
+\subsection{Posterior Predictive Checking}
+
+<<>>=
+load(paste0(RCPA_DIR, "thresholdCmp.rda"))
+oldDigits = getOption('digits')
+options(digits=2)
+@
+
+Model fit can be assessed with a posterior predictive check
+\parencite[Section 6.3]{gelman2013}.
+We compare the multinomial distributions of pairs of activities.
+For example, we can examine the pair \Sexpr{ppcDemoPair} on Item \emph{\Sexpr{ppcDemoFacet}},
+\begin{align}
+\text{observed data} &=
+<<results='asis'>>=
+printLatexMatrix(t(ppcDemoData$obs))
+@ 
+\\
+\text{model expected} &=
+<<results='asis'>>=
+printLatexMatrix(t(ppcDemoData$ex))
+@ 
+\\
+&\chi^2(3, \Sexpr{sum(ppcDemoData$obs)}) = \sum_i \frac{(o_i - e_i)^2}{e_i} =
+\Sexpr{ppcDemoData$stat}, p=\Sexpr{ppcDemoData$pval}.
+\end{align}
+A small $p$-value rejects the test of good fit.
+However, in our data, sample size is a problem.
+
+Textbooks often recommend that no more than 20\% of the events have expected frequencies less than 5.
+However, if we require a sample size of \Sexpr{ppcSampleSizeThreshold} or more than
+only \Sexpr{numPpcTests(rcd)} pairs out of \Sexpr{totalNumPairs(rcd)} are available to evaluate.
+The distribution of $p$-values should be uniform under the null hypothesis,
+but the test may be miscalibrated due to small sample sizes.
+To obtain a more accurate test, we can compare with simulated data.
+The distribution of $p$-values from simulated data
+provide a more accurate null distribution for comparison.
+
+<<>>=
+options(digits=oldDigits)
+@
+
+\section{Results}
+
+We fit a saturated model to examine the correlation structure between items.
+Poorly performing items were excluded.
+We then compared a common threshold model with per-item thresholds.
+Once our final model was selected then we reported
+fit statistics and posterior summaries of parameters.
+Due to our use of unusual models,
+we provide extra technical detail.
+
+Let $i$ index participants from 1 to $I$,
+$j$ index items from 1 to $J$,
+and $k$ index activities from 1 to $K$.
+Let $y_{ij}|k_a,k_b$ indicate
+person $i$'s response on item $j$ when
+comparing activities $k_a$ and $k_b$.
+Let $\tau_1$ and $\tau_2$ be category thresholds.
+Let $\theta_{jk}$ be activity $k$'s latent score on item $j$.
+Let $\sigma_j$ be the standard deviation for item $j$.
+
+Using $\Sigma_{j \times j}$ as the lower Chokesky factor of the item
+correlation matrix, the saturated model is,
+\begin{align}
+\Sigma &\sim \text{lkj}(2) \\
+\log\sigma &\sim \N(0,1) \label{eqn:standard-sd} \\
+\theta &\sim \sigma \cdot \Sigma \ \N(0, 1) \label{eqn:saturated} \\
+\tau_1, \tau_2 &\sim \N(0,5) \label{eqn:thresholds} \\
+\logit\left[\Pr(y_{ij}|k_a,k_b)\right] &= \alpha (\theta_{k_a} - \theta_{k_b}) + f(y_{ij}) \label{eqn:indicator}\\
+\text{where }\alpha &\equiv (\bar\sigma^2)^3 \label{eqn:slope} \\
+\text{and } f(r) &\equiv \begin{cases} 
+      -(\tau_1 + \tau_2) & r=\text{much more} \\
+      -\tau_1 & r=\text{somewhat more} \\
+      0 & r=\text{equal} \\
+      \tau_1 & r=\text{somewhat less} \\
+      (\tau_1 + \tau_2) & r=\text{much less} \\
+   \end{cases}. \label{eqn:compare}
+\end{align}
+This can be regarded as a structural equation model with logistic indicators.
+Latent scores $\theta$ were associated with the covariance matrix assembled
+from $\sigma$ and $\Sigma$ (Equation~\ref{eqn:saturated})
+using a non-centered parameterization \parencite[Section 28.6]{stan2.17}.
+Instead of a single $\theta$ \parencite[as in, e.g.,][]{birnbaum1968},
+our logistic used the difference between the latent scores
+of two activities (Equation~\ref{eqn:indicator}).
+In a preprocessing step (refer to \texttt{genCloud} in the online supplement),
+activities were sorted to ensure that the
+comparison in Equation~\ref{eqn:compare} was in the correct direction.
+
+In contrast to typical item response models \parencite[e.g.,][Chapter 6]{baker2004},
+placing a prior on the variance with a mode of 1.0 (Equation~\ref{eqn:standard-sd}) is not sufficient
+to ensure that latent scores $\theta$ tend to approach this mode.
+The logistic discrimination parameter $\alpha$ dominates other
+influences over the variance of $\theta$.
+Specifically, for a given $\alpha$,
+the variance of $\theta$ is determined by two factors:
+measurement error and transitive relations between activities.
+For example, latent scores for the set of activities $\{A,B,C,D\}$ will be spread out roughly
+twice as much if $A < B < C < D$ in comparison with $A = B < C = D$.
+A priori, there is no sensible way to set $\alpha$ or
+provide a prior because we have no knowledge of
+the distribution of latent score differences.
+To force item standard deviations $\hat\sigma$ close to 1.0,
+the slope of the logistic $\alpha$ was set to
+the mean of $\hat\sigma^2$ raised to the third power (Equation~\ref{eqn:slope}).
+This created a feedback loop to nudge $\alpha$ in the direction
+that would produce more standardized item variances.
+There is no strong reason not to use other exponents,
+but the third power seemed to provide a reasonable correction.
+
+\begin{figure}
+<<fig.height=4>>=
+load(paste0(RCPA_DIR, 'cluster.rda'))
+
+qgraph(tc, layout = "spring", graph = "cor", labels=colnames(tc),
+       legend.cex = 0.3,
+       cut = 0.3, maximum = 1, minimum = 0, esize = 20,
+       vsize = 7, repulsion = 0.8, negDashed=TRUE)
+
+@ 
+\caption{Visualization of item correlation matrix.
+Positive correlations are green and solid. Negative correlations are red and dashed.
+Edge thickness is determined by absolute correlation magnitude.
+Central items are connected to neighbors by larger absolute correlations
+than peripheral items.}
+\label{fig:item-correlation}
+\end{figure}
+
+The posterior was sampled using RStan~2.17 \parencite{rstan2.17}.
+No convergence warnings were observed and all
+potential scale reduction statistics $\hat R$ were well
+below 1.1 \parencite[Section 11.4]{gelman2013}.
+Often the goal of factor analysis is to determine
+how many latent factors are measured by a set of items \parencite[e.g.,][]{golino2017}.
+Here we assume that there is one latent factor, flow,
+and exclude items with weak loadings or items that obtain the wrong sign.
+
+Item correlations are exhibited in Figure~\ref{fig:item-correlation}.
+Items \emph{goal}, \emph{feedback}, and \emph{spont} were weakly connected and were excluded.
+Since Item \emph{control} positively correlated with Item \emph{predict},
+one of these items had to go.
+We chose to exclude Item \emph{control} since it was more peripheral
+and Item \emph{predict} more central.
+If Item \emph{evaluated} is included as an indicator then it obtains a
+positive loading as suggested by its positive correlation with Item
+\emph{stakes}. This is inconsistent with theory so Item
+\emph{evaluated} was excluded.
+Similarly, we excluded Item \emph{waiting} since it
+would obtain a positive loading, also inconsistent with theory.
+
+<<>>=
+rcd <- loadSingleFactorData(RCPA_DIR)
+finalNumIndicators <- length(extractFacetNames(rcd))
+load(paste0(RCPA_DIR, "thresholdCmp.rda"))
+@ 
+
+\begin{figure}
+<<thresholds, fig.height=3, warning=FALSE>>=
+ggplot(df, aes(sample=pvalue, color=model)) +
+  stat_qq(distribution=stats::qunif, size=.25) + coord_fixed() +
+  xlim(0,.5) + ylim(0,.5)
+@ 
+\caption{Quantile-quantile plot of $p$-values conditional
+  on whether thresholds are common or per-item.
+The downward bulge relative to the simulated distribution
+indicates more rejections of good fit than expected.}
+\label{fig:thresholds}
+\end{figure}
+
+With \Sexpr{finalNumIndicators} indicators selected,
+we turn our attention to response curve thresholds.
+We assumed common threshold for all items (Equation~\ref{eqn:thresholds}).
+Another option is to allow per-item thresholds.
+A difference in expected predictive accuracy of \Sexpr{looCmp[1]}
+($SE=\Sexpr{looCmp[2]}$) favored per-items thresholds.
+However, the posterior predictive check $p$-value distribution improved
+little (Figure~\ref{fig:thresholds}).
+Hence, we decided to retain the simpler common threshold model.
+
+<<>>=
+load(paste0(RCPA_DIR, "factorCmp.rda"))
+oldDigits <- getOption('digits')
+options(digits=0)
+@
+
+\begin{figure}
+\begin{center}
+\begin{tikzpicture}[
+model/.style={rectangle, draw=red!80, fill=red!5, very thick, minimum size=5mm},
+]
+%Nodes
+\node[model]      (ind)                              {Independence};
+\node[model]        (factor)       [below=of ind] {Factor};
+\node[model]      (saturated)       [below=of factor] {Saturated};
+
+\node[right=40pt](indIc) at
+  (ind){looic \Sexpr{ind_loo$looic} ($SE=\Sexpr{ind_loo$se_looic}$)};
+\node[right=40pt](factorIc) at
+  (factor){looic \Sexpr{fac_loo$looic} ($SE=\Sexpr{fac_loo$se_looic}$)};
+\node[right=40pt](satIc) at
+  (saturated){looic \Sexpr{sat_loo$looic} ($SE=\Sexpr{sat_loo$se_looic}$)};
+
+%Lines
+\draw[-] (ind.south) -- (factor.north)
+  node[midway, right=15pt]{elpd\_diff \Sexpr{indVsFac[1]} ($SE=\Sexpr{indVsFac[2]}$)};
+\draw[-] (factor.south) -- (saturated.north)
+  node[midway, right=15pt]{elpd\_diff \Sexpr{-satVsFac[1]} ($SE=\Sexpr{satVsFac[2]}$)};
+
+\end{tikzpicture}
+\end{center}
+<<>>=
+options(digits=oldDigits)
+@
+
+\caption{Model fitness and their relationship to each other.
+The looic statistic is similar in interpretation to AIC \parencite[lower is better;][]{vehtari2017}.
+Hence, models with more parameters are favored.
+However, the factor model is closer to the saturated model than the independence model
+with a Z score difference of only
+$\frac{\Sexpr{-satVsFac[1]}}{\Sexpr{satVsFac[2]}} = \Sexpr{-satVsFac[1]/satVsFac[2]}$
+compared with a Z score difference to the independence model of
+$\frac{\Sexpr{indVsFac[1]}}{\Sexpr{indVsFac[2]}} = \Sexpr{indVsFac[1]/indVsFac[2]}$.}
+\label{fig:model-fitness}
+\end{figure}
+
+To obtain our factor model, we introduced $\lambda_j$ factor
+loading of item $j$ and $\pi_k$ latent flow score of activity $k$.
+Instead of Equation~\ref{eqn:saturated}, we used
+\begin{align}
+\theta_{kj} &\sim \sigma_j \cdot \N(\pi_k \lambda_j, 1).
+\end{align}
+To better inform about model fit,
+we also esimated an independence and saturated model on the same data.
+Again, no convergence warnings were observed and all potential scale
+reduction statistics $\hat R$ were well below 1.1.
+The factor model is shown to have reasonable fit in Figure~\ref{fig:model-fitness}.
+In addition to overall model fit,
+leave-one-out cross-validation also identified \Sexpr{nrow(outliers)} potential outliers.
+However, none were concerning.
+All potential outliers involved
+activities with a sample size of \Sexpr{max(pmin(outliers$pa1ss, outliers$pa2ss))} or less.
+
+\begin{figure}
+<<fig.height=3>>=
+load(paste0(RCPA_DIR, "threshplot.rda"))
+
+draw <- function(alpha, th) {
+  tdiff <- seq(-2.5/alpha, 2.5/alpha, .05/alpha)
+  gr <- expand.grid(tdiff=tdiff, category=c("much more","somewhat more", 'equal',
+    "somewhat less", "much less"), p=NA)
+  gg <- matrix(c(0,
+    -(th[1] + th[2]),
+    -th[1],
+    th[1],
+    th[1] + th[2]), ncol=5, nrow=length(tdiff), byrow=TRUE)
+  gg[,2:5] <- (gg[,2:5] + alpha * tdiff)
+  gg <- t(apply(gg, 1, cumsum))
+  gg <- t(apply(gg, 1, softmax))
+  for (lev in 1:length(levels(gr$category))) {
+    gr[gr$category == levels(gr$category)[lev],'p'] <- gg[,lev]
+  }
+  geom_line(data=gr, aes(x=tdiff,y=p,color=category,linetype=category), alpha=.1)
+}
+
+pl <- ggplot() + xlab("difference in latent ranking (logits)") + ylab("probability") + ylim(0,1)
+for (cx in 1:25) {
+  pl <- pl + draw(item25$alpha[cx], c(item25$th1[cx], item25$th2[cx]))
+}
+print(pl)
+@ 
+\caption{Posterior distribution of category response curve for
+  all items.
+  Posterior means for logistic discrimination $\alpha$ and
+thresholds $\tau_1, \tau_2$ were $\Sexpr{th.summary['threshold1','mean']}$,
+$\Sexpr{th.summary['threshold2','mean']}$,
+and $\Sexpr{alpha.summary[,'mean']}$, respectively.}
+\label{fig:response-curve}
+\end{figure}
+
+\begin{figure}
+<<fig.height=3>>=
+load(paste0(RCPA_DIR, "genFlowData.rda"))
+
+mdf <- data.frame(facet=ordered(rownames(loadings)), x=loadings[,'mean'])
+rdf <- melt(rawLoadings)
+sdf <- data.frame(facet=ordered(rownames(loadings)), x=loadings[,'2.5%'], xend=loadings[,'97.5%'])
+
+ggplot() +   geom_vline(xintercept=0, color="green") +
+  geom_jitter(data=rdf, aes(value, facet), height = 0.35, alpha=.05) +
+  geom_segment(data=sdf, aes(y=facet, yend=facet, x=x, xend=xend),
+               color="red", alpha=.5, size=2) +
+  geom_point(data=mdf, aes(x, facet), color="white", size=1) +
+  theme(axis.title.y=element_blank())
+
+@ 
+\caption{Posterior means and distributions of factor loadings.
+The red stripe highlights the 95\% credible interval.}
+\label{fig:loadings}
+\end{figure}
+
+\begin{figure}
+<<fig.height=9>>=
+
+mdf <- data.frame(facet=ordered(rownames(flow)), x=-flow[,'mean'])
+rdf <- melt(rawFlow)
+rdf$value <- -rdf$value
+sdf <- data.frame(facet=ordered(rownames(flow)), x=-flow[,'2.5%'], xend=-flow[,'97.5%'])
+
+ggplot() +
+  geom_jitter(data=rdf, aes(value, facet), height = 0.35, alpha=.05, size=.5) +
+  geom_segment(data=sdf, aes(y=facet, yend=facet, x=x, xend=xend),
+               color="red", alpha=.5, size=1) +
+  geom_point(data=mdf, aes(x, facet), color="white", size=1) +
+  ylab("physical activity") + xlab("latent flow score")
+
+@ 
+\caption{Posterior means and distributions of latent flow scores.
+The red stripe highlights the 95\% credible interval.}
+\label{fig:activities}
+\end{figure}
+
+<<itemInfo, results="asis">>=
+
+str <- kable(itemInfo,  booktabs=T, escape=FALSE, linesep = "",
+  caption="Item Diagnostics",
+  row.names=TRUE) %>% kable_styling() %>%
+    add_footnote(escape=FALSE, threeparttable=TRUE,
+                 paste(
+        "\\emph{Note.}",
+        'It does not seem possible to completely disentangle latent score $\\hat\\theta_j$',
+        'variance and measurement error, however, we can make some tentative observations.',
+        "When item $j$'s standard deviation $\\hat\\sigma_j$ is large then",
+        "latent scores $\\hat\\theta_j$ are probably more disbursed,",
+        'differences between pairs of $\\hat\\theta_j$ are larger,',
+        'and this implies a more discriminating logistic curve which',
+        'we can regard as less measurement error.',
+        'However, the spread of latent scores $\\hat\\theta_j$ is also important.',
+        'Although Item \\emph{complex} was relatively difficult to measure,',
+        'the activites spread out over a relatively large space due',
+        'to transitive relations like $A < B < C$ and this',
+        'item obtained the largest absolute factor loading $\\hat\\lambda_j$.'))
+
+gsub('\\item [a]','', str, fixed=TRUE)
+
+@ 
+
+If our model is similar to the true model
+then simulation suggested that posterior means of
+recovered parameters would correlate at around $.8$
+with true parameters given the sample size
+and structure of the data collected (see \texttt{sim5.R}
+and \texttt{checkSim.R} from the online supplement).
+The category response curve is exhibited in Figure~\ref{fig:response-curve}.
+Flow loadings and latent flow scores are exhibited
+in Figures~\ref{fig:loadings} and \ref{fig:activities}, respectively.
+Finally, we look at some item diagnostics in Table~\ref{tab:itemInfo}.
+
+\section{Discussion}
+
+
+(Item waiting) Perhaps this is due to high flow activities like
+downhill skiing that involve a lot of time waiting on the lift to get
+back up the hill.
+
+% move to present tense here and for conclusion
+
+walking vs hiking -- Children with attention deficits concentrate better after walk in the park
+
+running is not very conducive to flow but there is a book on it \parencite{csikszentmihalyi2017}
+
+Only two participants compared \emph{sex} with other activities.
+More research could be done here.
+Even limited to straight, heterosexual sex,
+the male and female point-of-view seem likely to differ \parencite[e.g.,][]{wilson1987}.
+In addition, a comparison with orgasmic meditation,
+a practice that deliberately incorporates contemplative
+components that may support flow \parencite{daedone2011,losada2017},
+would be fascinating.
+
+Implications for flow training: You don't need to train on the facets
+that you get automatically from selecting a conducive activity.  But
+everybody needs to train on X, Y, Z. Talk about connection to
+meditation. [TODO]
+
+Specification of activities as free-form input
+was expedient but disadvantageous in some ways.
+
+Sample sizes between pairs of activities were
+highly skewed (see Figure~\ref{fig:activity-ss}).
+For example, there were 124 comparisons between \emph{running} and
+\emph{weightlifting}.
+A smarter data collecting website could steer participants
+away from pairs of activities that already have a lot of data.
+
+For activities that take place in a group context,
+it would be interesting to investigate items based on social flow
+triggers \parencite[e.g.,][]{sawyer2007}.
+
+People with a disability that adversely affects their ability TODO
+
+Investigate specific martial arts styles
+
+\printbibliography
+
+\appendix
+
+\section{Questionnaire}\label{app:questionnaire}
+
+For two activities, we asked for a short 1-2 word
+name and a clear description, both free-form text.
+The short 1-2 word names were substituted into Q6
+and Q9 placeholders, respectively.
+Exact replicas of the survey
+are available in the online supplement. Here we
+exhibit the items included in the main analyses
+labeled at the beginning
+with the short name that is used in the text as a
+succinct reference.
+\begin{singlespace}
+\noindent\emph{skill.} How much skill is required?
+\begin{itemize}
+\item {{Q9}} requires much more skill than {{Q6}}.
+\item {{Q9}} requires somewhat more skill than {{Q6}}.
+\item Both require roughly equal skill.
+\item {{Q6}} requires somewhat more skill than {{Q9}}.
+\item {{Q6}} requires much more skill than {{Q9}}.
+\end{itemize}
+\emph{predict.} How predictable is the action?
+\begin{itemize}
+\item {{Q6}} is much more predictable than {{Q9}}.
+\item {{Q6}} is somewhat more predictable than {{Q9}}.
+\item Both offer roughly equal predictability.
+\item {{Q9}} is somewhat more predictable than {{Q6}}.
+\item {{Q9}} is much more predictable than {{Q6}}.
+\end{itemize}
+\emph{novelty.} To what extent do you find new and fresh experiences during the activity?
+\begin{itemize}
+\item {{Q9}} offers a much more novelty than {{Q6}}.
+\item {{Q9}} offers a somewhat more novelty than {{Q6}}.
+\item Both offer roughly equal novelty.
+\item {{Q6}} offers a somewhat more novelty than {{Q9}}.
+\item {{Q6}} offers a much more novelty than {{Q9}}.
+\end{itemize}
+\emph{creative.} To what extent are there opportunities to express creativity during the activity?
+\begin{itemize}
+\item {{Q6}} admits much more creativity than {{Q9}}.
+\item {{Q6}} admits somewhat more creativity than {{Q9}}.
+\item Both admit roughly the same amount of creativity.
+\item {{Q9}} admits somewhat more creativity than {{Q6}}.
+\item {{Q9}} admits much more creativity than {{Q6}}.
+\end{itemize}
+\emph{complex.} How complex is the action and the environment in which it takes place?
+\begin{itemize}
+\item {{Q9}} is much more complex than {{Q6}}.
+\item {{Q9}} is somewhat more complex than {{Q6}}.
+\item Both are of roughly equal complexity.
+\item {{Q6}} is somewhat more complex than {{Q9}}.
+\item {{Q6}} is much more complex than {{Q9}}.
+\end{itemize}
+\emph{goal.} How clear and straightforward are the short-term, moment-to-moment goals?
+\begin{itemize}
+\item {{Q6}} has much more clear goals than {{Q9}}.
+\item {{Q6}} has somewhat more clear goals than {{Q9}}.
+\item Both have equally clear goals.
+\item {{Q9}} has somewhat more clear goals than {{Q6}}.
+\item {{Q9}} has much more clear goals than {{Q6}}.
+\end{itemize}
+\emph{feedback.} How quickly do you know whether what you wanted to accomplish in the short term was successful?
+\begin{itemize}
+\item {{Q9}} has much more immediate feedback than {{Q6}}.
+\item {{Q9}} has somewhat more immediate feedback than {{Q6}}.
+\item Both offer roughly equally immediate feedback.
+\item {{Q6}} has somewhat more immediate feedback than {{Q9}}.
+\item {{Q6}} has much more immediate feedback than {{Q9}}.
+\end{itemize}
+\emph{chatter.} Does your extraneous mental chatter temporarily shut down during the activity?
+\begin{itemize}
+\item {{Q6}} turns off my mental chatter much more than {{Q9}}.
+\item {{Q6}} turns off my mental chatter somewhat more than {{Q9}}.
+\item Both turn off my mental chatter to a roughly equal extent.
+\item {{Q9}} turns off my mental chatter somewhat more than {{Q6}}.
+\item {{Q9}} turns off my mental chatter much more than {{Q6}}.
+\end{itemize}
+\emph{waiting.} How much time do you feel like is spent waiting for the next step in the activity?
+\begin{itemize}
+\item {{ Q9 }} involves a lot more waiting than {{ Q6 }}.
+\item {{ Q9}} involves a somewhat more waiting than {{ Q6}}.
+\item Both involve about the same amount of waiting.
+\item {{ Q6 }} involves a somewhat more waiting than {{ Q9}}.
+\item {{ Q6 }} involves a lot more waiting than {{ Q9}}
+\end{itemize}
+\emph{body.} How much of your body is involved in the activity? Is it full-body or only part of your body?
+\begin{itemize}
+\item {{Q6}} involves much more of my body than {{Q9}}.
+\item {{Q6}} involves somewhat more of my body than {{Q9}}.
+\item Both involve my body to a roughly equal extent.
+\item {{Q9}} involves somewhat more of my body than {{Q6}}.
+\item {{Q9}} involves much more of my body than {{Q6}}.
+\end{itemize}
+\emph{control.} How much control do you feel like you can exert over your performance?
+\begin{itemize}
+\item {{Q9}} permits much more control than {{Q6}}.
+\item {{Q9}} permits somewhat more control than {{Q6}}.
+\item Both admit roughly equal control.
+\item {{Q6}} permits somewhat more control than {{Q9}}.
+\item {{Q6}} permits much more control than {{Q9}}.
+\end{itemize}
+\emph{present.} During the activity, to what extent do you feel like you are in the present moment?
+\begin{itemize}
+\item {{Q6}} brings me into the present much more than {{Q9}}.
+\item {{Q6}} brings me into the present somewhat more than {{Q9}}.
+\item Both bring me into the present to a roughly equal extent.
+\item {{Q9}} brings me into the present somewhat more than {{Q6}}.
+\item {{Q9}} brings me into the present much more than {{Q6}}.
+\end{itemize}
+\emph{spont.} How spontaneous is your action?
+\begin{itemize}
+\item {{Q9}} feels effortless compare to {{Q6}} where I have to struggle and force myself.
+\item {{Q9}} feels like less effort than {{Q6}}.
+\item Both require about the same extent of effort (both either effortless or effortful).
+\item {{Q6}} feels like less effort than {{Q9}}.
+\item {{Q6}} feels effortless compare to {{Q9}} where I have to struggle and force myself.
+\end{itemize}
+\emph{stakes.} During the activity, how important does the activity feel?
+\begin{itemize}
+\item {{Q6}} has much higher stakes than {{Q9}}.
+\item {{Q6}} has somewhat higher stakes than {{Q9}}.
+\item Both have roughly equal stakes.
+\item {{Q9}} has somewhat higher stakes than {{Q6}}.
+\item {{Q9}} has much higher stakes than {{Q6}}.
+\end{itemize}
+\emph{evaluated.} To what extent do you care about how others judge your performance?
+\begin{itemize}
+\item During {{Q9}}, I am much more concerned about others' evaluations than during {{Q6}}.
+\item During {{Q9}}, I am somewhat more concerned about others' evaluations than during {{Q6}}.
+\item During both {{Q9}} and {{Q6}}, I have roughly equal concern about others' evaluations.
+\item During {{Q6}}, I am somewhat more concerned about others' evaluations than during {{Q9}}.
+\item During {{Q6}}, I am much more concerned about others' evaluations than during {{Q9}}.
+\end{itemize}
+\emph{reward.} After engaging in the physical activity, to what extent do you feel great?
+\begin{itemize}
+\item {{Q6}} is much more rewarding than {{Q9}}.
+\item {{Q6}} is somewhat more rewarding than {{Q9}}.
+\item Both are roughly equally rewarding.
+\item {{Q9}} is somewhat more rewarding than {{Q6}}.
+\item {{Q9}} is much more rewarding than {{Q6}}.
+\end{itemize}
+\end{singlespace}
+
+\section{Unused and Discarded Items}\label{app:bad-items}
+
+A few more questions were asked about each activity.
+We asked, ``do you engage with a group or go it solo?''
+We also asked, ``how expert are you,'' with response choices
+\emph{beginner}, \emph{competent amateur},
+and \emph{expert or professional}.
+The motivation for both of these items was to
+subdivide activites into more specific categories.
+For example, solo cycling might be substantially
+different from a group spinning class with
+many people riding stationary bikes together.
+A larger sample would be needed to explore
+these fine distinctions.
+
+In an effort to clarify our interest in
+short-term goals and immediate feedback,
+we prefaced our goal and feedback items with
+a short introduction,
+``Goals can be organized by time scale. Here we distinguish immediate and longer term goals,''
+and two items that asked about long-term goals
+and long-term feedback.
+We felt that these long-term items were not likely correlates of flow
+and did not include them in the analyses.
+The purpose of these items was merely to help
+guide participants to a better understanding
+of our short-term goal and immediate feedback items.
+
+A potential criticism our of model is that it might give top flow
+rankings to extremely dangerous activities such as wingsuit flying and
+breath-hold diving.
+As an attempt to incorporate risk of injury into our model,
+we included two items that asked about the relative risk
+of minor and serious injury.
+As data were collected, two problems became apparent with
+this approach.
+Firstly, there was not an obvious way to incorporate these
+items into the model.
+Risk of injury was positively correlated with Item \emph{stakes}.
+Secondly, expert opinions and accident prevalence statistics are
+likely a more accurate source of information than our convenience sample.
+For example, the risk of concussion in football, ice hockey, and
+soccer are high enough that these games might be discontinued or
+modified to reduce the risk of injury \parencite{hootman2007,michelle2014}.
+However, the continued popularity of youth leagues
+demonstrates that awareness of the risk remains dim among non-experts.
+
+\end{document} 
