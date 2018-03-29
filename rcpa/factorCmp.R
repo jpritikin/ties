@@ -26,11 +26,12 @@ print(lookupContextByDatumIndex(rcd, pareto_k_ids(ind_loo)))
 print(sat_loo)
 print(lookupContextByDatumIndex(rcd, pareto_k_ids(sat_loo)))
 print(fac_loo)
-print(lookupContextByDatumIndex(rcd, pareto_k_ids(fac_loo)))
+outliers <- lookupContextByDatumIndex(rcd, pareto_k_ids(fac_loo))
+print(outliers)
 
 indVsFac <- compare(ind_loo, fac_loo)
 satVsFac <- compare(sat_loo, fac_loo)
 
-save(ind_loo, sat_loo, fac_loo, indVsFac, satVsFac, file="factorCmp.rda")
+save(ind_loo, sat_loo, fac_loo, indVsFac, satVsFac, outliers, file="factorCmp.rda")
 
 #plotByFacet(fit2t5, rcd)

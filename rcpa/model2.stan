@@ -2,13 +2,13 @@
 functions {
   vector cmp_probs(real alpha, real pa1, real pa2, real thr1, real thr2) {
     vector[5] unsummed;
-    real paDiff = (pa1 - pa2);
+    real paDiff = alpha * (pa1 - pa2);
     unsummed[1] = 0;
     unsummed[2] = paDiff - (thr1 + thr2);
     unsummed[3] = paDiff - thr1;
     unsummed[4] = paDiff + thr1;
     unsummed[5] = paDiff + thr1 + thr2;
-    return cumulative_sum(alpha * unsummed);
+    return cumulative_sum(unsummed);
   }
 }
 data {
@@ -39,7 +39,7 @@ parameters {
   cholesky_factor_corr[NFACETS] thetaCorChol;
 }
 transformed parameters {
-  real alpha = mean(sigma)/1.4;
+  real alpha = mean(sigma .* sigma)^3.0;
   // non-centered parameterization due to thin data
   matrix[NPA,NFACETS]     theta;    // latent score of PA by facet
   for (pa in 1:NPA) {

@@ -30,9 +30,9 @@ colnames(theta) <- facetNames
 rownames(theta) <- palist
 
 cmp_probs <- function(alpha, pa1, pa2, thr1, thr2) {
-  diff = pa1 - pa2;
+  diff = alpha * (pa1 - pa2);
   unsummed <- c(0, diff - (thr1+thr2), diff - thr1, diff + thr1, diff + (thr1+thr2))
-  cumsum(alpha * unsummed)
+  cumsum(unsummed)
 }
 
 for (rx in 1:nrow(rcd)) {

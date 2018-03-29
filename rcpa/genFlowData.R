@@ -13,14 +13,11 @@ names(dimnames(rawLoadings)) <- c('iteration', 'facet')
 
 palist <- extractPalist(rcd)
 
-minSampleSize <- 10
-
 flow <- summary(fit2t5, pars=c("flow"), probs=c(.025,.975))$summary
 rownames(flow) <- palist
 flow <- cbind(flow, ss=calcSampleSize(rcd))
 flow <- cbind(flow, index=1:nrow(flow))
 flow <- flow[order(flow[,'mean']),]
-flow <- flow[flow[,'ss'] > minSampleSize,]
 
 rawFlow <- sapply(extract(fit2t5, pars=paste0('flow[', flow[,'index'], ']')), function(x) c(x))
 colnames(rawFlow) <- rownames(flow)
@@ -29,7 +26,20 @@ names(dimnames(rawFlow)) <- c('iteration', 'facet')
 rawLoadings <- rawLoadings[1:500,]
 rawFlow <- rawFlow[1:500,]
 
-save(loadings, rawLoadings, flow, rawFlow, minSampleSize, file="genFlowData.rda")
+df <- summary(fit2t5, pars=c("sigma"), probs=c())$summary
+sigma <- df[,'mean']
+
+df <- summary(fit2t5, pars=c("theta"), probs=c())$summary
+tar <- array(df[,'mean'], dim=c(length(facetNames), length(palist)))
+dimnames(tar) <- list(facetNames, palist)
+  
+itemInfo <- data.frame('$\\hat\\sigma_j$'=c(sigma),
+  '$\\max(\\hat\\theta_j)-\\min(\\hat\\theta_j)$'=c(diff(apply(tar, 1, range))),
+  '$\\hat\\lambda_j$'=c(loadings[,'mean']),
+  row.names=facetNames, check.names=FALSE)
+itemInfo <- itemInfo[order(-itemInfo[,2]),]
+
+save(itemInfo, loadings, rawLoadings, flow, rawFlow, file="genFlowData.rda")
 
 q()
 
