@@ -193,12 +193,12 @@ formatCharVector <- function(name) {  # based on omxQuotes
 
 \section{Introduction}
 
-Optimal experience is a state in which an individual is completely
+``Flow is a state in which an individual is completely
 immersed in an activity without reflective self-consciousness but with
-a deep sense of control \parencite{csikszentmihaly1975}. % TODO better cite? is this a verbatim quote?
-Optimal experience
-has been vigorously studied from psychological, physiological,
-and neuroimaging standpoints \parencite[personal factors; e.g.,][]{jackson1998,demanzano2010,limb2008}.
+a deep sense of control'' \parencite[p.~1]{engeser2012}.
+Since its formal identification in the 1970s, personal factors of optimal experience
+have been vigorously studied from psychological, physiological,
+and neuroimaging standpoints \parencite[e.g.,][]{jackson1998,demanzano2010,limb2008}.
 In contrast, situation factors have received comparatively little attention.
 For example, one ecological momentary assessment study recoded hundreds
 of colorful activity descriptions into
@@ -206,6 +206,7 @@ only six general categories \parencite{schmidt2014}.
 We do not challenge the importance of personal factors.
 However, it seems doubtful that situational factors are of importance
 commensurate with the modest amount of research that has examined them.
+
 Growing interest in flow training
 \parencite[e.g.,][]{csikszentmihalyi2017,kotler2017}, a type of training that promises
 to increase the frequency and depth of flow experience, reinforces
@@ -224,25 +225,47 @@ information to guide their choice of an activity
 or some data about which activities are particularly conducive to flow,
 could be of interest.
 
-free-form input -- lots of missing data -- Bayesian
+There are about 8,000 sports \parencite{liponski2003} and physical
+activities are a superset of that.
+Even if we restrict our interest to the 400 most popular
+physical activities,
+it would be impractical to expect each participant to
+assign a score to 400 activities,
+many of which she may not have tried.
+A better approach is to regard our problem as similar to
+the problem of ranking a large number of Chess players.
+There are methods available to obtain a global ranking based on a
+limited number of pairwise comparisons \parencite[e.g.,][]{bradley1952}.
+Hence, we decided to invite participants to select two
+physical activities using free-form input and then compare them.
+Given that many activities might only be mentioned a few times,
+we anticipated challenges with missing data and small samples.
+Bayesian methods are particularly suitable for this situation
+because the prior density can pick up the slack when data
+are not available.
+Parameters can be estimated in a generative
+Bayesian model \parencite[i.e., with a proper prior;][p.~52]{gelman2013}
+even with no data.
 
-flow triggers, hypothesized antecedents of flow (can omit?)
-
-Additional flow antecedents associated with a group context
+Self-report instruments for flow have been developed \parencite{moneta2012}.
+We decided to adapt items from the Flow State Scale-2 and Dispositional Flow Scale-2
+measures \parencite[hereafter abbreviated FS2;][]{jackson2002}.
+The FS2 contains item content well suited to a brief, cross-sectional survey.
+Supplemental flow antecedents dependent on a group context
 have been proposed \parencite{sawyer2007}.
-Items based on these triggers were not included
-because they would only be applicable to some physical activities.
+For example, the notion of \emph{equal participation}
+suggests that flow will be hindered if there are
+conspicuous inequalities among the group.
+We decided not to pursue these additional antecedents
+because of applicability to only a subset activities,
+and we did not want to limit participants' free-form choice.
 
+Our hypothesis is that physical activities differ by how conducive
+they are to flow.
+However, it may more accurate to regard this study
+as exploratory, with the goal of generating many hypotheses.
 Complete source code for data preprocessing and analysis is
 available from TODO.
-
-\parencite{bradley1952} exploratory factor model -- novel, unaware of prior work
-
-growth mindset applied to self control
-
-Flow Scales-2 \parencite{jackson2002}
-
-Survey of measurement instruments \parencite{moneta2012}
 
 \section{Method}
 
@@ -260,7 +283,7 @@ As the derivation of our items are discussed,
 refer to Appendix~\ref{app:questionnaire} for the exact wording.
 
 One important antecedent of flow is the perceived
-fit of a subject's skill to activity demands \parencite{csikszentmihaly1975,keller2012}.
+fit of a subject's skill to activity demands \parencite{keller2012}.
 For example, anxiety may result when activity demands exceed skills
 and boredom may result when skills exceed demands.
 However, perceived fit cannot be assessed in the present study
@@ -268,7 +291,7 @@ because subjects' skills are averaged.
 Hence, we assume roughly satisfactory perceived fit because
 the experience of anxiety or boredom is generally uncomfortable
 and subjects were asked to report on voluntarily chosen activities.
-We do not, however, assume that all activities offer
+We do not, however, need to assume that all activities offer
 equal potential for perceived fit.
 
 Four items assessed potential activity demands.
@@ -291,7 +314,7 @@ in a straightforward way.
 Item \emph{evaluated} assessed the relative type of motivation,
 whether extrinsic or autotelic \parencite{csikszentmihalyi1999}.
 Note that this construct was labeled as ``loss of self consciousness''
-in Flow Scales-2 \parencite{jackson2002}.
+in FS2.
 Recently, some environmental correlates of flow have been proposed \parencite{kotler2014}.
 Items \emph{complex} and \emph{body} assessed relative complexity of
 the activity and environment, and the extent of bodily involvement, respectively.
@@ -315,7 +338,7 @@ of physical effort \parencite{dietrich2004}.
 Items \emph{chatter}, \emph{present}, and \emph{spont}
 assessed these aspects of phenomenology, respectively.
 Our phenomenology items correspond with the ``merging'' 
-factor in Flow Scales-2 \parencite{jackson2002}.
+factor in FS2.
 
 Although loading weakly in a factor analysis \parencite{jackson2002},
 time distortion is another putative phenomenological aspect of flow.
@@ -338,8 +361,7 @@ We expected that waiting would negatively correlate with flow.
 
 Item \emph{reward} assessed the relative degree of positive
 affect after engaging in an activity.
-This item corresponds to the ``autotelic'' factor in Flow Scales-2
-\parencite{jackson2002}.
+This item corresponds to the ``autotelic'' factor in FS2.
 Other potential consequents of flow, such as cognitive capacity
 or processing styles, have not received much empirical
 study \parencite{landhausser2012}.
@@ -584,6 +606,31 @@ Reanalysis and replication are welcome.
 The distribution of sample sizes is exhibited
 in Figure~\ref{fig:activity-ss}.
 
+\subsection{Model Overview}
+
+Our item model was derived from the logistic function.
+Let $\alpha$ be the slope or discrimination parameter,
+$c$ be the intercept, and $\theta$ the latent score.
+We can write the logistic function as,
+\begin{align}
+\frac{1}{1+\exp\left[ \alpha\theta + c \right]}. \label{eqn:logistic1}
+\end{align}
+Instead of a single $\theta$ \parencite[as in, e.g.,][]{birnbaum1968},
+our logistic used the difference between two latent scores.
+Since differences are symmetric, the $c$ parameter is fixed to zero,
+\begin{align}
+\frac{1}{1+\exp\left[ \alpha(\theta_1 - \theta_2) \right]}. \label{eqn:logistic2}
+\end{align}
+We extended this idea to multiple response categories
+in a way similar to the partial credit model \parencite{muraki1992}.
+These item models linked observed data to latent scores.
+The per-item latent scores were then related to each other
+by a covariance structure.
+This can be regarded as a structural equation model with logistic indicators.
+This model may be novel.
+We are unaware of prior studies that utilized a factor model
+built on top of pairwise comparison indicators.
+
 \subsection{Posterior Predictive Checking}
 
 <<>>=
@@ -595,18 +642,22 @@ options(digits=2)
 Model fit can be assessed with a posterior predictive check
 \parencite[Section 6.3]{gelman2013}.
 We compare the multinomial distributions of pairs of activities.
-For example, we can examine the pair \Sexpr{ppcDemoPair} on Item \emph{\Sexpr{ppcDemoFacet}},
+For example, we can examine the pair \Sexpr{ppcDemoPair} on
+Item \emph{\Sexpr{ppcDemoFacet}}.
+Response frequencies are given in columns from \emph{much more}
+on the left to \emph{much less} on the right
+in Equations~\ref{eqn:ppc-data} and \ref{eqn:ppc-expected},
 \begin{align}
 \text{observed data} &=
 <<results='asis'>>=
 printLatexMatrix(t(ppcDemoData$obs))
 @ 
-\\
+\label{eqn:ppc-data} \\
 \text{model expected} &=
 <<results='asis'>>=
 printLatexMatrix(t(ppcDemoData$ex))
 @ 
-\\
+\label{eqn:ppc-expected} \\
 &\chi^2(3, \Sexpr{sum(ppcDemoData$obs)}) = \sum_i \frac{(o_i - e_i)^2}{e_i} =
 \Sexpr{ppcDemoData$stat}, p=\Sexpr{ppcDemoData$pval}.
 \end{align}
@@ -614,13 +665,14 @@ A small $p$-value rejects the test of good fit.
 However, in our data, sample size is a problem.
 
 Textbooks often recommend that no more than 20\% of the events have expected frequencies less than 5.
-However, if we require a sample size of \Sexpr{ppcSampleSizeThreshold} or more than
-only \Sexpr{numPpcTests(rcd)} pairs out of \Sexpr{totalNumPairs(rcd)} are available to evaluate.
+Therefore, we required a sample size of \Sexpr{ppcSampleSizeThreshold} or more.
+However, we caution that this allowed us to evaluate only \Sexpr{numPpcTests(rcd)} pairs
+out of \Sexpr{totalNumPairs(rcd)}.
 The distribution of $p$-values should be uniform under the null hypothesis,
 but the test may be miscalibrated due to small sample sizes.
 To obtain a more accurate test, we can compare with simulated data.
 The distribution of $p$-values from simulated data
-provide a more accurate null distribution for comparison.
+provided a more accurate null distribution for comparison.
 
 <<>>=
 options(digits=oldDigits)
@@ -646,7 +698,7 @@ Let $\tau_1$ and $\tau_2$ be category thresholds.
 Let $\theta_{jk}$ be activity $k$'s latent score on item $j$.
 Let $\sigma_j$ be the standard deviation for item $j$.
 
-Using $\Sigma_{j \times j}$ as the lower Chokesky factor of the item
+Using $\Sigma_{J \times J}$ as the lower Chokesky factor of the item
 correlation matrix, the saturated model is,
 \begin{align}
 \Sigma &\sim \text{lkj}(2) \\
@@ -663,16 +715,14 @@ correlation matrix, the saturated model is,
       (\tau_1 + \tau_2) & r=\text{much less} \\
    \end{cases}. \label{eqn:compare}
 \end{align}
-This can be regarded as a structural equation model with logistic indicators.
 Latent scores $\theta$ were associated with the covariance matrix assembled
 from $\sigma$ and $\Sigma$ (Equation~\ref{eqn:saturated})
 using a non-centered parameterization \parencite[Section 28.6]{stan2.17}.
-Instead of a single $\theta$ \parencite[as in, e.g.,][]{birnbaum1968},
-our logistic used the difference between the latent scores
-of two activities (Equation~\ref{eqn:indicator}).
 In a preprocessing step (refer to \texttt{genCloud} in the online supplement),
 activities were sorted to ensure that the
 comparison in Equation~\ref{eqn:compare} was in the correct direction.
+Built up from Equation~\ref{eqn:logistic2},
+our item model is fully specified (Equation~\ref{eqn:indicator}).
 
 In contrast to typical item response models \parencite[e.g.,][Chapter 6]{baker2004},
 placing a prior on the variance with a mode of 1.0 (Equation~\ref{eqn:standard-sd}) is not sufficient
@@ -823,8 +873,7 @@ reduction statistics $\hat R$ were well below 1.1.
 The factor model is shown to have reasonable fit in Figure~\ref{fig:model-fitness}.
 In addition to overall model fit,
 leave-one-out cross-validation also identified \Sexpr{nrow(outliers)} potential outliers.
-However, none were concerning.
-All potential outliers involved
+None were concerning, however, since all potential outliers involved
 activities with a sample size of \Sexpr{max(pmin(outliers$pa1ss, outliers$pa2ss))} or less.
 
 \begin{figure}
@@ -858,9 +907,9 @@ print(pl)
 \caption{Posterior distribution of category response curve for
   all items.
   Posterior means for logistic discrimination $\alpha$ and
-thresholds $\tau_1, \tau_2$ were $\Sexpr{th.summary['threshold1','mean']}$,
-$\Sexpr{th.summary['threshold2','mean']}$,
-and $\Sexpr{alpha.summary[,'mean']}$, respectively.}
+thresholds $\tau_1, \tau_2$ were $\Sexpr{alpha.summary[,'mean']}$,
+$\Sexpr{th.summary['threshold1','mean']}$, and $\Sexpr{th.summary['threshold2','mean']}$,
+respectively.}
 \label{fig:response-curve}
 \end{figure}
 
@@ -968,6 +1017,7 @@ Implications for flow training: You don't need to train on the facets
 that you get automatically from selecting a conducive activity.  But
 everybody needs to train on X, Y, Z. Talk about connection to
 meditation. [TODO]
+\parencite{wilson2016}
 
 Specification of activities as free-form input
 was expedient but disadvantageous in some ways.
