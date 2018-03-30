@@ -847,6 +847,7 @@ model/.style={rectangle, draw=red!80, fill=red!5, very thick, minimum size=5mm},
 \end{center}
 <<>>=
 options(digits=oldDigits)
+if (nrow(outliers) != 1) stop('here')
 @
 
 \caption{Model fitness and their relationship to each other.
@@ -863,18 +864,19 @@ $\frac{\Sexpr{indVsFac[1]}}{\Sexpr{indVsFac[2]}} = \Sexpr{indVsFac[1]/indVsFac[2
 To obtain our factor model, we introduced $\lambda_j$ factor
 loading of item $j$ and $\pi_k$ latent flow score of activity $k$.
 Instead of Equation~\ref{eqn:saturated}, we used
-\begin{align}
-\theta_{kj} &\sim \sigma_j \cdot \N(\pi_k \lambda_j, 1).
-\end{align}
+$\theta_{kj} \sim \sigma_j \cdot \N(\pi_k \lambda_j, 1)$
+for the factor model.
 To better inform about model fit,
-we also esimated an independence and saturated model on the same data.
+we esimated an independence and saturated model on the same data.
+The independence model used $\theta_{j} \sim \N(0, \sigma_j)$
+in place of Equation~\ref{eqn:saturated} with no correlation matrix $\Sigma$.
 Again, no convergence warnings were observed and all potential scale
 reduction statistics $\hat R$ were well below 1.1.
 The factor model is shown to have reasonable fit in Figure~\ref{fig:model-fitness}.
 In addition to overall model fit,
-leave-one-out cross-validation also identified \Sexpr{nrow(outliers)} potential outliers.
-None were concerning, however, since all potential outliers involved
-activities with a sample size of \Sexpr{max(pmin(outliers$pa1ss, outliers$pa2ss))} or less.
+leave-one-out cross-validation also identified \Sexpr{nrow(outliers)} potential outlier.
+This was not concerning, however, since it involved
+an activity with a sample size of \Sexpr{max(pmin(outliers$pa1ss, outliers$pa2ss))}.
 
 \begin{figure}
 <<fig.height=3>>=
@@ -991,51 +993,102 @@ Flow loadings and latent flow scores are exhibited
 in Figures~\ref{fig:loadings} and \ref{fig:activities}, respectively.
 Finally, we look at some item diagnostics in Table~\ref{tab:itemInfo}.
 
-\section{Discussion}
+\section{Discussion and Conclusion}
 
+Our aim was to demonstrate that physical activities differ by how
+conducive they are to flow.
+Participants were asked to choose two activities and compare
+them with respect to a set of flow relevant facets.
+A factor model was fit to these data and factor scores obtained
+for each activity.
+Activities were distributed across three standard deviations,
+from running (weakly conducive to flow) to martial arts (strongly
+conducive to flow).
 
-(Item waiting) Perhaps this is due to high flow activities like
-downhill skiing that involve a lot of time waiting on the lift to get
-back up the hill.
+<<>>=
+load(paste0(RCPA_DIR, "plotAllItems.rda"))
+@ 
 
-% move to present tense here and for conclusion
+Six of our initial set of 16 items were excluded.
+Five of these items were based on items validated in FS2.
+So particularly for these validated items, what went wrong?
+It seems likely that Items \emph{control}, \emph{spont}, and
+\emph{evaluated} reflect mostly personal, not situational, factors.
+For Items \emph{goal} and \emph{feedback},
+we examined the range of latent scores obtained
+in an independence model.
+These ranges were \Sexpr{rangeByItem[,'goal1']} and
+\Sexpr{rangeByItem[,'feedback1']}, respectively.
+Such a narrow widths indicate that activities could hardly
+be distinguished from each other.
+Further research is needed to determine whether
+Items \emph{goal} and \emph{feedback} reflect
+personal, not situational, factors or whether
+there was some deficiency in the way these items
+were presented.
+Finally, we consider Item \emph{waiting}, a new item.
+In our sample, low flow activities like elliptical, walking,
+and running involved negligible waiting whereas high flow
+activities such as snow skiing and golf involved ample waiting.
+However, Item \emph{waiting} still seems plausible
+and we suggest that it may work in samples with more diverse activities.
 
-walking vs hiking -- Children with attention deficits concentrate better after walk in the park
+<<>>=
+rcd <- loadSingleFactorData(RCPA_DIR)
+et <- calcEdgeTable(rcd)
+@ 
 
-running is not very conducive to flow but there is a book on it \parencite{csikszentmihalyi2017}
+Allowing the choice of activities using free-form input
+is the most flexible approach for subjects,
+but may hinder data collection efficiency.
+Sample sizes between pairs of activities were
+highly skewed (see Figure~\ref{fig:activity-ss}).
+For example, the \Sexpr{names(which(et == max(et)))} pair
+received \Sexpr{which(et == max(et))} comparisons.
+A future data collection website might try to gently steer participants
+away from pairs of activities that have already attracted ample data.
 
-Only two participants compared \emph{sex} with other activities.
-More research could be done here.
+Some activity rankings are provocative and ignite our interest in
+follow up studies.
+For example, the broad category \emph{martial arts},
+a category highly conducive to flow,
+prompts investigation into specific styles.
+We anticipate that there are important differences between, for
+example, Tai chi and Brazilian jiu-jitsu.
+Sex is another activity for which we have even less information
+but equally burning curiosity.
 Even limited to straight, heterosexual sex,
 the male and female point-of-view seem likely to differ \parencite[e.g.,][]{wilson1987}.
 In addition, a comparison with orgasmic meditation,
 a practice that deliberately incorporates contemplative
-components that may support flow \parencite{daedone2011,losada2017},
-would be fascinating.
-
-Implications for flow training: You don't need to train on the facets
-that you get automatically from selecting a conducive activity.  But
-everybody needs to train on X, Y, Z. Talk about connection to
-meditation. [TODO]
-\parencite{wilson2016}
-
-Specification of activities as free-form input
-was expedient but disadvantageous in some ways.
-
-Sample sizes between pairs of activities were
-highly skewed (see Figure~\ref{fig:activity-ss}).
-For example, there were 124 comparisons between \emph{running} and
-\emph{weightlifting}.
-A smarter data collecting website could steer participants
-away from pairs of activities that already have a lot of data.
+components that may support flow,
+would be fascinating \parencite{daedone2011,losada2017}.
 
 For activities that take place in a group context,
 it would be interesting to investigate items based on social flow
 triggers \parencite[e.g.,][]{sawyer2007}.
+In addition, 
+it would also be interesting to collect data from specific communities.
+For example, a follow up study could focused on people with disabilities.
 
-People with a disability that adversely affects their ability TODO
-
-Investigate specific martial arts styles
+Finally, our results offer important insights for flow training.
+A recent book is dedicated to teaching runners how to achieve
+flow \parencite{csikszentmihalyi2017}.
+However, running is an activity that is among the least
+conducive to flow.
+That is not to say that people cannot achieve flow
+in the context of running.
+Certainly they can, but the extent and rigor of training
+might be drastically reduced by the choice of
+a more suitable physical activity.
+As part of integrating our results with flow training,
+it will be important to quantify the extent that
+statistically significant flow score differences
+translate into actual differences in flow experienced.
+Awareness of such situational factors may make a productive
+addition to the flow metacognitions questionnaire \parencite{wilson2016}.
+In summary, we look forward to a future where people enjoy flow
+with increased frequency and intensity.
 
 \printbibliography
 
