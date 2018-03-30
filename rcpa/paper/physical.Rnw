@@ -57,7 +57,7 @@
 
 \lstnewenvironment{code}[1][]{\lstset{language={R},nolol=true,basicstyle=\footnotesize\ttfamily,morecomment=[l]{\#},lineskip=-1pt,numbers=left,numberstyle=\tiny,firstnumber=auto,float,captionpos=b,extendedchars=false, #1}}{}
  
-\usepackage{caption} %remove TODO
+\usepackage{caption}
 \usepackage{subcaption}
 \captionsetup{subrefformat=parens}
 
@@ -103,9 +103,8 @@ Department of Psychiatry and Virginia Institute
 for Psychiatric and Behavior Genetics, Virginia Commonwealth University,
 800 E. Leigh St., Richmond, VA 23219. E-mail: jpritikin@pobox.com}
 
-\keywords{}
-
-\abstract{Not written yet.}
+\keywords{flow, situational factors, factor model, pairwise comparisons,
+ item response model, Bayesian}
 
 <<echo=FALSE, results='hide', warning=FALSE, cache=FALSE>>=
 library(knitr)
@@ -185,7 +184,31 @@ formatCharVector <- function(name) {  # based on omxQuotes
 	}
 }
 
+load(paste0(RCPA_DIR, 'demogr.rda'))
+
+rcd <- loadSingleFactorData(RCPA_DIR)
+finalNumIndicators <- length(extractFacetNames(rcd))
+
 @ 
+
+\abstract{Flow training promises to increase the frequency and depth of
+optimal experience.
+To date, most research has concentrated on psychological,
+physiological, and neuroimaging correlates of flow, all of which can
+be regarded as personal factors.
+Here we investigated whether some physical activities are more
+conducive to flow than others. \Sexpr{nrow(demogr)}
+participants were asked to compare two activities of their choice
+on \Sexpr{finalNumIndicators} facets related to flow.
+Statistically significant differences were found among activities
+using a Bayesian model to accommodate the sparseness of these data.
+\emph{Running} and \emph{martial arts} were examples of activities that were
+ranked low and high, respectively, in flow conduciveness.
+Based on these findings,
+flow training systems ought to recommend activities that are
+particularly conducive to flow or at least account for the flow
+relevant characteristics of a given specific physical activity.
+}
 
 \begin{document}
 
@@ -196,10 +219,11 @@ formatCharVector <- function(name) {  # based on omxQuotes
 ``Flow is a state in which an individual is completely
 immersed in an activity without reflective self-consciousness but with
 a deep sense of control'' \parencite[p.~1]{engeser2012}.
-Since its formal identification in the 1970s, personal factors of optimal experience
-have been vigorously studied from psychological, physiological,
+Since its formal identification in the 1970s, optimal experience
+has been vigorously studied from psychological, physiological,
 and neuroimaging standpoints \parencite[e.g.,][]{jackson1998,demanzano2010,limb2008}.
-In contrast, situation factors have received comparatively little attention.
+These standpoints all reflect personal factors.
+In contrast, situational factors have received comparatively little attention.
 For example, one ecological momentary assessment study recoded hundreds
 of colorful activity descriptions into
 only six general categories \parencite{schmidt2014}.
@@ -208,7 +232,7 @@ However, it seems doubtful that situational factors are of importance
 commensurate with the modest amount of research that has examined them.
 
 Growing interest in flow training
-\parencite[e.g.,][]{csikszentmihalyi2017,kotler2017}, a type of training that promises
+\parencite[e.g.,][]{csikszentmihalyi2017,kotler2014}, a type of training that promises
 to increase the frequency and depth of flow experience, reinforces
 the need for research on situational factors.
 For people who already have a favorite activity,
@@ -257,7 +281,7 @@ For example, the notion of \emph{equal participation}
 suggests that flow will be hindered if there are
 conspicuous inequalities among the group.
 We decided not to pursue these additional antecedents
-because of applicability to only a subset activities,
+because of their applicability to only a subset activities,
 and we did not want to limit participants' free-form choice.
 
 Our hypothesis is that physical activities differ by how conducive
@@ -274,7 +298,7 @@ available from TODO.
 Items must be easy to understand, especially on a brief survey.
 Since optimal experience is not yet a widely understood notion,
 detailed measures that ask about it are obliged to include
-a definition \parencite[c.f.,][p.~195]{csikszentmihalyi1992}.  %TODO check reference
+a definition \parencite[c.f.,][p.~195]{csikszentmihalyi1992}.
 To avoid this methodological complication,
 we decided to focus on hypothesized antecedents, phenomenology, and consequents.
 As far as possible,
@@ -409,9 +433,6 @@ gsub('\\item [a]','', str, fixed=TRUE)
 @ 
 
 <<results="asis">>=
-load(paste0(RCPA_DIR, 'demogr.rda'))
-
-# add booktabs support TODO
 table1(demogr, country, sex, education, splitby=~channel,
                     rounding_perc=0, output='latex2',na.rm=FALSE,
   caption="Demographics by Channel\\label{tab:demogr1}")
@@ -805,8 +826,8 @@ indicates more rejections of good fit than expected.}
 \end{figure}
 
 With \Sexpr{finalNumIndicators} indicators selected,
-we turn our attention to response curve thresholds.
-We assumed common threshold for all items (Equation~\ref{eqn:thresholds}).
+we turned our attention to response curve thresholds.
+We initially assumed common threshold for all items (Equation~\ref{eqn:thresholds}).
 Another option is to allow per-item thresholds.
 A difference in expected predictive accuracy of \Sexpr{looCmp[1]}
 ($SE=\Sexpr{looCmp[2]}$) favored per-items thresholds.
@@ -863,9 +884,12 @@ $\frac{\Sexpr{indVsFac[1]}}{\Sexpr{indVsFac[2]}} = \Sexpr{indVsFac[1]/indVsFac[2
 
 To obtain our factor model, we introduced $\lambda_j$ factor
 loading of item $j$ and $\pi_k$ latent flow score of activity $k$.
-Instead of Equation~\ref{eqn:saturated}, we used
-$\theta_{kj} \sim \sigma_j \cdot \N(\pi_k \lambda_j, 1)$
-for the factor model.
+Instead of Equation~\ref{eqn:saturated}, the factor model used,
+\begin{align}
+\lambda &\sim \N(0, 5) \\
+\pi &\sim \N(0,1) \\
+\theta_{kj} &\sim \sigma_j \cdot \N(\pi_k \lambda_j, 1).
+\end{align}
 To better inform about model fit,
 we esimated an independence and saturated model on the same data.
 The independence model used $\theta_{j} \sim \N(0, \sigma_j)$
@@ -991,6 +1015,10 @@ and \texttt{checkSim.R} from the online supplement).
 The category response curve is exhibited in Figure~\ref{fig:response-curve}.
 Flow loadings and latent flow scores are exhibited
 in Figures~\ref{fig:loadings} and \ref{fig:activities}, respectively.
+Some of the effect sizes between activities are large.
+For example, $\text{flow}_\text{martial arts} - \text{flow}_\text{running}$
+has a 95\% credible interval of $[\Sexpr{runningVsMartialArts[1]}, \Sexpr{runningVsMartialArts[2]}]$
+with $\log\left[ P(\text{flow}_\text{running} > \text{flow}_\text{martial arts})\right] < \Sexpr{log(1/numIterations)}$. % better to compute the probability instead of assuming 1/N TODO
 Finally, we look at some item diagnostics in Table~\ref{tab:itemInfo}.
 
 \section{Discussion and Conclusion}
@@ -1015,7 +1043,7 @@ So particularly for these validated items, what went wrong?
 It seems likely that Items \emph{control}, \emph{spont}, and
 \emph{evaluated} reflect mostly personal, not situational, factors.
 For Items \emph{goal} and \emph{feedback},
-we examined the range of latent scores obtained
+we examined the range of latent scores $\max(\hat\theta_j)-\min(\hat\theta_j)$ obtained
 in an independence model.
 These ranges were \Sexpr{rangeByItem[,'goal1']} and
 \Sexpr{rangeByItem[,'feedback1']}, respectively.
@@ -1031,7 +1059,8 @@ In our sample, low flow activities like elliptical, walking,
 and running involved negligible waiting whereas high flow
 activities such as snow skiing and golf involved ample waiting.
 However, Item \emph{waiting} still seems plausible
-and we suggest that it may work in samples with more diverse activities.
+and we suggest that it may work in samples with a larger,
+more diverse set of activities.
 
 <<>>=
 rcd <- loadSingleFactorData(RCPA_DIR)
@@ -1048,17 +1077,18 @@ received \Sexpr{which(et == max(et))} comparisons.
 A future data collection website might try to gently steer participants
 away from pairs of activities that have already attracted ample data.
 
-Some activity rankings are provocative and ignite our interest in
+Some activity rankings are provocative and prompt
 follow up studies.
 For example, the broad category \emph{martial arts},
 a category highly conducive to flow,
 prompts investigation into specific styles.
 We anticipate that there are important differences between, for
 example, Tai chi and Brazilian jiu-jitsu.
-Sex is another activity for which we have even less information
-but equally burning curiosity.
+\emph{Sex} is another activity for which we have even less information
+than \emph{martial arts} but equally burning curiosity.
 Even limited to straight, heterosexual sex,
-the male and female point-of-view seem likely to differ \parencite[e.g.,][]{wilson1987}.
+the male and female point-of-view seem likely to
+differ on flow facets \parencite[e.g.,][]{wilson1987}.
 In addition, a comparison with orgasmic meditation,
 a practice that deliberately incorporates contemplative
 components that may support flow,
@@ -1085,10 +1115,10 @@ As part of integrating our results with flow training,
 it will be important to quantify the extent that
 statistically significant flow score differences
 translate into actual differences in flow experienced.
-Awareness of such situational factors may make a productive
-addition to the flow metacognitions questionnaire \parencite{wilson2016}.
+Awareness of such situational factors may also
+prompt revision to the flow metacognitions questionnaire \parencite{wilson2016}.
 In summary, we look forward to a future where people enjoy flow
-with increased frequency and intensity.
+with vastly increased frequency and intensity.
 
 \printbibliography
 
@@ -1100,6 +1130,7 @@ For two activities, we asked for a short 1-2 word
 name and a clear description, both free-form text.
 The short 1-2 word names were substituted into Q6
 and Q9 placeholders, respectively.
+The longer activity descriptions assisted in coding.
 Exact replicas of the survey
 are available in the online supplement. Here we
 exhibit the items included in the main analyses
@@ -1266,7 +1297,7 @@ guide participants to a better understanding
 of our short-term goal and immediate feedback items.
 
 A potential criticism our of model is that it might give top flow
-rankings to extremely dangerous activities such as wingsuit flying and
+rankings to extremely hazardous activities such as wingsuit flying and
 breath-hold diving.
 As an attempt to incorporate risk of injury into our model,
 we included two items that asked about the relative risk
