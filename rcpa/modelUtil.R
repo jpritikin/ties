@@ -210,6 +210,12 @@ makeSimplex5 <- function(v) {
   got
 }
 
+calcEdgeTable <- function(rcd)
+{
+  edges <- paste(rcd[,'pa1'], rcd[,'pa2'], sep=":")
+  edgeTable <- table(edges)
+}
+
 numPpcTests <- function(rcd)
 {
   edges <- paste(rcd[,'pa1'], rcd[,'pa2'], sep=":")

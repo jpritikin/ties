@@ -26,6 +26,7 @@ R --no-save -f sim5.R
 R --no-save -f f8.R
 
 R --no-save -f fitStats.R
+R --no-save -f plotAllItems.R
 
 R --no-save -f cluster.R
 R --no-save -f threshplot.R

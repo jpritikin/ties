@@ -1,30 +1,16 @@
-# independence model
-# all data vs tiny sample size activities removed
-
 source("modelUtil.R")
 
-#colSums(is.na(rcd[-1:-4]))  # seems fairly uniform TODO
-
-load(paste0(outputDir(), "fit1s1.rda"))
+load(paste0(outputDir(), "fit1s2.rda"))
 
 facetNames <- extractFacetNames(rcd)
 palist <- extractPalist(rcd)
 
-estimator <- 'mean'
-
-df <- summary(fit1s1, pars=c("theta"), probs=c())$summary
-tar1 <- array(df[,estimator], dim=c(length(facetNames), length(palist)))
-
-load(paste0(outputDir(), "fit1s2.rda"))
-
-whitelist <- extractPalist(rcd)
-
 df <- summary(fit1s2, pars=c("theta"), probs=c())$summary
-tar2 <- array(df[,estimator], dim=c(length(facetNames), length(whitelist)))
+tar <- array(df[,'mean'], dim=c(length(facetNames), length(palist)))
+dimnames(tar) <- list(facetNames, palist)
 
-hist(c(tar1), breaks = 100)
-hist(c(tar2), breaks = 100)
+rangeByItem <- diff(apply(tar, 1, range))
 
-cor(c(tar1[,match(whitelist, palist)]), c(tar2))
+save(rangeByItem, file="plotAllItems.rda")
 
 plotByFacet(fit1s2, rcd)
