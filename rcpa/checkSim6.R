@@ -54,8 +54,11 @@ simResultTheta <- data.frame(par='$\\theta$', true=c(simTheta), recovered=c(estT
 simResult$par = ordered(simResult$par, levels=unique(simResult$par))
 
 cor(simResult$true, simResult$recovered)
+cor(simResultTheta$true, simResultTheta$recovered)
 
 save(simResult, simResultTheta, file="checkSim6.rda")
+
+q()
 
 library(ggplot2)
 library(tikzDevice)

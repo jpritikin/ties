@@ -114,6 +114,7 @@ opts_chunk$set(echo=FALSE, cache=FALSE, highlight=FALSE,
                size="footnotesize", background='#ffffff', fig.path="")
 loadlib <- function () {
 library(ggplot2)
+library(tikzDevice)
 library(xtable)
 library(OpenMx)
 library(gridExtra)
@@ -150,7 +151,7 @@ print.xtable <- function(x, ...) {
 printLatexMatrix <- function(mat) {
     cat("\\begin{bmatrix}")
     mat <- as.matrix(mat)
-    mat[abs(mat - 0.0) < 1e-6] <- NA
+#    mat[abs(mat - 0.0) < 1e-6] <- NA
     foo <- xtable::print.xtable(xtable(mat), only.contents=TRUE, include.colnames=FALSE,
                  include.rownames=FALSE, hline.after=c(), print.results=FALSE)
     lines <- strsplit(foo, "\n", fixed=TRUE)[[1]]
@@ -812,8 +813,8 @@ The posterior was sampled using RStan~2.17 \parencite{rstan2.17}.
 No convergence warnings were observed and all
 potential scale reduction statistics $\hat R$ were well
 below 1.1 \parencite[Section 11.4]{gelman2013}.
-This indicates that the parameter estimates have converged and
-will not improve substantially in accurate with additional sampling iterations.
+This indicates that the parameter estimates had converged and
+would not improve substantially in accuracy with additional sampling iterations.
 Often the goal of factor analysis is to determine
 how many latent factors are measured by a set of items \parencite[e.g.,][]{golino2017}.
 Here we assume that there is one latent factor, flow,
@@ -933,17 +934,26 @@ larger than \Sexpr{outliers[1,'pa1ss']}.
 
 <<>>=
 load(paste0(RCPA_DIR, "checkSim6.rda"))
+
+xMin <- min(c(simResult$true, simResult$recovered))
+xMax <- max(c(simResult$true, simResult$recovered))
+
+tikz(file = "checkSim6.tex", height=4, width=4)
+ggplot(simResult) + geom_point(aes(true, recovered, group=par, color=par, shape=par),
+  size=2) + geom_abline(slope=1, color="yellow", alpha=.5) + coord_fixed() +
+  xlim(xMin, xMax) + ylim(xMin, xMax) + ylab('posterior mean, recovered')
+dev.off()
 @ 
 \begin{figure}
 \begin{center}
-\input{../checkSim6.tex}  % figure out better path spec TODO
+\input{checkSim6.tex}
 \end{center}
 \caption{Ability of the factor model to recover parameters
 from simulated data. A correlation of \Sexpr{cor(simResult$true, simResult$recovered)}
 was obtained for item discrimination $\alpha$; thresholds $\tau_1, \tau_2$;
 standard deviations $\sigma$; factor loadings $\lambda$; and latent flow scores $\pi$.
 A correlation of \Sexpr{cor(simResultTheta$true, simResultTheta$recovered)} was
-found between between true and recovered item scores $\theta$ (not plotted).}
+found between between true and posterior mean recovered item scores $\theta$ (not plotted).}
 \label{fig:simResults}
 \end{figure}
 
