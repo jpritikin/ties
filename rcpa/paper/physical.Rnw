@@ -222,7 +222,8 @@ a deep sense of control'' \parencite[p.~1]{engeser2012}.
 Since its formal identification in the 1970s, optimal experience
 has been vigorously studied from psychological, physiological,
 and neuroimaging standpoints \parencite[e.g.,][]{jackson1998,demanzano2010,limb2008}.
-These standpoints all reflect personal factors.
+The primary focus was the person who experienced flow.
+Hence, we regard these studies as studying personal factors of flow.
 In contrast, situational factors have received comparatively little attention.
 For example, one ecological momentary assessment study recoded hundreds
 of colorful activity descriptions into
@@ -245,18 +246,27 @@ that activity is slightly more conducive to flow
 than figure skating (or vice versa).
 However, not everybody has already chosen an activity.
 For people at the beginning of their pursuit of flow,
-information to guide their choice of an activity
+information to guide their choice of an activity,
 or some data about which activities are particularly conducive to flow,
 could be of interest.
 
-There are about 8,000 sports \parencite{liponski2003} and physical
-activities are a superset of that.
+There are about 8,000 sports \parencite{liponski2003},
+and many more options are available if we broaden our interest
+to the general category of physical activities.
+Yet, each participant may only be familiar with
+a small subset of activities.
 Even if we restrict our interest to the 400 most popular
 physical activities,
-it would be impractical to expect each participant to
-assign a score to 400 activities,
-many of which she may not have tried.
-A better approach is to regard our problem as similar to
+it is unrealistic to expect each subject to
+assign global scores to each.
+Judgments that are more readily available are relative comparisons.
+For example, it is difficult to score the predictability of
+running outside on a global scale of $1-100$.
+However, we know that running outside is usually
+\emph{less} predictable than running on a treadmill.
+Therefore, we rely on relative comparisons.
+
+We can regard our problem as similar to
 the problem of ranking a large number of Chess players.
 There are methods available to obtain a global ranking based on a
 limited number of pairwise comparisons \parencite[e.g.,][]{bradley1952}.
@@ -274,13 +284,16 @@ even with no data.
 Self-report instruments for flow have been developed \parencite{moneta2012}.
 We decided to adapt items from the Flow State Scale-2 and Dispositional Flow Scale-2
 measures \parencite[hereafter abbreviated FS2;][]{jackson2002}.
-The FS2 contains item content well suited to a brief, cross-sectional survey.
-Supplemental flow antecedents dependent on a group context
-have been proposed \parencite{sawyer2007}.
-For example, the notion of \emph{equal participation}
-suggests that flow will be hindered if there are
+The FS2 contains 36 items, 4 items on each of 9 dimensions.
+These items concern a single person's experience.
+For example, one item is, ``I know clearly what I want to do.''
+The notion of flow has recently been extended to a group context \parencite{sawyer2007}.
+As part of this proposal, a variety conditions have
+been described that may support group flow.
+For example, one condition is the notion of \emph{equal participation},
+that flow will be hindered if there are
 conspicuous inequalities among the group.
-We decided not to pursue these additional antecedents
+However, we decided not to include conditions related to group flow
 because of their applicability to only a subset activities,
 and we did not want to limit participants' free-form choice.
 
@@ -296,7 +309,8 @@ available from TODO.
 \subsection{Questionnaire}
 
 Items must be easy to understand, especially on a brief survey.
-Since optimal experience is not yet a widely understood notion,
+Since optimal experience is not yet a widely understood notion by
+the public,
 detailed measures that ask about it are obliged to include
 a definition \parencite[c.f.,][p.~195]{csikszentmihalyi1992}.
 To avoid this methodological complication,
@@ -308,28 +322,34 @@ refer to Appendix~\ref{app:questionnaire} for the exact wording.
 
 One important antecedent of flow is the perceived
 fit of a subject's skill to activity demands \parencite{keller2012}.
-For example, anxiety may result when activity demands exceed skills
-and boredom may result when skills exceed demands.
-However, perceived fit cannot be assessed in the present study
-because subjects' skills are averaged.
-Hence, we assume roughly satisfactory perceived fit because
+For example, anxiety or boredom may result when
+activity demands exceed skills or skills exceed demands, respectively.
+FS2 assesses perceived fit with items such as,
+``I feel I am competent enough to meet the high demands of the situation.''
+However, in the present study, the focus was on situational factors.
+Subjects were asked to report on voluntarily chosen activities.
+We infer that perceived fit was roughly satisfactory because
 the experience of anxiety or boredom is generally uncomfortable
-and subjects were asked to report on voluntarily chosen activities.
+and would not be chosen voluntarily.
+Perceived fit was regarded as measurement error.
 We do not, however, need to assume that all activities offer
 equal potential for perceived fit.
 
-Four items assessed potential activity demands.
+Four items assessed activity demand flexibility.
 Item \emph{skill} assessed the relative amount of
 skill that a participant would need to acquire
 to achieve some degree of competence.
+This may seem vague, but it is not a difficult criterion
+for relative comparisons.
+For example, the game tic-tac-toe requires less skill than Chess.
 Items \emph{predict} and \emph{novelty} assessed the relative first
-and second order predictability of activities.
+and second order predictability of activities, respectively.
 Finally, Item \emph{creative} assessed the relative opportunities
 to express creativity.
 Activities with many skills to acquire,
 unpredictable activities, and
 activities that admit more creativity should offer
-more opportunities for perceived fit.
+more opportunities for satisfactory perceived fit.
 
 Another important antecedent of flow is the subjective value of the
 activity \parencite{keller2012}.
@@ -454,6 +474,8 @@ discon <- read.csv(paste0(RCPA_DIR, 'disconnected.csv'), header=FALSE, stringsAs
 
 @ 
 
+Our Institutional Review Board deemed this study exempt because
+no identifying information was collected.
 Participants were recruited from two channels.
 The \emph{public} channel consisted of
 online invitations posted at
@@ -739,6 +761,8 @@ correlation matrix, the saturated model is,
 Latent scores $\theta$ were associated with the covariance matrix assembled
 from $\sigma$ and $\Sigma$ (Equation~\ref{eqn:saturated})
 using a non-centered parameterization \parencite[Section 28.6]{stan2.17}.
+A non-centered parameterization was necessary to achieve
+efficient sampling with such sparse data.
 In a preprocessing step (refer to \texttt{genCloud} in the online supplement),
 activities were sorted to ensure that the
 comparison in Equation~\ref{eqn:compare} was in the correct direction.
@@ -788,6 +812,8 @@ The posterior was sampled using RStan~2.17 \parencite{rstan2.17}.
 No convergence warnings were observed and all
 potential scale reduction statistics $\hat R$ were well
 below 1.1 \parencite[Section 11.4]{gelman2013}.
+This indicates that the parameter estimates have converged and
+will not improve substantially in accurate with additional sampling iterations.
 Often the goal of factor analysis is to determine
 how many latent factors are measured by a set of items \parencite[e.g.,][]{golino2017}.
 Here we assume that there is one latent factor, flow,
@@ -816,12 +842,14 @@ load(paste0(RCPA_DIR, "thresholdCmp.rda"))
 <<thresholds, fig.height=3, warning=FALSE>>=
 ggplot(df, aes(sample=pvalue, color=model)) +
   stat_qq(distribution=stats::qunif, size=.25) + coord_fixed() +
-  xlim(0,.5) + ylim(0,.5)
+  xlim(0,.5) + ylim(0,.5) + geom_abline(slope=1, color="yellow", alpha=.5)
 @ 
 \caption{Quantile-quantile plot of $p$-values conditional
   on whether thresholds are common or per-item.
 The downward bulge relative to the simulated distribution
-indicates more rejections of good fit than expected.}
+indicates more rejections of good fit than expected.
+For reference, the null distribution of a perfectly calibrated test
+would be the $x=y$ line.}
 \label{fig:thresholds}
 \end{figure}
 
@@ -898,9 +926,26 @@ Again, no convergence warnings were observed and all potential scale
 reduction statistics $\hat R$ were well below 1.1.
 The factor model is shown to have reasonable fit in Figure~\ref{fig:model-fitness}.
 In addition to overall model fit,
-leave-one-out cross-validation also identified \Sexpr{nrow(outliers)} potential outlier.
-This was not concerning, however, since it involved
-an activity with a sample size of \Sexpr{max(pmin(outliers$pa1ss, outliers$pa2ss))}.
+leave-one-out cross-validation also identified \Sexpr{nrow(outliers)} potential outlier
+between \Sexpr{outliers[1,'pa1']} and \Sexpr{outliers[1,'pa2']} on Item \Sexpr{outliers[1,'facet']}.
+We attribute this to noise that would be averaged out if \Sexpr{outliers[1,'pa1']} had a sample size
+larger than \Sexpr{outliers[1,'pa1ss']}.
+
+<<>>=
+load(paste0(RCPA_DIR, "checkSim6.rda"))
+@ 
+\begin{figure}
+\begin{center}
+\input{../checkSim6.tex}  % figure out better path spec TODO
+\end{center}
+\caption{Ability of the factor model to recover parameters
+from simulated data. A correlation of \Sexpr{cor(simResult$true, simResult$recovered)}
+was obtained for item discrimination $\alpha$; thresholds $\tau_1, \tau_2$;
+standard deviations $\sigma$; factor loadings $\lambda$; and latent flow scores $\pi$.
+A correlation of \Sexpr{cor(simResultTheta$true, simResultTheta$recovered)} was
+found between between true and recovered item scores $\theta$ (not plotted).}
+\label{fig:simResults}
+\end{figure}
 
 \begin{figure}
 <<fig.height=3>>=
@@ -925,15 +970,15 @@ draw <- function(alpha, th) {
 }
 
 pl <- ggplot() + xlab("difference in latent ranking (logits)") + ylab("probability") + ylim(0,1)
-for (cx in 1:25) {
-  pl <- pl + draw(item25$alpha[cx], c(item25$th1[cx], item25$th2[cx]))
+for (cx in 1:50) {
+  pl <- pl + draw(pdata50[cx,'alpha'], pdata50[cx,paste0('threshold',1:2)])
 }
 print(pl)
 @ 
 \caption{Posterior distribution of category response curve for
   all items.
-  Posterior means for logistic discrimination $\alpha$ and
-thresholds $\tau_1, \tau_2$ were $\Sexpr{alpha.summary[,'mean']}$,
+  Posterior means for logistic discrimination $\hat\alpha$ and
+thresholds $\hat\tau_1, \hat\tau_2$ were $\Sexpr{alpha.summary[,'mean']}$,
 $\Sexpr{th.summary['threshold1','mean']}$, and $\Sexpr{th.summary['threshold2','mean']}$,
 respectively.}
 \label{fig:response-curve}
@@ -955,7 +1000,7 @@ ggplot() +   geom_vline(xintercept=0, color="green") +
   theme(axis.title.y=element_blank())
 
 @ 
-\caption{Posterior means and distributions of factor loadings.
+\caption{Posterior means and distributions of factor loadings $\hat\lambda$.
 The red stripe highlights the 95\% credible interval.}
 \label{fig:loadings}
 \end{figure}
@@ -976,8 +1021,10 @@ ggplot() +
   ylab("physical activity") + xlab("latent flow score")
 
 @ 
-\caption{Posterior means and distributions of latent flow scores.
-The red stripe highlights the 95\% credible interval.}
+\caption{Posterior means and distributions of latent flow scores $\hat\pi$.
+The red stripe highlights the 95\% credible interval.
+Wide intervals reflect activities with samples sizes as small as 2
+and should be interpreted with caution.}
 \label{fig:activities}
 \end{figure}
 
@@ -1006,19 +1053,20 @@ gsub('\\item [a]','', str, fixed=TRUE)
 
 @ 
 
-If our model is similar to the true model
-then simulation suggested that posterior means of
-recovered parameters would correlate at around $.8$
-with true parameters given the sample size
-and structure of the data collected (see \texttt{sim5.R}
-and \texttt{checkSim.R} from the online supplement).
+One way to gain further confidence in our results
+is to simulate data with known parameters,
+fit the model to the simulated data, and
+examine the correlation between known and recovered parameters.
+We conducted this procedure with the factor model.
+With encouraging simulation results (Figure~\ref{fig:simResults}),
+we report the results obtained from real data.
 The category response curve is exhibited in Figure~\ref{fig:response-curve}.
 Flow loadings and latent flow scores are exhibited
 in Figures~\ref{fig:loadings} and \ref{fig:activities}, respectively.
 Some of the effect sizes between activities are large.
-For example, $\text{flow}_\text{martial arts} - \text{flow}_\text{running}$
+For example, $\hat\pi_\text{martial arts} - \hat\pi_\text{running}$
 has a 95\% credible interval of $[\Sexpr{runningVsMartialArts[1]}, \Sexpr{runningVsMartialArts[2]}]$
-with $\log\left[ P(\text{flow}_\text{running} > \text{flow}_\text{martial arts})\right] < \Sexpr{log(1/numIterations)}$. % better to compute the probability instead of assuming 1/N TODO
+with $\log\left[ P(\hat\pi_\text{running} > \hat\pi_\text{martial arts})\right] < \Sexpr{log(runningVsMartialArtsP)}$.
 Finally, we look at some item diagnostics in Table~\ref{tab:itemInfo}.
 
 \section{Discussion and Conclusion}

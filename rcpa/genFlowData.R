@@ -3,6 +3,12 @@ source("modelUtil.R")
 load(paste0(outputDir(), "fit2t5.rda"))  # factor model
 
 facetNames <- extractFacetNames(rcd)
+palist <- extractPalist(rcd)
+
+tar <- extract(fit2t5, pars=paste0('flow[',match(c('running','martial arts'), palist),']'), permuted=FALSE)
+cmp1 <- c(tar[,,1]) - c(tar[,,2])
+runningVsMartialArtsP <- max(sum(cmp1 < 0) / length(cmp1), 1/length(cmp1))
+runningVsMartialArts <- quantile(cmp1, c(.025,.975))
 
 loadings <- summary(fit2t5, pars=c("flowLoadings"), probs=c(.025,.975))$summary
 rownames(loadings) <- facetNames
@@ -10,8 +16,6 @@ rownames(loadings) <- facetNames
 rawLoadings <- extract(fit2t5, pars=c("flowLoadings"))[[1]]
 colnames(rawLoadings) <- facetNames
 names(dimnames(rawLoadings)) <- c('iteration', 'facet')
-
-palist <- extractPalist(rcd)
 
 flow <- summary(fit2t5, pars=c("flow"), probs=c(.025,.975))$summary
 rownames(flow) <- palist
@@ -39,7 +43,7 @@ itemInfo <- data.frame('$\\hat\\sigma_j$'=c(sigma),
   row.names=facetNames, check.names=FALSE)
 itemInfo <- itemInfo[order(-itemInfo[,2]),]
 
-save(itemInfo, loadings, rawLoadings, flow, rawFlow, file="genFlowData.rda")
+save(runningVsMartialArts, runningVsMartialArtsP, itemInfo, loadings, rawLoadings, flow, rawFlow, file="genFlowData.rda")
 
 q()
 

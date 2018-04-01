@@ -22,7 +22,7 @@ for n in $(seq 7); do
 done
 
 # simulate data based on fit2t2
-R --no-save -f sim5.R
+R --no-save -f sim6.R
 R --no-save -f f8.R
 
 R --no-save -f fitStats.R
@@ -32,7 +32,7 @@ R --no-save -f cluster.R
 R --no-save -f threshplot.R
 R --no-save -f thresholdCmp.R
 R --no-save -f factorCmp.R
-R --no-save -f checkSim.R
+R --no-save -f checkSim6.R
 R --no-save -f genFlowData.R
 R --no-save -f genWebResults.R
 

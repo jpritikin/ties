@@ -9,15 +9,15 @@ alpha.summary <- summary(fit, pars="alpha", probs=c(.025,.975))$summary
 
 th.summary <- summary(fit, pars=paste0("threshold",1:2), probs=c(.025,.975))$summary
 
-alpha <- unlist(extract(fit, pars="alpha"), use.names=F)
-th1 <- unlist(extract(fit, pars="threshold1"), use.names=F)
-th2 <- unlist(extract(fit, pars="threshold2"), use.names=F)
+pdata <- extract(fit, pars=c("alpha", paste0('threshold', 1:2)), permuted = FALSE)
+pdata50 <- pdata[1:50,1,]
 
-s1 <- 1:25
+item25 <- list(
+  th1 = pdata50[1:25,'threshold1'],
+  th2 = pdata50[1:25,'threshold2'],
+  alpha = pdata50[1:25,'alpha'])
 
-item25 <- list(th1 = th1[s1], th2=th2[s1], alpha=alpha[s1])
-
-save(alpha.summary, th.summary, item25, file="threshplot.rda")
+save(alpha.summary, th.summary, item25, pdata50, file="threshplot.rda")
 
 q()
 
