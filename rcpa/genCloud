@@ -2649,6 +2649,14 @@ my %LongDict =
    'jogging@jogging is an running activity that can be done alone or with others jogging tends to be done outside in nice weather jogging can be an activity that includes pets such as dogs' => 'running',
    'gym dojohn strength training@strength training is a physical activity that includes many types of workouts strength training exercises could be done on the floor on a matt, on a treadmill or on a machine' => 'invalid',
    'vallyball@tennise' => 'invalid',
+   'lacrosse@outdoor lacrosse, spring lacrosse' => 'lacrosse',
+   'exercise@personal exercise' => 'invalid',
+   'gym@went on the treadmill at the gym' => 'invalid',
+   'soccer@play the goalie in soccer' => 'soccer',
+   'volleyball@club and school volleyball that also involve workouts' => 'volleyball',
+   'gym@workouts for volleyball and for myself at a gym/facility' => 'invalid',
+   'gym@squats, running on the treadmill, and weights for my arms' => 'invalid',
+   'walking@walking everyday for about 30 minutes' => 'walking',
   );
 
 # Could remove some of these later when we have huge samples. TODO
@@ -2746,6 +2754,7 @@ my %LocationMap =
 my %CountryMap =
   (
    'united states' => 'usa',
+   'unites states' => 'usa',
    'usa' => 'usa',
    'united states of america' => 'usa',
    'us' => 'usa',
