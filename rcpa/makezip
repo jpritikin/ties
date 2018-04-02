@@ -1,0 +1,19 @@
+#!/bin/sh
+
+name=$(date +%Y%m%d)
+rm -rf $name
+mkdir $name
+
+cp README.txt LICENSE.txt $name/
+cp archive/survey*.pdf $name/
+cp data-*.csv $name/
+cp genCloud qraw.R rawData.csv demogr.csv disconnected.csv prepDemogr.R $name/
+cp modelUtil.R model?.stan runStan $name/
+cp f?.R $name/
+cp fitStats.R cluster.R factorCmp.R genFlowData.R reportSampleSize.R thresholdCmp.R threshplot.R $name/
+cp plotAllItems.R byFacet.pdf $name/
+cp sim6.R checkSim6.R $name/
+cp genWebResults.R $name/
+
+zip -r rcpa-$name $name
+rm -r $name

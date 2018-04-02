@@ -308,7 +308,7 @@ they are to flow.
 However, it may more accurate to regard this study
 as exploratory, with the goal of generating many hypotheses.
 Complete source code for data preprocessing and analysis is
-available from TODO.
+available from \url{https://osf.io/bmnt3/}.
 
 \section{Method}
 
