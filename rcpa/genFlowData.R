@@ -10,6 +10,11 @@ cmp1 <- c(tar[,,1]) - c(tar[,,2])
 runningVsMartialArtsP <- max(sum(cmp1 < 0) / length(cmp1), 1/length(cmp1))
 runningVsMartialArts <- quantile(cmp1, c(.025,.975))
 
+tar <- extract(fit2t5, pars=paste0('flow[',match(c('hiking','mountain biking'), palist),']'), permuted=FALSE)
+cmp1 <- c(tar[,,1]) - c(tar[,,2])
+hikingVsMountainBikingP <- max(sum(cmp1 < 0) / length(cmp1), 1/length(cmp1))
+hikingVsMountainBiking <- quantile(cmp1, c(.025,.975))
+
 loadings <- summary(fit2t5, pars=c("flowLoadings"), probs=c(.025,.975))$summary
 rownames(loadings) <- facetNames
 
@@ -43,7 +48,8 @@ itemInfo <- data.frame('$\\hat\\sigma_j$'=c(sigma),
   row.names=facetNames, check.names=FALSE)
 itemInfo <- itemInfo[order(-itemInfo[,2]),]
 
-save(runningVsMartialArts, runningVsMartialArtsP, itemInfo, loadings, rawLoadings, flow, rawFlow, file="genFlowData.rda")
+save(hikingVsMountainBikingP, hikingVsMountainBiking, runningVsMartialArts, runningVsMartialArtsP,
+  itemInfo, loadings, rawLoadings, flow, rawFlow, file="genFlowData.rda")
 
 q()
 
