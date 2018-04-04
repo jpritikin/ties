@@ -820,11 +820,11 @@ provide a prior because we have no knowledge of
 the distribution of latent score differences.
 To force item standard deviations $\hat\sigma$ close to 1.0,
 the slope of the logistic $\alpha$ was set to
-the standard deviation $\hat\sigma$ raised to the sixth power (Equation~\ref{eqn:slope}).
+the mean of variances $\hat\sigma^2$ raised to the third power (Equation~\ref{eqn:slope}).
 This created a feedback loop to nudge $\alpha$ in the direction
 that would produce more standardized item variances.
-The sixth power provides a reasonable correction,
-and a larger exponent creates sampler problems due to so much
+The third power provides a reasonable correction,
+and a larger exponent can create sampling problems due to extreme
 curvature in the posterior.
 
 \begin{figure}
@@ -1188,7 +1188,7 @@ prompts investigation into specific styles.
 We anticipate that there are important differences between, for
 example, Tai chi and Brazilian jiu-jitsu.
 \emph{Sex} is another activity for which we have even less information
-than \emph{martial arts} but equally burning curiosity.
+than \emph{martial arts} but equal curiosity.
 Even limited to straight, heterosexual sex,
 the male and female point-of-view seem likely to
 differ \parencite[e.g.,][]{wilson1987}.
@@ -1219,10 +1219,6 @@ As part of integrating our results with flow training,
 it will be important to quantify the extent that
 statistically significant flow score differences
 translate into actual differences in a training regimen.
-Item validity is typically the primary concern with new measures.
-However, at least four of our 10 items are closely modeled
-on validated FS2 items (Items \emph{chatter}, \emph{present},
-\emph{stakes}, and \emph{reward}).
 A flow metacognitions questionnaire identified two personal factors
 that support flow, Beliefs that Flow Fosters Achievement
 and Confidence in Ability to Self-Regulate Flow \parencite{wilson2016}.
