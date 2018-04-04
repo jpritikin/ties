@@ -105,7 +105,7 @@ for Psychiatric and Behavior Genetics, Virginia Commonwealth University,
 800 E. Leigh St., Richmond, VA 23219. E-mail: jpritikin@pobox.com}
 
 \keywords{flow, situational factors, factor model, pairwise comparisons,
- item response model, Bayesian}
+ item response model, Bayesian methods}
 
 <<echo=FALSE, results='hide', warning=FALSE, cache=FALSE>>=
 library(knitr)
@@ -225,7 +225,7 @@ a deep sense of control'' \parencite[p.~1]{engeser2012}.
 Since its formal identification in the 1970s, optimal experience
 has been vigorously studied from psychological, physiological,
 and neuroimaging standpoints \parencite[e.g.,][]{jackson1998,demanzano2010,limb2008}.
-The primary focus has been the person who experienced flow.
+The primary focus of this body of research has been on the person who experienced flow.
 Hence, we regard these studies as studying \emph{personal} factors of flow.
 In contrast, situational factors have received comparatively little attention.
 For example, one ecological momentary assessment study recoded hundreds
@@ -259,9 +259,9 @@ to the general category of physical activities,
 many more options are available.
 This poses a challenge to survey research.
 Each participant may only be familiar with
-a small subset of activities.
-Even if we restrict our interest to the 400 most popular
-physical activities,
+a small subset of the many possible physical activities.
+Even if we restrict our interest to, say, the 100 most popular
+activities,
 it is unrealistic to expect each subject to
 assign global scores to each.
 Judgments that are more readily available are relative comparisons.
@@ -269,15 +269,14 @@ For example, it is difficult to score the predictability of
 running outside on a global scale of $1-100$.
 However, we all know that running outside is usually
 \emph{less} predictable than running on a treadmill.
-Therefore, we rely on relative comparisons.
 
-We can regard our problem as similar to
+Can relative comparisons be converted into absolute scores?
+Fortunately, this problem is similar to
 the problem of ranking a large number of Chess players.
-There are methods available to obtain a global ranking based on a
-limited number of pairwise comparisons \parencite[e.g.,][]{bradley1952}.
+Scoring methods are available \parencite[e.g.,][]{bradley1952}.
 Hence, we decided to invite participants to select two
 physical activities using free-form input and then compare them.
-Given that many activities might only be mentioned a few times,
+Given that many activities might be mentioned only a few times,
 we anticipated challenges with missing data and small samples.
 Bayesian methods are particularly suitable for this situation
 because the prior density can pick up the slack when data
@@ -303,10 +302,18 @@ However, we decided not to include conditions related to group flow
 because of their applicability to only a subset activities,
 and we did not want to limit participants' free-form choice.
 
+When new self-report items are introduced,
+researchers are generally obliged to present evidence
+that these items are valid, that they measure what
+the researchers claim that they measure.
+However, most of our item are closely modeled on FS2 items.
+FS2 has been validated and used in hundreds of studies.
+We argue that our items have sufficient evidence of
+validity by their close association with FS2 items.
+For readers who remain concerned about our item validity,
+this study can be regarded as exploratory.
 Our hypothesis is that physical activities differ by how conducive
 they are to flow.
-However, it may more accurate to regard this study
-as exploratory, with the goal of generating many hypotheses.
 Complete source code for data preprocessing and analysis is
 available from \url{https://osf.io/bmnt3/}.
 
@@ -361,6 +368,7 @@ Another important antecedent of flow is the subjective value of the
 activity \parencite{keller2012}.
 Item \emph{stakes} assessed this construct
 in a straightforward way.
+A similar FS2 item is, ``I am completely focused on the task at hand.''
 Item \emph{evaluated} assessed the relative type of motivation,
 whether extrinsic or autotelic \parencite{csikszentmihalyi1999}.
 Note that this construct was labeled as ``loss of self consciousness''
@@ -375,8 +383,10 @@ perceived fit.
 Items \emph{goal}, \emph{feedback}, and \emph{control} assessed
 the relative clarity of goals, immediacy of feedback,
 and degree of control over performance, respectively.
-These facets can be regarded as supplementary antecedents
-of flow \parencite{jackson2002}.
+These items correspond closely with similar items in FS2.
+For example, ``I know clearly what I want to do,''
+``I am aware of how well I am performing,''
+and ``I have a feeling of total control,'' respectively.
 Our attempt to clarify the time scale of goals and feedback
 is detailed in Appendix~\ref{app:bad-items}.
 We next consider items designed to assess the phenomenology of flow.
@@ -387,8 +397,10 @@ and have a sense of effortless regardless of the amount
 of physical effort \parencite{dietrich2004}.
 Items \emph{chatter}, \emph{present}, and \emph{spont}
 assessed these aspects of phenomenology, respectively.
-Our phenomenology items correspond with the ``merging'' 
+Our phenomenology items correspond with the \emph{merging}
 factor in FS2.
+An example of an FS2 \emph{merging} item is, ``I perform automatically,
+without thinking too much.''
 
 Although loading weakly in a factor analysis \parencite{jackson2002},
 time distortion is another putative phenomenological aspect of flow.
@@ -399,8 +411,7 @@ competitive swimming), whereas there are other activities
 where time plays at most a minor role (e.g., rock climbing).
 However, we actually want to ask whether the participant
 feels time passing in a periodic and regular way,
-which is more a question of subjective than objective time,
-but an interaction seems plausible.
+which is more a question of subjective than objective time.
 Should the effect size of time distortion in rock climbing
 be on the same scale with the effect size in competitive swimming?
 Rather that confront such vexing questions,
@@ -408,12 +419,13 @@ we decided to include a simpler item related to time.
 Item \emph{waiting} assessed the relative amount of
 time spent waiting.
 For example, in baseball, most batters wait on the bench.
-This item is more objective than subjective time distortion.
+This item is more objective than FS2's subjective time distortion.
 We expected that waiting would negatively correlate with flow.
 
 Item \emph{reward} assessed the relative degree of positive
 affect after engaging in an activity.
-This item corresponds to the ``autotelic'' factor in FS2.
+This item corresponds to the \emph{autotelic} factor in FS2.
+An example FS2 item is, ``I really enjoy the experience.''
 Other potential consequents of flow, such as cognitive capacity
 or processing styles, have not received much empirical
 study \parencite{landhausser2012}.
@@ -808,11 +820,12 @@ provide a prior because we have no knowledge of
 the distribution of latent score differences.
 To force item standard deviations $\hat\sigma$ close to 1.0,
 the slope of the logistic $\alpha$ was set to
-the mean of variances $\hat\sigma^2$ raised to the third power (Equation~\ref{eqn:slope}).
+the standard deviation $\hat\sigma$ raised to the sixth power (Equation~\ref{eqn:slope}).
 This created a feedback loop to nudge $\alpha$ in the direction
 that would produce more standardized item variances.
-There is no strong reason not to use other exponents,
-but the third power seemed to provide a reasonable correction.
+The sixth power provides a reasonable correction,
+and a larger exponent creates sampler problems due to so much
+curvature in the posterior.
 
 \begin{figure}
 <<fig.height=4>>=
@@ -1069,8 +1082,10 @@ str <- kable(itemInfo,  booktabs=T, escape=FALSE, linesep = "",
     add_footnote(escape=FALSE, threeparttable=TRUE,
                  paste(
         "\\emph{Note.}",
-        'It does not seem possible to completely disentangle latent score $\\hat\\theta_j$',
-        'variance and measurement error, however, we can make some tentative observations.',
+        'In standard factor analysis, the measurement error and factor',
+        'loading are cleanly separated \\parencite[e.g.,][]{kline2015}.',
+        'Here it does not seem possible to completely disentangle them.',
+        'However, we can make some tentative observations.',
         "When item $j$'s standard deviation $\\hat\\sigma_j$ is large then",
         "latent scores $\\hat\\theta_j$ are probably more disbursed,",
         'differences between pairs of $\\hat\\theta_j$ are larger,',
@@ -1203,12 +1218,15 @@ a more suitable physical activity.
 As part of integrating our results with flow training,
 it will be important to quantify the extent that
 statistically significant flow score differences
-translate into actual differences in training schedule.
-
+translate into actual differences in a training regimen.
+Item validity is typically the primary concern with new measures.
+However, at least four of our 10 items are closely modeled
+on validated FS2 items (Items \emph{chatter}, \emph{present},
+\emph{stakes}, and \emph{reward}).
 A flow metacognitions questionnaire identified two personal factors
 that support flow, Beliefs that Flow Fosters Achievement
 and Confidence in Ability to Self-Regulate Flow \parencite{wilson2016}.
-Awareness of situational factors may constitute a productive
+Awareness of situational factors may constitute a useful
 addition to this measure.
 In summary, we look forward to a future where people enjoy flow
 with vastly increased frequency and intensity.
