@@ -933,7 +933,7 @@ model/.style={rectangle, draw=red!80, fill=red!5, very thick, minimum size=5mm},
 \end{center}
 <<>>=
 options(digits=oldDigits)
-if (nrow(outliers) != 1) stop('here')
+if (nrow(outliers) != 0) stop('here')
 @
 
 \caption{Model fitness and their relationship to each other.
@@ -963,11 +963,11 @@ in place of Equation~\ref{eqn:saturated} with no correlation matrix $\Sigma$.
 Again, no convergence warnings were observed and all potential scale
 reduction statistics $\hat R$ were well below 1.1.
 The factor model is shown to have reasonable fit in Figure~\ref{fig:model-fitness}.
-In addition to overall model fit,
-leave-one-out cross-validation also identified \Sexpr{nrow(outliers)} potential outlier
-between \Sexpr{outliers[1,'pa1']} and \Sexpr{outliers[1,'pa2']} on Item \emph{\Sexpr{outliers[1,'facet']}}.
-We attribute this to noise that would be averaged out if \Sexpr{outliers[1,'pa1']} had a sample size
-larger than \Sexpr{outliers[1,'pa1ss']}.
+%% In addition to overall model fit,
+%% leave-one-out cross-validation also identified \Sexpr{nrow(outliers)} potential outlier
+%% between \Sexpr{outliers[1,'pa1']} and \Sexpr{outliers[1,'pa2']} on Item \emph{\Sexpr{outliers[1,'facet']}}.
+%% We attribute this to noise that would be averaged out if \Sexpr{outliers[1,'pa1']} had a sample size
+%% larger than \Sexpr{outliers[1,'pa1ss']}.
 
 <<results='hide'>>=
 load(paste0(RCPA_DIR, "checkSim6.rda"))
@@ -1189,7 +1189,8 @@ We anticipate that there are important differences between, for
 example, Tai chi and Brazilian jiu-jitsu.
 \emph{Sex} is another activity for which we have even less information
 than \emph{martial arts} but equal curiosity.
-Even limited to straight, heterosexual sex,
+By \emph{sex}, we assume that participants meant straight, heterosexual sex.
+Even limited to this narrow definition,
 the male and female point-of-view seem likely to
 differ \parencite[e.g.,][]{wilson1987}.
 In addition, a comparison with \emph{orgasmic meditation},
