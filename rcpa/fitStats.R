@@ -56,5 +56,5 @@ print(apply(pval, 2, function(x) sum(x<.05)))
 rm(fit2t5)
 
 load(paste0(outputDir(), "fit2t6.rda"))
-head(worstRhat(fit2t6, model2Par), n=20)
+head(worstRhat(fit2t6, model3Par), n=20)
 rm(fit2t6)

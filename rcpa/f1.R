@@ -1,3 +1,5 @@
+q()
+
 source("modelUtil.R")
 
 rcd <- loadRawData()
