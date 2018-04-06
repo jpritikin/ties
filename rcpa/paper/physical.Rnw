@@ -200,10 +200,11 @@ physiological, and neuroimaging correlates of flow, all of which can
 be regarded as personal factors.
 Here we investigated a situational factor of flow,
 whether some physical activities are more
-conducive to flow than others. \Sexpr{nrow(demogr)}
+conducive to flow than others.
+In a cross-sectional study, \Sexpr{nrow(demogr)}
 participants were asked to compare two activities of their choice
 on \Sexpr{finalNumIndicators} facets related to flow.
-Statistically significant differences were found among activities
+Statistically significant differences were found among activities,
 using a Bayesian model to accommodate the sparseness of these data.
 \emph{Running} and \emph{martial arts} were examples of activities that were
 ranked low and high, respectively, in flow conduciveness.
@@ -233,7 +234,8 @@ of colorful activity descriptions into
 only six general categories \parencite{schmidt2014}.
 We do not challenge the importance of personal factors.
 However, it seems doubtful that situational factors are of importance
-commensurate with the modest amount of research that has examined them.
+commensurate with the modest amount of research that has examined
+them \parencite[for a review of some work in this area, see][]{boffi2016}.
 
 Growing interest in flow training
 \parencite[e.g.,][]{csikszentmihalyi2017,kotler2014}, a type of training that promises
@@ -264,13 +266,13 @@ Even if we restrict our interest to, say, the 100 most popular
 activities,
 it is unrealistic to expect each subject to
 assign global scores to each.
-Judgments that are more readily available are relative comparisons.
 For example, it is difficult to score the predictability of
 running outside on a global scale of $1-100$.
-However, we all know that running outside is usually
+Judgments that are more readily available are relative comparisons.
+For example, we all know that running outside is usually
 \emph{less} predictable than running on a treadmill.
 
-Can relative comparisons be converted into absolute scores?
+If we have relative comparisons, can they be converted into absolute scores?
 Fortunately, this problem is similar to
 the problem of ranking a large number of Chess players.
 Scoring methods are available \parencite[e.g.,][]{bradley1952}.
@@ -281,9 +283,8 @@ we anticipated challenges with missing data and small samples.
 Bayesian methods are particularly suitable for this situation
 because the prior density can pick up the slack when data
 are not available.
-Parameters can be estimated in a generative
-Bayesian model \parencite[i.e., with a proper prior;][p.~52]{gelman2013}
-even with no data.
+In a generative Bayesian model \parencite[i.e., a model with a proper prior;][p.~52]{gelman2013},
+parameters can even be estimated with no data.
 
 Self-report instruments for flow have been developed \parencite{moneta2012}.
 We decided to adapt items from the Flow State Scale-2 and Dispositional Flow Scale-2
@@ -292,7 +293,7 @@ The FS2 contains 36 items, 4 items on each of 9 dimensions
 derived from \textcite{csikszentmihalyi1991}.
 These items concern a single person's experience.
 For example, one item is, ``I know clearly what I want to do.''
-The notion of flow has recently been extended to a group context \parencite{sawyer2007}.
+The notion of flow has recently been extended to a group context \parencite{sawyer2007,vandenhout2016}.
 A variety conditions have
 been described that may support group flow.
 For example, one condition is the notion of \emph{equal participation},
@@ -344,9 +345,9 @@ Subjects were asked to report on voluntarily chosen activities.
 We infer that perceived fit was roughly satisfactory because
 the experience of anxiety or boredom is generally uncomfortable
 and would not be chosen voluntarily.
-Perceived fit was regarded as measurement error.
+Hence, variation in perceived fit was regarded as measurement error.
 We do not, however, need to assume that all activities offer
-equal potential for perceived fit.
+equal opportunities for perceived fit.
 
 Four items assessed activity demand flexibility.
 Item \emph{skill} assessed the relative amount of
@@ -354,7 +355,7 @@ skill that a participant would need to acquire
 to achieve some degree of competence.
 This may seem vague, but it is not a difficult criterion
 for relative comparisons.
-For example, the game tic-tac-toe requires less skill than Chess.
+For example, the game Tic-tac-toe requires less skill than Chess.
 Items \emph{predict} and \emph{novelty} assessed the relative first
 and second order predictability of activities, respectively.
 Finally, Item \emph{creative} assessed the relative opportunities
@@ -394,7 +395,7 @@ We next consider items designed to assess the phenomenology of flow.
 Someone in flow should experience a reduction in
 extraneous mental chatter, feel more in the present moment,
 and have a sense of effortless regardless of the amount
-of physical effort \parencite{dietrich2004}.
+of physical effort \parencite{dietrich2004,stoll2016}.
 Items \emph{chatter}, \emph{present}, and \emph{spont}
 assessed these aspects of phenomenology, respectively.
 Our phenomenology items correspond with the \emph{merging}
@@ -638,7 +639,7 @@ martialArts <- sort(c('Tai chi',
 @
 
 Participants submitted two activities using free-form input.
-This input was coded by the primary investigator
+This input was coded by the primary investigator,
 mostly to match corresponding Wikipedia page titles.
 Specificity of activities were adjusted according to
 data availability.
@@ -757,9 +758,9 @@ options(digits=oldDigits)
 We fit a saturated model to examine the correlation structure between items.
 Poorly performing items will be excluded.
 We then compare a common threshold model with per-item thresholds.
-Once our final model is selected then we report
-fit statistics and posterior summaries of parameters.
-Due to our use of unusual models,
+Once our final model is selected,
+we report fit statistics and posterior summaries of parameters.
+Due to the use of unusual models,
 we provide extra technical detail.
 
 \section{Results}
@@ -809,9 +810,9 @@ In contrast to typical item response models \parencite[e.g.,][Chapter 6]{baker20
 placing a prior on the variance with a mode of 1.0 (Equation~\ref{eqn:standard-sd}) is not sufficient
 to ensure that latent scores $\theta$ tend to approach this mode.
 The logistic discrimination parameter $\alpha$ dominates other
-influences over the variance of $\theta$.
+influences over the variance of $\theta_j$.
 Specifically, for a given $\alpha$,
-the variance of $\theta$ is determined by two factors:
+the variance of $\theta_j$ is determined by two factors:
 measurement error and transitive relations between activities.
 For example, latent scores for the set of activities $\{A,B,C,D\}$ will be spread out roughly
 twice as much if $A < B < C < D$ in comparison with $A = B < C = D$.
@@ -846,20 +847,20 @@ than peripheral items.}
 \end{figure}
 
 The posterior was sampled using RStan~2.17 \parencite{rstan2.17}.
-No convergence warnings were observed and all
+No convergence warnings were observed. All
 potential scale reduction statistics $\hat R$ were well
-below 1.1 \parencite[Section 11.4]{gelman2013}.
-This suggested that the parameter estimates had converged and
+below 1.1 \parencite[Section 11.4]{gelman2013}
+which suggested that the parameter estimates had converged and
 would not improve substantially in accuracy with additional sampling iterations.
 Often the goal of factor analysis is to determine
 how many latent factors are measured by a set of items \parencite[e.g.,][]{golino2017}.
-Here we assumed that there was one latent factor, flow,
+Here we assumed that there was one latent factor, \emph{flow},
 and excluded items with weak loadings or items that obtained the wrong sign.
 
 Item correlations are exhibited in Figure~\ref{fig:item-correlation}.
 Items \emph{goal}, \emph{feedback}, and \emph{spont} were weakly connected and were excluded.
 Since Item \emph{control} positively correlated with Item \emph{predict},
-one of these items had to go.
+one of these two items had to go.
 We chose to exclude Item \emph{control} since it was more peripheral
 and Item \emph{predict} more central.
 If Item \emph{evaluated} is included as an indicator then it obtains a
@@ -933,7 +934,8 @@ model/.style={rectangle, draw=red!80, fill=red!5, very thick, minimum size=5mm},
 \end{center}
 <<>>=
 options(digits=oldDigits)
-if (nrow(outliers) != 0) stop('here')
+if (!is.null(outliers)) stop('here')
+#if (nrow(outliers) != 0) stop('here')
 @
 
 \caption{Model fitness and their relationship to each other.
@@ -963,6 +965,9 @@ in place of Equation~\ref{eqn:saturated} with no correlation matrix $\Sigma$.
 Again, no convergence warnings were observed and all potential scale
 reduction statistics $\hat R$ were well below 1.1.
 The factor model is shown to have reasonable fit in Figure~\ref{fig:model-fitness}.
+In addition to overall model fit,
+leave-one-out cross-validation can also identify outliers.
+However, no outliers were identified.
 %% In addition to overall model fit,
 %% leave-one-out cross-validation also identified \Sexpr{nrow(outliers)} potential outlier
 %% between \Sexpr{outliers[1,'pa1']} and \Sexpr{outliers[1,'pa2']} on Item \emph{\Sexpr{outliers[1,'facet']}}.
@@ -1162,8 +1167,12 @@ activities such as snow skiing and golf involved ample waiting.
 However, Item \emph{waiting} still seems plausible
 and we suggest that it may work in samples with a larger,
 more diverse set of activities.
-For item validity, it is also important to check whether the
-correlation structure of our retained items replicates in new samples.
+
+We estimated the item correlation matrix from data.
+Such correlation matrices can be vulnerable to overfitting.
+One way to address this concern is to perform
+a confirmatory factor analysis on a fresh sample.
+We leave this task for future work.
 
 <<>>=
 rcd <- loadSingleFactorData(RCPA_DIR)
@@ -1200,7 +1209,7 @@ would be fascinating \parencite{daedone2011,losada2017}.
 
 For activities that take place in a group context,
 it would be interesting to include items that tap
-conditions related to social flow \parencite[e.g.,][]{sawyer2007}.
+conditions related to social flow \parencite[e.g.,][]{vandenhout2016}.
 In addition, 
 it would also be interesting to collect data from specific communities.
 For example, a follow up study could focus on people with disabilities.
