@@ -1168,11 +1168,31 @@ However, Item \emph{waiting} still seems plausible
 and we suggest that it may work in samples with a larger,
 more diverse set of activities.
 
-We estimated the item correlation matrix from data.
-Such correlation matrices can be vulnerable to overfitting.
+There remains some uncertainty about our model.
+Model comparison suggested that per-item
+thresholds would improve fit, but the posterior
+predicting checking did not show much improvement.
+Due to the mixed evidence,
+we decided to use the simpler common threshold model.
+A larger sample, more amenable to posterior predictive checking,
+could help settle the question of whether per-item thresholds
+are justified.
+Another source of uncertainty was the result that
+while the factor model was closer to the saturated model
+than the independence model (Figure~\ref{fig:model-fitness}),
+there still remained a significant difference between the
+factor and saturated model.
+Ideally, the factor and saturated model should exhibit
+equally good fit.
+This difference suggests that some of the residual
+item correlations may be non-zero.
+Conservative inclusion of some residual
+correlations could improve the fit of the model.
+Regardless of the exact form of our model,
+factor loadings are vulnerable to overfitting.
 One way to address this concern is to perform
 a confirmatory factor analysis on a fresh sample.
-We leave this task for future work.
+We leave these modeling refinements to future work.
 
 <<>>=
 rcd <- loadSingleFactorData(RCPA_DIR)
@@ -1181,7 +1201,7 @@ et <- calcEdgeTable(rcd)
 
 Allowing the choice of activities using free-form input
 is the most flexible approach for subjects,
-but may hinder data collection efficiency.
+but hinders data collection efficiency.
 Sample sizes between pairs of activities were
 highly skewed (see Figure~\ref{fig:activity-ss}).
 For example, the \Sexpr{names(which(et == max(et)))} pair
