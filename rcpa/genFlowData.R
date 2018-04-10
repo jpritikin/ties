@@ -49,7 +49,7 @@ itemInfo <- data.frame('$\\hat\\sigma_j$'=c(sigma),
 itemInfo <- itemInfo[order(-itemInfo[,2]),]
 
 save(hikingVsMountainBikingP, hikingVsMountainBiking, runningVsMartialArts, runningVsMartialArtsP,
-  itemInfo, loadings, rawLoadings, flow, rawFlow, file="genFlowData.rda")
+  itemInfo, loadings, rawLoadings, flow, rawFlow, tar, file="genFlowData.rda")
 
 q()
 
