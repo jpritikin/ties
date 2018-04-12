@@ -48,8 +48,10 @@ itemInfo <- data.frame('$\\hat\\sigma_j$'=c(sigma),
   row.names=facetNames, check.names=FALSE)
 itemInfo <- itemInfo[order(-itemInfo[,2]),]
 
+numIterations <- length(cmp1)
+
 save(hikingVsMountainBikingP, hikingVsMountainBiking, runningVsMartialArts, runningVsMartialArtsP,
-  itemInfo, loadings, rawLoadings, flow, rawFlow, tar, file="genFlowData.rda")
+  numIterations, itemInfo, loadings, rawLoadings, flow, rawFlow, tar, file="genFlowData.rda")
 
 q()
 
