@@ -9,7 +9,7 @@ set -o errexit
 set -o nounset
 set -x
 
-exec &> >(tee -a runStan.log)
+exec &> >(tee runStan.log)
 
 date
 

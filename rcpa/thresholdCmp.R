@@ -2,18 +2,19 @@
 # 1 set of thresholds vs separate thresholds for every facet
 
 library(loo)
-options(loo.cores = 2)
 
 source("modelUtil.R")
+options(mc.cores = 1)
 
 load(paste0(outputDir(), "fit2t2.rda"))  # common threshold
+fit1_ll <- extract_log_lik(fit2t2, merge_chains = FALSE)
+loo1 <- loo(fit1_ll, r_eff=relative_eff(exp(fit1_ll)))
+rm(fit1_ll)
+
 load(paste0(outputDir(), "fit2t3.rda"))  # per facet threshold
-
-fit1_ll <- extract_log_lik(fit2t2)
-fit2_ll <- extract_log_lik(fit2t3)
-
-loo1 <- loo(fit1_ll)
-loo2 <- loo(fit2_ll)
+fit2_ll <- extract_log_lik(fit2t3, merge_chains = FALSE)
+loo2 <- loo(fit2_ll, r_eff=relative_eff(exp(fit2_ll)))
+rm(fit2_ll)
 
 looCmp <- compare(loo1, loo2)
 
