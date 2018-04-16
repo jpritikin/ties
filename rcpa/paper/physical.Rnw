@@ -207,28 +207,32 @@ Some large differences were found among activities,
 using a Bayesian model to accommodate the sparseness of these data.
 \emph{Running} and \emph{martial arts} were examples of activities that were
 ranked low and high, respectively, in flow propensity.
-Based on these findings,
-flow training systems ought to recommend activities that are
-particularly conducive to flow or at least account for the flow
-relevant characteristics of a given specific physical activity.
+These results suggest an extension to the causal model of
+flow that incorporates activity and environmental factors.
+The propensity to enjoy flow is increased by the selection
+of a complex, high stakes activity that offers demand flexibility and takes
+place in a complex environment.
+A more accurate theory of flow will facilitate
+more productive research that will speed the growth of our understanding.
+From a practical standpoint,
+flow training systems ought to account for a chosen activity'
+flow propensity or even recommend activities based on their
+flow propensity.
 }
 
 \begin{document}
 
 \maketitle
 
-Flow (or optimal) experience can be defined as a particular constellation of
-characteristics that we illustrate by way of martial arts cinema.
-Although many fine films have been made, here we suggest
-Jackie Chan's Rush Hour 1998 as an example.
-During a fight scene, Jackie must exercise \emph{concentration} and \emph{control}.
+During a fight scene, Jackie Chan must exercise \emph{concentration} and \emph{control}.
 Combatants have \emph{clear goals} and receive \emph{immediate feedback}.
 Jackie is often faced with \emph{demands that slightly exceed his skills},
 but he often invents creative ways to overcome his adversary.
 As we watch, vicariously, \emph{action and awareness merge} as we
 \emph{enjoy} the \emph{perfect} punch, block, and throw.
 Our example is set in a martial arts context,
-but a similar psychological state of flow can be found in diverse activities.
+but a similar psychological state of flow (or optimal) experience
+can also be found in other activities.
 The elements that define flow include three antecedents---task demands
 that slight exceed skills, clear goals, and immediate feedback---five
 phenomenological indicators---concentration, merging of action and awareness,
@@ -239,7 +243,7 @@ Since its formal identification in the 1970s, optimal experience
 has been vigorously studied from psychological, physiological,
 and neuroimaging standpoints \parencite[e.g.,][]{jackson1998,demanzano2010,limb2008}.
 The primary focus of this body of research has been on the person who
-experienced flow.
+experiences flow.
 The notion of flow emerged from research aiming to determine what
 made certain activities inherently motivating \parencite{engeser2012}.
 Investigations initially regarded flow as an outcome.
@@ -263,14 +267,14 @@ thoughts to become fully involved in skating?''
 The activity is a given;
 we can hardly advise an elite figure skater to abandon her
 skates for piano performance if
-that activity is slightly more conducive to flow
+that activity has slightly more propensity for flow
 than figure skating (or vice versa).
 However, not everybody has already chosen an activity.
 For people at the beginning of their pursuit of flow,
-can we provide any information to guide their choice of an activity?
-Is activity choice idiographic and flow purely a matter
-of fit between person and activity?
-Or are there nomothetic properties of activities that
+can we provide any information to guide their activity choice?
+Is flow purely a matter
+of fit between a specific person and activity pair?
+Or are there properties of activities that
 affect an activity' propensity for flow that generalize across all people?
 We sought to answer these questions.
 
@@ -285,30 +289,29 @@ This approach offered the benefit of less reliance on recall.
 Participants were signaled at random times with a pager and asked to
 complete an experience sampling form to report on their immediately preceding experience.
 These data tracked individuals longitudinally and permitted testing
-and refinement of the dynamic model of flow \parencite[e.g.,][]{chalip1984,massimini1988}
+and refinement of the dynamic model of flow \parencite[e.g.,][]{chalip1984,massimini1988}.
 However, these first two measurement instruments were not designed using test theory
-and have not been investigated with factor analysis
+and have not been investigated with factor analysis,
 leaving some doubt about their construct validity.
-Test theory concerns the valid measurement of latent constructs \parencite[e.g.,][]{crocker1986}.
-The Flow State Scale-2 and Dispositional Flow Scale-2 measures were
-the first measures developed according to test theory procedures
-\parencite[hereafter abbreviated FS2;][]{jackson2002}.
-The nine components of FS2 are balance between skills and demands (balance),
-merging of action and awareness (merging), clear goals (goals), immediate feedback (feedback),
-concentration, feeling of control (control), diminished self-consciousness (consciousness),
-time distortion (time), and positive affect (autotelic).
+The Flow State Scale-2 and Dispositional Flow Scale-2 measures
+\parencite[hereafter abbreviated FS2;][]{jackson2002} were
+the first measures developed according to test theory procedures \parencite[e.g.,][]{crocker1986}.
+The nine components of FS2 are balance between skills and demands (Balance),
+merging of action and awareness (Merging), clear goals (Goals), immediate feedback (Feedback),
+Concentration, feeling of control (Control), diminished self-consciousness (Consciousness),
+time distortion (Time), and positive affect (Autotelic).
 A shortcoming of FS2 is that it ignores the distinction between
 antecedents, phenomenological indicators, and consequents of flow.
-In any case, these nine components are regarded as correlated
+These nine components are regarded as correlated
 dimensions of flow that are combined together to produce an estimate of
 flow intensity or depth on a continuous scale.
 Confirmatory factor analyses that have examined the relationship of these
-items provide some evidence of construct validity.
+items provide some evidence of construct validity \parencite[e.g.,][]{jackson2002,jackson2008}.
 
-Prior measurement instruments are not well suited to studying
-activities apart from individuals.
-Hence, prior research has examined one activity at a time or,
-at most, a handful of activities.
+Can one of these self-report instruments
+be used to study activities apart from individuals?
+Prior research has examined an activity at a time or,
+at most, a handful of activities \parencite[e.g.,][]{schmidt2014}.
 There are about 8,000 sports \parencite{liponski2003},
 and if we broaden our interest
 to the general category of physical activities,
@@ -319,8 +322,7 @@ a small subset of the many possible physical activities.
 Even if we restrict our interest to, say, the 100 most popular
 activities,
 it is unrealistic to expect each subject to
-assign scores to each in a way similar to
-how we can measure cortisol.
+assign scores to each.
 For example, it is difficult to score the flow propensity of
 the activity \emph{running} on an absolute scale of $1-100$.
 Judgments that are more readily available are relative comparisons.
@@ -346,28 +348,24 @@ parameters can even be estimated with no data.
 \subsection{Scope of Investigation}
 
 FS2 items concern a single person's experience.
-The notion of flow has recently been extended to a group context \parencite{sawyer2007,vandenhout2016}.
-A variety conditions have
-been described that may support flow in a group context (``group flow'').
-For example, one condition is the notion of \emph{equal participation},
-that group flow will be hindered if there are
-conspicuous inequalities among the group.
-However, we decided not to include conditions related to group flow
-because of their applicability to only a subset activities,
+Although the notion of flow has recently been extended
+to a group context \parencite[group flow;][]{sawyer2007,vandenhout2016},
+we decided not to measure conditions
+that may support group flow.
+These conditions would only be applicable to a subset activities,
 and we did not want to limit participants' free-form choice.
 
 \subsection{Activity Flow Propensity Measure}
 
-Our goal is to develop a measure of flow propensity for activities.
-We use FS2, a validated measure of flow,
-as a starting point and derive our items from FS2 items.
+We use FS2 as a starting point
+and derive our items from FS2 items.
 As far as possible, items are adapted in minimal ways
 only to reflect the change in emphasis from
 the combined person-activity situation to the activity alone.
 We will consider the nine FS2 subscales in the follow order:
-\emph{balance}, \emph{concentration}, \emph{consciousness}
-\emph{goal}, \emph{feedback}, and \emph{control},
-\emph{merging}, \emph{time}, and \emph{autotelic}.
+Balance, Concentration, Consciousness
+Goal, Feedback, and Control,
+Merging, Time, and Autotelic.
 As the derivation of our items are discussed,
 refer to Appendix~\ref{app:questionnaire} for the exact wording.
 
@@ -375,7 +373,7 @@ One important antecedent of flow is the perceived
 fit of a subject's skill to activity demands \parencite{keller2012}.
 For example, anxiety or boredom may result when
 activity demands exceed skills or skills exceed demands, respectively.
-FS2 assesses perceived fit (i.e., \emph{balance}) with items such as,
+FS2 assesses perceived fit (i.e., Balance) with items such as,
 ``I feel I am competent enough to meet the high demands of the situation.''
 However, in the present study, the focus was on situational factors.
 We could only measure the demand half of the skills-demands balance.
@@ -417,10 +415,10 @@ activity \parencite{keller2012}.
 Item \emph{stakes} drew on related concepts like, ``importance,''
 and the fact that high stakes activities should recruit
 more concentration than low stakes activities.
-A similar FS2 item is, ``I am completely focused on the task at hand'' (\emph{concentration}).
+A similar FS2 item is, ``I am completely focused on the task at hand'' (Concentration).
 Item \emph{evaluated} assessed the relative type of motivation,
 whether extrinsic or not \parencite{csikszentmihalyi1999}.
-A similar FS2 item is, ``I am not concerned with what others may be thinking of me'' (\emph{consciousness}).
+A similar FS2 item is, ``I am not concerned with what others may be thinking of me'' (Consciousness).
 Items \emph{goal}, \emph{feedback}, and \emph{control} assessed
 the relative clarity of goals, immediacy of feedback,
 and degree of control over performance, respectively.
@@ -444,15 +442,15 @@ Someone in flow should experience a reduction in
 extraneous mental chatter, feel more in the present moment,
 and have a sense of effortless regardless of the amount
 of physical effort \parencite{dietrich2004,stoll2016}.
-Items \emph{chatter}, \emph{present}, and \emph{spont}
+Items \emph{chatter}, \emph{present}, and \emph{spontaneous}
 assessed these aspects of phenomenology, respectively.
-Our phenomenology items correspond with the \emph{merging}
-factor in FS2.
-An example of an FS2 \emph{merging} item is, ``I perform automatically,
+Our phenomenology items correspond with the Merging
+subscale in FS2.
+An example of an FS2 Merging item is, ``I perform automatically,
 without thinking too much.''
 
-Although loading weakly on flow in a factor analysis \parencite{jackson2002},
-time distortion is another putative phenomenological aspect of flow.
+Although loading weakly on Flow in a factor analysis \parencite{jackson2002},
+time distortion (Time) is another putative phenomenological aspect of flow.
 In theory, time slows down or passes more rapidly than usual.
 However, we imagine activity $\times$ subjective time interactions.
 Consider that a time clock can be an integral part of the game (e.g.,
@@ -468,12 +466,12 @@ we decided to include a simpler item related to time.
 Item \emph{waiting} assessed the relative amount of
 time spent waiting.
 For example, in baseball, most batters wait on the bench.
-This item is more objective than FS2's subjective time distortion.
+This item is more objective than FS2's subjective time distortion subscale.
 We expected that waiting would negatively correlate with flow.
 
 Item \emph{reward} assessed the relative degree of positive
 affect after engaging in an activity.
-This item corresponds to the \emph{autotelic} factor in FS2.
+This item corresponds to the Autotelic subscale in FS2.
 An example FS2 item is, ``I really enjoy the experience.''
 Other potential consequents of flow, such as cognitive capacity
 or processing styles, have not received much empirical
@@ -483,7 +481,7 @@ from prior research were not available.
 For the sake of completeness,
 we describe our unused and discarded items in Appendix~\ref{app:bad-items}.
 
-\subsection{Study}
+\subsection{Study Overview}
 
 %% When new self-report items are introduced,
 %% researchers are generally obliged to present evidence
@@ -498,11 +496,12 @@ we describe our unused and discarded items in Appendix~\ref{app:bad-items}.
 
 Our hypothesis is that physical activities differ by flow propensity.
 In a cross-sectional design,
-we examined many participants' experiences of activities
+we examined experiences of activities
 with respect to flow-relevant facets.
-Information from these pairwise comparisons were integrated using a factor model.
-The resulting factor scores $\hat\pi$ can be regarded as an activity's
-absolute flow propensity on a continuous scale.
+These pairwise comparisons were converted into latent absolute
+rankings, which in turn, served as indicators in a factor model.
+The resulting factor scores $\hat\pi$ can be regarded as activities'
+absolute flow propensities on a continuous scale.
 The null hypothesis is that all activities have equal flow propensity, $\sum |\hat\pi|=0$.
 Complete source code for data preprocessing and analysis is
 available from \url{https://osf.io/bmnt3/}.
@@ -638,7 +637,7 @@ participants are exhibited in Table~\ref{tab:demogr1}.
 
 \subsection{Preliminary Results}
 
-To help entice participation, we assembled a web page to exhibit
+To entice participation, we assembled a web page to exhibit
 preliminary results,
 \url{http://exuberant-island.surge.sh/rcpa/}.
 A brief instructional video is included that
@@ -750,7 +749,7 @@ converted into absolute rankings by the model.
 We fit a saturated model to examine the correlation structure among
 the latent absolute rankings.
 Poorly performing items were excluded.
-Threshold parameter $\tau_1, \tau_2$ mapped ordinal responses \emph{much}
+Threshold parameters $\tau_1, \tau_2$ mapped ordinal responses \emph{much}
 and \emph{somewhat} to the continuous logit scale.
 To determine whether \emph{much} and \emph{somewhat} were used similarly for all items,
 we compared a common threshold model with per-item thresholds.
@@ -781,13 +780,13 @@ than peripheral items.}
 Item correlations are exhibited in Figure~\ref{fig:item-correlation}.
 Often the goal of exploratory factor analysis is to determine
 how many latent factors are measured by a set of items \parencite[e.g.,][]{golino2017}.
-Here we assumed that there was one latent factor, \emph{flow},
+Here we assumed that there was one latent factor, Flow,
 and excluded items with weak loadings or items that obtained the wrong sign.
-Items \emph{goal}, \emph{feedback}, and \emph{spont} were weakly connected and were excluded.
+Items \emph{goal}, \emph{feedback}, and \emph{spontaneous} were weakly connected and were excluded.
 Item \emph{control} positively correlated with Item \emph{predict}.
 This was a problem because, in theory,
-Item \emph{control} should positively correlate with flow
-while Item \emph{predict} should negatively correlate with flow.
+Item \emph{control} should positively correlate with Flow
+while Item \emph{predict} should negatively correlate with Flow.
 One of these two items had to go.
 We chose to exclude Item \emph{control} since it was more peripheral
 and Item \emph{predict} more central.
@@ -863,7 +862,7 @@ model/.style={rectangle, draw=red!80, fill=red!5, very thick, minimum size=5mm},
 \end{center}
 <<>>=
 options(digits=oldDigits)
-if (!is.null(outliers)) stop('here')
+#if (!is.null(outliers)) stop('here')
 #if (nrow(outliers) != 0) stop('here')
 @
 
@@ -949,10 +948,10 @@ ggplot() +
   geom_segment(data=sdf, aes(y=facet, yend=facet, x=x, xend=xend),
                color="red", alpha=.5, size=1) +
   geom_point(data=mdf, aes(x, facet), color="white", size=1) +
-  ylab("physical activity") + xlab("latent flow score")
+  ylab("physical activity") + xlab("latent flow propensity score")
 
 @ 
-\caption{Posterior means and distributions of latent flow scores $\hat\pi$.
+\caption{Posterior means and distributions of latent flow propensity scores $\hat\pi$.
 The red stripe highlights the 95\% credible interval.
 Wide intervals reflect activities with samples sizes as small as 2
 and should be interpreted with caution.}
@@ -989,9 +988,9 @@ gsub('\\item [a]','', str, fixed=TRUE)
 The fits of the independence, factor, and saturated model are
 exhibited in Figure~\ref{fig:model-fitness}.
 The factor model fit is adequate, but there is room for improvement.
-In addition to overall model fit,
-leave-one-out cross-validation can also identify outliers.
-However, no outliers were identified.
+%% In addition to overall model fit,
+%% leave-one-out cross-validation can also identify outliers.
+%% However, no outliers were identified.
 %% In addition to overall model fit,
 %% leave-one-out cross-validation also identified \Sexpr{nrow(outliers)} potential outlier
 %% between \Sexpr{outliers[1,'pa1']} and \Sexpr{outliers[1,'pa2']} on Item \emph{\Sexpr{outliers[1,'facet']}}.
@@ -1002,31 +1001,31 @@ The \emph{somewhat} responses are never the most probable regardless of
 difference in latent ranking.
 Therefore, the addition of more response categories is unlikely to improve
 measurement accuracy.
-Flow loadings and latent flow scores are exhibited
+
+Flow loadings and latent flow propensity scores are exhibited
 in Figures~\ref{fig:loadings} and \ref{fig:activities}, respectively.
 To develop appreciation of these results, we can examine particular activity pairs.
 Some of the effect sizes between activities are large.
 For example, $\hat\pi_\text{martial arts} - \hat\pi_\text{running}$
 has a 95\% credible interval of~$[\Sexpr{runningVsMartialArts[1]}, \Sexpr{runningVsMartialArts[2]}]$,
 $\log\left[ P(\hat\pi_\text{running} = \hat\pi_\text{martial arts})\right] < \Sexpr{log(runningVsMartialArtsP)}$.
-This $p$-value is less than the conservative Bonferroni threshold
-for all pairwise comparisons of flow scores,
- $\log\left[0.05 (\frac{1}{2} \Sexpr{nrow(flow)} \cdot \Sexpr{nrow(flow)-1})^{-1}\right] =
-\Sexpr{log(0.05/(nrow(flow) * (nrow(flow)-1)/2))}$.
-These activities are practically at the opposite extremes, but
+Perhaps a correction should be made for multiple comparisons,
+but this $p$-value is limited by the number of draws from the posterior
+and would likely be smaller if the sampler was permitted to continue running.
+The activities \emph{running} and \emph{martial arts}
+are practically at the opposite extremes of flow propensity, but
 even similar activities can be distinguished.
 For example, $\hat\pi_\text{mountain biking} - \hat\pi_\text{hiking}$
 has a 95\% credible interval of $[\Sexpr{hikingVsMountainBiking[1]}, \Sexpr{hikingVsMountainBiking[2]}]$,
 $P(\hat\pi_\text{hiking} = \hat\pi_\text{mountain biking}) \approx \Sexpr{hikingVsMountainBikingP}$.
-Finally, item diagnostics are exhibited Table~\ref{tab:itemInfo}
+Finally, item diagnostics are exhibited (Table~\ref{tab:itemInfo})
 wherein we find that Item \emph{complex} is a good predictor of flow
 even though this item is relatively difficult to measure.
-
 % No point in actually computing this p-value since it's even less
 % than martial arts vs running.
 In summary, our hypothesis that physical activities differ by how
 conducive they are to flow was supported,
-$\log(P(\sum |\hat\pi|=0)) < \Sexpr{log(1/numIterations)}$. This is most clearly
+$\log\left[ P(\sum |\hat\pi|=0) \right] < \Sexpr{log(1/numIterations)}$. This is most clearly
 demonstrated by Figure~\ref{fig:activities}.
 
 \section{Discussion and Conclusion}
@@ -1037,9 +1036,9 @@ Participants were asked to choose two activities and compare
 them with respect to a set of flow relevant facets.
 A factor model was fit to these data and factor scores obtained
 for each activity.
-Activities were distributed across three standard deviations,
-from running (weak propensity to flow) to martial arts (strong
-propensity to flow).
+Activities were distributed across a continuous spectrum
+from running (weak propensity for flow) to
+martial arts (strong propensity for flow).
 
 <<>>=
 load(paste0(RCPA_DIR, "plotAllItems.rda"))
@@ -1048,7 +1047,7 @@ load(paste0(RCPA_DIR, "plotAllItems.rda"))
 Six of our initial set of 16 items were excluded.
 Five of these items were based on items validated in FS2.
 So what went wrong?
-It seems likely that Items \emph{control}, \emph{spont}, and
+It seems likely that Items \emph{control}, \emph{spontaneous}, and
 \emph{evaluated} reflect mostly personal, not situational, factors.
 For Items \emph{goal} and \emph{feedback},
 we examined the range of latent scores $\max(\hat\theta_j)-\min(\hat\theta_j)$ obtained
@@ -1062,6 +1061,11 @@ Items \emph{goal} and \emph{feedback} reflect
 personal, not situational, factors or whether
 there was some deficiency in the way these items
 were presented.
+The FS2 Concentration subscale was not well represented
+in our item set.
+Future studies could try items of the form,
+``I concentrate much more during {{Q6}} compared to {{Q7}},''
+or, ``{{Q6}} feels much more important than {{Q9}}.''
 Finally, we consider Item \emph{waiting}, a new item.
 In our sample, low flow activities like elliptical, walking,
 and running involved negligible waiting whereas high flow
@@ -1070,17 +1074,31 @@ However, Item \emph{waiting} still seems plausible
 and we suggest that it may work in samples with a larger,
 more diverse set of activities.
 
-TODO Suggest items for future studies:
-FS2 \emph{concentration} -- could try ``I concentrate much more during A1 compares to A2.''
-\emph{stakes} {{Q6}} feels much more important than {{Q9}}. \parencite{higgins2006}
-\emph{body} Why is bodily involvement related to flow? What is the mechanism?
+A curious pattern appears in the mean posterior estimates of flow.
+A natural environment seems to confer a flow advantage among activities
+that are otherwise almost identical.
+For example, 
+$\hat\pi_\text{walking}=\Sexpr{-flow['walking','mean']} < \hat\pi_\text{hiking}=\Sexpr{-flow['hiking','mean']}$,
+$\hat\pi_\text{running on a treadmill}=\Sexpr{-flow['running on a treadmill','mean']} < \hat\pi_\text{running}=\Sexpr{-flow['running','mean']}$,
+and 
+$\hat\pi_\text{cycling}=\Sexpr{-flow['cycling','mean']} < \hat\pi_\text{mountain biking}=\Sexpr{-flow['mountain biking','mean']}$.
+An innate affiliation between humans and other living things is one
+theory that might explain these data \parencite[e.g.,][]{wilson1984}.
+An alternate theory is that environments have a
+flow propensity similar to the way that we find
+activities have a flow propensity \parencite[e.g.,][]{rainisio2014}.
+Item \emph{complex} asked about ``action and the environment,'' which
+may have been double-barreled.
+Future studies should separate these concerns.
+We suggest that cycling in an environment experimentally manipulated
+using virtual reality technology may be one way to highlight these differences.
 
 There remains some uncertainty about our model.
 Model comparison suggested that per-item
 thresholds would improve fit, but the posterior
 predicting checking did not show much improvement.
 Per-item thresholds would mean that \emph{much} and
-\emph{somewhat} had different meanings in different items.
+\emph{somewhat} had different meanings for different items.
 Due to the mixed evidence,
 we decided to use the simpler common threshold model.
 A larger sample, more amenable to posterior predictive checking,
@@ -1127,21 +1145,6 @@ Reanalysis and replication are welcome.
 Raw data are made available under the Open
 Database License 1.0.\footnote{\url{https://opendatacommons.org/licenses/odbl/}}
 
-A curious pattern appears in the mean posterior estimates of flow.
-A natural environment seems to confer a flow advantage among activities
-that are otherwise almost identical.
-For example, 
-$\hat\pi_\text{walking}=\Sexpr{-flow['walking','mean']} < \hat\pi_\text{hiking}=\Sexpr{-flow['hiking','mean']}$,
-$\hat\pi_\text{running on a treadmill}=\Sexpr{-flow['running on a treadmill','mean']} < \hat\pi_\text{running}=\Sexpr{-flow['running','mean']}$,
-and 
-$\hat\pi_\text{cycling}=\Sexpr{-flow['cycling','mean']} < \hat\pi_\text{mountain biking}=\Sexpr{-flow['mountain biking','mean']}$.
-An innate affiliation between humans and other living things is one
-theory that might explain these data \parencite{wilson1984}.
-However, there are a handful of competing theories that
-might account for these differences \parencite[e.g.,][]{rainisio2014}.
-We suggest that cycling in an environment experimentally manipulated
-using virtual reality technology may be one way to put these alternatives to the test.
-
 For activities that take place in a group context,
 it would be interesting to include items that tap
 conditions related to social flow \parencite[e.g.,][]{vandenhout2016}.
@@ -1150,7 +1153,7 @@ In addition,
 it would also be interesting to collect data from specific communities.
 For example, a follow up study could focus on people with disabilities.
 
-Activities ranked with a high propensity to flow prompt follow up studies.
+Activities ranked with a high propensity for flow prompt follow up studies.
 For example, the broad category \emph{martial arts}
 prompts investigation into specific styles.
 We anticipate that there are important differences between, for
@@ -1181,7 +1184,7 @@ might be drastically reduced by the choice of
 a more suitable physical activity.
 As part of integrating our results with flow training,
 it will be important to quantify the extent that
-statistically significant flow score differences
+flow score differences
 translate into actual differences in a training regimen.
 A flow metacognitions questionnaire identified two personal factors
 that support flow, Beliefs that Flow Fosters Achievement
@@ -1189,7 +1192,7 @@ and Confidence in Ability to Self-Regulate Flow \parencite{wilson2016}.
 Awareness of situational factors may constitute a useful
 addition to this measure.
 
-In the Introduction, we presumed a model wherein a person
+Initially, we presumed a model wherein a person
 selects a single activity and pursues it to perfection.
 Of course this is an oversimplification;
 A person may pursue mastery in multiple activities.
@@ -1199,17 +1202,22 @@ activities.
 For example, if a person becomes familiar with flow in the context of
 martial arts, an activity more conducive to flow,
 then can she more easily find flow in
-activities less conductive to flow like running?
+activities with less propensity like running?
 More research is needed.
 
-TODO: Prior research on flow has not really taken the activity seriously.
-Suggest a re-conceptualization of flow that gives a more prominent
-role to attributes of a participant's chosen activity.
-
-Flow promises positive affect and enhanced performance.
-These benefits can be enjoyed for their own sake.
-However, we also look forward to a future where people enjoy flow
-with vastly increased frequency and intensity.
+Prior research on flow has generally focused on personal factors
+and attended less to the activity and environment.
+Our results point to the importance of complex, high stakes activities
+that offer demand flexibility and take place in complex environments.
+On the other hand, clear goals, immediate feedback, a sense of control, spontaneity,
+and intrinsic motivation are likely a function of personal factors,
+not of the particular activity.
+A more precise model of the causal structure can suggest better
+research designs that will speed the growth of our understanding of
+flow.
+We also look forward to the practical application of our growing
+knowledge to permit people to enjoy flow with vastly increased
+frequency and intensity.
 
 \printbibliography
 
@@ -1325,7 +1333,7 @@ succinct reference.
 \item {{Q9}} brings me into the present somewhat more than {{Q6}}.
 \item {{Q9}} brings me into the present much more than {{Q6}}.
 \end{itemize}
-\emph{spont.} How spontaneous is your action?
+\emph{spontaneous.} How spontaneous is your action?
 \begin{itemize}
 \item {{Q9}} feels effortless compare to {{Q6}} where I have to struggle and force myself.
 \item {{Q9}} feels like less effort than {{Q6}}.
@@ -1440,7 +1448,7 @@ P(\text{running} < \text{running on a treadmill}) &= \frac{1}{1+\exp\left[ \alph
 \end{align}
 We extended this idea to multiple response categories
 in a way similar to the partial credit model \parencite{muraki1992}.
-These item models linked observed data to latent scores.
+These item models linked relative observed data to absolute latent scores.
 The per-item latent scores were then related to each other
 by a covariance structure.
 This can be regarded as a structural equation model with logistic indicators.
@@ -1466,7 +1474,7 @@ dev.off()
 \caption{Ability of the factor model to recover parameters
 from simulated data. A correlation of \Sexpr{cor(simResult$true, simResult$recovered)}
 was obtained for item discrimination $\alpha$; thresholds $\tau_1, \tau_2$;
-standard deviations $\sigma$; factor loadings $\lambda$; and latent flow scores $\pi$.
+standard deviations $\sigma$; factor loadings $\lambda$; and latent flow propensity scores $\pi$.
 A correlation of \Sexpr{cor(simResultTheta$true, simResultTheta$recovered)} was
 found between between true and posterior mean recovered item scores $\theta$ (not plotted).}
 \label{fig:simResults}
@@ -1536,7 +1544,7 @@ and a larger exponent can create sampling problems due to extreme
 curvature in the posterior.
 
 For the factor model, we introduced $\lambda_j$ factor
-loading of item $j$ and $\pi_k$ latent flow score of activity $k$.
+loading of item $j$ and $\pi_k$ latent flow propensity score of activity $k$.
 The factor model replaced Equation~\ref{eqn:saturated} with,
 \begin{align}
 \lambda &\sim \N(0, 5) \\
