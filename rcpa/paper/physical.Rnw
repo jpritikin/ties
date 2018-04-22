@@ -87,7 +87,7 @@
 
 \newcommand{\E} {\mathbb{E}}
 
-\title{Situational factors in optimal experience: Which physical activities are conducive to flow?}
+\title{Exploration of the differences in flow-related traits across physical activities}
 
 \twoauthors{Joshua N.~Pritikin}{Karen M.~Schmidt}
 \twoaffiliations{Virginia Commonwealth University}{University of Virginia}
@@ -105,7 +105,8 @@ Department of Psychiatry and Virginia Institute
 for Psychiatric and Behavior Genetics, Virginia Commonwealth University,
 800 E. Leigh St., Richmond, VA 23219. E-mail: jpritikin@pobox.com}
 
-\keywords{flow, situational factors, factor model, pairwise comparisons,
+\keywords{flow experience, optimal experience,
+  situational factors, factor model, pairwise comparisons,
  item response model, Bayesian methods}
 
 <<echo=FALSE, results='hide', warning=FALSE, cache=FALSE>>=
@@ -208,7 +209,7 @@ using a Bayesian model to accommodate the sparseness of these data.
 \emph{Running} and \emph{martial arts} were examples of activities that were
 ranked low and high, respectively, in flow propensity.
 These results suggest an extension to the causal model of
-flow that incorporates activity and environmental factors.
+flow that incorporates activity and environment as factors.
 The propensity to enjoy flow is increased by the selection
 of a complex, high stakes activity that offers demand flexibility and takes
 place in a complex environment.
@@ -233,7 +234,7 @@ As we watch, vicariously, \emph{action and awareness merge} as we
 Our example is set in a martial arts context,
 but a similar psychological state of flow (or optimal) experience
 can also be found in other activities.
-The elements that define flow include three antecedents---task demands
+The elements that define \emph{flow} include three antecedents---task demands
 that slight exceed skills, clear goals, and immediate feedback---five
 phenomenological indicators---concentration, merging of action and awareness,
 sense of control, intrinsic motivation, and reduced self-consciousness---and
@@ -300,8 +301,6 @@ The nine components of FS2 are balance between skills and demands (Balance),
 merging of action and awareness (Merging), clear goals (Goals), immediate feedback (Feedback),
 Concentration, feeling of control (Control), diminished self-consciousness (Consciousness),
 time distortion (Time), and positive affect (Autotelic).
-A shortcoming of FS2 is that it ignores the distinction between
-antecedents, phenomenological indicators, and consequents of flow.
 These nine components are regarded as correlated
 dimensions of flow that are combined together to produce an estimate of
 flow intensity or depth on a continuous scale.
@@ -362,10 +361,14 @@ and derive our items from FS2 items.
 As far as possible, items are adapted in minimal ways
 only to reflect the change in emphasis from
 the combined person-activity situation to the activity alone.
-We will consider the nine FS2 subscales in the follow order:
-Balance, Concentration, Consciousness
-Goal, Feedback, and Control,
-Merging, Time, and Autotelic.
+We acknowledge that activities do not directly induce flow.
+Whether flow is experienced is ultimately a personal matter.
+A person may experience or not experience flow regardless
+of the activity.
+However, we contend that activities influence flow
+propensity by modulation of flow antecedents.
+We first consider the four antecedent FS2 subscales:
+Balance, Concentration, Goal, and Feedback.
 As the derivation of our items are discussed,
 refer to Appendix~\ref{app:questionnaire} for the exact wording.
 
@@ -378,9 +381,9 @@ FS2 assesses perceived fit (i.e., Balance) with items such as,
 However, in the present study, the focus was on situational factors.
 We could only measure the demand half of the skills-demands balance.
 Subjects were asked to report on voluntarily chosen activities.
-We infer that perceived fit was roughly satisfactory because
-the experience of anxiety or boredom is generally uncomfortable
-and would not be chosen voluntarily.
+We infer that perceived fit was not extremely poor because
+the vivid experience of anxiety or boredom
+would not be chosen voluntarily.
 Hence, variation in perceived fit was regarded as measurement error.
 We do not, however, need to assume that all activities offer
 equal opportunities for perceived fit.
@@ -408,7 +411,7 @@ activities that admit more creativity offer
 more demand flexibility and opportunities for satisfactory perceived fit.
 Any idiographic differences in people,
 such as a distaste for creative expression,
-was regarded as measurement error.
+were regarded as measurement error.
 
 Another important antecedent of flow is the subjective value of the
 activity \parencite{keller2012}.
@@ -416,16 +419,11 @@ Item \emph{stakes} drew on related concepts like, ``importance,''
 and the fact that high stakes activities should recruit
 more concentration than low stakes activities.
 A similar FS2 item is, ``I am completely focused on the task at hand'' (Concentration).
-Item \emph{evaluated} assessed the relative type of motivation,
-whether extrinsic or not \parencite{csikszentmihalyi1999}.
-A similar FS2 item is, ``I am not concerned with what others may be thinking of me'' (Consciousness).
-Items \emph{goal}, \emph{feedback}, and \emph{control} assessed
-the relative clarity of goals, immediacy of feedback,
-and degree of control over performance, respectively.
+Items \emph{goal} and \emph{feedback} assessed
+the relative clarity of goals and immediacy of feedback, respectively.
 These items correspond closely with similar items in FS2.
-For example, ``I know clearly what I want to do,''
-``I am aware of how well I am performing,''
-and ``I have a feeling of total control,'' respectively.
+For example, ``I know clearly what I want to do'' and
+``I am aware of how well I am performing,'' respectively.
 Our attempt to clarify the time scale of goals and feedback
 is detailed in Appendix~\ref{app:bad-items}.
 
@@ -437,10 +435,30 @@ We speculate that these items feed into both the subjective value antecedent,
 by making an activity more engrossing, and also admit more opportunities for
 perceived fit.
 
-We next consider items designed to assess the phenomenology of flow.
+We next turn our attention to phenomenological indicators and
+consequents of flow.
+Subjects unaware of flow theory may
+accidentally experience flow.
+We contend that the frequency of these accidents
+are, in part, modulated by activity flow propensity.
+In other words, flow propensity is
+expected to cause phenomenological indicators and consequents of flow.
+We consider FS2 subscales Consciousness, Control, Merging,
+Time, and Autotelic.
+
+Item \emph{evaluated} assessed the relative type of motivation,
+whether extrinsic or not \parencite{csikszentmihalyi1999}.
+We expected this item to reflect the prevalence of
+refereeing and spectating.
+A similar FS2 item is, ``I am not concerned with what others may be
+thinking of me'' (Consciousness).
+Item \emph{control} assessed the relative 
+feeling of degree of control over performance.
+A similar FS2 item is, ``I have a feeling of total control.''
+
 Someone in flow should experience a reduction in
 extraneous mental chatter, feel more in the present moment,
-and have a sense of effortless regardless of the amount
+and have a sense of effortlessness regardless of the amount
 of physical effort \parencite{dietrich2004,stoll2016}.
 Items \emph{chatter}, \emph{present}, and \emph{spontaneous}
 assessed these aspects of phenomenology, respectively.
@@ -462,15 +480,18 @@ where time plays at most a minor role (e.g., rock climbing).
 Should the effect size of time distortion in rock climbing
 be on the same scale with the effect size in competitive swimming?
 Rather that confront such vexing questions,
-we decided to include a simpler item related to time.
+we decided to probe the other extreme.
 Item \emph{waiting} assessed the relative amount of
-time spent waiting.
+time spent waiting, which can be regarded as
+an abject lack of time distortion.
 For example, in baseball, most batters wait on the bench.
-This item is more objective than FS2's subjective time distortion subscale.
 We expected that waiting would negatively correlate with flow.
 
 Item \emph{reward} assessed the relative degree of positive
 affect after engaging in an activity.
+We acknowledge that flow is not the only possible cause of positive affect.
+However, we hoped to distinguish activities practiced mainly for
+physical fitness with little expectation of flow.
 This item corresponds to the Autotelic subscale in FS2.
 An example FS2 item is, ``I really enjoy the experience.''
 Other potential consequents of flow, such as cognitive capacity
@@ -494,7 +515,9 @@ we describe our unused and discarded items in Appendix~\ref{app:bad-items}.
 %% to be regarded with less than the customary degree
 %% of skepticism.
 
-Our hypothesis is that physical activities differ by flow propensity.
+Our hypotheses are that physical activities differ by flow propensity
+and that our operationalization of flow propensity reflect
+activity flow propensity in practice.
 In a cross-sectional design,
 we examined experiences of activities
 with respect to flow-relevant facets.
@@ -502,7 +525,10 @@ These pairwise comparisons were converted into latent absolute
 rankings, which in turn, served as indicators in a factor model.
 The resulting factor scores $\hat\pi$ can be regarded as activities'
 absolute flow propensities on a continuous scale.
-The null hypothesis is that all activities have equal flow propensity, $\sum |\hat\pi|=0$.
+Null hypothesis \#1 is that all activities have equal flow propensity,
+$(\max\hat\pi-\min\hat\pi)=0$.
+Null hypothesis \#2 is that antecedent items are not positively
+correlated to items measuring phenomenological indicators and consequents.
 Complete source code for data preprocessing and analysis is
 available from \url{https://osf.io/bmnt3/}.
 
@@ -931,7 +957,7 @@ ggplot() +   geom_vline(xintercept=0, color="green") +
 
 @ 
 \caption{Posterior means and distributions of factor loadings $\hat\lambda$.
-The red stripe highlights the 95\% credible interval.}
+The red stripe highlights the 95\% uncertainty interval.}
 \label{fig:loadings}
 \end{figure}
 
@@ -952,7 +978,7 @@ ggplot() +
 
 @ 
 \caption{Posterior means and distributions of latent flow propensity scores $\hat\pi$.
-The red stripe highlights the 95\% credible interval.
+The red stripe highlights the 95\% uncertainty interval.
 Wide intervals reflect activities with samples sizes as small as 2
 and should be interpreted with caution.}
 \label{fig:activities}
@@ -1007,7 +1033,7 @@ in Figures~\ref{fig:loadings} and \ref{fig:activities}, respectively.
 To develop appreciation of these results, we can examine particular activity pairs.
 Some of the effect sizes between activities are large.
 For example, $\hat\pi_\text{martial arts} - \hat\pi_\text{running}$
-has a 95\% credible interval of~$[\Sexpr{runningVsMartialArts[1]}, \Sexpr{runningVsMartialArts[2]}]$,
+has a 95\% uncertainty interval of~$[\Sexpr{runningVsMartialArts[1]}, \Sexpr{runningVsMartialArts[2]}]$,
 $\log\left[ P(\hat\pi_\text{running} = \hat\pi_\text{martial arts})\right] < \Sexpr{log(runningVsMartialArtsP)}$.
 Perhaps a correction should be made for multiple comparisons,
 but this $p$-value is limited by the number of draws from the posterior
@@ -1016,17 +1042,24 @@ The activities \emph{running} and \emph{martial arts}
 are practically at the opposite extremes of flow propensity, but
 even similar activities can be distinguished.
 For example, $\hat\pi_\text{mountain biking} - \hat\pi_\text{hiking}$
-has a 95\% credible interval of $[\Sexpr{hikingVsMountainBiking[1]}, \Sexpr{hikingVsMountainBiking[2]}]$,
+has a 95\% uncertainty interval of $[\Sexpr{hikingVsMountainBiking[1]}, \Sexpr{hikingVsMountainBiking[2]}]$,
 $P(\hat\pi_\text{hiking} = \hat\pi_\text{mountain biking}) \approx \Sexpr{hikingVsMountainBikingP}$.
 Finally, item diagnostics are exhibited (Table~\ref{tab:itemInfo})
 wherein we find that Item \emph{complex} is a good predictor of flow
 even though this item is relatively difficult to measure.
 % No point in actually computing this p-value since it's even less
 % than martial arts vs running.
-In summary, our hypothesis that physical activities differ by how
-conducive they are to flow was supported,
-$\log\left[ P(\sum |\hat\pi|=0) \right] < \Sexpr{log(1/numIterations)}$. This is most clearly
-demonstrated by Figure~\ref{fig:activities}.
+
+In summary, that physical activities differ by
+flow propensity (Hypothesis \#1) was supported,
+$\log\left[ P(\max\hat\pi-\min\hat\pi=0) \right] < \Sexpr{log(1/numIterations)}$.
+This is most clearly demonstrated by Figure~\ref{fig:activities}.
+That we could retain both antecedents (Items \emph{skill}, \emph{predict},
+\emph{novelty}, \emph{creative}, \emph{stakes}, \emph{complex}, and \emph{body})
+and phenomenological indicators and consequents (Items \emph{chatter},
+\emph{present}, and \emph{reward}) in our factor model (Figure~\ref{fig:loadings})
+is evidence that our operationalization of the latent propensity construct
+translates into flow propensity in practice (Hypothesis \#2).
 
 \section{Discussion and Conclusion}
 
@@ -1045,7 +1078,7 @@ load(paste0(RCPA_DIR, "plotAllItems.rda"))
 @ 
 
 Six of our initial set of 16 items were excluded.
-Five of these items were based on items validated in FS2.
+All of these items were based on items validated in FS2.
 So what went wrong?
 It seems likely that Items \emph{control}, \emph{spontaneous}, and
 \emph{evaluated} reflect mostly personal, not situational, factors.
@@ -1054,25 +1087,27 @@ we examined the range of latent scores $\max(\hat\theta_j)-\min(\hat\theta_j)$ o
 in an independence model.
 These ranges were \Sexpr{rangeByItem[,'goal1']} and
 \Sexpr{rangeByItem[,'feedback1']}, respectively.
-Such a narrow widths indicate that activities could hardly
+Such a narrow widths (c.f., Table~\ref{tab:itemInfo}) indicate that activities could hardly
 be distinguished from each other.
 Further research is needed to determine whether
 Items \emph{goal} and \emph{feedback} reflect
 personal, not situational, factors or whether
 there was some deficiency in the way these items
 were presented.
-The FS2 Concentration subscale was not well represented
-in our item set.
-Future studies could try items of the form,
-``I concentrate much more during {{Q6}} compared to {{Q7}},''
-or, ``{{Q6}} feels much more important than {{Q9}}.''
-Finally, we consider Item \emph{waiting}, a new item.
 In our sample, low flow activities like elliptical, walking,
 and running involved negligible waiting whereas high flow
 activities such as snow skiing and golf involved ample waiting.
 However, Item \emph{waiting} still seems plausible
 and we suggest that it may work in samples with a larger,
 more diverse set of activities.
+
+The FS2 Concentration subscale was not well represented
+in our item set.
+Item \emph{stakes} performed well,
+ but simpler items might work even better.
+Future studies could try items of the form,
+``I concentrate much more during {{Q6}} compared to {{Q7}},''
+or, ``{{Q6}} feels much more important than {{Q9}}.''
 
 A curious pattern appears in the mean posterior estimates of flow.
 A natural environment seems to confer a flow advantage among activities
@@ -1087,11 +1122,12 @@ theory that might explain these data \parencite[e.g.,][]{wilson1984}.
 An alternate theory is that environments have a
 flow propensity similar to the way that we find
 activities have a flow propensity \parencite[e.g.,][]{rainisio2014}.
-Item \emph{complex} asked about ``action and the environment,'' which
-may have been double-barreled.
-Future studies should separate these concerns.
 We suggest that cycling in an environment experimentally manipulated
 using virtual reality technology may be one way to highlight these differences.
+If we take the idea of \emph{environmental flow propensity}
+seriously then we must question whether
+Item \emph{complex} was double-barreled, asking about ``action and the environment.''
+Future studies should separate these concerns.
 
 There remains some uncertainty about our model.
 Model comparison suggested that per-item
@@ -1126,7 +1162,7 @@ rcd <- loadSingleFactorData(RCPA_DIR)
 et <- calcEdgeTable(rcd)
 @ 
 
-Allowing the choice of activities using free-form input
+Allowing free-form input in the choice of activities
 is the most flexible approach for subjects,
 but hinders data collection efficiency.
 Sample sizes between pairs of activities were
@@ -1137,7 +1173,7 @@ A future data collection website might try to gently steer participants
 away from pairs of activities that have already attracted ample data.
 Another concern with free-form input is
 that it requires coding and, moreover, we 
-conditioned coding specificity on
+conditioned category specificity on
 activities' sample size.
 We do not claim that our coding choices were optimal.
 Alternate compromises seem plausible.
@@ -1152,8 +1188,14 @@ Additional items offer the potential for more precise measurement.
 In addition, 
 it would also be interesting to collect data from specific communities.
 For example, a follow up study could focus on people with disabilities.
+One limitation of our study is that its scope was limited to physical
+activities.
+It would also be interesting to consider activities that differ mainly
+in cognition.
+For example, activities like computer programming might
+be compared with writing poetry.
 
-Activities ranked with a high propensity for flow prompt follow up studies.
+Activities with high propensity for flow prompt follow up studies.
 For example, the broad category \emph{martial arts}
 prompts investigation into specific styles.
 We anticipate that there are important differences between, for
@@ -1189,8 +1231,8 @@ translate into actual differences in a training regimen.
 A flow metacognitions questionnaire identified two personal factors
 that support flow, Beliefs that Flow Fosters Achievement
 and Confidence in Ability to Self-Regulate Flow \parencite{wilson2016}.
-Awareness of situational factors may constitute a useful
-addition to this measure.
+Awareness of situational factors (activity and environmental flow propensity)
+may constitute a useful addition to this measure.
 
 Initially, we presumed a model wherein a person
 selects a single activity and pursues it to perfection.
