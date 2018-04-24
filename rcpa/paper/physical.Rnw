@@ -330,11 +330,11 @@ than when I run on a treadmill.
 If we have relative comparisons, can they be converted into absolute scores?
 This problem is similar to the problem of ranking a large number of
 chess players.
-Fortunately, a method is available that takes a
-set of chess match outcomes and determines the most likely
+Fortunately, methods are available that take a
+set of chess match outcomes and determine the most likely
 absolute rankings, even for players who did not play directly
-against each other \parencite[e.g.,][]{bradley1952,luce1959}.
-This method can be adapted to any type of relative comparison data.
+against each other \parencite[e.g.,][]{bradley1952,luce1959,elo1978}.
+These methods can be adapted to any type of relative comparison data.
 Hence, we invited participants to select two
 physical activities using free-form input and then compare them.
 
