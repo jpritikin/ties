@@ -28,6 +28,26 @@ flow <- cbind(flow, ss=calcSampleSize(rcd))
 flow <- cbind(flow, index=1:nrow(flow))
 flow <- flow[order(flow[,'mean']),]
 
+largeSampleThreshold <- 25
+largeSampleActivities <- rev(rownames(flow[flow[,'ss'] >= largeSampleThreshold,]))
+bigDiffL <- matrix(NA, nrow=length(largeSampleActivities), ncol=length(largeSampleActivities),
+  dimnames=list(largeSampleActivities,largeSampleActivities))
+bigDiffU <- matrix(NA, nrow=length(largeSampleActivities), ncol=length(largeSampleActivities),
+  dimnames=list(largeSampleActivities,largeSampleActivities))
+for (rx in 2:length(largeSampleActivities)) {
+  for (cx in 1:(rx-1)) {
+    tar <- extract(fit2t5, pars=paste0('flow[',match(c(
+      largeSampleActivities[cx],
+      largeSampleActivities[rx]), palist),']'), permuted=FALSE)
+    cmp1 <- c(tar[,,1]) - c(tar[,,2])
+    q1 <- quantile(cmp1, c(.025,.975))
+    bigDiffL[rx,cx] <- q1[1]
+    bigDiffU[rx,cx] <- q1[2]
+  }
+}
+bigDiffL <- bigDiffL[-1,-ncol(bigDiffL)]
+bigDiffU <- bigDiffU[-1,-ncol(bigDiffU)]
+
 rawFlow <- sapply(extract(fit2t5, pars=paste0('flow[', flow[,'index'], ']')), function(x) c(x))
 colnames(rawFlow) <- rownames(flow)
 names(dimnames(rawFlow)) <- c('iteration', 'facet')
@@ -51,6 +71,7 @@ itemInfo <- itemInfo[order(-itemInfo[,2]),]
 numIterations <- length(cmp1)
 
 save(hikingVsMountainBikingP, hikingVsMountainBiking, runningVsMartialArts, runningVsMartialArtsP,
+  largeSampleThreshold, largeSampleActivities, bigDiffL, bigDiffU,
   numIterations, itemInfo, loadings, rawLoadings, flow, rawFlow, tar, file="genFlowData.rda")
 
 q()

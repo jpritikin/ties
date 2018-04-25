@@ -255,8 +255,8 @@ separate from particular activities.
 As a research topic, we are particularly excited about flow because
 consequents appear to include positive affect
 and enhanced performance \parencite{landhausser2012}.
-A similar enthusiasm for flow induction is seen in popular books and
-courses that promise to increase the frequency and depth of flow
+A similar enthusiasm for flow induction is seen in popular books
+that promise to increase the frequency and depth of flow
 experience \parencite[e.g.,][]{csikszentmihalyi2017,kotler2014}.
 
 Flow happens in the context of an activity.
@@ -321,7 +321,7 @@ a small subset of the many possible physical activities.
 Even if we restrict our interest to, say, the 100 most popular
 activities,
 it is unrealistic to expect each subject to
-assign scores to each.
+assign a score to each.
 For example, it is difficult to score the flow propensity of
 the activity \emph{running} on an absolute scale of $1-100$.
 Judgments that are more readily available are relative comparisons.
@@ -415,8 +415,8 @@ were regarded as measurement error.
 
 Another important antecedent of flow is the subjective value of the
 activity \parencite{keller2012}.
-Item \emph{stakes} drew on related concepts like, ``importance,''
-and the fact that high stakes activities should recruit
+Item \emph{stakes} drew on related concepts like the felt importance
+of the activity and the fact that high stakes activities should recruit
 more concentration than low stakes activities.
 A similar FS2 item is, ``I am completely focused on the task at hand'' (Concentration).
 Items \emph{goal} and \emph{feedback} assessed
@@ -424,8 +424,6 @@ the relative clarity of goals and immediacy of feedback, respectively.
 These items correspond closely with similar items in FS2.
 For example, ``I know clearly what I want to do'' and
 ``I am aware of how well I am performing,'' respectively.
-Our attempt to clarify the time scale of goals and feedback
-is detailed in Appendix~\ref{app:bad-items}.
 
 Items \emph{complex} and \emph{body} assessed relative complexity of
 the activity and environment, and the extent of bodily involvement, respectively.
@@ -437,10 +435,10 @@ perceived fit.
 
 We next turn our attention to phenomenological indicators and
 consequents of flow.
-Subjects unaware of flow theory may
+Even subjects unaware of flow theory may
 accidentally experience flow.
-We contend that the frequency of these accidents
-are, in part, modulated by activity flow propensity.
+We contend that the frequency and depth of flow experience
+is, in part, modulated by activity flow propensity.
 In other words, flow propensity is
 expected to cause phenomenological indicators and consequents of flow.
 We consider FS2 subscales Consciousness, Control, Merging,
@@ -455,7 +453,6 @@ thinking of me'' (Consciousness).
 Item \emph{control} assessed the relative 
 feeling of degree of control over performance.
 A similar FS2 item is, ``I have a feeling of total control.''
-
 Someone in flow should experience a reduction in
 extraneous mental chatter, feel more in the present moment,
 and have a sense of effortlessness regardless of the amount
@@ -470,7 +467,7 @@ without thinking too much.''
 Although loading weakly on Flow in a factor analysis \parencite{jackson2002},
 time distortion (Time) is another putative phenomenological aspect of flow.
 In theory, time slows down or passes more rapidly than usual.
-However, we imagine activity $\times$ subjective time interactions.
+However, we were concerned about activity $\times$ subjective time interactions.
 Consider that a time clock can be an integral part of the game (e.g.,
 competitive swimming), whereas there are other activities
 where time plays at most a minor role (e.g., rock climbing).
@@ -499,8 +496,6 @@ or processing styles, have not received much empirical
 study \parencite{landhausser2012}.
 Hence, we did not include additional items since validated items
 from prior research were not available.
-For the sake of completeness,
-we describe our unused and discarded items in Appendix~\ref{app:bad-items}.
 
 \subsection{Study Overview}
 
@@ -527,8 +522,8 @@ The resulting factor scores $\hat\pi$ can be regarded as activities'
 absolute flow propensities on a continuous scale.
 Null hypothesis \#1 is that all activities have equal flow propensity,
 $(\max\hat\pi-\min\hat\pi)=0$.
-Null hypothesis \#2 is that antecedent items are not positively
-correlated to items measuring phenomenological indicators and consequents.
+Null hypothesis \#2 is that no antecedent items are positively
+correlated with items measuring phenomenological indicators and consequents.
 Complete source code for data preprocessing and analysis is
 available from \url{https://osf.io/bmnt3/}.
 
@@ -632,7 +627,7 @@ across some series of activity comparisons (edges) to
 any other member activity (vertex).
 The largest connected component in the complete graph was included and the
 remaining connected components were excluded.
-These criteria resulted in the exclusion of
+This criterion resulted in the exclusion of
 \Sexpr{formatCharVector(sort(discon$V1))}.
 
 <<>>=
@@ -676,6 +671,8 @@ the online supplement (see \texttt{explore.coffee}).
 \subsection{Procedure}
 
 Participants completed the Activity Flow Propensity Measure online.
+For the sake of completeness,
+we describe our unanalyzed and discarded items in Appendix~\ref{app:bad-items}.
 At the end of the survey, participants were invited to visit the 
 preliminary results page.
 
@@ -803,6 +800,7 @@ than peripheral items.}
 \label{fig:item-correlation}
 \end{figure}
 
+\subsection{Item Selection}
 Item correlations are exhibited in Figure~\ref{fig:item-correlation}.
 Often the goal of exploratory factor analysis is to determine
 how many latent factors are measured by a set of items \parencite[e.g.,][]{golino2017}.
@@ -831,76 +829,18 @@ load(paste0(RCPA_DIR, "thresholdCmp.rda"))
 
 \begin{figure}
 <<thresholds, fig.height=3, warning=FALSE>>=
-ggplot(df, aes(sample=pvalue, color=model)) +
-  stat_qq(distribution=stats::qunif, size=.25) + coord_fixed() +
+ggplot(df, aes(sample=pvalue, color=model, shape=model)) +
+  stat_qq(distribution=stats::qunif, size=1, alpha=.75) + coord_fixed() +
   xlim(0,.5) + ylim(0,.5) + geom_abline(slope=1, color="yellow", alpha=.5)
 @ 
 \caption{Quantile-quantile plot of $p$-values conditional
   on whether thresholds are common or per-item.
-The downward bulge relative to the simulated distribution
+The downward bulge in the common (red circle) and per-item (green triangle)
+models relative to the simulated (blue square) distribution
 indicates more rejections of good fit than expected (c.f., Equation~\ref{eqn:ppc-reject}).
 For reference, the null distribution of a perfectly calibrated test
 would be the $x=y$ line.}
 \label{fig:thresholds}
-\end{figure}
-
-With \Sexpr{finalNumIndicators} indicators selected,
-we turned our attention to the item response curve.
-We initially assumed common threshold for all items (Equation~\ref{eqn:thresholds}).
-Another option is to allow per-item thresholds.
-A difference in expected predictive accuracy of \Sexpr{looCmp[1]}
-($SE=\Sexpr{looCmp[2]}$) favored per-items thresholds.
-The posterior predictive check (PPC) is another way to assess model fit.
-Since the PPC $p$-value distribution improved
-little (Figure~\ref{fig:thresholds})
-we decided to retain the simpler common threshold model.
-
-<<>>=
-load(paste0(RCPA_DIR, "factorCmp.rda"))
-oldDigits <- getOption('digits')
-options(digits=0)
-@
-
-\begin{figure}
-\begin{center}
-\begin{tikzpicture}[
-model/.style={rectangle, draw=red!80, fill=red!5, very thick, minimum size=5mm},
-]
-%Nodes
-\node[model]      (ind)                              {Independence};
-\node[model]        (factor)       [below=of ind] {Factor};
-\node[model]      (saturated)       [below=of factor] {Saturated};
-
-\node[right=40pt](indIc) at
-  (ind){looic \Sexpr{ind_loo$looic} ($SE=\Sexpr{ind_loo$se_looic}$)};
-\node[right=40pt](factorIc) at
-  (factor){looic \Sexpr{fac_loo$looic} ($SE=\Sexpr{fac_loo$se_looic}$)};
-\node[right=40pt](satIc) at
-  (saturated){looic \Sexpr{sat_loo$looic} ($SE=\Sexpr{sat_loo$se_looic}$)};
-
-%Lines
-\draw[-] (ind.south) -- (factor.north)
-  node[midway, right=15pt]{elpd\_diff \Sexpr{indVsFac[1]} ($SE=\Sexpr{indVsFac[2]}$)};
-\draw[-] (factor.south) -- (saturated.north)
-  node[midway, right=15pt]{elpd\_diff \Sexpr{-satVsFac[1]} ($SE=\Sexpr{satVsFac[2]}$)};
-
-\end{tikzpicture}
-\end{center}
-<<>>=
-options(digits=oldDigits)
-#if (!is.null(outliers)) stop('here')
-#if (nrow(outliers) != 0) stop('here')
-@
-
-\caption{Model fitness and their relationship to each other.
-The looic statistic is similar in interpretation to AIC \parencite[lower is better;][]{vehtari2017}.
-Hence, models with more parameters are favored.
-However, the factor model is closer to the saturated model than the independence model
-with a Z score difference of only
-$\frac{\Sexpr{-satVsFac[1]}}{\Sexpr{satVsFac[2]}} = \Sexpr{-satVsFac[1]/satVsFac[2]}$
-compared with a Z score difference to the independence model of
-$\frac{\Sexpr{indVsFac[1]}}{\Sexpr{indVsFac[2]}} = \Sexpr{indVsFac[1]/indVsFac[2]}$.}
-\label{fig:model-fitness}
 \end{figure}
 
 \begin{figure}
@@ -984,6 +924,144 @@ and should be interpreted with caution.}
 \label{fig:activities}
 \end{figure}
 
+\subsection{Response Model}
+With \Sexpr{finalNumIndicators} indicators selected,
+we turned our attention to the item response curve,
+which maps ordinal responses to the continuous logit scale.
+We initially assumed common threshold for all items (Equation~\ref{eqn:thresholds}).
+Another option is to allow per-item thresholds.
+A difference in expected predictive accuracy of \Sexpr{looCmp[1]}
+($SE=\Sexpr{looCmp[2]}$) favored per-items thresholds.
+The posterior predictive check (PPC) is another way to assess model fit (see Appendix~\ref{app:model}).
+Since the PPC $p$-value distribution improved
+little (Figure~\ref{fig:thresholds})
+we decided to retain the simpler common threshold model.
+
+All our items used a symmetric 3-point Likert scale with
+response options \emph{much}, \emph{somewhat}, and \emph{equal}.
+The category response curve is exhibited in Figure~\ref{fig:response-curve}.
+Since the \emph{somewhat} responses are never the most probable regardless of
+difference in latent ranking,
+the addition of another response category (to a 4-point symmetric scale)
+is unlikely to improve measurement accuracy.
+
+\subsection{Factor Model}
+<<results='hide'>>=
+load(paste0(RCPA_DIR, "genFlowData.rda"))
+
+df <- NULL
+for (rx in 1:nrow(bigDiffL)) {
+  for (cx in 1:rx) {
+    df <- rbind(df,
+      data.frame(
+        rn=rownames(bigDiffL)[rx],
+        cn=colnames(bigDiffL)[cx],
+        lb=bigDiffL[rx,cx],
+        ub=bigDiffU[rx,cx],
+        ui=NA,
+        check.names=FALSE, stringsAsFactors=FALSE))
+  }
+}
+sig <- sign(df$lb) == sign(df$ub)
+df[sig, 'ui'] <- sprintf("$\\mathbf{[%.1f, %.1f]}$", df[sig,'lb'], df[sig,'ub'])
+df[!sig, 'ui'] <- sprintf("$[%.1f, %.1f]$", df[!sig,'lb'], df[!sig,'ub'])
+df$rn <- ordered(df$rn, levels=largeSampleActivities)
+df$cn <- ordered(df$cn, levels=largeSampleActivities)
+
+tikz(file = "bigDiff.tex", height=6, width=6)
+
+ggplot(df) + geom_text(aes(x=cn,y=rn,label=ui), size=2, angle=-45) +
+  theme(axis.title.y = element_blank(), axis.title.x = element_blank(),
+    axis.text.x = element_text(angle=45, hjust=1))
+dev.off()
+
+@ 
+\begin{figure}
+\begin{center}
+\input{bigDiff.tex}
+\end{center}
+\caption{Posterior 95\% uncertainty intervals of differences between
+  latent flow propensity scores $\hat\pi$ of activities with
+  sample size of \Sexpr{largeSampleThreshold} or larger.
+Since propensity scores $\hat\pi$ are standard normally
+distributed (Equation~\ref{eqn:pi-distribution}),
+these differences can be regarded as effect sizes.
+A difference of 0.2, 0.5, and 0.8 are regarded as
+small, medium, and large effect sizes, respectively \parencite{cohen1988}.
+Intervals that exclude zero are in bold, but
+no correction is made for multiple comparisons \parencite[e.g.,][]{sinclair2013}.}
+\label{fig:act-diff}
+\end{figure}
+
+<<>>=
+load(paste0(RCPA_DIR, "factorCmp.rda"))
+oldDigits <- getOption('digits')
+options(digits=0)
+@
+Factor model fit is often assessed by comparison to the independence
+and saturated model.
+Here the independence model obtained looic \Sexpr{ind_loo$looic} ($SE=\Sexpr{ind_loo$se_looic}$),
+the factor model \Sexpr{fac_loo$looic} ($SE=\Sexpr{fac_loo$se_looic}$),
+and the saturated model \Sexpr{sat_loo$looic} ($SE=\Sexpr{sat_loo$se_looic}$).
+The looic statistic is similar in interpretation to AIC \parencite[lower is better;][]{vehtari2017}.
+Hence, models with more parameters were favored. \Sexpr{options(digits=1)}
+Note that the factor model is closer to the saturated model than the independence model
+with a Z score difference of only
+$\frac{\Sexpr{-satVsFac[1]}}{\Sexpr{satVsFac[2]}} = \Sexpr{-satVsFac[1]/satVsFac[2]}$
+compared with a Z score difference to the independence model of
+$\frac{\Sexpr{indVsFac[1]}}{\Sexpr{indVsFac[2]}} = \Sexpr{indVsFac[1]/indVsFac[2]}$.
+Hence, the factor model fit was almost as good the saturated model,
+but there is some room for improvement.
+%% In addition to overall model fit,
+%% leave-one-out cross-validation can also identify outliers.
+%% However, no outliers were identified.
+%% In addition to overall model fit,
+%% leave-one-out cross-validation also identified \Sexpr{nrow(outliers)} potential outlier
+%% between \Sexpr{outliers[1,'pa1']} and \Sexpr{outliers[1,'pa2']} on Item \emph{\Sexpr{outliers[1,'facet']}}.
+%% We attribute this to noise that would be averaged out if \Sexpr{outliers[1,'pa1']} had a sample size
+%% larger than \Sexpr{outliers[1,'pa1ss']}.
+<<>>=
+options(digits=oldDigits)
+#if (!is.null(outliers)) stop('here')
+#if (nrow(outliers) != 0) stop('here')
+@
+
+Flow loadings and latent flow propensity scores are exhibited
+in Figures~\ref{fig:loadings} and \ref{fig:activities}, respectively.
+The loadings connect our items to the propensity scores and
+higher scores reflect greater propensity for flow.
+To develop appreciation of these results, we can examine particular activity pairs.
+For example, we compare two activities with a larger sample size and extreme propensity scores.
+The difference $\hat\pi_\text{martial arts} - \hat\pi_\text{running}$
+has a 95\% uncertainty interval of~$[\Sexpr{runningVsMartialArts[1]}, \Sexpr{runningVsMartialArts[2]}]$.
+This can be classified as a \emph{very large} or \emph{huge} effect size \parencite{sawilowsky2009}.
+It is not clear what alpha-level correction should be made for multiple comparisons \parencite[e.g.,][]{sinclair2013},
+but many millions of draws from the posterior would be required to estimate a $p$-value for this
+difference with any accuracy.
+The activities \emph{running} and \emph{martial arts}
+are practically at the opposite extremes of flow propensity, but
+even similar activities can be distinguished.
+For example, $\hat\pi_\text{mountain biking} - \hat\pi_\text{hiking}$
+has a 95\% uncertainty interval of $[\Sexpr{hikingVsMountainBiking[1]}, \Sexpr{hikingVsMountainBiking[2]}]$,
+$P(\hat\pi_\text{hiking} = \hat\pi_\text{mountain biking}) = \Sexpr{hikingVsMountainBikingP}$.
+Uncertainty intervals for all pairs of activities with sample size of \Sexpr{largeSampleThreshold} and greater
+are given in Figure~\ref{fig:act-diff}.
+
+In summary, that physical activities differ by
+flow propensity (Hypothesis \#1) was supported.
+% No point in actually computing this p-value since it's even less
+% than martial arts vs running.
+% $\log\left[ P(\max\hat\pi-\min\hat\pi=0) \right] < \Sexpr{log(1/numIterations)}$.
+This is most clearly demonstrated by Figure~\ref{fig:activities}.
+That we could retain both antecedents (Items \emph{skill}, \emph{predict},
+\emph{novelty}, \emph{creative}, \emph{stakes}, \emph{complex}, and \emph{body})
+and phenomenological indicators and consequents (Items \emph{chatter},
+\emph{present}, and \emph{reward}) in our factor model (Figure~\ref{fig:loadings})
+is evidence that our operationalization of the latent propensity construct
+translates into flow propensity in practice (Hypothesis \#2).
+
+\section{Discussion and Conclusion}
+
 <<itemInfo, results="asis">>=
 
 str <- kable(itemInfo,  booktabs=T, escape=FALSE, linesep = "",
@@ -1011,58 +1089,6 @@ gsub('\\item [a]','', str, fixed=TRUE)
 
 @ 
 
-The fits of the independence, factor, and saturated model are
-exhibited in Figure~\ref{fig:model-fitness}.
-The factor model fit is adequate, but there is room for improvement.
-%% In addition to overall model fit,
-%% leave-one-out cross-validation can also identify outliers.
-%% However, no outliers were identified.
-%% In addition to overall model fit,
-%% leave-one-out cross-validation also identified \Sexpr{nrow(outliers)} potential outlier
-%% between \Sexpr{outliers[1,'pa1']} and \Sexpr{outliers[1,'pa2']} on Item \emph{\Sexpr{outliers[1,'facet']}}.
-%% We attribute this to noise that would be averaged out if \Sexpr{outliers[1,'pa1']} had a sample size
-%% larger than \Sexpr{outliers[1,'pa1ss']}.
-The category response curve is exhibited in Figure~\ref{fig:response-curve}.
-The \emph{somewhat} responses are never the most probable regardless of
-difference in latent ranking.
-Therefore, the addition of more response categories is unlikely to improve
-measurement accuracy.
-
-Flow loadings and latent flow propensity scores are exhibited
-in Figures~\ref{fig:loadings} and \ref{fig:activities}, respectively.
-To develop appreciation of these results, we can examine particular activity pairs.
-Some of the effect sizes between activities are large.
-For example, $\hat\pi_\text{martial arts} - \hat\pi_\text{running}$
-has a 95\% uncertainty interval of~$[\Sexpr{runningVsMartialArts[1]}, \Sexpr{runningVsMartialArts[2]}]$,
-$\log\left[ P(\hat\pi_\text{running} = \hat\pi_\text{martial arts})\right] < \Sexpr{log(runningVsMartialArtsP)}$.
-Perhaps a correction should be made for multiple comparisons,
-but this $p$-value is limited by the number of draws from the posterior
-and would likely be smaller if the sampler was permitted to continue running.
-The activities \emph{running} and \emph{martial arts}
-are practically at the opposite extremes of flow propensity, but
-even similar activities can be distinguished.
-For example, $\hat\pi_\text{mountain biking} - \hat\pi_\text{hiking}$
-has a 95\% uncertainty interval of $[\Sexpr{hikingVsMountainBiking[1]}, \Sexpr{hikingVsMountainBiking[2]}]$,
-$P(\hat\pi_\text{hiking} = \hat\pi_\text{mountain biking}) \approx \Sexpr{hikingVsMountainBikingP}$.
-Finally, item diagnostics are exhibited (Table~\ref{tab:itemInfo})
-wherein we find that Item \emph{complex} is a good predictor of flow
-even though this item is relatively difficult to measure.
-% No point in actually computing this p-value since it's even less
-% than martial arts vs running.
-
-In summary, that physical activities differ by
-flow propensity (Hypothesis \#1) was supported,
-$\log\left[ P(\max\hat\pi-\min\hat\pi=0) \right] < \Sexpr{log(1/numIterations)}$.
-This is most clearly demonstrated by Figure~\ref{fig:activities}.
-That we could retain both antecedents (Items \emph{skill}, \emph{predict},
-\emph{novelty}, \emph{creative}, \emph{stakes}, \emph{complex}, and \emph{body})
-and phenomenological indicators and consequents (Items \emph{chatter},
-\emph{present}, and \emph{reward}) in our factor model (Figure~\ref{fig:loadings})
-is evidence that our operationalization of the latent propensity construct
-translates into flow propensity in practice (Hypothesis \#2).
-
-\section{Discussion and Conclusion}
-
 Our aim was to demonstrate that physical activities differ by
 flow propensity.
 Participants were asked to choose two activities and compare
@@ -1072,6 +1098,10 @@ for each activity.
 Activities were distributed across a continuous spectrum
 from running (weak propensity for flow) to
 martial arts (strong propensity for flow).
+That we could retain antecedents,
+phenomenological indicators, and consequents of flow
+in our factor model is evidence that
+our flow propensity construct is valid.
 
 <<>>=
 load(paste0(RCPA_DIR, "plotAllItems.rda"))
@@ -1080,22 +1110,24 @@ load(paste0(RCPA_DIR, "plotAllItems.rda"))
 Six of our initial set of 16 items were excluded.
 All of these items were based on items validated in FS2.
 So what went wrong?
-It seems likely that Items \emph{control}, \emph{spontaneous}, and
+It seems plausible that Items \emph{control}, \emph{spontaneous}, and
 \emph{evaluated} reflect mostly personal, not situational, factors.
 For Items \emph{goal} and \emph{feedback},
 we examined the range of latent scores $\max(\hat\theta_j)-\min(\hat\theta_j)$ obtained
 in an independence model.
 These ranges were \Sexpr{rangeByItem[,'goal1']} and
 \Sexpr{rangeByItem[,'feedback1']}, respectively.
-Such a narrow widths (c.f., Table~\ref{tab:itemInfo}) indicate that activities could hardly
+Such a narrow widths (c.f. Table~\ref{tab:itemInfo}) indicate that activities could hardly
 be distinguished from each other.
+Our attempt to clarify the time scale of goals and feedback
+is detailed in Appendix~\ref{app:bad-items}.
 Further research is needed to determine whether
 Items \emph{goal} and \emph{feedback} reflect
 personal, not situational, factors or whether
 there was some deficiency in the way these items
 were presented.
-In our sample, low flow activities like elliptical, walking,
-and running involved negligible waiting whereas high flow
+In our sample, low flow propensity activities like elliptical, walking,
+and running involved negligible waiting whereas high propensity
 activities such as snow skiing and golf involved ample waiting.
 However, Item \emph{waiting} still seems plausible
 and we suggest that it may work in samples with a larger,
@@ -1109,8 +1141,10 @@ Future studies could try items of the form,
 ``I concentrate much more during {{Q6}} compared to {{Q7}},''
 or, ``{{Q6}} feels much more important than {{Q9}}.''
 
-A curious pattern appears in the mean posterior estimates of flow.
-A natural environment seems to confer a flow advantage among activities
+Item \emph{complex} was a good predictor of flow even though this item
+was relatively difficult to measure (Table~\ref{tab:itemInfo}).
+A possibly related pattern appears in the mean posterior estimates of flow.
+A natural environment seems to confer a flow propensity advantage among activities
 that are otherwise almost identical.
 For example, 
 $\hat\pi_\text{walking}=\Sexpr{-flow['walking','mean']} < \hat\pi_\text{hiking}=\Sexpr{-flow['hiking','mean']}$,
@@ -1142,7 +1176,7 @@ could help settle the question of whether per-item thresholds
 are justified.
 Another source of uncertainty was the result that
 while the factor model was closer to the saturated model
-than the independence model (Figure~\ref{fig:model-fitness}),
+than the independence model,
 there still remained a significant difference between the
 factor and saturated models.
 Ideally, the factor and saturated models should exhibit
@@ -1166,7 +1200,7 @@ Allowing free-form input in the choice of activities
 is the most flexible approach for subjects,
 but hinders data collection efficiency.
 Sample sizes between pairs of activities were
-highly skewed (see Figure~\ref{fig:activity-ss}).
+highly skewed (Figure~\ref{fig:activity-ss}).
 For example, the \Sexpr{names(which(et == max(et)))} pair
 received \Sexpr{which(et == max(et))} comparisons.
 A future data collection website might try to gently steer participants
@@ -1421,7 +1455,7 @@ subdivide activites into more specific categories.
 For example, solo cycling might be substantially
 different from a group spinning class with
 many people riding stationary bikes together.
-A larger sample would be needed to explore
+A larger or more focused sample would be needed to explore
 these fine distinctions.
 
 In an effort to clarify our interest in
@@ -1434,11 +1468,11 @@ and long-term feedback, respectively.
 We felt that these long-term items were not likely correlates of flow
 and did not include them in the analyses.
 The purpose of these items was merely to help
-guide participants to a better understanding
+guide participants to a correct understanding
 of our short-term goal and immediate feedback items.
 
-A potential criticism our of model is that it might give top flow
-rankings to extremely hazardous activities such as wingsuit flying and
+A potential criticism our of model is that it might ascribe top flow
+propensity to extremely hazardous activities such as wingsuit flying and
 breath-hold diving.
 As an attempt to incorporate risk of injury into our model,
 we included two items that asked about the relative risk
@@ -1590,7 +1624,7 @@ loading of item $j$ and $\pi_k$ latent flow propensity score of activity $k$.
 The factor model replaced Equation~\ref{eqn:saturated} with,
 \begin{align}
 \lambda &\sim \N(0, 5) \\
-\pi &\sim \N(0,1) \\
+\pi &\sim \N(0,1) \label{eqn:pi-distribution} \\
 \theta_{kj} &\sim \sigma_j \cdot \N(\pi_k \lambda_j, 1)
 \end{align}
 and used no correlation matrix $\Sigma$ (Equation~\ref{eqn:lkj}).
@@ -1608,7 +1642,7 @@ is to simulate data with known parameters,
 fit the model to the simulated data, and
 examine the correlation between known and recovered parameters.
 We conducted this procedure with
-encouraging simulation results (Figure~\ref{fig:simResults}).
+encouraging results (Figure~\ref{fig:simResults}).
 
 \subsection{Posterior Predictive Checking}
 
