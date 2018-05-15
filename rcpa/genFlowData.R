@@ -62,17 +62,11 @@ df <- summary(fit2t5, pars=c("theta"), probs=c())$summary
 tar <- array(df[,'mean'], dim=c(length(facetNames), length(palist)))
 dimnames(tar) <- list(facetNames, palist)
   
-itemInfo <- data.frame('$\\hat\\sigma_j$'=c(sigma),
-  '$\\max(\\hat\\theta_j)-\\min(\\hat\\theta_j)$'=c(diff(apply(tar, 1, range))),
-  '$\\hat\\lambda_j$'=c(loadings[,'mean']),
-  row.names=facetNames, check.names=FALSE)
-itemInfo <- itemInfo[order(-itemInfo[,2]),]
-
 numIterations <- length(cmp1)
 
 save(hikingVsMountainBikingP, hikingVsMountainBiking, runningVsMartialArts, runningVsMartialArtsP,
   largeSampleThreshold, largeSampleActivities, bigDiffL, bigDiffU,
-  numIterations, itemInfo, loadings, rawLoadings, flow, rawFlow, tar, file="genFlowData.rda")
+  numIterations, loadings, rawLoadings, flow, rawFlow, tar, file="genFlowData.rda")
 
 q()
 

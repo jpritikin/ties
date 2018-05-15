@@ -11,6 +11,10 @@ dimnames(tar) <- list(facetNames, palist)
 
 rangeByItem <- diff(apply(tar, 1, range))
 
-save(rangeByItem, file="plotAllItems.rda")
+df <- summary(fit1s2, pars=c("sigma"), probs=c())$summary
+rownames(df) <- facetNames
+sigmaByItem <- df[,'mean']
+
+save(sigmaByItem, rangeByItem, file="plotAllItems.rda")
 
 plotByFacet(fit1s2, rcd)
