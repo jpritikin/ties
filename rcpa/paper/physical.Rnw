@@ -1126,17 +1126,21 @@ translates into flow propensity in practice (Hypothesis \#2).
 
 load(paste0(RCPA_DIR, "plotAllItems.rda"))
 
-itemInfo <- data.frame('$\\hat\\sigma_j$'=sigmaByItem,
+itemInfo <- data.frame(
+  '$\\hat\\sigma_j$'=sigmaByItem,
   '$\\max(\\hat\\theta_j)-\\min(\\hat\\theta_j)$'=c(rangeByItem),
+  '$\\hat\\sigma_j$'=NA,
+  '$\\max(\\hat\\theta_j)-\\min(\\hat\\theta_j)$'=NA,
   '$\\hat\\lambda_j$'=NA,
   row.names=names(sigmaByItem), check.names=FALSE)
-itemInfo[rownames(loadings),3] <- loadings[,'mean']
+itemInfo[rownames(loadings),c(3,4,5)] <- c(sigmaByItemFM, rangeByItemFM, loadings[,'mean'])
 itemInfo <- itemInfo[order(-itemInfo[,2]),]
 rownames(itemInfo) <- gsub("\\d", "", rownames(itemInfo))
 
 str <- kable(itemInfo,  booktabs=T, escape=FALSE, linesep = "",
   caption="Relative Item Diagnostics",
   row.names=TRUE) %>% kable_styling() %>%
+  add_header_above(c(" ", "Independence Model" = 2, "Factor Model" = 3)) %>%
     add_footnote(escape=FALSE, threeparttable=TRUE,
                  paste(
         "\\emph{Note.}",
@@ -1145,9 +1149,7 @@ str <- kable(itemInfo,  booktabs=T, escape=FALSE, linesep = "",
         "A smaller $\\hat\\sigma_j$ indicate a larger measurement error",
         "and a smaller range $\\max(\\hat\\theta_j)-\\min(\\hat\\theta_j)$ indicates",
         "a less informative item.",
-        "Factor loadings $\\hat\\lambda_j$ of larger absolute magnitude are more important predictors of Flow.",
-        "Posterior means $\\hat\\sigma_j$ and $\\hat\\theta_j$ are from the independence model",
-        "whereas $\\hat\\lambda_j$ are from the factor model."))
+        "Factor loadings $\\hat\\lambda_j$ of larger absolute magnitude are more important predictors of Flow."))
 
 gsub('\\item [a]','', str, fixed=TRUE)
 

@@ -56,16 +56,18 @@ rawLoadings <- rawLoadings[1:500,]
 rawFlow <- rawFlow[1:500,]
 
 df <- summary(fit2t5, pars=c("sigma"), probs=c())$summary
-sigma <- df[,'mean']
+rownames(df) <- facetNames
+sigmaByItemFM <- df[,'mean']
 
 df <- summary(fit2t5, pars=c("theta"), probs=c())$summary
 tar <- array(df[,'mean'], dim=c(length(facetNames), length(palist)))
 dimnames(tar) <- list(facetNames, palist)
+rangeByItemFM <- diff(apply(tar, 1, range))
   
 numIterations <- length(cmp1)
 
 save(hikingVsMountainBikingP, hikingVsMountainBiking, runningVsMartialArts, runningVsMartialArtsP,
-  largeSampleThreshold, largeSampleActivities, bigDiffL, bigDiffU,
+  largeSampleThreshold, largeSampleActivities, bigDiffL, bigDiffU, sigmaByItemFM, rangeByItemFM,
   numIterations, loadings, rawLoadings, flow, rawFlow, tar, file="genFlowData.rda")
 
 q()
