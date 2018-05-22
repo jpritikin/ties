@@ -1249,8 +1249,8 @@ activities' sample size.
 We do not claim that our coding choices were optimal.
 Alternate compromises seem plausible.
 Reanalysis and replication are welcome.
-Raw data are made available under the Open
-Database License 1.0.\footnote{\url{https://opendatacommons.org/licenses/odbl/}}
+Raw data are made available under the Community Data License Agreement
+-- Sharing -- Version 1.0.\footnote{\url{https://cdla.io/sharing-1-0/}}
 
 For activities that take place in a group context,
 it would be interesting to include items that tap
