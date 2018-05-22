@@ -831,10 +831,7 @@ We examined the correlation structure among
 the latent absolute rankings and excluded poorly performing items.
 Threshold parameters $\tau_1, \tau_2$ mapped ordinal responses \emph{much}
 and \emph{somewhat} to the continuous logit scale.
-To determine whether \emph{much} and \emph{somewhat} were used similarly for all items,
-we compared a common threshold model with per-item thresholds.
-Once our final model is selected,
-we report fit statistics and posterior summaries of parameters.
+We report fit statistics and posterior summaries of parameters.
 A detailed overview of our modeling framework is provided in Appendix~\ref{app:model}.
 
 \section{Results}
@@ -881,24 +878,7 @@ would obtain a positive loading, also inconsistent with theory.
 <<>>=
 rcd <- loadSingleFactorData(RCPA_DIR)
 finalNumIndicators <- length(extractFacetNames(rcd))
-load(paste0(RCPA_DIR, "thresholdCmp.rda"))
 @ 
-
-\begin{figure}
-<<thresholds, fig.height=3, warning=FALSE>>=
-ggplot(df, aes(sample=pvalue, color=model, shape=model)) +
-  stat_qq(distribution=stats::qunif, size=1, alpha=.75) + coord_fixed() +
-  xlim(0,.5) + ylim(0,.5) + geom_abline(slope=1, color="yellow", alpha=.5)
-@ 
-\caption{Quantile-quantile plot of $p$-values conditional
-  on whether thresholds are common or per-item.
-The downward bulge in the common (red circle) and per-item (green triangle)
-models relative to the simulated (blue square) distribution
-indicates more rejections of good fit than expected (c.f., Equation~\ref{eqn:ppc-reject}).
-For reference, the null distribution of a perfectly calibrated test
-would be the $x=y$ line.}
-\label{fig:thresholds}
-\end{figure}
 
 \begin{figure}
 <<fig.height=3>>=
@@ -985,15 +965,6 @@ and should be interpreted with caution.}
 With \Sexpr{finalNumIndicators} indicators selected,
 we turned our attention to the item response curve,
 which maps ordinal responses to the continuous logit scale.
-We initially assumed common threshold for all items (Equation~\ref{eqn:thresholds}).
-Another option is to allow per-item thresholds.
-A difference in expected predictive accuracy of \Sexpr{looCmp[1]}
-($SE=\Sexpr{looCmp[2]}$) favored per-items thresholds.
-The posterior predictive check (PPC) is another way to assess model fit (see Appendix~\ref{app:model}).
-Since the PPC $p$-value distribution improved
-little (Figure~\ref{fig:thresholds})
-we decided to retain the simpler common threshold model.
-
 All our items used a symmetric 3-point Likert scale with
 response options \emph{much}, \emph{somewhat}, and \emph{equal}.
 The category response curve is exhibited in Figure~\ref{fig:response-curve}.
@@ -1241,18 +1212,7 @@ Item \emph{complex} was double-barreled, asking about ``action and the environme
 Future studies should separate these concerns.
 
 There remains some uncertainty about our model.
-Model comparison suggested that per-item
-thresholds would improve fit, but the posterior
-predicting checking did not show much improvement.
-Per-item thresholds would mean that \emph{much} and
-\emph{somewhat} had different meanings for different items.
-Due to the mixed evidence,
-we decided to use the simpler common threshold model.
-A larger sample, more amenable to posterior predictive checking,
-could help settle the question of whether per-item thresholds
-are justified.
-Another source of uncertainty was the result that
-while the factor model was closer to the saturated model
+While the factor model was closer to the saturated model
 than the independence model,
 there still remained a significant difference between the
 factor and saturated models.
@@ -1723,60 +1683,24 @@ encouraging results (Figure~\ref{fig:simResults}).
 
 \subsection{Posterior Predictive Checking}
 
-<<>>=
-load(paste0(RCPA_DIR, "thresholdCmp.rda"))
-oldDigits = getOption('digits')
-options(digits=2)
-if (names(which(ppcDemoData$obs == max(ppcDemoData$obs))) != '-2') stop('here')
-@
-
 Model fit can be assessed with a posterior predictive check
 \parencite[Section 6.3]{gelman2013}.
-We compare the multinomial distributions of pairs of activities.
-For example, we can examine the pair \Sexpr{ppcDemoPair} on
-Item \emph{\Sexpr{ppcDemoFacet}}.
-Response frequencies are given in columns from \emph{much more}
-on the left to \emph{much less} on the right.
-In both observed and expected distributions,
-the most popular response was that
-hiking has much more novelty than swimming,
-\begin{align}
-\text{observed data} &=
-<<results='asis'>>=
-printLatexMatrix(t(ppcDemoData$obs))
-@ 
-\label{eqn:ppc-data} \\
-\text{model expected} &=
-<<results='asis'>>=
-printLatexMatrix(t(ppcDemoData$ex))
-@ 
-\label{eqn:ppc-expected}
-\end{align}
-We conduct a goodness of fit test,
-\begin{align}
-\chi^2(3, \Sexpr{sum(ppcDemoData$obs)}) &= \sum_i \frac{(o_i - e_i)^2}{e_i} \\
-&= \sum_i
-<<results='asis'>>=
-printLatexMatrix(t((ppcDemoData$obs - ppcDemoData$ex)^2 / ppcDemoData$ex))
-@ 
-\\
-&= \Sexpr{ppcDemoData$stat}, p=\Sexpr{ppcDemoData$pval}. \label{eqn:ppc-reject}
-\end{align}
-A small $p$-value rejects the test of good fit.
-However, in our data, sample size is a problem.
+However, the specific type of check depends on the structure of the
+data.
+We might compare observed and expected multinomial distributions
+\parencite[similar to][]{kang2008, orlando2000}.
+However, our multinomial distributions are specific to particular
+pairs of activities.
+For example, we could look at the multinomial distributions
+between hiking and swimming on item novelty.
 
-Textbooks often recommend that no more than 20\% of the events have expected frequencies less than 5.
-Therefore, we required a sample size of \Sexpr{ppcSampleSizeThreshold} or more.
-However, we caution that this allowed us to evaluate only \Sexpr{numPpcTests(rcd)} pairs
+However, our data are very sparse from this point of view.
+Textbooks often recommend that no more than 20\% of the events have
+expected frequencies less than 5.
+If we required a sample size of \Sexpr{ppcSampleSizeThreshold} or more
+then we could only evaluate \Sexpr{numPpcTests(rcd)} pairs of activities
 out of \Sexpr{totalNumPairs(rcd)}.
-The distribution of $p$-values should be uniform under the null hypothesis,
-but the test may be miscalibrated due to small sample sizes.
-To obtain a more accurate test, we can compare with simulated data.
-The distribution of $p$-values from simulated data
-provided a more accurate null distribution for comparison.
-
-<<>>=
-options(digits=oldDigits)
-@
+Since such checks would not be very informative,
+we do not include them.
 
 \end{document} 
