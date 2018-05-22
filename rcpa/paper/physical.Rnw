@@ -606,23 +606,21 @@ if (any(rowSums(cdata[,c(-1,-2)], na.rm=T) != cdata$total)) die("here")
 str <- kable(cdata,  booktabs=T, escape=FALSE, linesep = "",
   caption="Excluded Responses",
   row.names=FALSE) %>% kable_styling() %>%
-    add_footnote(escape=FALSE, threeparttable=TRUE,
-                 paste(
-        "\\emph{Note.}",
-        "Responses excluded as \\emph{mostly missing} had more than 10 skipped items.",
-        "Those excluded as \\emph{invalid} could not be coded.",
+  footnote(escape=FALSE, threeparttable=TRUE, general=paste(
+        "Responses excluded as \\\\emph{mostly missing} had more than 10 skipped items.",
+        "Those excluded as \\\\emph{invalid} could not be coded.",
         "For example, ``gym'' was judged too ambiguous because it",
         "could refer to aerobic exercise or weightlifting or something else.",
         "Also, some participants did not read the instructions carefully and submitted",
         "two activities (like ``swimming; tennis indoor tennis'') where they were suppose",
         "to provide a short name and extended description of the same single activity.",
-        "Responses excluded as \\emph{same activity} literally input the",
+        "Responses excluded as \\\\emph{same activity} literally input the",
         "same activity twice or input two similar activities like ``running''",
         "and ``jogging.'' This latter case required a coding judgment call (see Coding).",
-        "The \\emph{disabled} column reflects those participants who self",
+        "The \\\\emph{disabled} column reflects those participants who self",
         "reported that their physical disability more than slightly hindered their ability to perform the activity."))
 
-gsub('\\item [a]','', str, fixed=TRUE)
+str
 
 @ 
 
@@ -1141,17 +1139,15 @@ str <- kable(itemInfo,  booktabs=T, escape=FALSE, linesep = "",
   caption="Relative Item Diagnostics",
   row.names=TRUE) %>% kable_styling() %>%
   add_header_above(c(" ", "Independence Model" = 2, "Factor Model" = 3)) %>%
-    add_footnote(escape=FALSE, threeparttable=TRUE,
-                 paste(
-        "\\emph{Note.}",
-        "Relative measurement quality is reflected by item $j$'s standard deviation $\\hat\\sigma_j$",
-        "and latent score range $\\max(\\hat\\theta_j)-\\min(\\hat\\theta_j)$.",
-        "A smaller $\\hat\\sigma_j$ indicate a larger measurement error",
-        "and a smaller range $\\max(\\hat\\theta_j)-\\min(\\hat\\theta_j)$ indicates",
+  footnote(escape=FALSE, threeparttable=TRUE, general=paste(
+        "Relative measurement quality is reflected by item $j$'s standard deviation $\\\\hat\\\\sigma_j$",
+        "and latent score range $\\\\max(\\\\hat\\\\theta_j)-\\\\min(\\\\hat\\\\theta_j)$.",
+        "A smaller $\\\\hat\\\\sigma_j$ indicate a larger measurement error",
+        "and a smaller range $\\\\max(\\\\hat\\\\theta_j)-\\\\min(\\\\hat\\\\theta_j)$ indicates",
         "a less informative item.",
-        "Factor loadings $\\hat\\lambda_j$ of larger absolute magnitude are more important predictors of Flow."))
+        "Factor loadings $\\\\hat\\\\lambda_j$ of larger absolute magnitude are more important predictors of Flow."))
 
-gsub('\\item [a]','', str, fixed=TRUE)
+str
 
 @ 
 
