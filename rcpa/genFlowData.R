@@ -1,28 +1,30 @@
 source("modelUtil.R")
 
-load(paste0(outputDir(), "fit2t5.rda"))  # factor model
+load(paste0(outputDir(), "fitsfp.rda"))  # factor model
+
+fit <- fitsfp
 
 facetNames <- extractFacetNames(rcd)
 palist <- extractPalist(rcd)
 
-tar <- extract(fit2t5, pars=paste0('flow[',match(c('running','martial arts'), palist),']'), permuted=FALSE)
+tar <- extract(fit, pars=paste0('flow[',match(c('running','martial arts'), palist),']'), permuted=FALSE)
 cmp1 <- c(tar[,,1]) - c(tar[,,2])
 runningVsMartialArtsP <- max(sum(cmp1 < 0) / length(cmp1), 1/length(cmp1))
 runningVsMartialArts <- quantile(cmp1, c(.025,.975))
 
-tar <- extract(fit2t5, pars=paste0('flow[',match(c('hiking','mountain biking'), palist),']'), permuted=FALSE)
+tar <- extract(fit, pars=paste0('flow[',match(c('hiking','mountain biking'), palist),']'), permuted=FALSE)
 cmp1 <- c(tar[,,1]) - c(tar[,,2])
 hikingVsMountainBikingP <- max(sum(cmp1 < 0) / length(cmp1), 1/length(cmp1))
 hikingVsMountainBiking <- quantile(cmp1, c(.025,.975))
 
-loadings <- summary(fit2t5, pars=c("flowLoadings"), probs=c(.025,.975))$summary
+loadings <- summary(fit, pars=c("flowLoadings"), probs=c(.025,.975))$summary
 rownames(loadings) <- facetNames
 
-rawLoadings <- extract(fit2t5, pars=c("flowLoadings"))[[1]]
+rawLoadings <- extract(fit, pars=c("flowLoadings"))[[1]]
 colnames(rawLoadings) <- facetNames
 names(dimnames(rawLoadings)) <- c('iteration', 'facet')
 
-flow <- summary(fit2t5, pars=c("flow"), probs=c(.025,.975))$summary
+flow <- summary(fit, pars=c("flow"), probs=c(.025,.975))$summary
 rownames(flow) <- palist
 flow <- cbind(flow, ss=calcSampleSize(rcd))
 flow <- cbind(flow, index=1:nrow(flow))
@@ -36,7 +38,7 @@ bigDiffU <- matrix(NA, nrow=length(largeSampleActivities), ncol=length(largeSamp
   dimnames=list(largeSampleActivities,largeSampleActivities))
 for (rx in 2:length(largeSampleActivities)) {
   for (cx in 1:(rx-1)) {
-    tar <- extract(fit2t5, pars=paste0('flow[',match(c(
+    tar <- extract(fit, pars=paste0('flow[',match(c(
       largeSampleActivities[cx],
       largeSampleActivities[rx]), palist),']'), permuted=FALSE)
     cmp1 <- c(tar[,,1]) - c(tar[,,2])
@@ -48,18 +50,18 @@ for (rx in 2:length(largeSampleActivities)) {
 bigDiffL <- bigDiffL[-1,-ncol(bigDiffL)]
 bigDiffU <- bigDiffU[-1,-ncol(bigDiffU)]
 
-rawFlow <- sapply(extract(fit2t5, pars=paste0('flow[', flow[,'index'], ']')), function(x) c(x))
+rawFlow <- sapply(extract(fit, pars=paste0('flow[', flow[,'index'], ']')), function(x) c(x))
 colnames(rawFlow) <- rownames(flow)
 names(dimnames(rawFlow)) <- c('iteration', 'facet')
 
 rawLoadings <- rawLoadings[1:500,]
 rawFlow <- rawFlow[1:500,]
 
-df <- summary(fit2t5, pars=c("sigma"), probs=c())$summary
+df <- summary(fit, pars=c("sigma"), probs=c())$summary
 rownames(df) <- facetNames
 sigmaByItemFM <- df[,'mean']
 
-df <- summary(fit2t5, pars=c("theta"), probs=c())$summary
+df <- summary(fit, pars=c("theta"), probs=c())$summary
 tar <- array(df[,'mean'], dim=c(length(facetNames), length(palist)))
 dimnames(tar) <- list(facetNames, palist)
 rangeByItemFM <- diff(apply(tar, 1, range))

@@ -34,7 +34,7 @@ transformed data {
   }
 }
 parameters {
-  matrix[NPA,NFACETS]     theta_raw;
+  matrix[NPA,NFACETS]     rawTheta;
   real threshold1;
   real threshold2;
   row_vector<lower=0>[NFACETS] sigma;
@@ -46,14 +46,14 @@ transformed parameters {
   // non-centered parameterization due to thin data
   matrix[NPA,NFACETS]     theta;    // latent score of PA by facet
   for (pa in 1:NPA) {
-    theta[pa,] = sigma .* ((rawFlow[pa] * rawLoadings)' + theta_raw[pa,]);
+    theta[pa,] = sigma .* ((rawFlow[pa] * rawLoadings)' + rawTheta[pa,]);
   }
 }
 model {
   rawFlow ~ normal(0, 1);
   rawLoadings ~ normal(0,5);
   for (pa in 1:NPA) {
-    theta_raw[pa,] ~ normal(0, 1);
+    rawTheta[pa,] ~ normal(0, 1);
   }
   threshold1 ~ normal(0,5);
   threshold2 ~ normal(0,5);
@@ -71,7 +71,7 @@ generated quantities {
   vector[N] log_lik;
   vector[NFACETS] flowLoadings = rawLoadings;
   vector[NPA] flow = rawFlow;
-  int rcat_sim[NCMP,NFACETS];
+  //int rcat_sim[NCMP,NFACETS];
   int cur = 1;
 
   if (flowLoadings[1] < 0) {
@@ -79,13 +79,13 @@ generated quantities {
     flow = -flow;
   }
 
-  for (cmp in 1:NCMP) {
-    for (ff in 1:NFACETS) {
-      rcat_sim[cmp,ff] = categorical_logit_rng(cmp_probs(alpha, theta[pa1[cmp],ff],
-                                                         theta[pa2[cmp],ff],
-                                                         threshold1, threshold2)) - 3;
-    }
-  }
+  /* for (cmp in 1:NCMP) { */
+  /*   for (ff in 1:NFACETS) { */
+  /*     rcat_sim[cmp,ff] = categorical_logit_rng(cmp_probs(alpha, theta[pa1[cmp],ff], */
+  /*                                                        theta[pa2[cmp],ff], */
+  /*                                                        threshold1, threshold2)) - 3; */
+  /*   } */
+  /* } */
 
   for (cmp in 1:NCMP) {
     for (ff in 1:NFACETS) {

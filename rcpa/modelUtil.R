@@ -1,16 +1,11 @@
 library(rstan)
 
 rstan_options(auto_write = TRUE)
-options(mc.cores = parallel::detectCores())
+options(mc.cores = 1)
 
 outputDir <- function() './data/'
 
-stanChains <- 6
-ppcSampleSizeThreshold <- 10
-
-if (stanChains > parallel::detectCores()) {
-  stop(paste("Reduce stanChains to less than or equal to", parallel::detectCores()))
-}
+ppcSampleSizeThreshold <- 20
 
 loadRawData <- function(dir='.') {
   rcd <- read.csv(paste0(dir,"/rawData.csv"), stringsAsFactors=FALSE)
@@ -33,8 +28,12 @@ loadSingleFactorData <- function(dir='.') {
   rcd
 }
 
-loadSimData <- function(dir='.') {
-  read.csv(paste0(dir,"/simData.csv"), stringsAsFactors=FALSE)
+loadSim5Data <- function(dir='.') {
+  read.csv(paste0(dir,"/sim5Data.csv"), stringsAsFactors=FALSE)
+}
+
+loadSim6Data <- function(dir='.') {
+  read.csv(paste0(dir,"/sim6Data.csv"), stringsAsFactors=FALSE)
 }
 
 extractFacetNames <- function(rcd) {
@@ -132,16 +131,13 @@ lookupContextByDatumIndex1 <- function(rcd, index) {
   }
 }
 
-worstNeff <- function(fit, regPar) {
-  regParFit <- summary(fit, regPar, probs=c())$summary
-  regParFit[order(regParFit[,'n_eff']),]
-}
-
 # https://groups.google.com/forum/#!topic/stan-users/5WG51xKNSbA
 # http://andrewgelman.com/2007/04/02/markov_chain_mo/
 
-worstRhat <- function(fit, regPar) {
-  regParFit <- summary(fit, regPar, probs=c())$summary
+worstRhat <- function(fit) {
+  regParFit <- summary(fit, probs=c())$summary
+  mask <- grepl("^log_lik|rcat_sim", rownames(regParFit))
+  regParFit <- regParFit[!mask,]
   regParFit[order(-regParFit[,'Rhat']),]
 }
 
@@ -156,7 +152,7 @@ plotByFacet <- function(fit, rcd, output="byFacet.pdf") {
                  dimnames=list(facetNames, c('sigma','index')))
   info <- info[order(-info[,'sigma']),]
   
-  df <- summary(fit, pars=c("theta"), probs=.5)$summary
+  df <- summary(fit, pars=c("theta"), probs=c())$summary
   tar <- array(df[,'mean'], dim=c(length(facetNames), length(palist)))
   dimnames(tar) <- list(facetNames, palist)
   
@@ -164,12 +160,8 @@ plotByFacet <- function(fit, rcd, output="byFacet.pdf") {
   
   ss <- calcSampleSize(rcd)
   
-  hasFlow <- "flowLoadings" %in% names(fit@inits[[1]])
-  if (hasFlow) {
-    flow <- summary(fit, pars=c("flowLoadings"), probs=.5)$summary
-  } else {
-    flow <- NULL
-  }
+  flow <- try(summary(fit, pars=c("flowLoadings"), probs=c())$summary, silent=TRUE)
+  if (is(flow, "try-error")) flow <- NULL
   
   cairo_pdf(file=output, onefile=TRUE, height=3, pointsize=5)
   

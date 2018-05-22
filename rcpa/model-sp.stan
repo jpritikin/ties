@@ -1,4 +1,4 @@
-// Saturated covariance + per-facet thresholds
+// Saturated covariance + per-item thresholds
 functions {
   vector cmp_probs(real alpha, real pa1, real pa2, real thr1, real thr2) {
     vector[5] unsummed;
@@ -32,24 +32,24 @@ transformed data {
   }
 }
 parameters {
-  matrix[NPA,NFACETS]     theta_raw;
+  matrix[NPA,NFACETS]     rawTheta;
   real threshold1[NFACETS];
   real threshold2[NFACETS];
   vector<lower=0>[NFACETS] sigma;
-  cholesky_factor_corr[NFACETS] thetaCorChol;
+  cholesky_factor_corr[NFACETS] rawThetaCorChol;
 }
 transformed parameters {
   real alpha = mean(sigma .* sigma)^3.0;
   // non-centered parameterization due to thin data
   matrix[NPA,NFACETS]     theta;    // latent score of PA by facet
   for (pa in 1:NPA) {
-    theta[pa,] = (sigma .* (thetaCorChol * theta_raw[pa,]'))';
+    theta[pa,] = (sigma .* (rawThetaCorChol * rawTheta[pa,]'))';
   }
 }
 model {
-  thetaCorChol ~ lkj_corr_cholesky(2);
+  rawThetaCorChol ~ lkj_corr_cholesky(2);
   for (pa in 1:NPA) {
-    theta_raw[pa,] ~ normal(0,1);
+    rawTheta[pa,] ~ normal(0,1);
   }
   threshold1 ~ normal(0,5);
   threshold2 ~ normal(0,5);
@@ -65,7 +65,7 @@ model {
 }
 generated quantities {
   vector[N] log_lik;
-  int rcat_sim[NCMP,NFACETS];
+  //  int rcat_sim[NCMP,NFACETS];
   corr_matrix[NFACETS] thetaCor;
   int cur = 1;
 
@@ -80,13 +80,13 @@ generated quantities {
     }
   }
 
-  thetaCor = multiply_lower_tri_self_transpose(thetaCorChol);
+  thetaCor = multiply_lower_tri_self_transpose(rawThetaCorChol);
 
-  for (cmp in 1:NCMP) {
-    for (ff in 1:NFACETS) {
-      rcat_sim[cmp,ff] = categorical_logit_rng(cmp_probs(alpha, theta[pa1[cmp],ff],
-                                                         theta[pa2[cmp],ff],
-                                                         threshold1[ff], threshold2[ff])) - 3;
-    }
-  }
+  // for (cmp in 1:NCMP) {
+  //   for (ff in 1:NFACETS) {
+  //     rcat_sim[cmp,ff] = categorical_logit_rng(cmp_probs(alpha, theta[pa1[cmp],ff],
+  //                                                        theta[pa2[cmp],ff],
+  //                                                        threshold1, threshold2)) - 3;
+  //   }
+  // }
 }

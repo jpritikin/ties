@@ -1,28 +1,44 @@
 # saturated covariance matrix
 # 1 set of thresholds vs separate thresholds for every facet
 
+library(loo)
 library(qgraph)
 source("modelUtil.R")
 
 load(paste0(outputDir(), "fit2t1.rda"))
+
+load(paste0(outputDir(), "fitwsp.rda"))
 
 if (0){
   library(shinystan)
   shinystan::launch_shinystan(fit2t1)
 }
 
-estimator <- 'mean'
 facetNames <- extractFacetNames(rcd)
 facetNames <- sub('\\d', '', facetNames, perl=TRUE)
 
 df <- summary(fit2t1, pars=c("thetaCor"), probs=c(.975,.025))$summary
-#df[sign(df[,'95%']) != sign(df[,'5%']), estimator] <- 0
-tc <- matrix(df[,estimator], length(facetNames), length(facetNames))
+tc <- matrix(df[,'mean'], length(facetNames), length(facetNames))
 dimnames(tc) <- list(facetNames, facetNames)
+
+df <- summary(fitwsp, pars=c("thetaCor"), probs=c(.975,.025))$summary
+tp <- matrix(df[,'mean'], length(facetNames), length(facetNames))
+dimnames(tp) <- list(facetNames, facetNames)
+
+wsc_ll <- extract_log_lik(fit2t1, merge_chains = FALSE)
+wsp_ll <- extract_log_lik(fitwsp, merge_chains = FALSE)
+wsc_loo <- loo(wsc_ll, r_eff=relative_eff(exp(wsc_ll)))
+wsp_loo <- loo(wsp_ll, r_eff=relative_eff(exp(wsp_ll)))
+
+c1 <- compare(wsc_loo, wsp_loo)
+print(c1)
+print(c1[1]/c1[2])
+
+print(cor(tc[lower.tri(tc)], tp[lower.tri(tp)]))
 
 ss <- calcSampleSize(rcd)
 
-save(ss, tc, file="cluster.rda")
+save(ss, tp, file="cluster.rda")
 
 # exclude: spont goal1 feedback1 control waiting
 
@@ -64,7 +80,7 @@ clusteringPlot(
 factanal(covmat=tc, factors=1)
 
 #df <- summary(fit2t1, pars=c("theta"), probs=.5)$summary
-#tar <- array(df[,estimator], dim=c(NFACETS, NPA))
+#tar <- array(df[,'mean'], dim=c(NFACETS, NPA))
 
 if (0) {
   library(shinystan)

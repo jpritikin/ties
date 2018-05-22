@@ -21,22 +21,22 @@ simTheta <- as.matrix(read.csv("sim6Theta.csv", row.names=1))
 
 rm(fit2t5)
 
-load(paste0(outputDir(), "fit2t6.rda"))
+load(paste0(outputDir(), "fit2t7.rda")) # per-item thresholds
 
-df <- summary(fit2t6, pars=c("sigma"), probs=c())$summary
+df <- summary(fit2t7, pars=c("sigma"), probs=c())$summary
 estSigma <- matrix(df[,'mean'], length(facetNames), 1,
   dimnames= list(facetNames, c()))
 
-df <- summary(fit2t6, pars=c("alpha", paste0("threshold",1:2)), probs=c())$summary
+df <- summary(fit2t7, pars=c("alpha", paste0("threshold",1:2)), probs=c())$summary
 estItem <- df[,'mean']
 
-df <- summary(fit2t6, pars=c("flowLoadings"), probs=c())$summary
+df <- summary(fit2t7, pars=c("flowLoadings"), probs=c())$summary
 estLoadings <- df[,'mean']
 
-df <- summary(fit2t6, pars='flow', probs=c())$summary
+df <- summary(fit2t7, pars='flow', probs=c())$summary
 estFlow <- df[,'mean']
 
-df <- summary(fit2t6, pars=c("theta"), probs=c())$summary
+df <- summary(fit2t7, pars=c("theta"), probs=c())$summary
 estTheta <- t(array(df[,'mean'], dim=c(length(facetNames), length(palist))))
 dimnames(estTheta) <- list(palist, facetNames)
 
@@ -44,7 +44,7 @@ options(stringsAsFactors=FALSE)
 
 simResult <- rbind(
   data.frame(par='$\\alpha$', true=item[1], recovered=estItem[1]),
-  data.frame(par='$\\tau$', true=item[2:3], recovered=estItem[2:3]),
+#  data.frame(par='$\\tau$', true=item[2:3], recovered=estItem[2:3]),
   data.frame(par='$\\sigma$', true=sigma, recovered=estSigma),
   data.frame(par='$\\lambda$', true=loadings, recovered=estLoadings),
   data.frame(par='$\\pi$', true=c(simFlow), recovered=c(estFlow)))
@@ -56,7 +56,7 @@ simResult$par = ordered(simResult$par, levels=unique(simResult$par))
 cor(simResult$true, simResult$recovered)
 cor(simResultTheta$true, simResultTheta$recovered)
 
-save(simResult, simResultTheta, file="checkSim6.rda")
+save(simResult, simResultTheta, file="checkSim7.rda")
 
 q()
 

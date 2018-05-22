@@ -1,38 +1,40 @@
+options(width=100)
 library(loo)
 
 source("modelUtil.R")
 options(mc.cores = 1)
 
-load(paste0(outputDir(), "fit2t4.rda"))  # independent
-load(paste0(outputDir(), "fit2t2.rda"))  # saturated
-load(paste0(outputDir(), "fit2t5.rda"))  # factor model
+load(paste0(outputDir(), "fitsip.rda"))  # independent
+load(paste0(outputDir(), "fitssp.rda"))  # saturated
+load(paste0(outputDir(), "fitsfp.rda"))  # factor model
 
 # rhat
 
-ind_ll <- extract_log_lik(fit2t4, merge_chains = FALSE)
-rm(fit2t4)
-
-sat_ll <- extract_log_lik(fit2t2, merge_chains = FALSE)
-rm(fit2t2)
-
-fac_ll <- extract_log_lik(fit2t5, merge_chains = FALSE)
-rm(fit2t5)
+ind_ll <- extract_log_lik(fitsip, merge_chains = FALSE)
+sat_ll <- extract_log_lik(fitssp, merge_chains = FALSE)
+fac_ll <- extract_log_lik(fitsfp, merge_chains = FALSE)
 
 ind_loo <- loo(ind_ll, r_eff=relative_eff(exp(ind_ll)))
 sat_loo <- loo(sat_ll, r_eff=relative_eff(exp(sat_ll)))
 fac_loo <- loo(fac_ll, r_eff=relative_eff(exp(fac_ll)))
 
+outlierTable <- function(rcd, loo1) {
+  ids <- pareto_k_ids(loo1)
+  if (0 == length(ids)) return(NULL)
+  df <- lookupContextByDatumIndex(rcd, ids)
+  df <- cbind(pareto=pareto_k_values(loo1)[ids], df)
+  df <- df[order(-df$pareto),]
+  df
+}
+
 print(ind_loo)
-print(lookupContextByDatumIndex(rcd, pareto_k_ids(ind_loo)))
+outlierTable(rcd, ind_loo)
 print(sat_loo)
-print(lookupContextByDatumIndex(rcd, pareto_k_ids(sat_loo)))
+outlierTable(rcd, sat_loo)
 print(fac_loo)
-outliers <- lookupContextByDatumIndex(rcd, pareto_k_ids(fac_loo))
-print(outliers)
+outlierTable(rcd, fac_loo)
 
 indVsFac <- compare(ind_loo, fac_loo)
 satVsFac <- compare(sat_loo, fac_loo)
 
-save(ind_loo, sat_loo, fac_loo, indVsFac, satVsFac, outliers, file="factorCmp.rda")
-
-#plotByFacet(fit2t5, rcd)
+save(ind_loo, sat_loo, fac_loo, indVsFac, satVsFac, file="factorCmp.rda")

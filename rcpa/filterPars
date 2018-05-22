@@ -1,0 +1,38 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use Text::CSV_XS;
+use Fatal qw(open);
+use Data::Dumper;
+
+my @header;
+my @mask;
+
+my $csv = Text::CSV_XS->new({ binary => 1, auto_diag => 1 });
+my $out = *STDOUT;
+
+sub filt {
+	my @result;
+	for my $x (0..$#mask) {
+	    push @result, $_[$x] if $mask[$x];
+	}
+	\@result;
+}
+
+while (defined(my $l = <>)) {
+    chomp $l;
+    if ($l =~ /^#/) {
+	print "$l\n";
+    } elsif (!@header) {
+	$csv->parse($l);
+	@header = $csv->fields;
+	@mask = map { 1 - m/^raw/ } @header;
+	$csv->print($out, filt(@header));
+	print $out "\n";
+    } else {
+	$csv->parse($l);
+	$csv->print($out, filt($csv->fields));
+	print $out "\n";
+    }
+}

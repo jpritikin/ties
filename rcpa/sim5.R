@@ -6,7 +6,7 @@ load(paste0(outputDir(), "fit2t2.rda"))
 facetNames <- extractFacetNames(rcd)
 
 df <- summary(fit2t2, pars=c("thetaCor"), probs=c(.975,.025))$summary
-# Could cause non-positive definite problem
+# Could cause non-positive definiteness
 #df[sign(df[,'97.5%']) != sign(df[,'2.5%']), estimator] <- 0
 tc <- matrix(df[,'mean'], length(facetNames), length(facetNames),
   dimnames= list(facetNames, facetNames))
@@ -44,5 +44,5 @@ for (rx in 1:nrow(rcd)) {
   })
 }
 
-write.csv(rcd, "simData.csv", row.names=FALSE)
-write.csv(theta, "simTheta.csv")
+write.csv(rcd, "sim5Data.csv", row.names=FALSE)
+write.csv(theta, "sim5Theta.csv")

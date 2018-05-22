@@ -1,0 +1,109 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use Fatal qw(open chmod);
+
+my @spec =
+  (
+   # acronym code:
+   # w = whitelist, s = singlefactor, s5,s6 = sim
+   # i = independence, s = saturated, f = factor model
+   # c = common threshold, p = per-item thresholds
+   ['loadWhitelistRawData', 'model-ic', 2000, 'fit1s2', 'fitwic'],
+   ['loadWhitelistRawData', 'model-sc', 2000, 'fit2t1', 'fitwsc'],
+   ['loadSingleFactorData', 'model-sc', 1000, 'fit2t2', 'fitssc'],
+   ['loadSingleFactorData', 'model-fc', 2000, 'fit2t5', 'fitsfc'],
+   ['loadSim5Data', 'model-sc', 1000, 'fit2t8', 'fits5sc'],
+   ['loadSim6Data', 'model-fc', 1000, 'fit2t6', 'fits6fc'],
+   ['loadSim6Data', 'model-fp', 1000, 'fit2t7', 'fits6fp'],
+   ['loadSingleFactorData', 'model-fp', 2000, 'fitsfp'],
+   ['loadWhitelistRawData', 'model-ip', 2000, 'fitwip'],
+   ['loadWhitelistRawData', 'model-sp', 2000, 'fitwsp'],
+   ['loadSingleFactorData', 'model-ip', 1000, 'fitsip'],
+   ['loadSingleFactorData', 'model-sp', 1000, 'fitssp'],
+  );
+
+for my $x (1..scalar(@spec)) {
+    my $s = $spec[$x-1];
+    my $sname = sprintf("s%02d", $x);
+    open(my $fh, '>', $sname);
+    select $fh;
+    my ($data, $model, $ss, $dest1, $dest2) = @$s;
+    my $halfss = int($ss/2);
+    print qq[#!/bin/sh
+
+set -o errexit
+set -o nounset
+set -x
+
+R --no-save <<EOF
+source("modelUtil.R")
+rcd <- $data()
+d1 <- prepDataForStan(rcd)
+stan_rdump(names(d1), envir=list2env(d1), file="$sname.data.R")
+EOF
+
+if [ ! -e $model -o $model.stan -nt $model ]; then
+    echo "$model is out of date"
+    exit 1
+fi
+rm -f $model.hpp
+
+for n in \$(seq 6); do
+  cat > ./$sname.gdb\$n <<EOF
+  run sample num_samples=$halfss num_warmup=$halfss \\
+     algorithm=hmc engine=nuts max_depth=15 \\
+     data file=$sname.data.R \\
+     output file=data/${sname}_\$n.csv
+  where
+EOF
+  gdb ./$model -n -batch -x ./$sname.gdb\$n &
+done
+
+wait
+
+for n in \$(seq 6); do
+  ./filterPars data/${sname}_\$n.csv > data/${sname}f_\$n.csv
+done
+
+R --no-save <<EOF
+source("modelUtil.R")
+rcd <- $data()
+csvfiles <- dir(outputDir(), pattern = '${sname}f_[0-9].csv', full.names = TRUE)
+$dest1 <- read_stan_csv(csvfiles)
+];
+    if ($dest2) {
+	print qq[$dest2 <- $dest1
+save($dest1, $dest2, rcd, file=paste0(outputDir(), "$dest1.rda"))
+];
+    } else {
+	print qq[save($dest1, rcd, file=paste0(outputDir(), "$dest1.rda"))
+];
+    }
+    print qq[EOF
+
+rm -f $sname.data.R $sname.gdb?
+];
+}
+
+for my $x (1..scalar(@spec)) {
+    chmod 0755, sprintf("s%02d", $x)
+}
+
+my $models = 'models <- c(' . join(',', map({ "'$_->[3]'"  } @spec)).')';
+open(my $fh, '>', 'fitStats.R');
+select $fh;
+print qq[
+options(width=200)
+
+$models
+
+for (fn1 in models) {
+  print(fn1)
+  source("modelUtil.R")
+  load(paste0(outputDir(), paste0(fn1, ".rda")))
+  print(head(worstRhat(get(fn1, pos=1)), n=20))
+  rm(list=setdiff(ls(), c('fn1')))
+}
+];

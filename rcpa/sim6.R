@@ -46,6 +46,6 @@ for (rx in 1:nrow(rcd)) {
   })
 }
 
-write.csv(rcd, "simData.csv", row.names=FALSE)
-write.csv(theta, "simTheta.csv")
-write.csv(flowScore, "simFlow.csv")
+write.csv(rcd, "sim6Data.csv", row.names=FALSE)
+write.csv(theta, "sim6Theta.csv")
+write.csv(flowScore, "sim6Flow.csv")

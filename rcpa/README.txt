@@ -22,7 +22,7 @@ model2.stan -- Saturated model
 
 model3.stan -- Factor model model
 
-model4.stan -- Saturated model with per-item thresholds
+model5.stan -- Factor model with per-item thresholds
 
 f?.R -- scripts to run Stan models
 
@@ -50,3 +50,5 @@ reportSampleSize.R -- Report sample size by activity
 runStan -- Shell script to run all other scripts
 
 genWebResults.R -- Extract reports for preliminary results website
+
+TODO: add pa-browser stuff

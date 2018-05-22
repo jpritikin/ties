@@ -2,34 +2,25 @@ library(jsonlite)
 
 source("modelUtil.R")
 
-load(paste0(outputDir(), "fit2t5.rda"))
+load(paste0(outputDir(), "fitsfp.rda"))  # factor model
 
-sim_fit <- fit2t5
+sim_fit <- fitsfp
 
 facetNames <- extractFacetNames(rcd)
 NFACETS <- length(facetNames)
 whitelist <- extractPalist(rcd)
 
 # check whether to flip loading sign
-fl <- as.data.frame(summary(sim_fit, pars=c("flowLoadings"), probs=c(.025,.975))$summary)
-fl$index <- 1:nrow(fl)
+fl <- as.data.frame(summary(sim_fit, pars=c("flowLoadings"), probs=c())$summary)
 rownames(fl) <- facetNames
-fl[order(fl[,'mean']),]
-
-estimator <- 'mean'
-
-df <- summary(sim_fit, pars='sigma', probs=.5)$summary
-sigma <- matrix(df[,estimator], nrow=1,
-                dimnames=list(NULL, facetNames))
-print(sigma)
 
 flow <- summary(sim_fit, pars=c("flow"), probs=.5)$summary
 
 df <- summary(sim_fit, pars=c("theta"), probs=.5)$summary
-tar <- array(df[,estimator], dim=c(NFACETS, length(whitelist)))
+tar <- array(df[,'mean'], dim=c(NFACETS, length(whitelist)))
 
 if (nrow(df) != prod(dim(tar))) stop("mismatch")
-tar <- rbind(tar, flow[, estimator])
+tar <- rbind(tar, flow[, 'mean'])
 
 if (0) {
   library(shinystan)
@@ -43,7 +34,7 @@ cat(paste("var RCPA_DATA=",
           ";\nvar RCPA_FACETS=",
           toJSON(c(facetNames,'flow')),
           ";\nvar RCPA_FACET_ALPHA=",  # rename TODO
-          toJSON(c(sigma[1,],0)),
+          toJSON(c(abs(fl[,'mean']))),
           ";\nvar RCPA_PA=",
           toJSON(whitelist),
           ";\nvar RCPA_PA_SAMPLESIZE=",

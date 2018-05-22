@@ -1,3 +1,5 @@
+# This is for a saturated covariance matrix
+
 source("modelUtil.R")
 
 load(paste0(outputDir(), "fit2t2.rda"))
@@ -19,17 +21,17 @@ alpha1 <- df[,estimator]
 
 rm(fit2t2)
 
-load(paste0(outputDir(), "fit2t6.rda"))
+load(paste0(outputDir(), "fit2t8.rda"))
 
-df <- summary(fit2t6, pars=c("thetaCor"), probs=c())$summary
+df <- summary(fit2t8, pars=c("thetaCor"), probs=c())$summary
 sc <- matrix(df[,estimator], length(facetNames), length(facetNames),
   dimnames= list(facetNames, facetNames))
 
-df <- summary(fit2t6, pars=c("sigma"), probs=c())$summary
+df <- summary(fit2t8, pars=c("sigma"), probs=c())$summary
 sigma2 <- matrix(df[,estimator], length(facetNames), 1,
   dimnames= list(facetNames, c()))
 
-df <- summary(fit2t6, pars=c("alpha"), probs=c())$summary
+df <- summary(fit2t8, pars=c("alpha"), probs=c())$summary
 alpha2 <- df[,estimator]
 
 print(max(abs(alpha1 - alpha2)))
@@ -40,15 +42,15 @@ mask <- lower.tri(sc, F)
 print(cor(tc[mask], sc[mask]))
 print(max(abs(tc[mask] - sc[mask])))
 
-df <- summary(fit2t6, pars=c("theta"), probs=c())$summary
+df <- summary(fit2t8, pars=c("theta"), probs=c())$summary
 tar <- t(array(df[,estimator], dim=c(length(facetNames), length(palist))))
 dimnames(tar) <- list(palist, facetNames)
 
-simTheta <- as.matrix(read.csv("simTheta.csv", row.names=1))
+simTheta <- as.matrix(read.csv("sim5Theta.csv", row.names=1))
 print(cor(c(tar), c(simTheta)))
 print(max(abs(c(tar) - c(simTheta))))
 
-pval <- ppc(fit2t6, rcd)
-print(sum(pval<.05) / length(pval))
-print(apply(pval, 1, function(x) sum(x<.05)))
-print(apply(pval, 2, function(x) sum(x<.05)))
+#pval <- ppc(fit2t8, rcd)
+#print(sum(pval<.05) / length(pval))
+#print(apply(pval, 1, function(x) sum(x<.05)))
+#print(apply(pval, 2, function(x) sum(x<.05)))

@@ -1,4 +1,4 @@
-// Independence model
+// Independence model with per-item thresholds
 functions {
   vector cmp_probs(real alpha, real pa1, real pa2, real thr1, real thr2) {
     vector[5] unsummed;
@@ -33,8 +33,8 @@ transformed data {
 }
 parameters {
   matrix[NPA,NFACETS]     theta;    // latent score of PA by facet
-  real threshold1;
-  real threshold2;
+  real threshold1[NFACETS];
+  real threshold2[NFACETS];
   vector<lower=0>[NFACETS] sigma;
 }
 transformed parameters {
@@ -54,22 +54,22 @@ model {
           cmp_probs(alpha,
           theta[pa1[cmp],ff],
           theta[pa2[cmp],ff],
-          threshold1, threshold2));
+          threshold1[ff], threshold2[ff]));
     }
   }
 }
 generated quantities {
   vector[N] log_lik;
   int cur = 1;
-  int rcat_sim[NCMP,NFACETS];
+  // int rcat_sim[NCMP,NFACETS];
 
-  for (cmp in 1:NCMP) {
-    for (ff in 1:NFACETS) {
-      rcat_sim[cmp,ff] = categorical_logit_rng(cmp_probs(alpha, theta[pa1[cmp],ff],
-                                                         theta[pa2[cmp],ff],
-                                                         threshold1, threshold2)) - 3;
-    }
-  }
+  // for (cmp in 1:NCMP) {
+  //   for (ff in 1:NFACETS) {
+  //     rcat_sim[cmp,ff] = categorical_logit_rng(cmp_probs(alpha, theta[pa1[cmp],ff],
+  //                                                        theta[pa2[cmp],ff],
+  //                                                        threshold1, threshold2)) - 3;
+  //   }
+  // }
 
   for (cmp in 1:NCMP) {
     for (ff in 1:NFACETS) {
@@ -77,7 +77,7 @@ generated quantities {
         log_lik[cur] = categorical_logit_lpmf(rcat[cmp,ff] |
                                               cmp_probs(alpha, theta[pa1[cmp],ff],
                                                         theta[pa2[cmp],ff],
-                                                        threshold1, threshold2));
+                                                        threshold1[ff], threshold2[ff]));
         cur = cur + 1;
     }
   }

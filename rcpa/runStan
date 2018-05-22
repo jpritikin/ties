@@ -15,24 +15,38 @@ date
 
 git log -1 --oneline
 
+bad=
+for m in model*.stan; do
+    bin=$(basename $m .stan)
+    if [ $m -nt $bin ]; then
+	bad="$bad rcpa/$bin"
+    fi
+done
+if [ "x$bad" != x ]; then
+    echo "$bad are out of date"
+    exit 1
+fi
+
 R --no-save -f prepDemogr.R
 
-for n in $(seq 7); do
-  R --no-save -f f$n.R
-done
+./genSampler
 
-# simulate data based on fit2t2
+for n in $(seq --format="%02.0f" 4); do ./s$n; done
+
+R --no-save -f sim5.R
 R --no-save -f sim6.R
-R --no-save -f f8.R
+
+for n in $(seq --format="%02.0f" 5 12); do ./s$n; done
 
 R --no-save -f fitStats.R
 R --no-save -f plotAllItems.R
 
 R --no-save -f cluster.R
 R --no-save -f threshplot.R
-R --no-save -f thresholdCmp.R
 R --no-save -f factorCmp.R
+R --no-save -f checkSim5.R
 R --no-save -f checkSim6.R
+R --no-save -f checkSim7.R
 R --no-save -f genFlowData.R
 R --no-save -f genWebResults.R
 
