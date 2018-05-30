@@ -42,7 +42,7 @@ parameters {
   vector[NFACETS] rawLoadings;
 }
 transformed parameters {
-  real alpha = mean(sigma .* sigma)^3.0;
+  real alpha = mean((1 + rawLoadings .* rawLoadings)' .* sigma .* sigma)^3.0;
   // non-centered parameterization due to thin data
   matrix[NPA,NFACETS]     theta;    // latent score of PA by facet
   for (pa in 1:NPA) {
