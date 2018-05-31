@@ -46,7 +46,6 @@ R --no-save -f threshplot.R
 R --no-save -f factorCmp.R
 R --no-save -f checkSim5.R
 R --no-save -f checkSim6.R
-R --no-save -f checkSim7.R
 R --no-save -f genFlowData.R
 R --no-save -f genWebResults.R
 

@@ -1,50 +1,54 @@
+options(stringsAsFactors=FALSE)
+
 source("modelUtil.R")
 
-load(paste0(outputDir(), "fit2t5.rda"))
+load(paste0(outputDir(), "fitsfp.rda"))
 
 facetNames <- extractFacetNames(rcd)
 palist <- extractPalist(rcd)
 
-df <- summary(fit2t5, pars=c("sigma"), probs=c())$summary
+df <- summary(fitsfp, pars=c("sigma"), probs=c())$summary
 sigma <- df[,'mean']
 names(sigma) <- facetNames
 
-df <- summary(fit2t5, pars=c("alpha", paste0("threshold",1:2)), probs=c())$summary
-item <- df[,'mean']
+df <- summary(fitsfp, pars=c("alpha", paste0("threshold",1:2)), probs=c())$summary
+alphaOrig <- df['alpha', 'mean']
 
-df <- summary(fit2t5, pars='flowLoadings', probs=c())$summary
+df <- summary(fitsfp, pars='flowLoadings', probs=c())$summary
 loadings <- df[,'mean']
 names(loadings) <- facetNames
 
 simFlow  <- as.matrix(read.csv("sim6Flow.csv", row.names=1))
 simTheta <- as.matrix(read.csv("sim6Theta.csv", row.names=1))
+simThr <- as.matrix(read.csv("sim6Thresh.csv", row.names=1))
 
-rm(fit2t5)
+load(paste0(outputDir(), "fits6fp.rda"))
 
-load(paste0(outputDir(), "fit2t6.rda"))
-
-df <- summary(fit2t6, pars=c("sigma"), probs=c())$summary
+df <- summary(fits6fp, pars=c("sigma"), probs=c())$summary
 estSigma <- matrix(df[,'mean'], length(facetNames), 1,
   dimnames= list(facetNames, c()))
 
-df <- summary(fit2t6, pars=c("alpha", paste0("threshold",1:2)), probs=c())$summary
-estItem <- df[,'mean']
+df <- summary(fits6fp, pars="alpha", probs=c())$summary
+alpha <- df[,'mean']
 
-df <- summary(fit2t6, pars=c("flowLoadings"), probs=c())$summary
+df <- summary(fits6fp, pars=c("threshold1"), probs=c())$summary
+th1 <- df[,'mean']
+df <- summary(fits6fp, pars=c("threshold2"), probs=c())$summary
+th2 <- df[,'mean']
+
+df <- summary(fits6fp, pars=c("flowLoadings"), probs=c())$summary
 estLoadings <- df[,'mean']
 
-df <- summary(fit2t6, pars='flow', probs=c())$summary
+df <- summary(fits6fp, pars='flow', probs=c())$summary
 estFlow <- df[,'mean']
 
-df <- summary(fit2t6, pars=c("theta"), probs=c())$summary
+df <- summary(fits6fp, pars=c("theta"), probs=c())$summary
 estTheta <- t(array(df[,'mean'], dim=c(length(facetNames), length(palist))))
 dimnames(estTheta) <- list(palist, facetNames)
 
-options(stringsAsFactors=FALSE)
-
 simResult <- rbind(
-  data.frame(par='$\\alpha$', true=item[1], recovered=estItem[1]),
-  data.frame(par='$\\tau$', true=item[2:3], recovered=estItem[2:3]),
+  data.frame(par='$\\alpha$', true=alphaOrig, recovered=alpha),
+  data.frame(par='$\\tau$', true=c(simThr), recovered=c(th1, th2)),
   data.frame(par='$\\sigma$', true=sigma, recovered=estSigma),
   data.frame(par='$\\lambda$', true=loadings, recovered=estLoadings),
   data.frame(par='$\\pi$', true=c(simFlow), recovered=c(estFlow)))
