@@ -2,10 +2,18 @@ source("modelUtil.R")
 
 library(ggplot2)
 
+load(paste0(outputDir(), "fitsip.rda"))  # independence model
+
+alphaInd <- summary(fitsip, pars="alpha", probs=c(.025,.975))$summary
+
+print(alphaInd)
+
 load(paste0(outputDir(), "fitsfp.rda"))  # factor model
 fit <- fitsfp
 
 alpha.summary <- summary(fit, pars="alpha", probs=c(.025,.975))$summary
+
+print(alpha.summary)  # should be similar to alphaInd
 
 facetNames <- extractFacetNames(rcd)
 

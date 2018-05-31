@@ -68,9 +68,24 @@ rangeByItemFM <- diff(apply(tar, 1, range))
   
 numIterations <- length(cmp1)
 
+df <- extract(fit, pars=c('flowLoadings', 'sigma'), permuted=FALSE)
+stdP <- apply(df, 1:2, function(v) {
+  std <- rep(NA, length(facetNames))
+  for (fx in 1:length(facetNames)) {
+    loading <- v[fx]
+    sigma <- v[length(facetNames) + fx]
+    itemVar <- (1 + loading^2) * sigma^2
+    std[fx] <- (loading^2 * sigma^2) / itemVar
+  }
+  names(std) <- facetNames
+  std
+})
+stdLoadings <- t(apply(stdP, 1, function(v) quantile(c(v), c(.025,.975))))
+
 save(hikingVsMountainBikingP, hikingVsMountainBiking, runningVsMartialArts, runningVsMartialArtsP,
   largeSampleThreshold, largeSampleActivities, bigDiffL, bigDiffU, sigmaByItemFM, rangeByItemFM,
-  numIterations, loadings, rawLoadings, flow, rawFlow, tar, file="genFlowData.rda")
+  numIterations, loadings, rawLoadings, flow, rawFlow, tar,
+  stdLoadings, file="genFlowData.rda")
 
 q()
 

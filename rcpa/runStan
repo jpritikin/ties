@@ -31,12 +31,12 @@ R --no-save -f prepDemogr.R
 
 ./genSampler
 
-for n in $(seq --format="%02.0f" 4); do ./s$n; done
+for n in $(seq --format="%02.0f" 7); do ./s$n; done
 
 R --no-save -f sim5.R
 R --no-save -f sim6.R
 
-for n in $(seq --format="%02.0f" 5 12); do ./s$n; done
+for n in $(seq --format="%02.0f" 8 9); do ./s$n; done
 
 R --no-save -f fitStats.R
 R --no-save -f plotAllItems.R

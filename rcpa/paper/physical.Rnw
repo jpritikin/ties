@@ -1073,7 +1073,7 @@ To develop appreciation of these results, we can examine particular activity pai
 For example, we compare two activities with a larger sample size at opposite ends of the scale.
 The difference $\hat\pi_\text{martial arts} - \hat\pi_\text{running}$
 has a 95\% uncertainty interval of~$[\Sexpr{runningVsMartialArts[1]}, \Sexpr{runningVsMartialArts[2]}]$.
-This can be classified as a \emph{very large} or \emph{huge} effect size \parencite{sawilowsky2009}.
+This can be classified as a \emph{huge} effect size \parencite{sawilowsky2009}.
 It is not clear what alpha-level correction should be made for multiple comparisons \parencite[e.g.,][]{sinclair2013},
 but many millions of draws from the posterior would be required to estimate a $p$-value for this
 difference with any accuracy.
@@ -1106,25 +1106,30 @@ load(paste0(RCPA_DIR, "plotAllItems.rda"))
 itemInfo <- data.frame(
   '$\\hat\\sigma_j$'=sigmaByItem,
   '$\\max(\\hat\\theta_j)-\\min(\\hat\\theta_j)$'=c(rangeByItem),
-  '$\\hat\\sigma_j$'=NA,
-  '$\\max(\\hat\\theta_j)-\\min(\\hat\\theta_j)$'=NA,
   '$\\hat\\lambda_j$'=NA,
+  '\\% variance$^a$'=NA,
   row.names=names(sigmaByItem), check.names=FALSE)
-itemInfo[rownames(loadings),c(3,4,5)] <- c(sigmaByItemFM, rangeByItemFM, loadings[,'mean'])
+itemInfo[rownames(loadings), 3] <- c(loadings[,'mean'])
+itemInfo[rownames(loadings), 4] <-
+  apply(stdLoadings, 1, function(x) sprintf("$[%.0f, %.0f]$", 100*x[1], 100*x[2]))
 itemInfo <- itemInfo[order(-itemInfo[,2]),]
 rownames(itemInfo) <- gsub("\\d", "", rownames(itemInfo))
 
 str <- kable(itemInfo,  booktabs=T, escape=FALSE, linesep = "",
   caption="Relative Item Diagnostics",
   row.names=TRUE) %>% kable_styling() %>%
-  add_header_above(c(" ", "Independence Model" = 2, "Factor Model" = 3)) %>%
+  add_header_above(c(" ", "Independence Model" = 2, "Factor Model" = 2)) %>%
   footnote(escape=FALSE, threeparttable=TRUE, general_title="Note.", general=paste(
         "Relative measurement quality is reflected by item $j$'s standard deviation $\\\\hat\\\\sigma_j$",
         "and latent score range $\\\\max(\\\\hat\\\\theta_j)-\\\\min(\\\\hat\\\\theta_j)$.",
         "A smaller $\\\\hat\\\\sigma_j$ indicate a larger measurement error",
         "and a smaller range $\\\\max(\\\\hat\\\\theta_j)-\\\\min(\\\\hat\\\\theta_j)$ indicates",
         "a less informative item.",
-        "Factor loadings $\\\\hat\\\\lambda_j$ of larger absolute magnitude are more important predictors of Flow."))
+        "Factor loadings $\\\\hat\\\\lambda_j$ of larger absolute magnitude are more important predictors of Flow."),
+    alphabet=c(paste("Proportion of variance accounted for by the Flow latent factor,",
+      "95\\\\% uncertainty interval.",
+      "All factor model items are significantly different",
+      "from zero at the $\\\\alpha=.05$ level.")))
 
 str
 
@@ -1641,7 +1646,7 @@ comparison in Equation~\ref{eqn:compare} was in the correct direction.
 Built up from Equation~\ref{eqn:logistic2},
 our item model is fully specified (Equation~\ref{eqn:indicator}).
 
-In contrast to typical item response models \parencite[e.g.,][Chapter 6]{baker2004},
+Contrary to typical item response models \parencite[e.g.,][Chapter 6]{baker2004},
 placing a prior on the variance with a mode of 1.0 (Equation~\ref{eqn:standard-sd}) is not sufficient
 to ensure that the variances of latent scores $\sigma$ approach this mode.
 The logistic discrimination parameter $\alpha$ dominates other
@@ -1651,29 +1656,37 @@ the variance of $\theta_j$ is determined by two factors:
 measurement error and transitive relations between activities.
 For example, latent scores for the set of activities $\{A,B,C,D\}$ will be spread out roughly
 twice as much if $A < B < C < D$ in comparison with $A = B < C = D$.
-A priori, there is no sensible way to set $\alpha$ or
-provide a prior because we have no knowledge of
+A priori, there is no appropriate stochastic distribution
+for $\alpha$ because we have no knowledge of
 the distribution of latent score differences.
 To force item standard deviations $\hat\sigma$ close to 1.0,
 the slope of the logistic $\alpha$ was set to
-the mean of variances $\hat\sigma^2$ raised to the third power (Equation~\ref{eqn:slope}).
+the mean of the latent score variances raised to the third power (Equation~\ref{eqn:slope}).
 This created a feedback loop to nudge $\alpha$ in the direction
 that would produce more standardized item variances.
 The third power provides a reasonable correction,
 and a larger exponent can create sampling problems due to extreme
 curvature in the posterior.
 
-For the factor model, we introduced $\lambda_j$ factor
-loading of item $j$ and $\pi_k$ latent flow propensity score of activity $k$.
-The factor model replaced Equation~\ref{eqn:saturated} with,
+To obtain the independence and factor models,
+the correlation matrix $\Sigma$ was replaced.
+The independence model used $\theta_{j} \sim \N(0, \sigma_j)$
+in place of Equation~\ref{eqn:saturated}.
+To obtain the factor model,
+we introduced $\lambda_j$ factor loading of item $j$ and
+$\pi_k$ latent flow propensity score of activity $k$
+and replaced Equation~\ref{eqn:saturated} with,
 \begin{align}
 \lambda &\sim \N(0, 5) \\
 \pi &\sim \N(0,1) \label{eqn:pi-distribution} \\
-\theta_{kj} &\sim \sigma_j \cdot \N(\pi_k \lambda_j, 1)
+\theta_{kj} &\sim \sigma_j \cdot \N(\pi_k \lambda_j, 1).
 \end{align}
-and used no correlation matrix $\Sigma$ (Equation~\ref{eqn:lkj}).
-The independence model used $\theta_{j} \sim \N(0, \sigma_j)$
-in place of Equation~\ref{eqn:saturated} with no correlation matrix $\Sigma$.
+The definition of $\alpha$ (Equation~\ref{eqn:slope}) also needed adjustment
+because path tracing rules \parencite{boker2002} dictated a different
+equation for the latent score variances,
+\begin{align}
+\alpha &\equiv \left[ \frac{1}{J} \sum_{j=1}^J (1 + \lambda_j^2) \sigma_j^2 \right]^3.
+\end{align}
 
 The posteriors were sampled using RStan~2.17.1 \parencite{rstan2.17}.
 All models completed without convergence warnings.

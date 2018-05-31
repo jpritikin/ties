@@ -12,16 +12,13 @@ my @spec =
    # c = common threshold, p = per-item thresholds
    ['loadWhitelistRawData', 'model-ic', 2000, 'fit1s2', 'fitwic'],
    ['loadWhitelistRawData', 'model-sc', 2000, 'fit2t1', 'fitwsc'],
-   ['loadSingleFactorData', 'model-sc', 1000, 'fit2t2', 'fitssc'],
-   ['loadSingleFactorData', 'model-fc', 2000, 'fit2t5', 'fitsfc'],
-   ['loadSim5Data', 'model-sc', 1000, 'fit2t8', 'fits5sc'],
-   ['loadSim6Data', 'model-fc', 1000, 'fit2t6', 'fits6fc'],
-   ['loadSim6Data', 'model-fp', 1000, 'fit2t7', 'fits6fp'],
-   ['loadSingleFactorData', 'model-fp', 2000, 'fitsfp'],
    ['loadWhitelistRawData', 'model-ip', 2000, 'fitwip'],
    ['loadWhitelistRawData', 'model-sp', 2000, 'fitwsp'],
    ['loadSingleFactorData', 'model-ip', 1000, 'fitsip'],
+   ['loadSingleFactorData', 'model-fp', 2000, 'fitsfp'],
    ['loadSingleFactorData', 'model-sp', 1000, 'fitssp'],
+   ['loadSim5Data', 'model-sp', 1000, 'fits5sp'],
+   ['loadSim6Data', 'model-fp', 1000, 'fits6fp'],
   );
 
 for my $x (1..scalar(@spec)) {
