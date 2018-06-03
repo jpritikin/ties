@@ -351,7 +351,7 @@ it is unrealistic to expect each subject to
 assign a score to each.
 For example, it is difficult to score the flow propensity of
 the activity \emph{running} on an absolute scale of $1-100$.
-Judgments that are more readily available are relative comparisons.
+Judgments that are more readily available are relative comparisons \parencite[e.g.,][]{jones2011,graus2015}.
 For example, I experience flow \emph{more often} when I run outside
 than when I run on a treadmill.
 If we obtain relative comparisons, can they be converted into absolute scores?
