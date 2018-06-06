@@ -359,7 +359,7 @@ This problem is similar to the problem of ranking a large number of
 chess players.
 Fortunately, methods are available that take a
 set of chess match outcomes and determine the most likely
-absolute rankings, even for players who did not play directly
+absolute player rankings, even for players who did not play directly
 against each other \parencite[e.g.,][]{bradley1952,luce1959,elo1978}.
 These methods can be adapted to any type of relative comparison data.
 Hence, we invited participants to select two
@@ -442,12 +442,12 @@ activity demands exceed skills or skills exceed demands, respectively.
 FS2 assesses perceived fit (i.e., Balance) with items such as,
 ``I feel I am competent enough to meet the high demands of the situation.''
 However, in the present study, the focus was on situational factors.
-We could only measure the demand part of the skills-demands balance.
+We could only assess the demand part of the skills-demands balance.
 Subjects were asked to report on voluntarily chosen activities.
 We infer that perceived fit was not extremely poor because
 the vivid experience of anxiety or boredom
 would not be chosen voluntarily.
-Hence, variation in perceived fit was regarded as measurement error.
+Variation in perceived fit was regarded as measurement error.
 We do not, however, need to assume that all activities offer
 equal opportunities for perceived fit.
 
@@ -549,7 +549,7 @@ Item \emph{reward} assessed the relative degree of positive
 affect after engaging in an activity.
 We acknowledge that flow is not the only possible cause of positive affect.
 However, we hoped to distinguish activities practiced mainly for
-physical fitness with little expectation of flow.
+physical fitness with limited expectation of enjoyment.
 This item corresponds to the Autotelic subscale in FS2.
 An example FS2 item is, ``I really enjoy the experience.''
 Other potential consequents of flow, such as cognitive capacity
@@ -572,7 +572,7 @@ from prior research were not available.
 %% of skepticism.
 
 Our hypotheses are that physical activities differ by flow propensity
-and that our operationalization of flow propensity reflect
+and, that our operationalization of flow propensity reflects
 activity flow propensity in practice.
 In a cross-sectional design,
 we examined experiences of activities
@@ -831,8 +831,7 @@ The relative paired comparisons for each item were
 converted into absolute rankings by the model.
 We examined the correlation structure among
 the latent absolute rankings and excluded poorly performing items.
-Threshold parameters $\tau_1, \tau_2$ mapped ordinal responses \emph{much}
-and \emph{somewhat} to the continuous logit scale.
+With items selected, a factor model was fit.
 We report fit statistics and posterior summaries of parameters.
 A detailed overview of our modeling framework is provided in Appendix~\ref{app:model}.
 
@@ -921,7 +920,8 @@ print(pl + facet_wrap(~item))
 \caption{Posterior distribution of category response curves.
 For a given difference in latent ranking,
 the category highest in the plot is the most probable response.
-The \emph{somewhat} responses were unpopular except for Item \emph{complex}.
+The \emph{somewhat} responses were unpopular except for,
+possibly, Item \emph{complex}.
 }
 \label{fig:response-curve}
 \end{sidewaysfigure}
@@ -972,16 +972,16 @@ and should be interpreted with caution.}
 
 \subsection{Response Model}
 With \Sexpr{finalNumIndicators} indicators selected,
-we turned our attention to the item response curves,
-which maps ordinal responses to the continuous logit scale.
+we turned our attention to the item response curves
+that map ordinal responses to the continuous logit scale.
 All our items used a symmetric 3-point Likert scale with
 response options \emph{much}, \emph{somewhat}, and \emph{equal}.
 The category response curves are exhibited in Figure~\ref{fig:response-curve}.
-In all items except for Item \emph{complex},
-the \emph{somewhat} responses are never the most probable regardless of
+In all items except for possibly Item \emph{complex},
+the \emph{somewhat} responses were never the most probable regardless of
 difference in latent ranking.
-Hence, the addition of another response category (use of a 4-point symmetric scale)
-is unlikely to improve measurement accuracy.
+Hence, the addition of another response category (i.e., use of a 4-point symmetric scale)
+is unlikely to improve measurement efficiency.
 
 \subsection{Factor Model}
 <<results='hide'>>=
@@ -1094,7 +1094,7 @@ That we could retain both antecedents (Items \emph{skill}, \emph{predict},
 \emph{novelty}, \emph{creative}, \emph{stakes}, \emph{complex}, and \emph{body})
 and phenomenological indicators and consequents (Items \emph{chatter},
 \emph{present}, and \emph{reward}) in our factor model (Figure~\ref{fig:loadings})
-is evidence that our operationalization of the latent propensity construct
+is evidence that our operationalization
 translates into flow propensity in practice (Hypothesis \#2).
 
 \section{Discussion and Conclusion}
@@ -1146,7 +1146,7 @@ from running (weak propensity for flow) to
 martial arts (strong propensity for flow).
 That we could retain antecedents,
 phenomenological indicators, and consequents of flow
-in our factor model is evidence that
+in our factor model constitutes evidence that
 our flow propensity construct is valid.
 
 Six of our initial set of 16 items were excluded.
@@ -1257,8 +1257,8 @@ A future data collection website might try to gently steer participants
 away from pairs of activities that have already attracted ample data.
 Another concern with free-form input is
 that it requires coding and, moreover, we 
-conditioned category specificity on
-activities' sample size.
+felt obliged to condition category specificity on
+activity sample size.
 We do not claim that our coding choices were optimal.
 Alternate compromises seem plausible.
 Reanalysis and replication are welcome.
@@ -1306,9 +1306,9 @@ conducive to flow.
 That is not to say that people cannot achieve flow
 in the context of running.
 Certainly they can, but the extent and rigor of training
-might be drastically reduced by the choice of
+might be reduced by the choice of
 a more suitable physical activity.
-As part of integrating our results with flow training,
+Specifically,
 it will be important to quantify the extent that
 flow score differences
 translate into actual differences in a training regimen.
@@ -1544,7 +1544,7 @@ demonstrates that awareness of the risk remains dim among non-experts.
 
 \subsection{Model Overview}
 
-Our item model was derived from the logistic function.
+Our item model was built from the logistic function.
 Let $\alpha$ be the slope or discrimination parameter,
 $c$ be the intercept, and $\theta$ the latent score.
 We can write the logistic function as,
@@ -1657,7 +1657,7 @@ measurement error and transitive relations between activities.
 For example, latent scores for the set of activities $\{A,B,C,D\}$ will be spread out roughly
 twice as much if $A < B < C < D$ in comparison with $A = B < C = D$.
 A priori, there is no appropriate stochastic distribution
-for $\alpha$ because we have no knowledge of
+for $\alpha$ because we cannot predict
 the distribution of latent score differences.
 To force item standard deviations $\hat\sigma$ close to 1.0,
 the slope of the logistic $\alpha$ was set to
@@ -1685,8 +1685,13 @@ The definition of $\alpha$ (Equation~\ref{eqn:slope}) also needed adjustment
 because path tracing rules \parencite{boker2002} dictated a different
 equation for the latent score variances,
 \begin{align}
-\alpha &\equiv \left[ \frac{1}{J} \sum_{j=1}^J (1 + \lambda_j^2) \sigma_j^2 \right]^3.
+\alpha &\equiv \left[ \frac{1}{J} \sum_{j=1}^J (1 + \lambda_j^2) \sigma_j^2 \right]^3.\label{eqn:slope-fm}
 \end{align}
+Although Equations~\ref{eqn:slope} and \ref{eqn:slope-fm} appear
+superficially different,
+they both estimate the same thing and obtained
+similar mean posterior estimates,
+\Sexpr{alphaInd[,'mean']} and \Sexpr{alpha.summary[,'mean']}, respectively.
 
 The posteriors were sampled using RStan~2.17.1 \parencite{rstan2.17}.
 All models completed without convergence warnings.

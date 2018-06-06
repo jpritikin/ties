@@ -26,7 +26,8 @@ rownames(th2.summary) <- facetNames
 pdata <- extract(fit, pars=c("alpha", paste0('threshold',1:2)), permuted = FALSE)
 item50 <- pdata[1:50,1,]
 
-save(facetNames, alpha.summary, th1.summary, th2.summary, item50, file="threshplot.rda")
+save(facetNames, alphaInd, alpha.summary,
+  th1.summary, th2.summary, item50, file="threshplot.rda")
 
 q()
 
